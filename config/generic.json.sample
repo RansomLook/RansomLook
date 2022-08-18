@@ -1,0 +1,14 @@
+{
+    "email": {
+        "smtp_server": "localhost",
+        "smtp_port": 25,
+        "from": "RansomLook <ransomlook@myorg.local>",
+        "to": ["Team <team@myorg.local>"],
+        "_nodes": {
+            "smtp_server": "SMTP server to use to send notifications",
+            "smtp_port": "SMTP port of the SMTP server",
+            "from": "Email address for the notifications",
+            "to": "Email address to receive the notification "
+        }
+    }
+}

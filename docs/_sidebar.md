@@ -1,0 +1,6 @@
+- [Home](README.md)
+- [Recent posts](recentposts.md)
+- [Status](status.md)
+- [Group profiles](profiles.md)
+- [Forums & Market](markets.md)
+- [Stats & graphs](stats.md)

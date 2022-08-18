@@ -1,0 +1,37 @@
+#!/usr/bin/env python3
+#from ransomlook import ransomlook
+import json
+
+import smtplib
+
+from datetime import date
+from datetime import timedelta
+
+from collections import defaultdict
+
+from ransomlook.sharedutils import openjson
+from ransomlook.sharedutils import dbglog, stdlog
+
+def getnewpost(date):
+    '''
+    check if a post already exists in posts.json
+    '''
+    posts = openjson('data/posts.json')
+    notify = defaultdict(list)
+    for post in posts:
+        if post['discovered'].split()[0] == date :
+            notify[post['group_name']].append(post['post_title'])
+    return notify
+
+def main():
+    newposts = getnewpost(str(date.today() - timedelta(days =2)))
+    for key in newposts:
+        print(key)
+        for entry in newposts[key]:
+            print('* '+entry)
+
+    
+
+if __name__ == '__main__':
+    main()
+

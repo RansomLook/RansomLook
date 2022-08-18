@@ -1,0 +1,26 @@
+[tool.poetry]
+name = "ransomlook"
+version = "0.1.0"
+description = "Yet An Other Ransom Looker"
+authors = ["Fafner KeyZee <fkz@p4nd4.land>"]
+
+[tool.poetry.scripts]
+scrape = "bin.scrape:main"
+parse = "bin.parse:main"
+markdown = "bin.markdown:main"
+notify = "bin.notify:main"
+add = "bin.add:main"
+
+[tool.poetry.dependencies]
+python = "^3.10"
+tldextract = "^3.3.0"
+lxml = "^4.8.0"
+matplotlib = "^3.5.2"
+playwright = "^1.22.0"
+bs4 = "^0.0.1"
+
+[tool.poetry.dev-dependencies]
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
