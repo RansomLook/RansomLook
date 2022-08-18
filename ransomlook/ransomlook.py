@@ -162,7 +162,7 @@ def adder(name, location):
     '''
     if checkexisting(name):
         stdlog('ransomlook: ' + 'records for ' + name + ' already exist, appending to avoid duplication')
-        appender(args.name, args.location)
+        appender(name, location)
     else:
         groups = openjson("data/groups.json")
         newrec = creategroup(name, location)
