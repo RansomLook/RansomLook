@@ -9,7 +9,7 @@ __pycache__/
 <<<<<<< HEAD
 <<<<<<< HEAD
 # Ignore local folders
-data/
+data/*
 source/
 
 # Json file
