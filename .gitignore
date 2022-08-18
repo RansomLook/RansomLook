@@ -6,6 +6,8 @@ __pycache__/
 # C extensions
 *.so
 
+<<<<<<< HEAD
+<<<<<<< HEAD
 # Ignore local folders
 data/
 source/
@@ -13,6 +15,13 @@ source/
 # Json file
 *.json
 
+=======
+>>>>>>> 6d249c6 (Initial commit)
+=======
+# Json file
+*.json
+
+>>>>>>> 6ebb6f3 (Update .gitignore)
 # Distribution / packaging
 .Python
 build/
