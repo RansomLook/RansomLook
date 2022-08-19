@@ -3,8 +3,8 @@
 import datetime
 import matplotlib.pyplot as plt
 
-from sharedutils import gcount
-from sharedutils import openjson
+from .sharedutils import gcount
+from .sharedutils import openjson
 
 def plot_posts_by_group():
     '''
@@ -81,3 +81,8 @@ def pie_posts_by_group():
     plt.savefig('docs/graphs/grouppie.png',dpi=300, bbox_inches="tight")
     plt.clf()
     plt.cla()
+
+def main():
+    plot_posts_by_group()
+    trend_posts_per_day()
+    pie_posts_by_group()

@@ -302,7 +302,7 @@ def groupcount():
 
 def parsercount():
     groups = openjson('data/groups.json')
-    parse_count = 1
+    parse_count = 0
     for group in groups:
         if group['parser'] is True:
             parse_count += 1

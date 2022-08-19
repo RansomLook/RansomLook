@@ -8,23 +8,21 @@ import glob
 from os.path import dirname, basename, isfile, join
 
 
-from sharedutils import gcount
-from sharedutils import openjson
-from sharedutils import postcount
-from sharedutils import hostcount
-from sharedutils import groupcount
-from sharedutils import postssince
-from sharedutils import parsercount
-from sharedutils import onlinecount
-from sharedutils import postslast24h
-from sharedutils import version2count
-from sharedutils import poststhisyear
-from sharedutils import currentmonthstr
-from sharedutils import mounthlypostcount
-from sharedutils import headlesscount
-from sharedutils import countcaptchahosts
-from sharedutils import stdlog, dbglog, errlog, honk
-from ransomlook.plotting import trend_posts_per_day, plot_posts_by_group, pie_posts_by_group
+from .sharedutils import gcount
+from .sharedutils import openjson
+from .sharedutils import postcount
+from .sharedutils import hostcount
+from .sharedutils import groupcount
+from .sharedutils import postssince
+from .sharedutils import parsercount
+from .sharedutils import onlinecount
+from .sharedutils import postslast24h
+from .sharedutils import poststhisyear
+from .sharedutils import currentmonthstr
+from .sharedutils import mounthlypostcount
+from .sharedutils import countcaptchahosts
+from .sharedutils import stdlog, dbglog, errlog, honk
+from .plotting import trend_posts_per_day, plot_posts_by_group, pie_posts_by_group
 
 from sharedutils import createfile
 
