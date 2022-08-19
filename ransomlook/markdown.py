@@ -24,7 +24,7 @@ from .sharedutils import countcaptchahosts
 from .sharedutils import stdlog, dbglog, errlog, honk
 from .plotting import trend_posts_per_day, plot_posts_by_group, pie_posts_by_group
 
-from sharedutils import createfile
+from .sharedutils import createfile
 
 def suffix(d):
     return 'th' if 11<=d<=13 else {1:'st',2:'nd',3:'rd'}.get(d%10, 'th')
