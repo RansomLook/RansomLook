@@ -8,6 +8,15 @@ from datetime import timedelta
 import glob
 from os.path import dirname, basename, isfile, join
 
+import tldextract
+from urllib.parse import urlparse, urlsplit
+
+logging.basicConfig(
+    format='%(asctime)s,%(msecs)d %(levelname)-8s %(message)s',
+    datefmt='%Y-%m-%d:%H:%M:%S',
+    level=logging.INFO
+    )
+
 def stdlog(msg):
     '''standard infologging'''
     logging.info(msg)
@@ -139,3 +148,71 @@ def countcaptchahosts():
         if group['captcha'] is True:
             captcha_count += 1
     return captcha_count
+
+'''
+Ransomlook
+'''
+def siteschema(location):
+    '''
+    returns a dict with the site schema
+    '''
+    if not location.startswith('http'):
+        dbglog('sharedutils: ' + 'assuming we have been given an fqdn and appending protocol')
+        location = 'http://' + location
+    schema = {
+        'fqdn': getapex(location),
+        'title': None,
+        'version': getonionversion(location)[0],
+        'slug': location,
+        'available': False,
+        'updated': None,
+        'lastscrape': '2021-05-01 00:00:00.000000'
+    }
+    dbglog('sharedutils: ' + 'schema - ' + str(schema))
+    return schema
+
+def getapex(slug):
+    '''
+    returns the domain for a given webpage/url slug
+    '''
+    stripurl = tldextract.extract(slug)
+    print(stripurl)
+    if stripurl.subdomain:
+        return stripurl.subdomain + '.' + stripurl.domain + '.' + stripurl.suffix
+    else:
+        return stripurl.domain + '.' + stripurl.suffix
+
+def getonionversion(slug):
+    '''
+    returns the version of an onion service (v2/v3)
+    https://support.torproject.org/onionservices/v2-deprecation
+    '''
+    version = None
+    stripurl = tldextract.extract(slug)
+    location = stripurl.domain + '.' + stripurl.suffix
+    stdlog('sharedutils: ' + 'checking for onion version - ' + str(location))
+    if len(stripurl.domain) == 16:
+        stdlog('sharedutils: ' + 'v2 onionsite detected')
+        version = 2
+    elif len(stripurl.domain) == 56:
+        stdlog('sharedutils: ' + 'v3 onionsite detected')
+        version = 3
+    else:
+        stdlog('sharedutils: ' + 'unknown onion version, assuming clearnet')
+        version = 0
+    return version, location
+
+def striptld(slug):
+    '''
+    strips the tld from a url
+    '''
+    #stripurl = tldextract.extract(slug)
+    #return stripurl.domain
+    parsed = urlparse(slug)
+    scheme = "%s://" % parsed.scheme
+    return parsed.geturl().replace(scheme, '', 1).replace('/','-')
+
+def createfile(slug):
+    schema = urlsplit(slug)
+    filename = schema.netloc+''.join(schema.path.split('/'))
+    return ''.join(filename.split('.'))

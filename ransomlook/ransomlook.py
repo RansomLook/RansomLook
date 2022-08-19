@@ -16,17 +16,17 @@ from datetime import datetime
 #import geckodrive
 #from markdown import main as markdown
 
-from sharedutils import striptld
-from sharedutils import openjson
-from sharedutils import checktcp
-from sharedutils import siteschema
-from sharedutils import socksfetcher
-from sharedutils import getsitetitle
-from sharedutils import getonionversion
-from sharedutils import sockshost, socksport
-from sharedutils import stdlog, dbglog, errlog, honk
+from .sharedutils import striptld
+from .sharedutils import openjson
+#from .sharedutils import checktcp
+from .sharedutils import siteschema
+#from .sharedutils import socksfetcher
+#from .sharedutils import getsitetitle
+#from .sharedutils import getonionversion
+#from .sharedutils import sockshost, socksport
+from .sharedutils import stdlog, dbglog, errlog, honk
 
-from sharedutils import createfile
+from .sharedutils import createfile
 
 from playwright.sync_api import sync_playwright, TimeoutError as PlaywrightTimeoutError
 
