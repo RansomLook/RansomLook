@@ -78,7 +78,10 @@ def scraper() -> None:
                browser = p.chromium.launch(proxy={"server": "socks5://127.0.0.1:9050"})
                context = browser.new_context(ignore_https_errors= True )
                page = context.new_page()
-               entry = page.goto(host['slug'], wait_until='load')
+               if 'timeout' in host and host['timeout'] is not None:
+                  entry = page.goto(host['slug'], wait_until='load', timeout = host['timeout']*1000)
+               else:
+                  entry = page.goto(host['slug'], wait_until='load')
                #page.screenshot(path="example.png", full_page=True)
                page.bring_to_front()
                page.wait_for_timeout(5000) 
@@ -105,6 +108,7 @@ def scraper() -> None:
                    groupsfile.close()
             except PlaywrightTimeoutError:
                print("Timeout!")
+               stdlog('Timeout!')
             except Exception as e:
                print(e)
                print("error")

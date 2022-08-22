@@ -165,6 +165,7 @@ def siteschema(location) -> Dict :
     schema = {
         'fqdn': getapex(location),
         'title': None,
+        'timeout': None,
         'version': getonionversion(location)[0],
         'slug': location,
         'available': False,

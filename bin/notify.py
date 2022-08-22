@@ -5,7 +5,7 @@ import json
 import smtplib
 from email.message import EmailMessage
 
-from typing import List, Any
+from typing import List, Any, Dict
 
 from datetime import date
 from datetime import timedelta
@@ -16,7 +16,7 @@ from ransomlook.sharedutils import openjson
 from ransomlook.sharedutils import dbglog, stdlog
 from ransomlook.default.config import get_config
 
-def getnewpost(date: str) :
+def getnewpost(date: str) -> Dict :
     '''
     check if a post already exists in posts.json
     '''
