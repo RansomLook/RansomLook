@@ -7,6 +7,9 @@ from datetime import datetime
 from datetime import timedelta
 import glob
 from os.path import dirname, basename, isfile, join
+import sys
+
+from typing import Dict
 
 import tldextract
 from urllib.parse import urlparse, urlsplit
@@ -45,8 +48,8 @@ def honk(msg):
 '''
 Graphs
 '''
-def gcount(posts):
-    group_counts = {}
+def gcount(posts) -> Dict[str, int]:
+    group_counts: Dict[str, int] = {}
     for post in posts:
         if post['group_name'] in group_counts:
             group_counts[post['group_name']] += 1

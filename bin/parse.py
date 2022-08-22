@@ -9,7 +9,7 @@ from datetime import datetime
 from datetime import timedelta
 
 from ransomlook.sharedutils import openjson
-from ransomlook.sharedutils import dbglog, stdlog
+from ransomlook.sharedutils import dbglog, stdlog, errlog
 
 def posttemplate(victim, group_name, timestamp):
     '''

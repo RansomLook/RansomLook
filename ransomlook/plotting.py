@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 import datetime
 import matplotlib.pyplot as plt # type: ignore
+from typing import Dict, List
 
 from .sharedutils import gcount
 from .sharedutils import openjson
@@ -10,9 +11,10 @@ def plot_posts_by_group():
     '''
     plot the number of posts by group in a barchart
     '''
-    posts = openjson('data/posts.json') 
+    posts = openjson('data/posts.json')
     group_counts = gcount(posts)
-    group_counts = sorted(group_counts.items(), key=lambda x: x[1], reverse=True)
+    print(gcount(posts))
+    group_counts = sorted(group_counts.items(), key=lambda x: x[1], reverse=True) # type: ignore
     groups = [x[0] for x in group_counts]
     counts = [x[1] for x in group_counts]
     plt.bar(groups, counts)
@@ -35,7 +37,7 @@ def trend_posts_per_day():
     # list of duplicate dates should be marged to show a count of posts per day
     # i.e ['2021-12-07', '2021-12-07', '2021-12-07', '2021-12-07', '2021-12-07']
     # becomes [{'2021-12-07',4}] etc
-    datecount = {}
+    datecount: Dict[str, int] = {}
     for date in dates:
         if date in datecount:
             datecount[date] += 1
@@ -44,10 +46,10 @@ def trend_posts_per_day():
     # remove '2021-09-09' - generic date of import along w/ anything before 2021-08
     datecount.pop('2021-09-09', None)
     datecount = {k: v for k, v in datecount.items() if k >= '2021-08-01'}
-    datecount = list(datecount.items())
-    datecount.sort(key=lambda x: x[0])
-    dates = [datetime.datetime.strptime(x[0], '%Y-%m-%d').date() for x in datecount]
-    counts = [x[1] for x in datecount]
+    datecount2 = list(datecount.items())
+    datecount2.sort(key=lambda x: x[0])
+    dates = [datetime.datetime.strptime(x[0], '%Y-%m-%d').date() for x in datecount2]
+    counts = [x[1] for x in datecount2]
     plt.plot(dates, counts)
     plt.title('posts per day')
     plt.xlabel('date')
@@ -62,13 +64,19 @@ def pie_posts_by_group():
     plot the number of posts by group in a pie
     '''
     posts = openjson('data/posts.json')
+    group_counts : Dict[str, int] = {}
     group_counts = gcount(posts)
-    group_counts = sorted(group_counts.items(), key=lambda x: x[1], reverse=True)
+    group_counts = sorted(group_counts.items(), key=lambda x: x[1], reverse=True) # type: ignore
     groups = [x[0] for x in group_counts]
-    counts = [x[1] for x in group_counts]
+    counts: List[int] = []
+    counts = [x[1] for x in group_counts] # type: ignore
     # ignoring the top 10 groups, merge the rest into "other"
+    topgroups: List[str] = []
     topgroups = groups[:10]
+    topcounts: List[int] = []
     topcounts = counts[:10]
+    print(topgroups)
+    othercounts: List[int] = []
     othercounts = counts[10:]
     othercount = sum(othercounts)
     topgroups.append('other')
