@@ -9,7 +9,7 @@ import glob
 from os.path import dirname, basename, isfile, join
 import sys
 
-from typing import Dict
+from typing import Dict, List, Tuple, Any
 
 import tldextract
 from urllib.parse import urlparse, urlsplit
@@ -20,19 +20,19 @@ logging.basicConfig(
     level=logging.INFO
     )
 
-def stdlog(msg):
+def stdlog(msg: Any) -> None :
     '''standard infologging'''
     logging.info(msg)
 
-def dbglog(msg):
+def dbglog(msg: Any) -> None :
     '''standard debug logging'''
     logging.debug(msg)
 
-def errlog(msg):
+def errlog(msg: Any) -> None :
     '''standard error logging'''
     logging.error(msg)
 
-def openjson(file):
+def openjson(file: str) -> List :
     '''
     opens a file and returns the json as a dict
     '''
@@ -40,7 +40,7 @@ def openjson(file):
         data = json.load(jsonfile)
     return data
 
-def honk(msg):
+def honk(msg: Any) -> None :
     '''critical error logging with termination'''
     logging.critical(msg)
     sys.exit()
@@ -48,7 +48,7 @@ def honk(msg):
 '''
 Graphs
 '''
-def gcount(posts) -> Dict[str, int]:
+def gcount(posts: List) -> Dict[str, int]:
     group_counts: Dict[str, int] = {}
     for post in posts:
         if post['group_name'] in group_counts:
@@ -60,18 +60,18 @@ def gcount(posts) -> Dict[str, int]:
 '''
 markdown
 '''
-def postcount():
+def postcount() -> int :
     post_count = 0
     posts = openjson('data/posts.json')
     for post in posts:
         post_count += 1
     return post_count
 
-def groupcount():
+def groupcount() -> int :
     groups = openjson('data/groups.json')
     return len(groups)
 
-def hostcount():
+def hostcount() -> int :
     groups = openjson('data/groups.json')
     host_count = 0
     for group in groups:
@@ -79,7 +79,7 @@ def hostcount():
             host_count += 1
     return host_count
 
-def postssince(days):
+def postssince(days: int) -> int :
     '''returns the number of posts within the last x days'''
     post_count = 0
     posts = openjson('data/posts.json')
@@ -89,7 +89,7 @@ def postssince(days):
             post_count += 1
     return post_count
 
-def poststhisyear():
+def poststhisyear() -> int :
     '''returns the number of posts within the current year'''
     post_count = 0
     posts = openjson('data/posts.json')
@@ -100,7 +100,7 @@ def poststhisyear():
             post_count += 1
     return post_count
 
-def postslast24h():
+def postslast24h() -> int :
     '''returns the number of posts within the last 24 hours'''
     post_count = 0
     posts = openjson('data/posts.json')
@@ -110,12 +110,12 @@ def postslast24h():
             post_count += 1
     return post_count
 
-def parsercount():
+def parsercount() -> int :
     modules = glob.glob(join(dirname('ransomlook/parsers/'), "*.py"))
     __all__ = [ basename(f)[:-3] for f in modules if isfile(f) and not f.endswith('__init__.py')]
     return len(__all__)
 
-def onlinecount():
+def onlinecount() -> int :
     groups = openjson('data/groups.json')
     online_count = 0
     for group in groups:
@@ -124,13 +124,13 @@ def onlinecount():
                 online_count += 1
     return online_count
 
-def currentmonthstr():
+def currentmonthstr() -> str :
     '''
     return the current, full month name in lowercase
     '''
     return datetime.now().strftime('%B').lower()
 
-def mounthlypostcount():
+def mounthlypostcount() -> int :
     '''
     returns the number of posts within the current month
     '''
@@ -143,7 +143,7 @@ def mounthlypostcount():
             post_count += 1
     return post_count
 
-def countcaptchahosts():
+def countcaptchahosts() -> int :
     '''returns a count on the number of groups that have captchas'''
     groups = openjson('data/groups.json')
     captcha_count = 0
@@ -155,7 +155,7 @@ def countcaptchahosts():
 '''
 Ransomlook
 '''
-def siteschema(location):
+def siteschema(location) -> Dict :
     '''
     returns a dict with the site schema
     '''
@@ -174,7 +174,7 @@ def siteschema(location):
     dbglog('sharedutils: ' + 'schema - ' + str(schema))
     return schema
 
-def getapex(slug):
+def getapex(slug: str) -> str :
     '''
     returns the domain for a given webpage/url slug
     '''
@@ -185,7 +185,7 @@ def getapex(slug):
     else:
         return stripurl.domain + '.' + stripurl.suffix
 
-def getonionversion(slug):
+def getonionversion(slug: str) -> Tuple[int, str]:
     '''
     returns the version of an onion service (v2/v3)
     https://support.torproject.org/onionservices/v2-deprecation
@@ -205,7 +205,7 @@ def getonionversion(slug):
         version = 0
     return version, location
 
-def striptld(slug):
+def striptld(slug: str) -> str :
     '''
     strips the tld from a url
     '''
@@ -215,7 +215,7 @@ def striptld(slug):
     scheme = "%s://" % parsed.scheme
     return parsed.geturl().replace(scheme, '', 1).replace('/','-')
 
-def createfile(slug):
+def createfile(slug: str) -> str :
     schema = urlsplit(slug)
     filename = schema.netloc+''.join(schema.path.split('/'))
     return ''.join(filename.split('.'))

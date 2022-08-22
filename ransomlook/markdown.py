@@ -7,6 +7,7 @@ from datetime import datetime as dt
 import glob
 from os.path import dirname, basename, isfile, join
 
+from typing import Dict, List
 
 from .sharedutils import gcount
 from .sharedutils import openjson
@@ -26,7 +27,7 @@ from .plotting import trend_posts_per_day, plot_posts_by_group, pie_posts_by_gro
 
 from .sharedutils import createfile
 
-def suffix(d):
+def suffix(d: int) -> str :
     return 'th' if 11<=d<=13 else {1:'st',2:'nd',3:'rd'}.get(d%10, 'th')
 
 def custom_strftime(fmt, t):
@@ -34,13 +35,14 @@ def custom_strftime(fmt, t):
 
 friendly_tz = custom_strftime('%B {S}, %Y', dt.now()).lower()
 
-def writeline(file, line):
+def writeline(file: str, line: str) -> None:
     '''write line to file'''
     with open(file, 'a') as f:
         f.write(line + '\n')
         f.close()
 
-def groupreport():
+
+def groupreport() -> List:
     '''
     create a list with number of posts per unique group
     '''
@@ -53,7 +55,8 @@ def groupreport():
     stdlog('group report generated with %d groups' % len(sorted_group_counts))
     return sorted_group_counts
 
-def mainpage():
+
+def mainpage() -> None:
     '''
     main markdown report generator - used with github pages
     '''
@@ -78,7 +81,7 @@ def mainpage():
     writeline(uptime_sheet, '')
     writeline(uptime_sheet, 'There are `' + str(parsercount()) + '` custom parsers indexing posts')
 
-def indexpage():
+def indexpage() -> None :
     index_sheet = 'docs/status.md'
     with open(index_sheet, 'w') as f:
         f.close()
@@ -142,7 +145,7 @@ def indexpage():
             line = '| [' + group['name'].title().replace(" ","")  + '](/#/markets?id=' + group['name'].replace(" ","-") + ') | ' + title + ' | ' + statusemoji + ' | ' + lastseen + ' | ' + host['fqdn'] + ' | ' + screen + ' |'
             writeline(index_sheet, line)
 
-def sidebar():
+def sidebar() -> None :
     '''
     create a sidebar markdown report
     '''
@@ -160,7 +163,7 @@ def sidebar():
 
     stdlog('sidebar generated')
 
-def statspage():
+def statspage() -> None:
     '''
     create a stats page in markdown containing the matplotlib graphs
     '''
@@ -179,7 +182,7 @@ def statspage():
     writeline(statspage, '![](graphs/grouppie.png)')
     stdlog('stats page generated')
 
-def recentposts(top):
+def recentposts(top: int) -> List :
     '''
     create a list the last X posts (most recent)
     '''
@@ -196,7 +199,7 @@ def recentposts(top):
     stdlog('recent posts generated')
     return recentposts
 
-def recentpage():
+def recentpage() -> None :
     '''create a markdown table for the last 100 posts based on the discovered value'''
     fetching_count = 100
     stdlog('generating recent posts page')
@@ -221,7 +224,7 @@ def recentpage():
         writeline(recentpage, line)
     stdlog('recent posts page generated')
 
-def profilepage():
+def profilepage() -> None :
     '''
     create a profile page for each group in their unique markdown files within docs/profiles
     '''
@@ -299,7 +302,7 @@ def profilepage():
         writeline(profilepage, '')
     stdlog('profile page generation complete')
 
-def marketpage():
+def marketpage() -> None :
     '''
     create a profile page for each group in their unique markdown files within docs/profiles
     '''
@@ -377,7 +380,7 @@ def marketpage():
         writeline(marketpage, '')
     stdlog('profile page generation complete')
 
-def main():
+def main() -> None :
     stdlog('generating doco')
     mainpage()
     indexpage()

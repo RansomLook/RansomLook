@@ -5,6 +5,8 @@ import json
 import smtplib
 from email.message import EmailMessage
 
+from typing import List, Any
+
 from datetime import date
 from datetime import timedelta
 
@@ -14,7 +16,7 @@ from ransomlook.sharedutils import openjson
 from ransomlook.sharedutils import dbglog, stdlog
 from ransomlook.default.config import get_config
 
-def getnewpost(date):
+def getnewpost(date: str) :
     '''
     check if a post already exists in posts.json
     '''
@@ -25,7 +27,7 @@ def getnewpost(date):
             notify[post['group_name']].append(post['post_title'])
     return notify
 
-def main():
+def main() -> None :
 
     email_config = get_config('generic','email')
     

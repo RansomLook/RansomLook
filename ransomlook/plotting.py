@@ -7,7 +7,7 @@ from typing import Dict, List
 from .sharedutils import gcount
 from .sharedutils import openjson
 
-def plot_posts_by_group():
+def plot_posts_by_group() -> None :
     '''
     plot the number of posts by group in a barchart
     '''
@@ -24,7 +24,7 @@ def plot_posts_by_group():
     plt.clf()
     plt.cla()
 
-def trend_posts_per_day():
+def trend_posts_per_day() -> None :
     '''
     plot the trend of the number of posts per day
     '''
@@ -57,7 +57,7 @@ def trend_posts_per_day():
     plt.clf()
     plt.cla()
 
-def pie_posts_by_group():
+def pie_posts_by_group() -> None :
     '''
     plot the number of posts by group in a pie
     '''
@@ -85,7 +85,7 @@ def pie_posts_by_group():
     plt.clf()
     plt.cla()
 
-def main():
+def main() -> None :
     plot_posts_by_group()
     trend_posts_per_day()
     pie_posts_by_group()

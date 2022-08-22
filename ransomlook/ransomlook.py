@@ -10,6 +10,7 @@ import json
 import argparse
 from datetime import datetime
 
+from typing import List, Dict
 # local imports
 
 #import parsers
@@ -30,11 +31,11 @@ from .sharedutils import createfile
 
 from playwright.sync_api import sync_playwright, TimeoutError as PlaywrightTimeoutError
 
-def creategroup(name, location):
+def creategroup(name: str, location: str) -> Dict[str, object] :
     '''
     create a new group for a new provider - added to groups.json
     '''
-    location = siteschema(location)
+    mylocation = siteschema(location)
     insertdata = {
         'name': name,
         'captcha': bool(),
@@ -43,13 +44,13 @@ def creategroup(name, location):
         'javascript_render': bool(),
         'meta': None,
         'locations': [
-            location
+            mylocation
         ],
         'profile': list()
     }
     return insertdata
 
-def checkexisting(provider):
+def checkexisting(provider: str) -> bool:
     '''
     check if group already exists within groups.json
     '''
@@ -59,7 +60,7 @@ def checkexisting(provider):
             return True
     return False
 
-def scraper():
+def scraper() -> None:
     '''main scraping function'''
     groups = openjson("data/groups.json")
     # iterate each provider
@@ -109,7 +110,7 @@ def scraper():
                print("error")
             browser.close()
 
-def forumscraper():
+def forumscraper() -> None :
     '''main scraping function'''
     groups = openjson("data/markets.json")
     # iterate each provider
@@ -156,7 +157,7 @@ def forumscraper():
                print(e)
             browser.close()
 
-def adder(name, location):
+def adder(name: str, location: str) -> None:
     '''
     handles the addition of new providers to groups.json
     '''
@@ -171,7 +172,7 @@ def adder(name, location):
             json.dump(groups, groupsfile, ensure_ascii=False, indent=4)
         stdlog('ransomlook: ' + 'record for ' + name + ' added to groups.json')
 
-def appender(name, location):
+def appender(name: str, location: str) -> None:
     '''
     handles the addition of new mirrors and relays for the same site
     to an existing group within groups.json
