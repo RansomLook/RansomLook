@@ -18,6 +18,7 @@ lxml = "^4.8.0"
 matplotlib = "^3.5.2"
 playwright = "^1.22.0"
 bs4 = "^0.0.1"
+mypy = "^0.971"
 
 [tool.poetry.dev-dependencies]
 
