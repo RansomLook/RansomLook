@@ -19,6 +19,7 @@ matplotlib = "^3.5.2"
 playwright = "^1.22.0"
 bs4 = "^0.0.1"
 mypy = "^0.971"
+rocketchat-API = "^1.26.0"
 
 [tool.poetry.dev-dependencies]
 

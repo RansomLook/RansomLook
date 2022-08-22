@@ -12,8 +12,7 @@ def plot_posts_by_group():
     plot the number of posts by group in a barchart
     '''
     posts = openjson('data/posts.json')
-    group_counts = gcount(posts)
-    group_counts = sorted(group_counts.items(), key=lambda x: x[1], reverse=True) # type: ignore
+    group_counts = sorted(gcount(posts).items(), key=lambda x: x[1], reverse=True)
     groups = [x[0] for x in group_counts]
     counts = [x[1] for x in group_counts]
     plt.bar(groups, counts)
@@ -63,12 +62,10 @@ def pie_posts_by_group():
     plot the number of posts by group in a pie
     '''
     posts = openjson('data/posts.json')
-    group_counts : Dict[str, int] = {}
-    group_counts = gcount(posts)
-    group_counts = sorted(group_counts.items(), key=lambda x: x[1], reverse=True) # type: ignore
+    group_counts = sorted(gcount(posts).items(), key=lambda x: x[1], reverse=True)
     groups = [x[0] for x in group_counts]
     counts: List[int] = []
-    counts = [x[1] for x in group_counts] # type: ignore
+    counts = [x[1] for x in group_counts]
     # ignoring the top 10 groups, merge the rest into "other"
     topgroups: List[str] = []
     topgroups = groups[:10]

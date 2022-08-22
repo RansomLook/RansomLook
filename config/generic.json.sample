@@ -10,5 +10,13 @@
             "from": "Email address for the notifications",
             "to": "Email address to receive the notification "
         }
+    },
+    "rocketchat": {
+        "enable": false,
+        "server": "localhost",
+        "ssl_verify": false,
+        "user_id": "",
+        "auth_token": "",
+        "channel_name": ""
     }
 }

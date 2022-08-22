@@ -213,6 +213,7 @@ python-versions = ">=3.7"
 [package.dependencies]
 greenlet = "1.1.2"
 pyee = "8.1.0"
+typing-extensions = {version = "*", markers = "python_version <= \"3.8\""}
 websockets = "10.1"
 
 [[package]]
@@ -274,6 +275,17 @@ python-versions = "*"
 [package.dependencies]
 requests = ">=1.0.0"
 six = "*"
+
+[[package]]
+name = "rocketchat-api"
+version = "1.26.0"
+description = "Python API wrapper for Rocket.Chat"
+category = "main"
+optional = false
+python-versions = "*"
+
+[package.dependencies]
+requests = "*"
 
 [[package]]
 name = "setuptools-scm"
@@ -360,8 +372,8 @@ python-versions = ">=3.7"
 
 [metadata]
 lock-version = "1.1"
-python-versions = "^3.10"
-content-hash = "4841ef59ca5300ded0128c959f9f5d86af814265d680ea5ec7196dc181bdbac5"
+python-versions = "^3.8,<3.11"
+content-hash = "38e74e798689fbc9a3c994998e2540b18abf0bdf1863283d464539ca45b332b2"
 
 [metadata.files]
 beautifulsoup4 = [
@@ -469,6 +481,7 @@ requests-file = [
     {file = "requests-file-1.5.1.tar.gz", hash = "sha256:07d74208d3389d01c38ab89ef403af0cfec63957d53a0081d8eca738d0247d8e"},
     {file = "requests_file-1.5.1-py2.py3-none-any.whl", hash = "sha256:dfe5dae75c12481f68ba353183c53a65e6044c923e64c24b2209f6c7570ca953"},
 ]
+rocketchat-api = []
 setuptools-scm = [
     {file = "setuptools_scm-6.4.2-py3-none-any.whl", hash = "sha256:acea13255093849de7ccb11af9e1fb8bde7067783450cee9ef7a93139bddf6d4"},
     {file = "setuptools_scm-6.4.2.tar.gz", hash = "sha256:6833ac65c6ed9711a4d5d2266f8024cfa07c533a0e55f4c12f6eff280a5a9e30"},

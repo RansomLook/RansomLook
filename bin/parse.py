@@ -8,6 +8,9 @@ import json
 from datetime import datetime
 from datetime import timedelta
 
+from ransomlook.default.config import get_config
+from ransomlook.rocket import rocketnotify
+
 from ransomlook.sharedutils import openjson
 from ransomlook.sharedutils import dbglog, stdlog, errlog
 
@@ -42,6 +45,7 @@ def appender(post_title, group_name):
     '''
     append a new post to posts.json
     '''
+    rocketconfig = get_config('generic','rocketchat')
     if len(post_title) == 0:
         errlog('post_title is empty')
         return
@@ -60,6 +64,8 @@ def appender(post_title, group_name):
             '''
             dbglog('writing changes to posts.json')
             json.dump(posts, outfile, indent=4, ensure_ascii=False)
+        if rocketconfig['enable'] == True:
+            rocketnotify(rocketconfig, group_name, post_title)
 
 def main():
     modules = glob.glob(join(dirname('ransomlook/parsers/'), "*.py"))
@@ -72,8 +78,9 @@ def main():
             for entry in module.main():
                 print(entry)
                 appender(entry, parser)
-        except:
+        except Exception as e:
             print("Error with : " + parser)
+            print(e)
             pass
 
 
