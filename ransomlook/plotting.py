@@ -13,7 +13,6 @@ def plot_posts_by_group():
     '''
     posts = openjson('data/posts.json')
     group_counts = gcount(posts)
-    print(gcount(posts))
     group_counts = sorted(group_counts.items(), key=lambda x: x[1], reverse=True) # type: ignore
     groups = [x[0] for x in group_counts]
     counts = [x[1] for x in group_counts]
@@ -75,7 +74,6 @@ def pie_posts_by_group():
     topgroups = groups[:10]
     topcounts: List[int] = []
     topcounts = counts[:10]
-    print(topgroups)
     othercounts: List[int] = []
     othercounts = counts[10:]
     othercount = sum(othercounts)
