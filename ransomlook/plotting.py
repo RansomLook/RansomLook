@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 import datetime
-import matplotlib.pyplot as plt
+import matplotlib.pyplot as plt # type: ignore
 
 from .sharedutils import gcount
 from .sharedutils import openjson
