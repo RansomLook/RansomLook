@@ -1,0 +1,44 @@
+# This is a basic workflow to help you get started with Actions
+
+name: CI
+
+# Controls when the workflow will run
+on:
+  # Triggers the workflow on push or pull request events but only for the "main" branch
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+ jobs:
+  splash-container:
+     runs-on: ubuntu-latest
+
+     strategy:
+       matrix:
+         python-version: ["3.8", "3.9", "3.10"]
+
+     steps:
+      - uses: actions/checkout@v2
+
+      - name: Set up Python ${{matrix.python-version}}
+        uses: actions/setup-python@v2
+        with:
+          python-version: ${{matrix.python-version}}
+
+      - name: Install system deps
+        run: |
+          # playwright required deps.
+          sudo apt install libnss3 libnspr4 libatk1.0-0 libatk-bridge2.0-0 libcups2 libxkbcommon0 libxdamage1 libgbm1 libpango-1.0-0 libcairo2 libatspi2.0-0
+          python -m pip install --upgrade pip poetry
+      - name: Install & run Ransomlook
+        run: |
+          echo RANSOMLOOK_HOME="'`pwd`'" > .env
+          cp config/generic.json.sample config/generic.json
+          poetry install -vvv
+      - name: Install pylookyloo and run test
+        run: |
+          poetry run add Google https://www.google.fr
+          poetry run scrape
+          poetry run parse
+          poetry run markdown
