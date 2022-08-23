@@ -18,5 +18,6 @@
         "user_id": "",
         "auth_token": "",
         "channel_name": ""
-    }
+    },
+    "thread": 4
 }

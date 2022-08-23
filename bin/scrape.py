@@ -4,8 +4,8 @@ from ransomlook import ransomlook
 
 def main():
     print("Starting scraping")
-    ransomlook.scraper()
-    ransomlook.forumscraper()
+    ransomlook.scraper("data/groups.json")
+    ransomlook.scraper("data/markets.json")
 
 if __name__ == '__main__':
     main()
