@@ -390,10 +390,13 @@ def main() -> None :
     profilepage()
     marketpage()
     # if posts.json has been modified within the last 45 mins, assume new posts discovered and recreate graphs
-    if os.path.getmtime('data/posts.json') > (time.time() - (45 * 60)):
-        stdlog('posts.json has been modified within the last 45 mins, assuming new posts discovered and recreating graphs')
-        trend_posts_per_day()
-        plot_posts_by_group()
-        pie_posts_by_group()
-    else:
-        stdlog('posts.json has not been modified within the last 45 mins, assuming no new posts discovered')
+    try:
+        if os.path.getmtime('data/posts.json') > (time.time() - (45 * 60)):
+            stdlog('posts.json has been modified within the last 45 mins, assuming new posts discovered and recreating graphs')
+            trend_posts_per_day()
+            plot_posts_by_group()
+            pie_posts_by_group()
+        else:
+            stdlog('posts.json has not been modified within the last 45 mins, assuming no new posts discovered')
+    except:
+        errlog('post.json doesn\'t exist, can create graph')
