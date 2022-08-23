@@ -145,10 +145,14 @@ def appender(name: str, location: str) -> None:
     success = bool()
     for group in groups:
         if group['name'] == name:
+            for loc in group['locations']:
+                 if location == loc['slug']:
+                     errlog('cannot append to non-existing provider or the location already exists')
+                     return
             group['locations'].append(siteschema(location))
             success = True
     if success:
         with open('data/groups.json', 'w', encoding='utf-8') as groupsfile:
             json.dump(groups, groupsfile, ensure_ascii=False, indent=4)
     else:
-        errlog('cannot append to non-existing provider')
+        errlog('cannot append to non-existing provider or the location already exists')
