@@ -34,7 +34,8 @@ jobs:
           echo RANSOMLOOK_HOME="'`pwd`'" > .env
           cp config/generic.json.sample config/generic.json
           poetry install -vvv
-      - name: Install pylookyloo and run test
+          poetry run playwright install
+      - name: Run test
         run: |
           poetry run add Google https://www.google.fr
           poetry run scrape
