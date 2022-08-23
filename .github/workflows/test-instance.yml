@@ -1,6 +1,4 @@
-# This is a basic workflow to help you get started with Actions
-
-name: CI
+name: Run local test for ransomwatch
 
 # Controls when the workflow will run
 on:
@@ -10,7 +8,7 @@ on:
   pull_request:
     branches: [ "main" ]
 
- jobs:
+jobs:
   splash-container:
      runs-on: ubuntu-latest
 
