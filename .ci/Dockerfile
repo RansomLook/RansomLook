@@ -13,10 +13,10 @@ RUN pip3 install poetry
 
 WORKDIR ransomlook
 
-COPY ransomlook ransomlook/
-COPY bin bin/
-COPY pyproject.toml .
-COPY poetry.lock .
+COPY ../ransomlook ransomlook/
+COPY ../bin bin/
+COPY ../pyproject.toml .
+COPY ../poetry.lock .
 
 RUN echo RANSOMLOOK_HOME="'`pwd`'" > .env
 RUN poetry install

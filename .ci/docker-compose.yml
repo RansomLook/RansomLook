@@ -12,7 +12,7 @@
             poetry run parse
             poetry run markdown
     volumes:
-        - ./config:/ransomlook/config
-        - ./data:/ransomlook/data
-        - ./docs:/ransomlook/docs
-        - ./source:/ransomlook/source
+        - ../config:/ransomlook/config
+        - ../data:/ransomlook/data
+        - ../docs:/ransomlook/docs
+        - ../source:/ransomlook/source
