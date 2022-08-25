@@ -1,0 +1,17 @@
+  ransomlook:
+    build: .
+    working_dir: /ransomlook
+    tty: true
+    command:
+        - /bin/sh
+        - -c
+        - |
+            service tor start
+            poetry run scrape
+            poetry run parse
+            poetry run markdown
+    volumes:
+        - ./config:/ransomlook/config
+        - ./data:/ransomlook/data
+        - ./docs:/ransomlook/docs
+        - ./source:/ransomlook/source
