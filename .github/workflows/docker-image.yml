@@ -11,8 +11,6 @@ jobs:
   build:
 
     runs-on: ubuntu-latest
-    env:
-      COMPOSE_FILE: .ci/docker-compose.yml
 
     steps:
     - uses: actions/checkout@v3
