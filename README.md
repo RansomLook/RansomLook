@@ -67,11 +67,6 @@ server {
 		try_files $uri $uri/ =404;
 	}
 
-        location /screenshots/ {
-                alias /home/user/ransomlook/source/screenshots/;
-                autoindex on;
-	}
-
 }
 
 ``` 

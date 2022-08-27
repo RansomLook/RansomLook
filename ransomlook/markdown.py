@@ -110,7 +110,7 @@ def indexpage() -> None :
                 title = ''
             screen = ''
             screenfile = 'screenshots/' + group['name'] + '-' + createfile(host['slug']) + '.png'
-            if os.path.exists('source/' + screenfile):
+            if os.path.exists('docs/' + screenfile):
                 screen = '<a href="' +  screenfile + '">Screen</a>'
             line = '| [' + group['name'].title().replace(" ","") + '](/profiles?id=' + group['name'] + ') | ' + title + ' | ' + statusemoji + ' | ' + lastseen + ' | ' + host['fqdn'] + ' | ' + screen + ' |'
             writeline(index_sheet, line)
@@ -140,7 +140,7 @@ def indexpage() -> None :
                 title = ''
             screen = ''
             screenfile = 'screenshots/' + group['name'] + '-' + createfile(host['slug']) + '.png'
-            if os.path.exists('source/' + screenfile):
+            if os.path.exists('docs/' + screenfile):
                 screen = '<a href="' +  screenfile + '">Screen</a>'
             line = '| [' + group['name'].title().replace(" ","")  + '](/#/markets?id=' + group['name'].replace(" ","-") + ') | ' + title + ' | ' + statusemoji + ' | ' + lastseen + ' | ' + host['fqdn'] + ' | ' + screen + ' |'
             writeline(index_sheet, line)
@@ -270,7 +270,7 @@ def profilepage() -> None :
             time = time[0] + ':' + time[1]
             screen = ''
             screenfile = 'screenshots/' + group['name'] + '-' + createfile(host['slug']) + '.png'
-            if os.path.exists('source/' + screenfile):
+            if os.path.exists('docs/' + screenfile):
                 screen = '<a href="' +  screenfile + '" rel="noopener noreferrer" target="_blank">Screen</a>'
             if host['available']== True:
                 statusemoji = '<center>⬆️ </center>'
@@ -348,7 +348,7 @@ def marketpage() -> None :
             time = time[0] + ':' + time[1]
             screen = ''
             screenfile = 'screenshots/' + group['name'] +'-' + createfile(host['slug']) + '.png'
-            if os.path.exists('source/' + screenfile):
+            if os.path.exists('docs/' + screenfile):
                 screen = '<a href="' +  screenfile + '" rel="noopener noreferrer" target="_blank">Screen</a>'
             if host['available']== True:
                 statusemoji = '<center>⬆️ </center>'
