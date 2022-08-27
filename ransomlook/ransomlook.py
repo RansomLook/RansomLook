@@ -82,7 +82,7 @@ def threadscape(q, lock):
                     sitesource.close()
 
                filename = group + '-' + createfile(host['slug']) + '.png'
-               name = os.path.join(os.getcwd(), 'data/screenshots', filename)
+               name = os.path.join(os.getcwd(), 'docs/screenshots', filename)
                saved = page.screenshot(path=name, full_page=True)
                lock.acquire()
                host['available'] = True
