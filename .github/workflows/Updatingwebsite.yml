@@ -43,7 +43,7 @@ jobs:
           poetry run parse
           poetry run markdown
           mv data/groups.json data/groups.json.sample
-          mv posts/groups.json data/posts.json.sample
+          mv data/posts.json data/posts.json.sample
       - name: save changes
         run: |  
           git config user.name github-actions
