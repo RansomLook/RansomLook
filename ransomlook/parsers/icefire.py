@@ -18,6 +18,7 @@ def main():
                     list_div.append(item.text.strip())
             file.close()
     list_div = list(dict.fromkeys(list_div))
-    list_div.remove('updating')
+    if 'updating' in list_div:
+        list_div.remove('updating')
     print(list_div)
     return list_div
