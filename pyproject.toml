@@ -10,6 +10,8 @@ parse = "bin.parse:main"
 markdown = "bin.markdown:main"
 notify = "bin.notify:main"
 add = "bin.add:main"
+start = "bin.start:main"
+stop = "bin.stop:main"
 
 [tool.poetry.dependencies]
 python = "^3.8,<3.11"

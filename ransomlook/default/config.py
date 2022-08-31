@@ -68,3 +68,10 @@ def get_config(config_type: str, entry: str, quiet: bool=False) -> Any:
     with (get_homedir() / 'config' / f'{config_type}.json.sample').open() as _c:
         sample_config = json.load(_c)
     return sample_config[entry]
+
+def get_socket_path(name: str) -> str:
+    mapping = {
+        'cache': Path('cache', 'cache.sock'),
+        'indexing': Path('indexing', 'indexing.sock'),
+    }
+    return str(get_homedir() / mapping[name])

@@ -11,6 +11,7 @@ __pycache__/
 # Ignore local folders
 data/*
 source/
+cache/
 
 # Json file
 *.json
