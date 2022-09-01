@@ -69,12 +69,14 @@ def threadscape(q, lock):
                else:
                   entry = page.goto(host['slug'], wait_until='load', timeout = 120000)
                page.bring_to_front()
-               page.wait_for_timeout(15000) 
+               delay = host['delay']*1000 if ( 'delay' in host and host['delay'] is not None ) else 15000
+               print(delay)
+               page.wait_for_timeout(delay)
                page.mouse.move(x=500, y=400)
                page.wait_for_load_state('networkidle')
                page.mouse.wheel(delta_y=2000, delta_x=0)
                page.wait_for_load_state('networkidle')
-               page.wait_for_timeout(15000)
+               page.wait_for_timeout(5000)
                filename = group + '-' + striptld(host['slug']) + '.html'
                name = os.path.join(os.getcwd(), 'source', filename)
                with open(name, 'w', encoding='utf-8') as sitesource:

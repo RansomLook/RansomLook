@@ -169,6 +169,7 @@ def siteschema(location) -> Dict :
         'fqdn': getapex(location),
         'title': None,
         'timeout': None,
+        'delay': None,
         'version': getonionversion(location)[0],
         'slug': location,
         'available': False,
