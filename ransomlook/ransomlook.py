@@ -61,7 +61,7 @@ def threadscape(q, lock):
             https://support.torproject.org/onionservices/v2-deprecation/
             '''
             try:
-               browser = p.chromium.launch(proxy={"server": "socks5://127.0.0.1:9050"})
+               browser = p.chromium.launch(proxy={"server": "socks5://127.0.0.1:9050"}, args=['--unsafely-treat-insecure-origin-as-secure='+host['slug']])
                context = browser.new_context(ignore_https_errors= True )
                page = context.new_page()
                if 'timeout' in host and host['timeout'] is not None:
