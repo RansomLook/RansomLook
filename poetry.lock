@@ -343,7 +343,7 @@ python-versions = ">=3.7"
 
 [[package]]
 name = "types-redis"
-version = "4.3.19"
+version = "4.3.20"
 description = "Typing stubs for redis"
 category = "dev"
 optional = false
