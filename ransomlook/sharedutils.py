@@ -139,10 +139,11 @@ def mounthlypostcount() -> int :
     '''
     post_count = 0
     posts = openjson('data/posts.json')
-    current_month = datetime.now().month
+    date_today = datetime.now()
+    month_first_day = date_today.replace(day=1, hour=0, minute=0, second=0, microsecond=0)
     for post in posts:
         datetime_object = datetime.strptime(post['discovered'], '%Y-%m-%d %H:%M:%S.%f')
-        if datetime_object.month == current_month:
+        if datetime_object > month_first_day:
             post_count += 1
     return post_count
 
