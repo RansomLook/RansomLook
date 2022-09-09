@@ -259,7 +259,7 @@ def profilepage() -> None :
                 writeline(profilepage, '- ' + profile)
                 writeline(profilepage, '')
         writeline(profilepage, '| Page Title | Available | Tor version | Last visit | Fqdn | Screen')
-        writeline(profilepage, '|---|---|---|---|---|---|')        
+        writeline(profilepage, '|---|---|---|---|---|---|')
         for host in group['locations']:
             # convert date to ddmmyyyy hh:mm
             date = host['lastscrape'].split(' ')[0]
