@@ -17,5 +17,4 @@ def main():
             file.close()
     list_div = list(dict.fromkeys(list_div))
     print(list_div)
-    list_div=[]
     return list_div
