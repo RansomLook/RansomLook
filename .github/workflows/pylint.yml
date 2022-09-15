@@ -25,4 +25,4 @@ jobs:
         pip install pylint
     - name: analyse
       run: |
-        pylint `ls -R|grep .py$|xargs`
+        pylint ransomlook
