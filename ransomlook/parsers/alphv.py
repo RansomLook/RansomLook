@@ -9,13 +9,13 @@ def main():
             if filename.startswith(__name__.split('.')[-1]+'-'):
                 html_doc='source/'+filename
                 file=open(html_doc,'r')
-                soup=BeautifulSoup(file,'html.parser')
                 if 'api' in filename:
-                    jsonpart= soup.pre.contents
-                    data = json.loads(jsonpart[0])
+                    jsondata = file.readline()
+                    data = json.loads(jsondata)
                     for entry in data['items']:
                        list_div.append(entry['title'].strip())
                 else :
+                    soup=BeautifulSoup(file,'html.parser')
                     divs_name=soup.find_all('div',{'class': 'post-header'})
                     for div in divs_name:
                         for item in div.contents :
