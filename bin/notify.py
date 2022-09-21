@@ -31,25 +31,21 @@ def main() -> None :
 
     email_config = get_config('generic','email')
     
-    newposts = getnewpost(str(date.today() - timedelta(days =1)))
+    newposts = getnewpost(str(date.today() - timedelta(days =0)))
     if newposts == {}:
         print('No new post')
         return
-    message = u"""\
-Hello,
-
-Please check the new entries in RansomLook: 
-"""
+    message = email_config['message_head']
     for key in newposts:
         message+="\n"+key+" :\n"
         for entry in newposts[key]:
             message+="* "+ entry +"\n"
 
-    message += "\nBest regards"
+    message += email_config['message_foot']
 
     fromaddr = email_config['from']
     toaddrs = email_config['to']
-    subject = 'New Notification from RansomLook'
+    subject = email_config['subject']
 
     msg = EmailMessage()
     msg['Subject'] = subject

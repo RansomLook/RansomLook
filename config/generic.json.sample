@@ -4,6 +4,9 @@
         "smtp_port": 25,
         "from": "RansomLook <ransomlook@myorg.local>",
         "to": ["Team <team@myorg.local>"],
+        "subject": "New Notification from RansomLook",
+        "message_head": "Hello,\n\nPlease check the new entries in RansomLook:",
+        "message_foot": "Best regards,\n\nRansomlook Team",
         "_nodes": {
             "smtp_server": "SMTP server to use to send notifications",
             "smtp_port": "SMTP port of the SMTP server",
