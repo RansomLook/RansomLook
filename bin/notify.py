@@ -31,7 +31,7 @@ def main() -> None :
 
     email_config = get_config('generic','email')
     
-    newposts = getnewpost(str(date.today() - timedelta(days =0)))
+    newposts = getnewpost(str(date.today() - timedelta(days =1)))
     if newposts == {}:
         print('No new post')
         return
