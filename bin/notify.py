@@ -36,6 +36,8 @@ def main() -> None :
         print('No new post')
         return
     message = email_config['message_head']
+    message += str((date.today() - timedelta(days =1)).strftime("%d-%m-%Y"))+'.\n'
+
     for key in newposts:
         message+="\n"+key+" :\n"
         for entry in newposts[key]:
