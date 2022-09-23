@@ -83,7 +83,6 @@ def main():
 
         try:
             for entry in module.main():
-                print(type(entry))
                 appender(entry, parser)
         except Exception as e:
             print("Error with : " + parser)

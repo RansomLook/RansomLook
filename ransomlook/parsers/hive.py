@@ -18,8 +18,6 @@ def main():
                        list_div.append({"title":entry['title'].strip(),"description":entry["description"].strip()})
                 else:
                     divs_name=soup.find_all('div', {"class": "blog-card-info"})
-                    print(type(divs_name))
-                    print(len(divs_name))
                     for div in divs_name:
                         title=div.h2.text.strip()
                         if div.p is not None:
