@@ -15,15 +15,21 @@ def main():
                     jsonpart= soup.pre.contents
                     data = json.loads(jsonpart[0])
                     for entry in data:
-                       list_div.append(entry['title'].strip())
+                       list_div.append({"title":entry['title'].strip(),"description":entry["description"].strip()})
                 else:
                     divs_name=soup.find_all('div', {"class": "blog-card-info"})
+                    print(type(divs_name))
+                    print(len(divs_name))
                     for div in divs_name:
-                        for item in div.find_all('h2') :
-                            list_div.append(item.text.strip())
+                        title=div.h2.text.strip()
+                        if div.p is not None:
+                            description=div.p.text.strip()
+                        else:
+                            description = None
+                        list_div.append({'title':title, 'description': description})
                 file.close()
         except:
             pass
-    list_div = list(dict.fromkeys(list_div))
     print(list_div)
+    list_div= []
     return list_div
