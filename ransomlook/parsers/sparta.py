@@ -5,16 +5,19 @@ def main():
     list_div=[]
 
     for filename in os.listdir('source'):
-        if filename.startswith(__name__.split('.')[-1]+'-'):
-            html_doc='source/'+filename
-            file=open(html_doc,'r')
-            soup=BeautifulSoup(file,'html.parser')
-            divs_name=soup.find_all('div', {"class": "card-header d-flex justify-content-between"})
-            for div in divs_name:
-                itemize= div.find_all('h2')
-                for item in itemize :
-                    list_div.append(item.text.strip())
-            file.close()
-    list_div = list(dict.fromkeys(list_div))
+        try:
+            if filename.startswith(__name__.split('.')[-1]+'-'):
+                html_doc='source/'+filename
+                file=open(html_doc,'r')
+                soup=BeautifulSoup(file,'html.parser')
+                divs_name=soup.find_all('div', {"class": "card mb-2"})
+                for div in divs_name:
+                    title = div.find('h2').text.strip()
+                    description = div.find('p').text.strip()
+                    list_div.append({'title':title, 'description': description})
+                file.close()
+        except:
+            print("Failed during : " + filename)
+            pass
     print(list_div)
     return list_div

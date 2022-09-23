@@ -14,14 +14,15 @@ from ransomlook.rocket import rocketnotify
 from ransomlook.sharedutils import openjson
 from ransomlook.sharedutils import dbglog, stdlog, errlog
 
-def posttemplate(victim, group_name, timestamp):
+def posttemplate(victim, group_name, description, timestamp):
     '''
     assuming we have a new post - form the template we will use for the new entry in posts.json
     '''
     schema = {
         'post_title': victim,
         'group_name': group_name,
-        'discovered': timestamp
+        'discovered': timestamp,
+        'description' : description
     }
     stdlog('new post: ' + victim)
     dbglog(schema)
@@ -41,11 +42,17 @@ def existingpost(post_title, group_name):
     stdlog('post does not exist: ' + post_title)
     return False
 
-def appender(post_title, group_name):
+def appender(entry, group_name):
     '''
     append a new post to posts.json
     '''
     rocketconfig = get_config('generic','rocketchat')
+    if type(entry) is str :
+       post_title = entry
+       description = ''
+    else :
+       post_title=entry['title']
+       description = entry['description']
     if len(post_title) == 0:
         errlog('post_title is empty')
         return
@@ -54,7 +61,7 @@ def appender(post_title, group_name):
         post_title = post_title[:90]
     if existingpost(post_title, group_name) is False:
         posts = openjson('data/posts.json')
-        newpost = posttemplate(post_title, group_name, str(datetime.today()))
+        newpost = posttemplate(post_title, group_name, description, str(datetime.today()))
         stdlog('adding new post: ' + 'group:' + group_name + 'title:' + post_title)
         posts.append(newpost)
         with open('data/posts.json', 'w') as outfile:
@@ -65,7 +72,7 @@ def appender(post_title, group_name):
             dbglog('writing changes to posts.json')
             json.dump(posts, outfile, indent=4, ensure_ascii=False)
         if rocketconfig['enable'] == True:
-            rocketnotify(rocketconfig, group_name, post_title)
+            rocketnotify(rocketconfig, group_name, post_title, description)
 
 def main():
     modules = glob.glob(join(dirname('ransomlook/parsers/'), "*.py"))
@@ -76,7 +83,7 @@ def main():
 
         try:
             for entry in module.main():
-                print(entry)
+                print(type(entry))
                 appender(entry, parser)
         except Exception as e:
             print("Error with : " + parser)
