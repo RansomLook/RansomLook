@@ -31,5 +31,4 @@ def main():
         except:
             pass
     print(list_div)
-    list_div= []
     return list_div
