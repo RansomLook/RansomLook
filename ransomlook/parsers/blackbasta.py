@@ -18,7 +18,7 @@ def main():
                     for desc in descs:
                         description += desc.text.strip()
                     list_div.append({'title':title, 'description': description})
-            file.close()
+                file.close()
         except:
             print("Failed during : " + filename)
             pass
