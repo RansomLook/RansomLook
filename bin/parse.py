@@ -62,7 +62,7 @@ def appender(entry, group_name):
     if existingpost(post_title, group_name) is False:
         posts = openjson('data/posts.json')
         newpost = posttemplate(post_title, group_name, description, str(datetime.today()))
-        stdlog('adding new post: ' + 'group:' + group_name + 'title:' + post_title)
+        stdlog('adding new post: ' + 'group: ' + group_name + ' title: ' + post_title)
         posts.append(newpost)
         with open('data/posts.json', 'w') as outfile:
             '''
