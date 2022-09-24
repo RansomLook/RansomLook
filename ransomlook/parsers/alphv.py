@@ -14,16 +14,20 @@ def main():
                     jsonpart= soup.pre.contents
                     data = json.loads(jsonpart[0])
                     for entry in data['items']:
-                       list_div.append(entry['title'].strip())
+                        title = entry['title'].strip()
+                        description = entry['publication']['description'].strip()
+                        list_div.append({'title':title, 'description': description})
                 else :
-                    divs_name=soup.find_all('div',{'class': 'post-header'})
+                    divs_name=soup.find_all('div', {'class': 'post-body'})
                     for div in divs_name:
-                        for item in div.contents :
-                            list_div.append(item.text.strip())
+                        title = div.find('div', {'class': 'post-header'}).text.strip()
+                        description = div.find('div', {'class': 'post-description'}).text.strip()
+                        print(description)
+                        list_div.append({'title':title, 'description': description})
                 file.close()
         except:
+            print("Failed during : " + filename)
             pass
-    list_div = list(dict.fromkeys(list_div))
     print(list_div)
 
     return list_div
