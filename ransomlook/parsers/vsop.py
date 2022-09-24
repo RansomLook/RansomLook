@@ -5,17 +5,21 @@ def main():
     list_div=[]
 
     for filename in os.listdir('source'):
-        if filename.startswith(__name__.split('.')[-1]+'-'):
-            html_doc='source/'+filename
-            file=open(html_doc,'r')
-            soup=BeautifulSoup(file,'html.parser')
-            divs_name=soup.find_all('h6', {"class": "uppercase font-x1"})
-            for div in divs_name:
-                list_div.append(div.text.strip())
-            divs_name=soup.find_all('h6', {"class": "nospace uppercase font-x1"})
-            for div in divs_name:
-                list_div.append(div.text.strip())
-            file.close()
-    list_div = list(dict.fromkeys(list_div))
+        try:
+            if filename.startswith(__name__.split('.')[-1]+'-'):
+                html_doc='source/'+filename
+                file=open(html_doc,'r')
+                soup=BeautifulSoup(file,'html.parser')
+                divs_name=soup.find_all('div', {'class': 'group center testimonials'})
+                for div in divs_name:
+                    articles = div.find_all('article')
+                    for article in articles:
+                        title = article.find('h6').text.strip()
+                        description = article.find('blockquote').text.strip()
+                        list_div.append({'title':title, 'description': description})
+                file.close()
+        except:
+            print("Failed during : " + filename)
+            pass
     print(list_div)
     return list_div
