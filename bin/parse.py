@@ -28,16 +28,23 @@ def posttemplate(victim, group_name, description, timestamp):
     dbglog(schema)
     return schema
 
-def existingpost(post_title, group_name):
+def existingpost(post_title, group_name, description):
     '''
     check if a post already exists in posts.json
     '''
     posts = openjson('data/posts.json')
+    print(description)
     for post in posts:
         dbglog('checking post: ' + post['post_title'])
         if post['post_title'] == post_title and post['group_name'] == group_name:
             stdlog('post already exists: ' + post_title)
             print('post already exists: ' + post_title)
+            if description != '':
+                if 'description' not in post or post['description'] == '':
+                   post['description']= description
+                   print('Updating description ' + post['post_title'])
+                   outfile = open('data/posts.json', 'w')
+                   json.dump(posts, outfile, indent=4, ensure_ascii=False)
             return True
     stdlog('post does not exist: ' + post_title)
     return False
@@ -59,7 +66,7 @@ def appender(entry, group_name):
     # limit length of post_title to 90 chars
     if len(post_title) > 90:
         post_title = post_title[:90]
-    if existingpost(post_title, group_name) is False:
+    if existingpost(post_title, group_name, description) is False:
         posts = openjson('data/posts.json')
         newpost = posttemplate(post_title, group_name, description, str(datetime.today()))
         stdlog('adding new post: ' + 'group: ' + group_name + ' title: ' + post_title)
