@@ -12,4 +12,10 @@ server {
         proxy_read_timeout 300;
         proxy_pass http://localhost:8000/;
     }
+    location /screenshots/ {
+        alias *INSTALLDIR*/source/screenshots/;
+	try_files $uri $uri/ =404;
+	autoindex on;
+    }
+
 }
