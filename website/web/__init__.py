@@ -90,7 +90,7 @@ def groups():
         for group in groups:
             for location in group['locations']:
                 screenfile = '/screenshots/' + group['name'] + '-' + createfile(location['slug']) + '.png'
-                if os.path.exists(str(getçhomedir()) + '/source' + screenfile):
+                if os.path.exists(str(get_homedir()) + '/source' + screenfile):
                     location['screen']=screenfile
         posts = openjson('data/posts.json')
         sorted_posts = sorted(posts, key=lambda x: x['discovered'], reverse=True)
