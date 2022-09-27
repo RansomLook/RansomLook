@@ -14,7 +14,7 @@ import time
 from typing import Dict
 from playwright.sync_api import sync_playwright, TimeoutError as PlaywrightTimeoutError
 
-from .default.config import get_config
+from .default.config import get_config, get_homedir
 
 from .sharedutils import striptld
 from .sharedutils import openjson
@@ -84,7 +84,7 @@ def threadscape(queuethread, lock):
                     sitesource.close()
 
                 filename = group + '-' + createfile(host['slug']) + '.png'
-                name = os.path.join(os.getcwd(), 'docs/screenshots', filename)
+                name = os.path.join(get_homedir(), 'source/screenshots', filename)
                 page.screenshot(path=name, full_page=True)
                 lock.acquire()
                 host['available'] = True
