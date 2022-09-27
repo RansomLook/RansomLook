@@ -83,6 +83,26 @@ def status():
 
         return render_template("status.html", data=groups, markets=markets)
 
+@app.route("/alive")
+def alive():
+        groups = openjson('data/groups.json')
+        groups.sort(key=lambda x: x["name"].lower())
+        for group in groups:
+            for location in group['locations']:
+                screenfile = '/screenshots/' + group['name'] + '-' + createfile(location['slug']) + '.png'
+                if os.path.exists(str(get_homedir()) + '/source' + screenfile):
+                    location['screen']=screenfile
+        markets = openjson('data/markets.json')
+        markets.sort(key=lambda x: x["name"].lower())
+        for group in markets:
+            for location in group['locations']:
+                screenfile = '/screenshots/' + group['name'] + '-' + createfile(location['slug']) + '.png'
+                if os.path.exists(str(get_homedir()) + '/source' + screenfile):
+                    location['screen']=screenfile
+
+        return render_template("alive.html", data=groups, markets=markets)
+
+
 @app.route("/groups")
 def groups():
         groups = openjson('data/groups.json')

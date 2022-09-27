@@ -34,6 +34,7 @@
                   <ul>
                       <li><a href=#groupsstatus>Groups Status</></li>
                       <li><a href=#marketsstatus>Markets Status</></li>
+                      <li><a href={{ url_for('alive') }}>Alive</></li>
                   </ul>
               {% endif %}
               <li {% if request.path == '/groups' %} class="active" {% endif %}><a href="{{ url_for('groups') }}" title="Group profiles">Group profiles</a></li>

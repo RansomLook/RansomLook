@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+
+{% block title %}Status page{% endblock %}
+
+{% block content %}
+    <article id="main" class="markdown-section">
+	<h1>Status</h1>
+        <h2 id="groupsalive">📚 Groups alive</h2>
+        <table>
+          <thead>
+            <tr>
+                <th><center>Group</center></th>
+                <th><center>Page title</center></th>
+                <th><center>Location</center></th>
+                <th><center>Screen</center></th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for entry in data %}
+                {% for location in entry['locations'] %}
+                {% if location['available'] is true %}
+                <tr><td> <a href="/group/{{entry['name']}}"> {{entry['name']}} </td>
+                <td> {{location['title'] }} </td>
+                <td> {{location['fqdn']}} </td>
+                {% if 'screen' in location %}
+                <td><a href="{{ location['screen'] }}" rel="noopener noreferrer" target="_blank">Screen</a></td>
+                {% else %}
+                <td> </td>
+                {% endif %}
+                </tr>
+                {% endif %}
+                {% endfor %}
+            {% endfor %}
+          <tbody>
+        </table>
+        <h2 id="marketsalive">📚 Markets alive</h2>
+        <table>
+          <thead>
+            <tr>
+                <th><center>Market</center></th>
+                <th><center>Page title</center></th>
+                <th><center>Location</center></th>
+                <th><center>Screen</center></th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for entry in markets %}
+                {% for location in entry['locations'] %}
+                {% if location['available'] is true %}
+                <tr><td> <a href="/market/{{entry['name']}}"> {{entry['name']}} </td>
+                <td> {{location['title'] }} </td>
+                <td> {{location['fqdn']}} </td>
+                {% if 'screen' in location %}
+                <td><a href="{{ location['screen'] }}" rel="noopener noreferrer" target="_blank"">Screen</a></td>
+                {% else %}
+                <td> </td>
+                {% endif %}
+                </tr>
+                {% endif %}
+                {% endfor %}
+            {% endfor %}
+          <tbody>
+        </table>
+    </article>
+{% endblock %}
