@@ -109,7 +109,6 @@ def group(name):
                                 if post['group_name'].lower() == name.lower():
                                          groupposts.append(post)
                         groupposts = sorted(groupposts, key=lambda x: x['discovered'], reverse=True)
-                        print(len(groupposts))
                         return render_template("group.html", group = group, posts=groupposts)
         return redirect(url_for("home"))
 
