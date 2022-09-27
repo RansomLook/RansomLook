@@ -148,7 +148,10 @@ mypy.json
 # Pyre type checker
 .pyre/
 
-ransmlook website
+# ransmlook website
 secret_key
 d3.v7.min.js  
 jquery.min.js
+datatables.min.js
+datatables.min.css
+sri.txt

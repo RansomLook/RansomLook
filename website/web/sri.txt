@@ -3,7 +3,7 @@
     "d3.v7.min.js": "MefNfAGJ/pEy89xLOFs3V6pYPs6AmUhXJrRlydI/9wZuGrqxmrdQ80zKHUcyadAcpH67teDZcBeS6oMJLPtTqw==",
     "datatables.min.css": "ACFzyS/pMaB3CoarK7aekHljDkNfixvotP0GnePbD6PFbvn7PT4v3nM2uDXyM13ceqESH9CJ7aCRz19rNInvgg==",
     "datatables.min.js": "VUgHTv8zUr1K/xtRWvjLwZx2RiyuMfhxefJuDMNFQ2KYT9Y/qGKxgLJ2PBSQzyqbb9uoCzYzccAeF2hC7Qa91Q==",
-    "generic.css": "CqCUHIzXr1SOoY8s6i8efF73PHLj7vuzjGKpvDJF20+SF2sXbeoQM5QlBz3cC/8rP1Ij6aZpEgC6gKjo2Fm2HA==",
+    "generic.css": "aRqh2zXqttrxGDka6eEQaygd+/nWkokZVEPk69q8Ra+ogTZpMIsEg16aKWYv0j7EujZ5k9dzhCLJoYTyLNFC+w==",
     "generic.js": "UmFl4fHmB/UjMdUuYdFy9BfzQlJTyeImNHCFyBO4SdLxBCwCGxkF3NQvel1PKqW8JTnoPlPpq/n9d+vCfPeegA==",
     "jquery.min.js": "aVKKRRi/Q/YV+4mjoKBsE4x3H+BkegoM/em46NNlCqNTmUYADjBbeNefNxYV7giUp0VxICtqdrbqU7iVaeZNXA=="
   }
