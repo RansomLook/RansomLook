@@ -23,6 +23,9 @@ bs4 = "^0.0.1"
 mypy = "^0.971"
 rocketchat-API = "^1.26.0"
 pylint = "^2.15.3"
+Flask = "^2.2.2"
+Flask-Moment = "^1.0.4"
+Bootstrap-Flask = "^2.1.0"
 
 [tool.poetry.dev-dependencies]
 mypy = "^0.971"

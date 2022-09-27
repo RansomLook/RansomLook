@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+
+{% block title %}Recent posts{% endblock %}
+
+{% block content %}
+    <article id="main" class="markdown-section">
+	<h1>Recent posts</h1>
+        <p><em>Last 100 posts</em></p>
+        <table>
+          <thead>
+            <tr>
+                <th>Date</th>
+                <th>Title</th>
+                <th>Group</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for entry in data %}
+                <tr><td> {{entry['discovered'].split(' ')[0]}} </td><td><code> {{entry['post_title'] }} </code></td><td> <a href="/group/{{entry['group_name']}}">{{entry['group_name']}}</td></tr>
+            {% endfor %}
+          <tbody>
+        </table>
+    </article>
+{% endblock %}

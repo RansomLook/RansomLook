@@ -1,0 +1,85 @@
+{% extends "base.html" %}
+
+{% block title %}Groups{% endblock %}
+
+{% block groups %}
+<ul>
+{% for entry in data %}
+  <li><a href="#{{entry['name'].title()}}">{{entry['name'].title()}}</a></li>
+{% endfor %}
+</ul>
+{% endblock %}
+{% block markets %}
+<ul>
+{% for entry in data %}
+  <li><a href="#{{entry['name'].title()}}">{{entry['name'].title()}}</a></li>
+{% endfor %}
+</ul>
+{% endblock %}
+
+{% block content %}
+    <article id="main" class="markdown-section">
+	<h1>Group profiles</h1>
+        {% for entry in data %}
+            <h2 id="{{entry['name'].title()}}"> {{ entry['name'].title() }}<h2>
+            <h4>Description</h2>
+            {% if entry['meta'] is not none %}
+            <p>{{ entry['meta'] }}</p>
+            {% endif %}
+            {% for profile in entry['profile'] %}
+            <p> {{ profile }} </p>
+            {% endfor %}
+            {% if entry['name'].lower() in parser %}
+            <p><em>parsing : <code>enabled</code></em></p>
+            {% endif %}
+            <h3>Links</h2>
+            <table>
+            <thead>
+                <tr>
+                    <th> Page title </th>
+                    <th> Available </th>
+                    <th> Last visit</th>
+                    <th> URL </th>
+                    <th> Screen </th>
+                </tr>
+            </thead>
+            <tbody>
+            {% for location in entry['locations'] %}
+                <tr>
+                <td> {{ location['title'] }}  </td>
+                {% if location['available'] is true %} <td><center> ⬆️ </center></td>
+                {% else %} <td><center> ⬇️ </center></td>
+                {% endif %}
+                <td> {{ location['lastscrape'].split(' ')[0] }}</td>
+                <td> {{location['slug']}} </td>
+                {% if 'screen' in location %}
+                <td><a href="{{ location['screen'] }}" rel="noopener noreferrer" target="_blank"">Screen</a></td>
+                {% else %}
+                <td> </td>
+                {% endif %}
+                </tr>
+            {% endfor %}
+           </tbody>
+           </table>
+
+            <h4>Posts</h2>
+            <table>
+            <thead>
+                <tr>
+                    <th>Title</th>
+                    <th>Date</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for post in posts %}
+                    {% if post['group_name'] == entry['name'] %}
+                    <tr><td><code> {{post['post_title']}} </code></td>
+                        <td> {{post['discovered'].split(' ')[0]}} </td>
+                    </tr>
+                    {% endif %}
+                {% endfor %}
+            </tbody>
+            </table>
+        {% endfor %}
+    </article>
+{% endblock %}

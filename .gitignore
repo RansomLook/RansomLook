@@ -13,6 +13,8 @@ data/*
 source/
 cache/
 
+
+
 # Json file
 *.json
 
@@ -146,3 +148,7 @@ mypy.json
 # Pyre type checker
 .pyre/
 
+ransmlook website
+secret_key
+d3.v7.min.js  
+jquery.min.js

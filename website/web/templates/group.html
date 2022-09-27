@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% block title %}{{group['name']}} details{% endblock %}
+{% block content %}
+    <article id="main" class="markdown-section">
+	<h1>{{group['name']}}</h1>
+        <h2>Description</h2>
+        {{group['meta']}}
+        <h2>Links</h2>
+        {% for location in group['locations'] %}
+            <p> {{location['slug']}} </p>
+        {% endfor %}
+        <h2>Posts</h2>
+        <table>
+          <thead>
+            <tr>
+                <th>Title</th>
+                <th>Date</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for entry in posts %}
+                <tr><td> {{entry['post_title']}} </td>
+                    <td> {{entry['discovered'].split(' ')[0]}} </td>
+               </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+    </article>
+{% endblock %}

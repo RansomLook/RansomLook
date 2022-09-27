@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% block title %}🦕 RansomLook 🦖{% endblock %}
+{% block content %}
+    <article id="main" class="markdown-section">
+        <h1>Welcome to 🦕 RansomLook 🦖 !</h1>
+        <p><em>{{ date.title() }}</em></p>
+
+        <p>Currently tracking <code>{{data['nbgroups']}}</code> groups across <code>{{data['nblocations']}}</code> relays & mirrors - <em><code>{{data['online']}}</code> currently online</em>
+
+        <p>There have been <code>{{data['24h']}}</code> posts within the last 24 hours</p>
+
+        <p>There have been <code>{{data['monthlypost']}}</code> posts within the month of {{data['month']}}</p>
+
+        <p>There have been <code>{{data['90d']}}</code> posts within the last 90 days</p>
+
+        <p>There have been <code>{{data['yearlypost']}}</code> posts within the year of {{data['year']}}</p>
+
+        <p>There have been <code>{{data['nbposts']}}</code> posts since the dawn of ransomlook</p>
+
+        <p>There are <code>{{data['nbparsers']}}</code> custom parsers indexing posts</p>
+    </article>
+{% endblock %}

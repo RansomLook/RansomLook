@@ -11,6 +11,8 @@ import sys
 
 from typing import Dict, List, Tuple, Any
 
+from ransomlook.default.config import get_homedir
+
 import tldextract
 from urllib.parse import urlparse, urlsplit
 
@@ -37,7 +39,8 @@ def openjson(file: str) -> List :
     opens a file and returns the json as a dict
     '''
     try:
-        with open(file, encoding='utf-8') as jsonfile:
+        filename=file
+        with open(str(get_homedir())+'/'+filename, encoding='utf-8') as jsonfile:
             data = json.load(jsonfile)
     except:
         data = []
@@ -114,7 +117,7 @@ def postslast24h() -> int :
     return post_count
 
 def parsercount() -> int :
-    modules = glob.glob(join(dirname('ransomlook/parsers/'), "*.py"))
+    modules = glob.glob(join(dirname(str(get_homedir())+'/'+'ransomlook/parsers/'), "*.py"))
     __all__ = [ basename(f)[:-3] for f in modules if isfile(f) and not f.endswith('__init__.py')]
     return len(__all__)
 
