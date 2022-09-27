@@ -3,18 +3,18 @@
 {% block content %}
     <article id="main" class="markdown-section">
 	<h1>{{group['name'].title()}}</h1>
-        <h2>Description</h2>
+        <h3>Description</h3>
         {% if group['meta'] is not none %}
         <p>{{group['meta']}}</p>
         {% endif %}
         {% for profile in group['profiles'] %}
         <p>{{profile}}</p>
         {% endfor %}
-        <h2>Links</h2>
+        <h3>Links</h3>
         {% for location in group['locations'] %}
             <p> {{location['slug']}} </p>
         {% endfor %}
-        <h2>Posts</h2>
+        <h3>Posts</h3>
         <table>
           <thead>
             <tr>

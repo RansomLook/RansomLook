@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "ransomlook"
-version = "0.1.0"
+version = "0.9.0"
 description = "Yet An Other Ransom Looker"
 authors = ["Fafner KeyZee <fkz@p4nd4.land>"]
 
@@ -11,7 +11,11 @@ markdown = "bin.markdown:main"
 notify = "bin.notify:main"
 add = "bin.add:main"
 start = "bin.start:main"
+start_website = "bin.start_website:main"
 stop = "bin.stop:main"
+run_backend = "bin.run_backend:main"
+shutdown = "bin.shutdown:main"
+update = "bin.update:main"
 
 [tool.poetry.dependencies]
 python = "^3.8,<3.11"
@@ -23,9 +27,11 @@ bs4 = "^0.0.1"
 mypy = "^0.971"
 rocketchat-API = "^1.26.0"
 pylint = "^2.15.3"
-Flask = "^2.2.2"
 Flask-Moment = "^1.0.4"
 Bootstrap-Flask = "^2.1.0"
+redis = "^4.3.4"
+Flask = "^2.2.2"
+gunicorn = "^20.1.0"
 
 [tool.poetry.dev-dependencies]
 mypy = "^0.971"

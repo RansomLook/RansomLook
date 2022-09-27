@@ -23,7 +23,7 @@
         {% for entry in data %}
             <h2 id="{{entry['name'].title()}}"> {{ entry['name'].title() }}<h2>
             <h4>Description</h2>
-            {% if entry['meta'] is not None %}
+            {% if entry['meta'] is not none %}
             <p>{{ entry['meta'] }}</p>
             {% endif %}
             {% for profile in entry['profile'] %}

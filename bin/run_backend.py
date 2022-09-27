@@ -68,6 +68,7 @@ def check_all(stop: bool=False):
 def stop_all():
     shutdown_cache()
 
+
 def main():
     parser = argparse.ArgumentParser(description='Manage backend DBs.')
     parser.add_argument("--start", action='store_true', default=False, help="Start all")

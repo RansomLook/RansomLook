@@ -11,7 +11,7 @@ from ransomlook.sharedutils import openjson, createfile
 from ransomlook.sharedutils import groupcount, hostcount, onlinecount, postslast24h, mounthlypostcount, currentmonthstr, postssince, poststhisyear,postcount,parsercount
 from ransomlook.default.config import get_homedir
 
-from helpers import get_secret_key, sri_load
+from .helpers import get_secret_key, sri_load
 
 app = Flask(__name__)
 
@@ -70,15 +70,15 @@ def status():
         groups.sort(key=lambda x: x["name"].lower())
         for group in groups:
             for location in group['locations']:
-                screenfile = 'static/screenshots/' + group['name'] + '-' + createfile(location['slug']) + '.png'
-                if os.path.exists(screenfile):
+                screenfile = '/screenshots/' + group['name'] + '-' + createfile(location['slug']) + '.png'
+                if os.path.exists(str(get_homedir()) + screenfile):
                     location['screen']=screenfile
         markets = openjson('data/markets.json')
         markets.sort(key=lambda x: x["name"].lower())
         for group in markets:
             for location in group['locations']:
-                screenfile = 'static/screenshots/' + group['name'] + '-' + createfile(location['slug']) + '.png'
-                if os.path.exists(screenfile):
+                screenfile = '/screenshots/' + group['name'] + '-' + createfile(location['slug']) + '.png'
+                if os.path.exists(str(get_homedir()) + screenfile):
                     location['screen']=screenfile
 
         return render_template("status.html", data=groups, markets=markets)
@@ -124,7 +124,6 @@ def markets():
                     location['screen']=screenfile
         posts = openjson('data/posts.json')
         sorted_posts = sorted(posts, key=lambda x: x['discovered'], reverse=True)
-        print(groups)
         return render_template("groups.html", data=groups, posts=sorted_posts)
 
 @app.route("/market/<name>")
@@ -142,4 +141,4 @@ def market(name):
         return redirect(url_for("home"))
 
 if __name__ == "__main__":
-	app.run(host="0.0.0.0", port=8000, debug=True)
+	app.run(debug=True)
