@@ -1,3 +1,4 @@
+
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
@@ -8,10 +9,11 @@ from datetime import timedelta
 import glob
 from os.path import dirname, basename, isfile, join
 import sys
+import redis
 
 from typing import Dict, List, Tuple, Any
 
-from ransomlook.default.config import get_homedir
+from ransomlook.default.config import get_homedir, get_socket_path
 
 import tldextract
 from urllib.parse import urlparse, urlsplit
@@ -68,19 +70,23 @@ markdown
 '''
 def postcount() -> int :
     post_count = 0
-    posts = openjson('data/posts.json')
-    for post in posts:
-        post_count += 1
+    red = redis.Redis(unix_socket_path=get_socket_path('cache'), db=2)
+    for group in red.keys():
+        grouppost = json.loads(red.get(group))
+        post_count+=len(grouppost)
     return post_count
 
 def groupcount() -> int :
-    groups = openjson('data/groups.json')
+    red = redis.Redis(unix_socket_path=get_socket_path('cache'), db=0)
+    groups = red.keys()
     return len(groups)
 
 def hostcount() -> int :
-    groups = openjson('data/groups.json')
+    red = redis.Redis(unix_socket_path=get_socket_path('cache'), db=0)
+    groups = red.keys()
     host_count = 0
-    for group in groups:
+    for entry in groups:
+        group = json.loads(red.get(entry))
         for host in group['locations']:
             host_count += 1
     return host_count
@@ -88,32 +94,41 @@ def hostcount() -> int :
 def postssince(days: int) -> int :
     '''returns the number of posts within the last x days'''
     post_count = 0
-    posts = openjson('data/posts.json')
-    for post in posts:
-        datetime_object = datetime.strptime(post['discovered'], '%Y-%m-%d %H:%M:%S.%f')
-        if datetime_object > datetime.now() - timedelta(days=days):
-            post_count += 1
+    red = redis.Redis(unix_socket_path=get_socket_path('cache'), db=2)
+    groups = red.keys()
+    for entry in groups:
+        posts = json.loads(red.get(entry))
+        for post in posts:
+            datetime_object = datetime.strptime(post['discovered'], '%Y-%m-%d %H:%M:%S.%f')
+            if datetime_object > datetime.now() - timedelta(days=days):
+                post_count += 1
     return post_count
 
 def poststhisyear() -> int :
     '''returns the number of posts within the current year'''
-    post_count = 0
-    posts = openjson('data/posts.json')
     current_year = datetime.now().year
-    for post in posts:
-        datetime_object = datetime.strptime(post['discovered'], '%Y-%m-%d %H:%M:%S.%f')
-        if datetime_object.year == current_year:
-            post_count += 1
+    post_count = 0
+    red = redis.Redis(unix_socket_path=get_socket_path('cache'), db=2)
+    groups = red.keys()
+    for entry in groups:
+        posts = json.loads(red.get(entry))
+        for post in posts:
+            datetime_object = datetime.strptime(post['discovered'], '%Y-%m-%d %H:%M:%S.%f')
+            if datetime_object.year == current_year:
+                post_count += 1
     return post_count
 
 def postslast24h() -> int :
     '''returns the number of posts within the last 24 hours'''
     post_count = 0
-    posts = openjson('data/posts.json')
-    for post in posts:
-        datetime_object = datetime.strptime(post['discovered'], '%Y-%m-%d %H:%M:%S.%f')
-        if datetime_object > datetime.now() - timedelta(hours=24):
-            post_count += 1
+    red = redis.Redis(unix_socket_path=get_socket_path('cache'), db=2)
+    groups = red.keys()
+    for entry in groups:
+        posts = json.loads(red.get(entry))
+        for post in posts:
+            datetime_object = datetime.strptime(post['discovered'], '%Y-%m-%d %H:%M:%S.%f')
+            if datetime_object > datetime.now() - timedelta(hours=24):
+                post_count += 1
     return post_count
 
 def parsercount() -> int :
@@ -122,9 +137,11 @@ def parsercount() -> int :
     return len(__all__)
 
 def onlinecount() -> int :
-    groups = openjson('data/groups.json')
+    red = redis.Redis(unix_socket_path=get_socket_path('cache'), db=0)
+    groups = red.keys()
     online_count = 0
-    for group in groups:
+    for entry in groups:
+        group = json.loads(red.get(entry))
         for host in group['locations']:
             if host['available'] is True:
                 online_count += 1
@@ -141,22 +158,27 @@ def mounthlypostcount() -> int :
     returns the number of posts within the current month
     '''
     post_count = 0
-    posts = openjson('data/posts.json')
+    red = redis.Redis(unix_socket_path=get_socket_path('cache'), db=2)
+    groups = red.keys()
     date_today = datetime.now()
     month_first_day = date_today.replace(day=1, hour=0, minute=0, second=0, microsecond=0)
-    for post in posts:
-        datetime_object = datetime.strptime(post['discovered'], '%Y-%m-%d %H:%M:%S.%f')
-        if datetime_object > month_first_day:
-            post_count += 1
+    for entry in groups:
+        posts = json.loads(red.get(entry))
+        for post in posts:
+            datetime_object = datetime.strptime(post['discovered'], '%Y-%m-%d %H:%M:%S.%f')
+            if datetime_object > month_first_day:
+                post_count += 1
     return post_count
 
 def countcaptchahosts() -> int :
     '''returns a count on the number of groups that have captchas'''
-    groups = openjson('data/groups.json')
+    red = redis.Redis(unix_socket_path=get_socket_path('cache'), db=0)
+    groups = red.keys()
     captcha_count = 0
-    for group in groups:
+    for entry in groups:
+        group = json.loads(red.get(entry))
         if group['captcha'] is True:
-            captcha_count += 1
+            online_count += 1
     return captcha_count
 
 '''

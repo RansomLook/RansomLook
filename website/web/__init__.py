@@ -1,16 +1,18 @@
 from flask import Flask, render_template, redirect, url_for
-import flask_moment 
+import flask_moment
 from flask_bootstrap import Bootstrap5  # type: ignore
 
 from datetime import datetime as dt
 import glob
 from os.path import dirname, basename, isfile, join
 import os
+import json
+from redis import Redis
 
-from ransomlook.sharedutils import openjson, createfile
+from ransomlook.sharedutils import createfile
 from ransomlook.sharedutils import groupcount, hostcount, onlinecount, postslast24h, mounthlypostcount, currentmonthstr, postssince, poststhisyear,postcount,parsercount
 from ransomlook.default.config import get_homedir
-
+from ransomlook.default import get_socket_path
 from .helpers import get_secret_key, sri_load
 
 app = Flask(__name__)
@@ -55,7 +57,13 @@ def home():
 
 @app.route("/recent")
 def recent():
-        posts = openjson('data/posts.json')
+        posts = []
+        red = Redis(unix_socket_path=get_socket_path('cache'), db=2)
+        for key in red.keys():
+                entries = json.loads(red.get(key))
+                for entry in entries:
+                    entry['group_name']=key.decode()
+                posts.append(entry)
         sorted_posts = sorted(posts, key=lambda x: x['discovered'], reverse=True)
         recentposts = []
         for post in sorted_posts:
@@ -66,14 +74,24 @@ def recent():
 
 @app.route("/status")
 def status():
-        groups = openjson('data/groups.json')
+        red = Redis(unix_socket_path=get_socket_path('cache'), db=0)
+        groups = []
+        for key in red.keys():
+                entry= json.loads(red.get(key))
+                entry['name']=key.decode()
+                groups.append(entry)
         groups.sort(key=lambda x: x["name"].lower())
         for group in groups:
             for location in group['locations']:
                 screenfile = '/screenshots/' + group['name'] + '-' + createfile(location['slug']) + '.png'
                 if os.path.exists(str(get_homedir()) + '/source' + screenfile):
                     location['screen']=screenfile
-        markets = openjson('data/markets.json')
+        red = Redis(unix_socket_path=get_socket_path('cache'), db=3)
+        markets = []
+        for key in red.keys():
+                entry= json.loads(red.get(key))
+                entry['name']=key.decode()
+                markets.append(entry)
         markets.sort(key=lambda x: x["name"].lower())
         for group in markets:
             for location in group['locations']:
@@ -84,15 +102,26 @@ def status():
         return render_template("status.html", data=groups, markets=markets)
 
 @app.route("/alive")
+
 def alive():
-        groups = openjson('data/groups.json')
+        red = Redis(unix_socket_path=get_socket_path('cache'), db=0)
+        groups = []
+        for key in red.keys():
+                entry= json.loads(red.get(key))
+                entry['name']=key.decode()
+                groups.append(entry)
         groups.sort(key=lambda x: x["name"].lower())
         for group in groups:
             for location in group['locations']:
                 screenfile = '/screenshots/' + group['name'] + '-' + createfile(location['slug']) + '.png'
                 if os.path.exists(str(get_homedir()) + '/source' + screenfile):
                     location['screen']=screenfile
-        markets = openjson('data/markets.json')
+        red = Redis(unix_socket_path=get_socket_path('cache'), db=3)
+        markets = []
+        for key in red.keys():
+                entry= json.loads(red.get(key))
+                entry['name']=key.decode()
+                markets.append(entry)
         markets.sort(key=lambda x: x["name"].lower())
         for group in markets:
             for location in group['locations']:
@@ -105,59 +134,88 @@ def alive():
 
 @app.route("/groups")
 def groups():
-        groups = openjson('data/groups.json')
+        red = Redis(unix_socket_path=get_socket_path('cache'), db=0)
+        redpost = Redis(unix_socket_path=get_socket_path('cache'), db=2)
+
+        groups = []
+        for key in red.keys():
+                entry= json.loads(red.get(key))
+                entry['name']=key.decode()
+                if key in redpost.keys():
+                    posts=json.loads(redpost.get(key))
+                    sorted_posts = sorted(posts, key=lambda x: x['discovered'], reverse=True)
+                    entry['posts']= sorted_posts
+                else:
+                    entry['posts']={}
+                groups.append(entry)
         groups.sort(key=lambda x: x["name"].lower())
         for group in groups:
             for location in group['locations']:
                 screenfile = '/screenshots/' + group['name'] + '-' + createfile(location['slug']) + '.png'
                 if os.path.exists(str(get_homedir()) + '/source' + screenfile):
                     location['screen']=screenfile
-        posts = openjson('data/posts.json')
-        sorted_posts = sorted(posts, key=lambda x: x['discovered'], reverse=True)
         modules = glob.glob(join(dirname(str(get_homedir())+'/ransomlook/parsers/'), "*.py"))
         parserlist = [ basename(f)[:-3].split('.')[0] for f in modules if isfile(f) and not f.endswith('__init__.py')]
-        return render_template("groups.html", data=groups, posts=sorted_posts, parser=parserlist)
+        return render_template("groups.html", data=groups, parser=parserlist)
 
 @app.route("/group/<name>")
 def group(name):
-        groups = openjson('data/groups.json')
-        for group in groups:
-                if group['name'].lower() == name.lower():
-                        posts = openjson('data/posts.json')
-                        groupposts = []
-                        for post in posts:
-                                if post['group_name'].lower() == name.lower():
-                                         groupposts.append(post)
-                        groupposts = sorted(groupposts, key=lambda x: x['discovered'], reverse=True)
-                        return render_template("group.html", group = group, posts=groupposts)
+        red = Redis(unix_socket_path=get_socket_path('cache'), db=0)
+        groups = []
+        for key in red.keys():
+                if key.decode().lower() == name.lower():
+                        group= json.loads(red.get(key))
+                        group['name']=key.decode()
+                        redpost = Redis(unix_socket_path=get_socket_path('cache'), db=2)
+                        if key in redpost.keys():
+                            posts=json.loads(redpost.get(key))
+                            sorted_posts = sorted(posts, key=lambda x: x['discovered'], reverse=True)
+                        else:
+                            sorted_posts = {}
+                        return render_template("group.html", group = group, posts=sorted_posts)
+
         return redirect(url_for("home"))
 
 @app.route("/markets")
 def markets():
-        groups = openjson('data/markets.json')
+        red = Redis(unix_socket_path=get_socket_path('cache'), db=3)
+        redpost = Redis(unix_socket_path=get_socket_path('cache'), db=2)
+
+        groups = []
+        for key in red.keys():
+                entry= json.loads(red.get(key))
+                entry['name']=key.decode()
+                if key in redpost.keys():
+                    posts=json.loads(redpost.get(key))
+                    sorted_posts = sorted(posts, key=lambda x: x['discovered'], reverse=True)
+                    entry['posts']= sorted_posts
+                else:
+                    entry['posts']={}
+                groups.append(entry)
         groups.sort(key=lambda x: x["name"].lower())
         for group in groups:
             for location in group['locations']:
                 screenfile = '/screenshots/' + group['name'] + '-' + createfile(location['slug']) + '.png'
-                if os.path.exists(str(get_homedir) + '/source' +screenfile):
+                if os.path.exists(str(get_homedir()) + '/source' + screenfile):
                     location['screen']=screenfile
-        posts = openjson('data/posts.json')
-        sorted_posts = sorted(posts, key=lambda x: x['discovered'], reverse=True)
-        return render_template("groups.html", data=groups, posts=sorted_posts)
+        modules = glob.glob(join(dirname(str(get_homedir())+'/ransomlook/parsers/'), "*.py"))
+        parserlist = [ basename(f)[:-3].split('.')[0] for f in modules if isfile(f) and not f.endswith('__init__.py')]
+        return render_template("groups.html", data=groups, parser=parserlist)
 
 @app.route("/market/<name>")
 def market(name):
-        groups = openjson('data/markets.json')
-        for group in groups:
-                if group['name'].lower() == name.lower():
-                        posts = openjson('data/posts.json')
-                        groupposts = []
-                        for post in posts:
-                                if post['group_name'].lower() == name.lower():
-                                         groupposts.append(post)
-                        groupposts = sorted(groupposts, key=lambda x: x['discovered'], reverse=True)
+        red = Redis(unix_socket_path=get_socket_path('cache'), db=3)
+        groups = []
+        for key in red.keys():
+                if key.decode().lower() == name.lower():
+                        group= json.loads(red.get(key))
+                        group['name']=key.decode()
+                        red2 = Redis(unix_socket_path=get_socket_path('cache'), db=2)
+                        posts=json.loads(red2.get(key))
+                        groupposts = sorted(posts, key=lambda x: x['discovered'], reverse=True)
                         return render_template("group.html", group = group, posts=groupposts)
         return redirect(url_for("home"))
+
 
 if __name__ == "__main__":
 	app.run(debug=True)

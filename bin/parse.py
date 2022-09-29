@@ -8,46 +8,27 @@ import json
 from datetime import datetime
 from datetime import timedelta
 
-from ransomlook.default.config import get_config
+import collections
+
+import redis
+
+from ransomlook.default.config import get_config, get_socket_path
 from ransomlook.rocket import rocketnotify
 
-from ransomlook.sharedutils import openjson
 from ransomlook.sharedutils import dbglog, stdlog, errlog
 
-def posttemplate(victim, group_name, description, timestamp):
+def posttemplate(victim, description, timestamp):
     '''
     assuming we have a new post - form the template we will use for the new entry in posts.json
     '''
     schema = {
         'post_title': victim,
-        'group_name': group_name,
         'discovered': timestamp,
         'description' : description
     }
     stdlog('new post: ' + victim)
     dbglog(schema)
     return schema
-
-def existingpost(post_title, group_name, description):
-    '''
-    check if a post already exists in posts.json
-    '''
-    posts = openjson('data/posts.json')
-    print(description)
-    for post in posts:
-        dbglog('checking post: ' + post['post_title'])
-        if post['post_title'] == post_title and post['group_name'] == group_name:
-            stdlog('post already exists: ' + post_title)
-            print('post already exists: ' + post_title)
-            if description != '':
-                if 'description' not in post or post['description'] == '':
-                   post['description']= description
-                   print('Updating description ' + post['post_title'])
-                   outfile = open('data/posts.json', 'w')
-                   json.dump(posts, outfile, indent=4, ensure_ascii=False)
-            return True
-    stdlog('post does not exist: ' + post_title)
-    return False
 
 def appender(entry, group_name):
     '''
@@ -66,20 +47,23 @@ def appender(entry, group_name):
     # limit length of post_title to 90 chars
     if len(post_title) > 90:
         post_title = post_title[:90]
-    if existingpost(post_title, group_name, description) is False:
-        posts = openjson('data/posts.json')
-        newpost = posttemplate(post_title, group_name, description, str(datetime.today()))
-        stdlog('adding new post: ' + 'group: ' + group_name + ' title: ' + post_title)
-        posts.append(newpost)
-        with open('data/posts.json', 'w') as outfile:
-            '''
-            use ensure_ascii to mandate utf-8 in the case the post contains cyrillic 🇷🇺
-            https://pynative.com/python-json-encode-unicode-and-non-ascii-characters-as-is/
-            '''
-            dbglog('writing changes to posts.json')
-            json.dump(posts, outfile, indent=4, ensure_ascii=False)
-        if rocketconfig['enable'] == True:
-            rocketnotify(rocketconfig, group_name, post_title, description)
+    red = redis.Redis(unix_socket_path=get_socket_path('cache'), db=2)
+    keys = red.keys()
+    posts=[]
+
+    if group_name.encode() in red.keys():
+        posts = json.loads(red.get(group_name))
+        for post in posts:
+            if post['post_title'] == post_title:
+                stdlog('post already existing')
+                print(post)
+                return
+    newpost = posttemplate(post_title, description, str(datetime.today()))
+    stdlog('adding new post: ' + 'group: ' + group_name + ' title: ' + post_title)
+    posts.append(newpost)
+    red.set(group_name, json.dumps(posts))
+    if rocketconfig['enable'] == True:
+        rocketnotify(rocketconfig, group_name, post_title, description)
 
 def main():
     modules = glob.glob(join(dirname('ransomlook/parsers/'), "*.py"))

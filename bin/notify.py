@@ -10,21 +10,25 @@ from typing import List, Any, Dict
 from datetime import date
 from datetime import timedelta
 
+import redis
+
 from collections import defaultdict
 
-from ransomlook.sharedutils import openjson
 from ransomlook.sharedutils import dbglog, stdlog
-from ransomlook.default.config import get_config
+from ransomlook.default.config import get_config, get_socket_path
 
 def getnewpost(date: str) -> Dict :
     '''
     check if a post already exists in posts.json
     '''
-    posts = openjson('data/posts.json')
+    red = redis.Redis(unix_socket_path=get_socket_path('cache'), db=2)
     notify = defaultdict(list)
-    for post in posts:
-        if post['discovered'].split()[0] == date :
-            notify[post['group_name']].append(post['post_title'])
+    for group in red.keys():
+        posts = json.loads(red.get(group))
+        for post in posts:
+            if post['discovered'].split()[0] == date :
+                notify[group.decode()].append(post['post_title'])
+    notify =  dict(sorted(notify.items()))
     return notify
 
 def main() -> None :
@@ -48,7 +52,6 @@ def main() -> None :
     fromaddr = email_config['from']
     toaddrs = email_config['to']
     subject = email_config['subject']
-
     msg = EmailMessage()
     msg['Subject'] = subject
     msg['From'] = fromaddr

@@ -14,7 +14,9 @@ import time
 from typing import Dict
 from playwright.sync_api import sync_playwright, TimeoutError as PlaywrightTimeoutError
 
-from .default.config import get_config, get_homedir
+from .default.config import get_config, get_homedir, get_socket_path
+
+import redis
 
 from .sharedutils import striptld
 from .sharedutils import openjson
@@ -24,13 +26,12 @@ from .sharedutils import createfile
 
 # pylint: disable=W0703
 
-def creategroup(name: str, location: str) -> Dict[str, object] :
+def creategroup(location: str) -> Dict[str, object] :
     '''
     create a new group for a new provider - added to groups.json
     '''
     mylocation = siteschema(location)
     insertdata = {
-        'name': name,
         'captcha': bool(),
         'meta': None,
         'locations': [
@@ -44,10 +45,9 @@ def checkexisting(provider: str) -> bool:
     '''
     check if group already exists within groups.json
     '''
-    groups = openjson("data/groups.json")
-    for group in groups:
-        if group['name'] == provider:
-            return True
+    red = redis.Redis(unix_socket_path=get_socket_path('cache'), db=0)
+    if provider.encode() in red.keys():
+        return True
     return False
 
 def threadscape(queuethread, lock):
@@ -56,7 +56,7 @@ def threadscape(queuethread, lock):
     '''
     with sync_playwright() as play:
         while True:
-            host, group = queuethread.get()
+            host, group, base = queuethread.get()
             stdlog('Starting : ' + host['fqdn']+ ' --------- ' + group)
             host['available'] = bool()
             try:
@@ -99,28 +99,44 @@ def threadscape(queuethread, lock):
                 errlog("error")
             browser.close()
             stdlog('leaving : ' + host['fqdn']+ ' --------- ' + group)
+            red = redis.Redis(unix_socket_path=get_socket_path('cache'), db=base)
+            updated = json.loads(red.get(group))
+            for loc in updated['locations']:
+                if loc['slug'] == host['slug']:
+                    loc.update(host)
+            red.set(group, json.dumps(updated))
+            time.sleep(5)
             queuethread.task_done()
 
-def scraper(file: str) -> None:
+def scraper(base: int) -> None:
     '''main scraping function'''
-    groups = openjson(file)
+    red = redis.Redis(unix_socket_path=get_socket_path('cache'), db=base)
+    groups=[]
+    for key in red.keys():
+        group = json.loads(red.get(key))
+        group['name'] = key.decode()
+        groups.append(group)
+    groups.sort(key=lambda x: len(x['locations']), reverse=True)
     lock = Lock()
     queuethread = queue.Queue() # type: ignore
     for _ in range(get_config('generic','thread')):
         thread1 = Thread(target=threadscape, args=(queuethread,lock), daemon=True)
         thread1.start()
+
     for group in groups:
         stdlog('ransomloook: ' + 'working on ' + group['name'])
         # iterate each location/mirror/relay
         for host in group['locations']:
-            data=[host,group['name']]
+            data=[host,group['name'],base]
             queuethread.put(data)
     queuethread.join()
     time.sleep(5)
     stdlog('Writing result')
-    with open(file, 'w', encoding='utf-8') as groupsfile:
-        json.dump(groups, groupsfile, ensure_ascii=False, indent=4)
-        groupsfile.close()
+
+
+    #with open(file, 'w', encoding='utf-8') as groupsfile:
+    #    json.dump(groups, groupsfile, ensure_ascii=False, indent=4)
+    #    groupsfile.close()
 
 def adder(name: str, location: str) -> None:
     '''
@@ -131,11 +147,9 @@ def adder(name: str, location: str) -> None:
             ' already exist, appending to avoid duplication')
         appender(name, location)
     else:
-        groups = openjson("data/groups.json")
-        newrec = creategroup(name, location)
-        groups.append(dict(newrec))
-        with open('data/groups.json', 'w', encoding='utf-8') as groupsfile:
-            json.dump(groups, groupsfile, ensure_ascii=False, indent=4)
+        red = redis.Redis(unix_socket_path=get_socket_path('cache'), db=0)
+        newrec = creategroup(location)
+        red.set(name, json.dumps(newrec))
         stdlog('ransomlook: ' + 'record for ' + name + ' added to groups.json')
 
 def appender(name: str, location: str) -> None:
@@ -143,18 +157,12 @@ def appender(name: str, location: str) -> None:
     handles the addition of new mirrors and relays for the same site
     to an existing group within groups.json
     '''
-    groups = openjson("data/groups.json")
+    red = redis.Redis(unix_socket_path=get_socket_path('cache'), db=0)
+    group = json.loads(red.get(name))
     success = bool()
-    for group in groups:
-        if group['name'] == name:
-            for loc in group['locations']:
-                if location == loc['slug']:
-                    errlog('cannot append to non-existing provider or the location already exists')
-                    return
-            group['locations'].append(siteschema(location))
-            success = True
-    if success:
-        with open('data/groups.json', 'w', encoding='utf-8') as groupsfile:
-            json.dump(groups, groupsfile, ensure_ascii=False, indent=4)
-    else:
-        errlog('cannot append to non-existing provider or the location already exists')
+    for loc in group['locations']:
+        if location == loc['slug']:
+            errlog('cannot append to non-existing provider or the location already exists')
+            return
+    group['locations'].append(siteschema(location))
+    red.set(name, json.dumps(group))

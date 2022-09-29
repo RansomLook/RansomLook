@@ -29,8 +29,8 @@
     <div class="sidebar-nav">
           <ul><li {% if request.path == '/' %} class="active" {% endif %}><a href="{{ url_for('home') }}" title="Home">Home</a></li>
               <li {% if request.path == '/recent' %} class="active" {% endif %}><a href="{{ url_for('recent') }}" title="Recent posts">Recent posts</a></li>
-              <li {% if request.path == '/status' %} class="active" {% endif %}><a href="{{ url_for('status') }}" title="Status">Status</a></li>
-              {% if request.path == '/status' %}
+              <li {% if request.path == '/status' or request.path == '/alive' %} class="active" {% endif %}><a href="{{ url_for('status') }}" title="Status">Status</a></li>
+              {% if request.path == '/status' or request.path == '/alive' %}
                   <ul>
                       <li><a href=#groupsstatus>Groups Status</></li>
                       <li><a href=#marketsstatus>Markets Status</></li>

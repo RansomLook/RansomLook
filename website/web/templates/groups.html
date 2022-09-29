@@ -71,12 +71,10 @@
                 </tr>
             </thead>
             <tbody>
-                {% for post in posts %}
-                    {% if post['group_name'] == entry['name'] %}
+                {% for post in entry['posts'] %}
                     <tr><td><code> {{post['post_title']}} </code></td>
                         <td> {{post['discovered'].split(' ')[0]}} </td>
                     </tr>
-                    {% endif %}
                 {% endfor %}
             </tbody>
             </table>
