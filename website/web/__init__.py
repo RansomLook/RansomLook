@@ -1,5 +1,6 @@
 from flask import Flask, render_template, redirect, url_for
 import flask_moment
+from flask import request
 from flask_bootstrap import Bootstrap5  # type: ignore
 
 from datetime import datetime as dt
@@ -63,7 +64,7 @@ def recent():
                 entries = json.loads(red.get(key))
                 for entry in entries:
                     entry['group_name']=key.decode()
-                posts.append(entry)
+                    posts.append(entry)
         sorted_posts = sorted(posts, key=lambda x: x['discovered'], reverse=True)
         recentposts = []
         for post in sorted_posts:
@@ -216,6 +217,40 @@ def market(name):
                         return render_template("group.html", group = group, posts=groupposts)
         return redirect(url_for("home"))
 
+@app.route('/search', methods=['GET', 'POST'])
+def search():
+    if request.method == 'POST':
+        query = request.form.get('search')
+        red = Redis(unix_socket_path=get_socket_path('cache'), db=0)
+        groups = []
+        for key in red.keys():
+            group = json.loads(red.get(key))
+            if query.lower() in key.decode().lower() or group['meta'] is not None and query.lower() in group['meta'].lower():
+                group['name']=key.decode().lower()
+                groups.append(group)
+        groups.sort(key=lambda x: x["name"].lower())
+
+        red = Redis(unix_socket_path=get_socket_path('cache'), db=3)
+        markets = []
+        for key in red.keys():
+            group = json.loads(red.get(key))
+            if query.lower() in key.decode().lower() or group['meta'] is not None and query.lower() in group['meta'].lower():
+                group['name'] = key.decode().lower()
+                markets.append(group)
+        groups.sort(key=lambda x: x["name"].lower())
+
+        red = Redis(unix_socket_path=get_socket_path('cache'), db=2)
+        posts = []
+        for key in red.keys():
+                entries = json.loads(red.get(key))
+                for entry in entries:
+                    if query.lower() in entry['post_title'] or 'description' in entry and entry['description'] is not None and query.lower() in entry['description'].lower():
+                        entry['group_name']=key.decode()
+                        posts.append(entry)
+        posts.sort(key=lambda x: x["group_name"].lower())
+
+        return render_template("search.html", query=query,groups=groups, markets=markets, posts=posts)
+    return redirect(url_for("home"))
 
 if __name__ == "__main__":
 	app.run(debug=True)

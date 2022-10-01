@@ -25,8 +25,15 @@
   </head>
   <body class="ready sticky">
   <aside class="sidebar">
+         <div class="search">
+           <div class="input-wrap">
+            <center><form action="{{ url_for('search') }}" method="post"><input type="text" name="search" value="" aria-label="Search text" placeholder="type to search"></form></center>
+           </div>
+         </div>
+    </br>
     <h1 class="app-name"><a class="app-name-link" data-nosearch="" href="/">🦕 RansomLook 🦖</a></h1>
     <div class="sidebar-nav">
+
           <ul><li {% if request.path == '/' %} class="active" {% endif %}><a href="{{ url_for('home') }}" title="Home">Home</a></li>
               <li {% if request.path == '/recent' %} class="active" {% endif %}><a href="{{ url_for('recent') }}" title="Recent posts">Recent posts</a></li>
               <li {% if request.path == '/status' or request.path == '/alive' %} class="active" {% endif %}><a href="{{ url_for('status') }}" title="Status">Status</a></li>

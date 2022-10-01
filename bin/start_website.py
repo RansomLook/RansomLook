@@ -24,7 +24,7 @@ class Website(AbstractManager):
         return Popen(['gunicorn', '-w', '10',
                       '--graceful-timeout', '2', '--timeout', '300',
                       '-b', f'{ip}:{port}',
-                      '--log-level', 'info',
+                      '--log-level', 'debug',
                       'web:app'],
                      cwd=website_dir)
 
