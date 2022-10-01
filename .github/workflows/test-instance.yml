@@ -41,4 +41,3 @@ jobs:
           poetry run add Google https://www.google.fr
           poetry run scrape
           poetry run parse
-          poetry run markdown
