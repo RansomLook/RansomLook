@@ -9,7 +9,6 @@
             service tor start
             poetry run scrape
             poetry run parse
-            poetry run markdown
     volumes:
         - ./config:/ransomlook/config
         - ./data:/ransomlook/data
