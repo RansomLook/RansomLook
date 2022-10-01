@@ -248,7 +248,6 @@ def search():
                         entry['group_name']=key.decode()
                         posts.append(entry)
         posts.sort(key=lambda x: x["group_name"].lower())
-
         return render_template("search.html", query=query,groups=groups, markets=markets, posts=posts)
     return redirect(url_for("home"))
 

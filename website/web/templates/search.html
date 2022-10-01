@@ -5,24 +5,51 @@
 {% block content %}
     <article id="main" class="markdown-section">
 	<h1>Groups</h1>
-        {% for entry in groups %}
-        <h2>{{entry['name'].title()}}</2>
-        <h4>Description</h4>
-        {% if entry['meta'] is not none %}
-        <p>{{entry['meta']}}</p>
+        {% if not groups %}
+        <p> No result </p>
+        {% else %}
+        <table>
+          <thead>
+            <tr>
+                <th>Group</th>
+                <th>Description</th>
+            </tr>
+          </thead>
+          <tbody>
+          {% for entry in groups %}
+            <tr>
+                <td><a href="/group/{{entry['name']}}">{{entry['name'].title()}}</a></td>
+                <td> {{entry['meta']}} </td>
+          {% endfor %}
+          </tbody>
+        </table>
         {% endif %}
-        {% endfor %}
 
 	<h1>Markets</h1>
-        {% for entry in markets %}
-        <h2>{{entry['name'].title()}}</h2>
-        {% if entry['meta'] is not none %}
-        <h4>Description</h4>
-        <p>{{entry['meta']}}</p>
+        {% if not markets %}
+        <p> No result </p>
+        {% else %}
+        <table>
+          <thead>
+            <tr>
+                <th>Group</th>
+                <th>Description</th>
+            </tr>
+          </thead>
+          <tbody>
+          {% for entry in markets %}
+            <tr>
+                <td><a href="/market/{{entry['name']}}">{{entry['name'].title()}}</a></td>
+                <td> {{entry['meta']}} </td>
+          {% endfor %}
+          </tbody>
+        </table>
         {% endif %}
-        {% endfor %}
       
-        <h2>Post</h2>
+        <h2>Posts</h2>
+        {% if not posts %}
+        <p> No result </p>
+        {% else %}
         <table>
           <thead>
             <tr>
@@ -34,7 +61,7 @@
           <tbody>
           {% for entry in posts %}
             <tr>
-                <td>{{entry['group_name'].title()}}</td>
+                <td><a href="/group/{{entry['group_name']}}">{{entry['group_name'].title()}}</a></td>
                 <td>{{entry['post_title']}}</td>
                 <td>{{entry['discovered']}}</td>
             <tr>
@@ -45,5 +72,6 @@
           {% endfor %}
           </tbody>
         </table>
+        {% endif %}
     </article>
 {% endblock %}

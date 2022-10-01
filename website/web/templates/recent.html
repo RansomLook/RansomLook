@@ -16,7 +16,7 @@
           </thead>
           <tbody>
             {% for entry in data %}
-                <tr><td> {{entry['discovered'].split(' ')[0]}} </td><td><code> {{entry['post_title'] }} </code></td><td> <a href="/group/{{entry['group_name']}}">{{entry['group_name']}}</td></tr>
+                <tr><td> {{entry['discovered'].split(' ')[0]}} </td><td><code> {{entry['post_title'] }} </code></td><td> <a href="/group/{{entry['group_name']}}">{{entry['group_name']}}</a></td></tr>
             {% endfor %}
           <tbody>
         </table>
