@@ -26,9 +26,6 @@
             {% if entry['meta'] is not none %}
             <p>{{ entry['meta'] }}</p>
             {% endif %}
-            {% for profile in entry['profile'] %}
-            <p> {{ profile }} </p>
-            {% endfor %}
             {% if entry['name'].lower() in parser %}
             <p><em>parsing : <code>enabled</code></em></p>
             {% endif %}
