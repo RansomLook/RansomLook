@@ -16,11 +16,12 @@
         "auth_token": "",
         "channel_name": ""
     },
-    "malpedia"; "",
+    "malpedia": "",
     "thread": 4,
     "website_listen_ip": "127.0.0.1",
     "website_listen_port": 8000,
     "_notes": {
+        "malpedia": "malpedia apikey",
         "email": "Email configuration",
         "rocketchat": "Informatin about rocketckat",
         "website_listen_ip": "IP Flask will listen on. Defaults to 0.0.0.0, meaning all interfaces.",
