@@ -2,7 +2,7 @@
 name = "astroid"
 version = "2.12.10"
 description = "An abstract syntax tree for Python with inference support."
-category = "main"
+category = "dev"
 optional = false
 python-versions = ">=3.7.2"
 
@@ -139,7 +139,7 @@ dev = ["PyTest", "PyTest (<5)", "PyTest-Cov", "PyTest-Cov (<2.6)", "bump2version
 name = "dill"
 version = "0.3.5.1"
 description = "serialize all of python"
-category = "main"
+category = "dev"
 optional = false
 python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*, !=3.4.*, !=3.5.*, !=3.6.*"
 
@@ -267,7 +267,7 @@ testing = ["flufl.flake8", "importlib-resources (>=1.3)", "packaging", "pyfakefs
 name = "isort"
 version = "5.10.1"
 description = "A Python utility / library to sort Python imports."
-category = "main"
+category = "dev"
 optional = false
 python-versions = ">=3.6.1,<4.0"
 
@@ -311,7 +311,7 @@ python-versions = ">=3.7"
 name = "lazy-object-proxy"
 version = "1.7.1"
 description = "A fast and thorough lazy object proxy."
-category = "main"
+category = "dev"
 optional = false
 python-versions = ">=3.6"
 
@@ -361,7 +361,7 @@ setuptools_scm = ">=7"
 name = "mccabe"
 version = "0.7.0"
 description = "McCabe checker, plugin for flake8"
-category = "main"
+category = "dev"
 optional = false
 python-versions = ">=3.6"
 
@@ -369,7 +369,7 @@ python-versions = ">=3.6"
 name = "mypy"
 version = "0.971"
 description = "Optional static typing for Python"
-category = "main"
+category = "dev"
 optional = false
 python-versions = ">=3.6"
 
@@ -387,7 +387,7 @@ reports = ["lxml"]
 name = "mypy-extensions"
 version = "0.4.3"
 description = "Experimental type system extensions for programs checked with the mypy typechecker."
-category = "main"
+category = "dev"
 optional = false
 python-versions = "*"
 
@@ -426,7 +426,7 @@ tests = ["check-manifest", "coverage", "defusedxml", "markdown2", "olefile", "pa
 name = "platformdirs"
 version = "2.5.2"
 description = "A small Python module for determining appropriate platform-specific dirs, e.g. a \"user data dir\"."
-category = "main"
+category = "dev"
 optional = false
 python-versions = ">=3.7"
 
@@ -436,7 +436,7 @@ test = ["appdirs (==1.4.4)", "pytest (>=6)", "pytest-cov (>=2.7)", "pytest-mock 
 
 [[package]]
 name = "playwright"
-version = "1.26.0"
+version = "1.26.1"
 description = "A high-level API to automate web browsers"
 category = "main"
 optional = false
@@ -460,7 +460,7 @@ python-versions = "*"
 name = "pylint"
 version = "2.15.3"
 description = "python code static checker"
-category = "main"
+category = "dev"
 optional = false
 python-versions = ">=3.7.2"
 
@@ -632,7 +632,7 @@ python-versions = ">=3.7"
 name = "tomlkit"
 version = "0.11.4"
 description = "Style preserving TOML library"
-category = "main"
+category = "dev"
 optional = false
 python-versions = ">=3.6,<4.0"
 
@@ -732,7 +732,7 @@ testing = ["func-timeout", "jaraco.itertools", "pytest (>=6)", "pytest-black (>=
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.8,<3.11"
-content-hash = "c5f105be65fb16743ec08e029e7c350196c2fb16e1a7454c57c9118a359fea28"
+content-hash = "7f9f6200154b7085ced2c0312b8959d878931f72a3928c94c8fb9554f48a60be"
 
 [metadata.files]
 astroid = [
@@ -1347,13 +1347,13 @@ platformdirs = [
     {file = "platformdirs-2.5.2.tar.gz", hash = "sha256:58c8abb07dcb441e6ee4b11d8df0ac856038f944ab98b7be6b27b2a3c7feef19"},
 ]
 playwright = [
-    {file = "playwright-1.26.0-py3-none-macosx_10_13_x86_64.whl", hash = "sha256:4841796a44582b0d4cc0424ebce2da717d3aa04adb4051145dc480be198549bb"},
-    {file = "playwright-1.26.0-py3-none-macosx_11_0_arm64.whl", hash = "sha256:5d910b865a6c539d3589d1a9a67d221f060460b812b65f933e872f8762bd640a"},
-    {file = "playwright-1.26.0-py3-none-macosx_11_0_universal2.whl", hash = "sha256:fd7546d4b61ebe7fd1f1fa5eebdaf884263d97b111be6208a02a1bde5f36308f"},
-    {file = "playwright-1.26.0-py3-none-manylinux1_x86_64.whl", hash = "sha256:c6d9df284a74897eb667ee8e865137ed2fbdd93b8ba8f43e257871a3fbf1e9c4"},
-    {file = "playwright-1.26.0-py3-none-manylinux_2_17_aarch64.manylinux2014_aarch64.whl", hash = "sha256:759292562f50e7f04ef75eac7039ab7149461b2ac97c91f77d73cc974b3f49bb"},
-    {file = "playwright-1.26.0-py3-none-win32.whl", hash = "sha256:aa3e8ee10bce4d8992a8332f4358ab571724dfd0c34540e6b56e7ac062cc6e20"},
-    {file = "playwright-1.26.0-py3-none-win_amd64.whl", hash = "sha256:a04a549a32cea8000036274af6fe7e7b7ac3697021cd3cc2bb3e92341b89147d"},
+    {file = "playwright-1.26.1-py3-none-macosx_10_13_x86_64.whl", hash = "sha256:eabf81e932076be5afe8f198c13cde913db319ccb07a9c16ea13bd0d372b40b2"},
+    {file = "playwright-1.26.1-py3-none-macosx_11_0_arm64.whl", hash = "sha256:ecd2d47a671d40f2c9f2fa70dec5c4e8f341194e7450e1483c787e02eecb6f61"},
+    {file = "playwright-1.26.1-py3-none-macosx_11_0_universal2.whl", hash = "sha256:a04bb9f2b25ad00077c7816e51b2cc3edc9b5ae7ed864ab1efbc3037a16db868"},
+    {file = "playwright-1.26.1-py3-none-manylinux1_x86_64.whl", hash = "sha256:c3cc87fc738d7c7668d8e3a8086fca2c6f981d31e560cee5f89415d17160f7e5"},
+    {file = "playwright-1.26.1-py3-none-manylinux_2_17_aarch64.manylinux2014_aarch64.whl", hash = "sha256:e8b3a58cd903d21bf71b0361b8f1379bb9de8046ecf5a866f5d13bd815100099"},
+    {file = "playwright-1.26.1-py3-none-win32.whl", hash = "sha256:1b06a0cd1d0c4ded1c5412129f9207d2589aa5ac86645cfa1a89690ef610228b"},
+    {file = "playwright-1.26.1-py3-none-win_amd64.whl", hash = "sha256:9dfbb664a0d3865ec3db4cd636dab755c7bf5eeadcaf1d6abe9ab8c9c26c431f"},
 ]
 pyee = [
     {file = "pyee-8.1.0-py2.py3-none-any.whl", hash = "sha256:383973b63ad7ed5e3c0311f8b179c52981f9e7b3eaea0e9a830d13ec34dde65f"},
