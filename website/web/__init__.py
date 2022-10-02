@@ -244,7 +244,7 @@ def search():
         for key in red.keys():
                 entries = json.loads(red.get(key))
                 for entry in entries:
-                    if query.lower() in entry['post_title'] or 'description' in entry and entry['description'] is not None and query.lower() in entry['description'].lower():
+                    if query.lower() in entry['post_title'].lower() or 'description' in entry and entry['description'] is not None and query.lower() in entry['description'].lower():
                         entry['group_name']=key.decode()
                         posts.append(entry)
         posts.sort(key=lambda x: x["group_name"].lower())
