@@ -8,17 +8,17 @@
         {% if not groups %}
         <p> No result </p>
         {% else %}
-        <table>
+        <table  id="table" class="table" style="display:table; table-layout:auto; width:100%">
           <thead>
             <tr>
-                <th>Group</th>
-                <th>Description</th>
+                <th style="width:10%"> Group </th>
+                <th> Description </th>
             </tr>
           </thead>
           <tbody>
           {% for entry in groups %}
             <tr>
-                <td><a href="/group/{{entry['name']}}">{{entry['name'].title()}}</a></td>
+                <td><center><a href="/group/{{entry['name']}}">{{entry['name'].title()}}</a></center></td>
                 <td> {{entry['meta']}} </td>
           {% endfor %}
           </tbody>
@@ -29,17 +29,17 @@
         {% if not markets %}
         <p> No result </p>
         {% else %}
-        <table>
+        <table id="table" class="table" style="display:table; table-layout:auto; width:100%">
           <thead>
             <tr>
-                <th>Group</th>
-                <th>Description</th>
+                <th style="width:15%"> Group </th>
+                <th> Description </th>
             </tr>
           </thead>
           <tbody>
           {% for entry in markets %}
             <tr>
-                <td><a href="/market/{{entry['name']}}">{{entry['name'].title()}}</a></td>
+                <td><center><a href="/market/{{entry['name']}}">{{entry['name'].title()}}</a></center></td>
                 <td> {{entry['meta']}} </td>
           {% endfor %}
           </tbody>
@@ -50,12 +50,12 @@
         {% if not posts %}
         <p> No result </p>
         {% else %}
-        <table>
+        <table  id="table" class="table" style="display:table; table-layout:auto; width:100%">
           <thead>
             <tr>
-                <th>Group</th>
+                <th style="width:15%"> Group </th>
                 <th>Title</th>
-                <th>Date</th>
+                <th style="width:10%"> Date </th>
             </tr>
           </thead>
           <tbody>
@@ -66,7 +66,7 @@
                 <td>{{entry['discovered']}}</td>
             <tr>
                 {% if 'description' in entry and entry['description'] is not none %}
-            <tr><td colspan="3"> {{entry['description']}} </td></tr>
+            <tr><td colspan="3"> {{entry['description'].split(' ')[0]}} </td></tr>
                 {% endif %}
 
           {% endfor %}

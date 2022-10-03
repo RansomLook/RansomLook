@@ -15,17 +15,19 @@
             <p> {{location['slug']}} </p>
         {% endfor %}
         <h3>Posts</h3>
-        <table>
+        <table id="table" class="table" style="display:table; table-layout:auto; width:100%">
           <thead>
             <tr>
-                <th>Title</th>
-                <th>Date</th>
+                <th style="width:10%"> Date </th>
+                <th style="width:25%"> Titre </th>
+                <th> Description </th>
             </tr>
           </thead>
           <tbody>
             {% for entry in posts %}
-                <tr><td> {{entry['post_title']}} </td>
-                    <td> {{entry['discovered'].split(' ')[0]}} </td>
+                <tr>
+                    <td><center> {{entry['discovered'].split(' ')[0]}} </center></td>
+                    <td> {{entry['post_title']}} </td>
                     {% if entry['description'] is not none %}
                     <td> {{entry['description']}} </td>
                     {% endif %}

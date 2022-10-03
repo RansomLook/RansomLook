@@ -30,14 +30,15 @@
             <p><em>parsing : <code>enabled</code></em></p>
             {% endif %}
             <h3>Links</h2>
-            <table>
+            <div class="table-responsive">
+            <table id="table" class="table" style="display:table; table-layout:auto; width:100%">
             <thead>
                 <tr>
-                    <th> Page title </th>
-                    <th> Available </th>
-                    <th> Last visit</th>
-                    <th> URL </th>
-                    <th> Screen </th>
+                    <th style="width:25%"> Page title </th>
+                    <th style="width:5%"> Available </th>
+                    <th style="width:10%"> Last visit</th>
+                    <th style="width:50%"> URL </th>
+                    <th style="width:10%"> Screen </th>
                 </tr>
             </thead>
             <tbody>
@@ -47,7 +48,7 @@
                 {% if location['available'] is true %} <td><center> ⬆️ </center></td>
                 {% else %} <td><center> ⬇️ </center></td>
                 {% endif %}
-                <td> {{ location['lastscrape'].split(' ')[0] }}</td>
+                <td><center> {{ location['lastscrape'].split(' ')[0] }} </center></td>
                 <td> {{location['slug']}} </td>
                 {% if 'screen' in location %}
                 <td><a href="{{ location['screen'] }}" rel="noopener noreferrer" target="_blank"">Screen</a></td>
@@ -58,23 +59,26 @@
             {% endfor %}
            </tbody>
            </table>
+           </div>
 
             <h4>Posts</h2>
-            <table>
+            <div class="table-responsive">
+            <table id="table" class="table" style="display:table; table-layout:auto; width:100%">
             <thead>
                 <tr>
                     <th>Title</th>
-                    <th>Date</th>
+                    <th style="width:10%">Date</th>
                 </tr>
             </thead>
             <tbody>
                 {% for post in entry['posts'] %}
                     <tr><td><code> {{post['post_title']}} </code></td>
-                        <td> {{post['discovered'].split(' ')[0]}} </td>
+                        <td><center> {{post['discovered'].split(' ')[0]}} </center></td>
                     </tr>
                 {% endfor %}
             </tbody>
             </table>
+            </div>
         {% endfor %}
     </article>
 {% endblock %}
