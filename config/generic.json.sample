@@ -4,6 +4,7 @@
         "smtp_port": 25,
         "from": "RansomLook <ransomlook@myorg.local>",
         "to": ["Team <team@myorg.local>"],
+        "to_bcc": [],
         "subject": "New Notification from RansomLook",
         "message_head": "Hello,\n\nPlease check the new entries in RansomLook:",
         "message_foot": "Best regards,\n\nRansomlook Team"

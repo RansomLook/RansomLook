@@ -51,11 +51,13 @@ def main() -> None :
 
     fromaddr = email_config['from']
     toaddrs = email_config['to']
+    toaddrsbcc = email_config['to_bcc']
     subject = email_config['subject']
     msg = EmailMessage()
     msg['Subject'] = subject
     msg['From'] = fromaddr
     msg['To'] = ', '.join(toaddrs)
+    msg['Bcc'] = ', '.join(toaddrsbcc)
     msg.set_content(message)
     try:
          server = smtplib.SMTP(email_config['smtp_server'],email_config['smtp_port'])
