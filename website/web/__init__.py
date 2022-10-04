@@ -211,9 +211,12 @@ def market(name):
                 if key.decode().lower() == name.lower():
                         group= json.loads(red.get(key))
                         group['name']=key.decode()
-                        red2 = Redis(unix_socket_path=get_socket_path('cache'), db=2)
-                        posts=json.loads(red2.get(key))
-                        groupposts = sorted(posts, key=lambda x: x['discovered'], reverse=True)
+                        redpost = Redis(unix_socket_path=get_socket_path('cache'), db=2)
+                        if key in redpost.keys():
+                            posts=json.loads(redpost.get(key))
+                            sorted_posts = sorted(posts, key=lambda x: x['discovered'], reverse=True)
+                        else:
+                            sorted_posts = {}
                         return render_template("group.html", group = group, posts=groupposts)
         return redirect(url_for("home"))
 
