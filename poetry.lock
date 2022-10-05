@@ -608,7 +608,7 @@ python-versions = ">=3.6"
 
 [[package]]
 name = "tldextract"
-version = "3.3.1"
+version = "3.4.0"
 description = "Accurately separates a URL's subdomain, domain, and public suffix, using the Public Suffix List (PSL). By default, this includes the public ICANN TLDs and their exceptions. You can optionally support the Public Suffix List's private domains as well."
 category = "main"
 optional = false
@@ -732,7 +732,7 @@ testing = ["func-timeout", "jaraco.itertools", "pytest (>=6)", "pytest-black (>=
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.8,<3.11"
-content-hash = "1979c0dd2d9e044b8810bd3a2463086d73c7ee3e9c16fa3db9db0e5f21a3f54f"
+content-hash = "e97a99841e4c8e1d466d7b97ba0a6a3ce8dc95064872f6083ff6ac840b8749b3"
 
 [metadata.files]
 astroid = [
@@ -1405,8 +1405,8 @@ soupsieve = [
     {file = "soupsieve-2.3.2.post1.tar.gz", hash = "sha256:fc53893b3da2c33de295667a0e19f078c14bf86544af307354de5fcf12a3f30d"},
 ]
 tldextract = [
-    {file = "tldextract-3.3.1-py3-none-any.whl", hash = "sha256:35a0260570e214d8d3cfeeb403992fe9e2b686925f63c9b03c5933408ac2aa5a"},
-    {file = "tldextract-3.3.1.tar.gz", hash = "sha256:fe15ac3205e5a25b61689369f98cb45c7778a8f2af113d7c11559ece5195f2d6"},
+    {file = "tldextract-3.4.0-py3-none-any.whl", hash = "sha256:47aa4d8f1a4da79a44529c9a2ddc518663b25d371b805194ec5ce2a5f615ccd2"},
+    {file = "tldextract-3.4.0.tar.gz", hash = "sha256:78aef13ac1459d519b457a03f1f74c1bf1c2808122a6bcc0e6840f81ba55ad73"},
 ]
 tomli = [
     {file = "tomli-2.0.1-py3-none-any.whl", hash = "sha256:939de3e7a6161af0c887ef91b7d41a53e7c5a1ca976325f429cb46ea9bc30ecc"},
