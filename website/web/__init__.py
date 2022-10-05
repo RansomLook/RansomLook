@@ -217,7 +217,7 @@ def market(name):
                             sorted_posts = sorted(posts, key=lambda x: x['discovered'], reverse=True)
                         else:
                             sorted_posts = {}
-                        return render_template("group.html", group = group, posts=groupposts)
+                        return render_template("group.html", group = group, posts=sorted_posts)
         return redirect(url_for("home"))
 
 @app.route('/search', methods=['GET', 'POST'])
