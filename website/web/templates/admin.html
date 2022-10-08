@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+{% from 'bootstrap5/utils.html' import render_messages %}
+{% block title %}🦕 RansomLook 🦖{% endblock %}
+{% block content %}
+{{ render_messages(container=True, dismissible=True) }}
+
+    <article id="main" class="markdown-section">
+        <h1>Welcome to 🦕 RansomLook 🦖 admin zone!</h1>
+        <p><em>You are logged as : {{user}}</em></p>
+    </article>
+{% endblock %}

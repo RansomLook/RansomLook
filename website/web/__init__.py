@@ -1,4 +1,4 @@
-from flask import Flask, render_template, redirect, url_for
+from flask import Flask, render_template, redirect, url_for, flash
 import flask_moment
 from flask import request
 from flask_bootstrap import Bootstrap5  # type: ignore
@@ -10,11 +10,14 @@ import os
 import json
 from redis import Redis
 
+import flask_login  # type: ignore
+from werkzeug.security import check_password_hash
+
 from ransomlook.sharedutils import createfile
 from ransomlook.sharedutils import groupcount, hostcount, onlinecount, postslast24h, mounthlypostcount, currentmonthstr, postssince, poststhisyear,postcount,parsercount
 from ransomlook.default.config import get_homedir
 from ransomlook.default import get_socket_path
-from .helpers import get_secret_key, sri_load
+from .helpers import get_secret_key, sri_load, User, build_users_table, load_user_from_request
 
 app = Flask(__name__)
 
@@ -26,6 +29,56 @@ app.config['SESSION_COOKIE_NAME'] = 'ransomlook'
 app.config['SESSION_COOKIE_SAMESITE'] = 'Strict'
 
 flask_moment.Moment(app=app)
+
+# Auth stuff
+login_manager = flask_login.LoginManager()
+login_manager.init_app(app)
+
+@login_manager.user_loader
+def user_loader(username):
+    if username not in build_users_table():
+        return None
+    user = User()
+    user.id = username
+    return user
+
+
+@login_manager.request_loader
+def _load_user_from_request(request):
+    return load_user_from_request(request)
+
+
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+    if request.method == 'GET':
+        return '''
+               <form action='login' method='POST'>
+                <input type='text' name='username' id='username' placeholder='username'/>
+                <input type='password' name='password' id='password' placeholder='password'/>
+                <input type='submit' name='submit'/>
+               </form>
+               '''
+
+    username = request.form['username']
+    users_table = build_users_table()
+    if username in users_table and check_password_hash(users_table[username]['password'], request.form['password']):
+        user = User()
+        user.id = username
+        flask_login.login_user(user)
+        flash(f'Logged in as: {flask_login.current_user.id}', 'success')
+    else:
+        flash(f'Unable to login as: {username}', 'error')
+
+    return redirect(url_for('admin'))
+
+@app.route('/logout')
+@flask_login.login_required
+def logout():
+    flask_login.logout_user()
+    flash('Successfully logged out.', 'success')
+    return redirect(url_for('home'))
+
+# End auth
 
 def get_sri(directory: str, filename: str) -> str:
     sha512 = sri_load()[directory][filename]
@@ -39,7 +92,7 @@ def suffix(d: int) -> str :
 def custom_strftime(fmt, t):
     return t.strftime(fmt).replace('{S}', str(t.day) + suffix(t.day))
 
-@app.route("/")
+@app.route('/')
 def home():
         date = custom_strftime('%B {S}, %Y', dt.now()).lower()
         data = {}
@@ -253,6 +306,14 @@ def search():
         posts.sort(key=lambda x: x["group_name"].lower())
         return render_template("search.html", query=query,groups=groups, markets=markets, posts=posts)
     return redirect(url_for("home"))
+
+# Admin Zone
+
+@app.route('/admin/')
+@app.route('/admin')
+@flask_login.login_required
+def admin():
+    return render_template('admin.html', user=flask_login.current_user.get_id())
 
 if __name__ == "__main__":
 	app.run(debug=True)

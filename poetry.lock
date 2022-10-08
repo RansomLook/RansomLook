@@ -178,6 +178,18 @@ async = ["asgiref (>=3.2)"]
 dotenv = ["python-dotenv"]
 
 [[package]]
+name = "Flask-Login"
+version = "0.6.2"
+description = "User authentication and session management for Flask."
+category = "main"
+optional = false
+python-versions = ">=3.7"
+
+[package.dependencies]
+Flask = ">=1.0.4"
+Werkzeug = ">=1.0.1"
+
+[[package]]
 name = "flask-moment"
 version = "1.0.4"
 description = "Formatting of dates and times in Flask templates using moment.js."
@@ -238,6 +250,14 @@ eventlet = ["eventlet (>=0.24.1)"]
 gevent = ["gevent (>=1.4.0)"]
 setproctitle = ["setproctitle"]
 tornado = ["tornado (>=0.2)"]
+
+[[package]]
+name = "hashlib"
+version = "20081119"
+description = "Secure hash and message digest algorithm library"
+category = "main"
+optional = false
+python-versions = "*"
 
 [[package]]
 name = "idna"
@@ -682,7 +702,7 @@ optional = false
 python-versions = ">=3.7"
 
 [[package]]
-name = "werkzeug"
+name = "Werkzeug"
 version = "2.2.2"
 description = "The comprehensive WSGI web application library."
 category = "main"
@@ -732,7 +752,7 @@ testing = ["func-timeout", "jaraco.itertools", "pytest (>=6)", "pytest-black (>=
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.8,<3.11"
-content-hash = "e97a99841e4c8e1d466d7b97ba0a6a3ce8dc95064872f6083ff6ac840b8749b3"
+content-hash = "f7013cf7fee0127c9e6cf2d614aff249c142fcc611fe491b06b327cd544e57bd"
 
 [metadata.files]
 astroid = [
@@ -861,6 +881,10 @@ Flask = [
     {file = "Flask-2.2.2-py3-none-any.whl", hash = "sha256:b9c46cc36662a7949f34b52d8ec7bb59c0d74ba08ba6cb9ce9adc1d8676d9526"},
     {file = "Flask-2.2.2.tar.gz", hash = "sha256:642c450d19c4ad482f96729bd2a8f6d32554aa1e231f4f6b4e7e5264b16cca2b"},
 ]
+Flask-Login = [
+    {file = "Flask-Login-0.6.2.tar.gz", hash = "sha256:c0a7baa9fdc448cdd3dd6f0939df72eec5177b2f7abe6cb82fc934d29caac9c3"},
+    {file = "Flask_Login-0.6.2-py3-none-any.whl", hash = "sha256:1ef79843f5eddd0f143c2cd994c1b05ac83c0401dc6234c143495af9a939613f"},
+]
 flask-moment = [
     {file = "Flask-Moment-1.0.4.tar.gz", hash = "sha256:161b0f473a7c46c1d46f9eadb807d56353bb28c00cc0ee34208c5b2ead9645c2"},
     {file = "Flask_Moment-1.0.4-py3-none-any.whl", hash = "sha256:4a6caf71f62339d112bad53f8b9e7e2bd9b01d022ded7f7937e677cf90009d61"},
@@ -928,6 +952,9 @@ greenlet = [
 gunicorn = [
     {file = "gunicorn-20.1.0-py3-none-any.whl", hash = "sha256:9dcc4547dbb1cb284accfb15ab5667a0e5d1881cc443e0677b4882a4067a807e"},
     {file = "gunicorn-20.1.0.tar.gz", hash = "sha256:e0a968b5ba15f8a328fdfd7ab1fcb5af4470c28aaf7e55df02a99bc13138e6e8"},
+]
+hashlib = [
+    {file = "hashlib-20081119.zip", hash = "sha256:419de2fd10ae71ed9c6adcb55903f116abd1d8acc8c814dfd5f839b4d5013e38"},
 ]
 idna = [
     {file = "idna-3.4-py3-none-any.whl", hash = "sha256:90b77e79eaa3eba6de819a0c442c0b4ceefc341a7a2ab77d7562bf49f425c5c2"},
@@ -1482,7 +1509,7 @@ websockets = [
     {file = "websockets-10.1-pp37-pypy37_pp73-win_amd64.whl", hash = "sha256:1dafe98698ece09b8ccba81b910643ff37198e43521d977be76caf37709cf62b"},
     {file = "websockets-10.1.tar.gz", hash = "sha256:181d2b25de5a437b36aefedaf006ecb6fa3aa1328ec0236cdde15f32f9d3ff6d"},
 ]
-werkzeug = [
+Werkzeug = [
     {file = "Werkzeug-2.2.2-py3-none-any.whl", hash = "sha256:f979ab81f58d7318e064e99c4506445d60135ac5cd2e177a2de0089bfd4c9bd5"},
     {file = "Werkzeug-2.2.2.tar.gz", hash = "sha256:7ea2d48322cc7c0f8b3a215ed73eabd7b5d75d0b50e31ab006286ccff9e00b8f"},
 ]

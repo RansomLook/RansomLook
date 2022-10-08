@@ -17,6 +17,7 @@
         "auth_token": "",
         "channel_name": ""
     },
+     "users": {},
     "malpedia": "",
     "thread": 4,
     "website_listen_ip": "127.0.0.1",
@@ -27,7 +28,8 @@
         "rocketchat": "Informatin about rocketckat",
         "website_listen_ip": "IP Flask will listen on. Defaults to 0.0.0.0, meaning all interfaces.",
         "website_listen_port": "Port Flask will listen on.",
-        "thread": "Number of PW instances to run"
+        "thread": "Number of PW instances to run",
+        "users":  "It is some kind of an admin accounts. Format: {username: password}"
     }
 
 }
