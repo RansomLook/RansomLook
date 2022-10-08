@@ -190,8 +190,8 @@ Flask = ">=1.0.4"
 Werkzeug = ">=1.0.1"
 
 [[package]]
-name = "flask-moment"
-version = "1.0.4"
+name = "Flask-Moment"
+version = "1.0.5"
 description = "Formatting of dates and times in Flask templates using moment.js."
 category = "main"
 optional = false
@@ -250,14 +250,6 @@ eventlet = ["eventlet (>=0.24.1)"]
 gevent = ["gevent (>=1.4.0)"]
 setproctitle = ["setproctitle"]
 tornado = ["tornado (>=0.2)"]
-
-[[package]]
-name = "hashlib"
-version = "20081119"
-description = "Secure hash and message digest algorithm library"
-category = "main"
-optional = false
-python-versions = "*"
 
 [[package]]
 name = "idna"
@@ -752,7 +744,7 @@ testing = ["func-timeout", "jaraco.itertools", "pytest (>=6)", "pytest-black (>=
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.8,<3.11"
-content-hash = "f7013cf7fee0127c9e6cf2d614aff249c142fcc611fe491b06b327cd544e57bd"
+content-hash = "ece21081e07c9c15773ad86dfbc7587ee0a9a13aa7e0235a23ea676d049db388"
 
 [metadata.files]
 astroid = [
@@ -885,9 +877,9 @@ Flask-Login = [
     {file = "Flask-Login-0.6.2.tar.gz", hash = "sha256:c0a7baa9fdc448cdd3dd6f0939df72eec5177b2f7abe6cb82fc934d29caac9c3"},
     {file = "Flask_Login-0.6.2-py3-none-any.whl", hash = "sha256:1ef79843f5eddd0f143c2cd994c1b05ac83c0401dc6234c143495af9a939613f"},
 ]
-flask-moment = [
-    {file = "Flask-Moment-1.0.4.tar.gz", hash = "sha256:161b0f473a7c46c1d46f9eadb807d56353bb28c00cc0ee34208c5b2ead9645c2"},
-    {file = "Flask_Moment-1.0.4-py3-none-any.whl", hash = "sha256:4a6caf71f62339d112bad53f8b9e7e2bd9b01d022ded7f7937e677cf90009d61"},
+Flask-Moment = [
+    {file = "Flask-Moment-1.0.5.tar.gz", hash = "sha256:33307ecd4af8290b6df6a9828ff55ac0977d0567817f9bc0f69803d22ed2b55c"},
+    {file = "Flask_Moment-1.0.5-py3-none-any.whl", hash = "sha256:6e7b3eef89e2137bbbee975405f241a68a44edfa34bf052c92d84364992adca6"},
 ]
 fonttools = [
     {file = "fonttools-4.37.3-py3-none-any.whl", hash = "sha256:a5bc5f5d48faa4085310b8ebd4c5d33bf27c6636c5f10a7de792510af2745a81"},
@@ -952,9 +944,6 @@ greenlet = [
 gunicorn = [
     {file = "gunicorn-20.1.0-py3-none-any.whl", hash = "sha256:9dcc4547dbb1cb284accfb15ab5667a0e5d1881cc443e0677b4882a4067a807e"},
     {file = "gunicorn-20.1.0.tar.gz", hash = "sha256:e0a968b5ba15f8a328fdfd7ab1fcb5af4470c28aaf7e55df02a99bc13138e6e8"},
-]
-hashlib = [
-    {file = "hashlib-20081119.zip", hash = "sha256:419de2fd10ae71ed9c6adcb55903f116abd1d8acc8c814dfd5f839b4d5013e38"},
 ]
 idna = [
     {file = "idna-3.4-py3-none-any.whl", hash = "sha256:90b77e79eaa3eba6de819a0c442c0b4ceefc341a7a2ab77d7562bf49f425c5c2"},
