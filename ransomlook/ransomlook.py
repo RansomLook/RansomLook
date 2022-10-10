@@ -138,21 +138,22 @@ def scraper(base: int) -> None:
     #    json.dump(groups, groupsfile, ensure_ascii=False, indent=4)
     #    groupsfile.close()
 
-def adder(name: str, location: str) -> None:
+def adder(name: str, location: str, db: int) -> int:
     '''
     handles the addition of new providers to groups.json
     '''
     if checkexisting(name):
         stdlog('ransomlook: ' + 'records for ' + name + \
             ' already exist, appending to avoid duplication')
-        appender(name, location)
+        return appender(name, location, db)
     else:
         red = redis.Redis(unix_socket_path=get_socket_path('cache'), db=0)
         newrec = creategroup(location)
         red.set(name, json.dumps(newrec))
         stdlog('ransomlook: ' + 'record for ' + name + ' added to groups.json')
+        return 0
 
-def appender(name: str, location: str) -> None:
+def appender(name: str, location: str, db: int) -> int:
     '''
     handles the addition of new mirrors and relays for the same site
     to an existing group within groups.json
@@ -163,6 +164,7 @@ def appender(name: str, location: str) -> None:
     for loc in group['locations']:
         if location == loc['slug']:
             errlog('cannot append to non-existing provider or the location already exists')
-            return
+            return 2
     group['locations'].append(siteschema(location))
     red.set(name, json.dumps(group))
+    return 1

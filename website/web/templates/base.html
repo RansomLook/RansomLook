@@ -49,6 +49,15 @@
               <li {% if request.path == '/markets' %} class="active" {% endif %}><a href="{{ url_for('markets') }}" title="Forums &amp; Market">Forums &amp; Market</a></li>
               {% if request.path == '/markets' %}{% block markets %}{% endblock %}{% endif %}
               <li {% if request.path == '/' %} class="active" {% endif %}><a href="/" title="Stats &amp; graphs">Stats &amp; graphs</a></li></ul>
+          {% if current_user.is_authenticated %}
+          <ul><li>Admin Zone </li>
+              <ul>
+              <li {% if request.path == '/admin/add' %} class="active" {% endif %}><a href="{{ url_for('addgroup') }}" title="Add ">Add</a></li>
+              <li {% if request.path == '/admin/edit' %} class="active" {% endif %}><a href="{{ url_for('edit') }}" title="Edit ">Edit</a></li>
+              <li {% if request.path == '/admin/logs' %} class="active" {% endif %}><a href="{{ url_for('logs') }}" title="Logs ">Logs</a></li>
+              </ul>
+          </ul>
+          {% endif %}          
     </div>
   </aside>
     <section class="content">

@@ -10,14 +10,17 @@ import os
 import json
 from redis import Redis
 
+import ast
 import flask_login  # type: ignore
 from werkzeug.security import check_password_hash
 
+from ransomlook.ransomlook import adder
 from ransomlook.sharedutils import createfile
 from ransomlook.sharedutils import groupcount, hostcount, onlinecount, postslast24h, mounthlypostcount, currentmonthstr, postssince, poststhisyear,postcount,parsercount
 from ransomlook.default.config import get_homedir
 from ransomlook.default import get_socket_path
 from .helpers import get_secret_key, sri_load, User, build_users_table, load_user_from_request
+from .forms import AddForm, LoginForm, SelectForm, EditForm, DeleteForm
 
 app = Flask(__name__)
 
@@ -50,26 +53,21 @@ def _load_user_from_request(request):
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
-    if request.method == 'GET':
-        return '''
-               <form action='login' method='POST'>
-                <input type='text' name='username' id='username' placeholder='username'/>
-                <input type='password' name='password' id='password' placeholder='password'/>
-                <input type='submit' name='submit'/>
-               </form>
-               '''
 
-    username = request.form['username']
-    users_table = build_users_table()
-    if username in users_table and check_password_hash(users_table[username]['password'], request.form['password']):
-        user = User()
-        user.id = username
-        flask_login.login_user(user)
-        flash(f'Logged in as: {flask_login.current_user.id}', 'success')
-    else:
-        flash(f'Unable to login as: {username}', 'error')
+    form = LoginForm()
+    if form.validate_on_submit():
+        username = form.username.data
+        users_table = build_users_table()
+        if username in users_table and check_password_hash(users_table[username]['password'], form.password.data):
+            user = User()
+            user.id = username
+            flask_login.login_user(user)
+            flash(f'Logged in as: {flask_login.current_user.id}', 'success')
+            return redirect(url_for('admin'))
+        else:
+            flash(f'Unable to login as: {username}', 'error')
+    return render_template('login.html', form=form)
 
-    return redirect(url_for('admin'))
 
 @app.route('/logout')
 @flask_login.login_required
@@ -220,6 +218,8 @@ def group(name):
                 if key.decode().lower() == name.lower():
                         group= json.loads(red.get(key))
                         group['name']=key.decode()
+                        if group['meta'] is not None:
+                            group['meta']=group['meta'].replace('\n', '<br/>')
                         redpost = Redis(unix_socket_path=get_socket_path('cache'), db=2)
                         if key in redpost.keys():
                             posts=json.loads(redpost.get(key))
@@ -313,7 +313,98 @@ def search():
 @app.route('/admin')
 @flask_login.login_required
 def admin():
-    return render_template('admin.html', user=flask_login.current_user.get_id())
+    return render_template('admin.html')
+
+@app.route('/admin/add', methods=['GET', 'POST'])
+@flask_login.login_required
+def addgroup():
+    score = int(round(dt.now().timestamp()))
+    form = AddForm()
+    if form.validate_on_submit():
+        res = adder(form.groupname.data.lower(), form.url.data, form.category.data)
+        if res > 1:
+           flash(f'Fail to add: {form.url.data} to {form.groupname.data}.  Url already exists for this group', 'error')
+           return render_template('add.html',form=form)
+        else:
+           flash(f'Success to add: {form.url.data} to {form.groupname.data}', 'success')
+           redlogs = Redis(unix_socket_path=get_socket_path('cache'), db=1)
+           redlogs.zadd("logs", {f"{flask_login.current_user.id} add : {form.groupname.data}, {form.url.data}": score})
+           return redirect(url_for('admin'))
+    return render_template('add.html',form=form)
+
+@app.route('/admin/edit', methods=['GET', 'POST'])
+@flask_login.login_required
+def edit():
+    formSelect = SelectForm()
+    formMarkets = SelectForm()
+    red = Redis(unix_socket_path=get_socket_path('cache'), db=0)
+    keys = red.keys()
+    choices=[('','Please select your group')]
+    keys.sort(key=lambda x: x.lower())
+    for key in keys:
+        choices.append((key.decode(), key.decode()))
+    formSelect.group.choices=choices
+
+    red = Redis(unix_socket_path=get_socket_path('cache'), db=3)
+    keys = red.keys()
+    choices=[('','Please select your group')]
+    keys.sort(key=lambda x: x.lower())
+    for key in keys:
+        choices.append((key.decode(), key.decode()))
+    formMarkets.group.choices=choices
+
+    if formSelect.validate_on_submit():
+        return redirect('/admin/edit/'+'0'+'/'+formSelect.group.data)
+    if formMarkets.validate_on_submit():
+        return redirect('/admin/edit/'+'3'+'/'+formMarkets.group.data)
+    return render_template('edit.html', form=formSelect, formMarkets=formMarkets)
+
+@app.route('/admin/edit/<database>/<name>', methods=['GET', 'POST'])
+@flask_login.login_required
+def editgroup(database, name):
+    score = int(round(dt.now().timestamp()))
+    deleteButton = DeleteForm()
+    form = EditForm()
+    red = Redis(unix_socket_path=get_socket_path('cache'), db=database)
+    redlogs = Redis(unix_socket_path=get_socket_path('cache'), db=1)
+    if deleteButton.validate_on_submit():
+        red.delete(name)
+        redlogs.zadd('logs', {f'{flask_login.current_user.id} deleted : {name}': score})
+        flash(f'Success to delete : {name}', 'success')
+        return redirect(url_for('admin'))
+    if form.validate_on_submit():
+        data = json.loads(red.get(name))
+        data['meta']=form.description.data
+        print(form.profiles.data)
+        data['profile'] = ast.literal_eval(form.profiles.data)
+        data['links'] = form.links.data
+        red.set(name, json.dumps(data))
+        redlogs.zadd('logs', {f'{flask_login.current_user.id} modified : {name}, {data["meta"]}, {data["profile"]}, {data["links"]}': score})
+        if name != form.groupname.data:
+            red.rename(name, form.groupname.data.lower())
+            redlogs.zadd('logs', {f'{flask_login.current_user.id} renamed : {name} to {form.groupname.data}': score})
+        flash(f'Success to edit : {form.groupname.data}', 'success')
+        return redirect(url_for('admin'))
+    form.groupname.label=name
+    form.groupname.data=name
+    data = json.loads(red.get(name))
+    if form.description.data == None:
+        form.description.data = data['meta']
+    if form.profiles.data == None:
+        form.profiles.data = data['profile']
+    if form.links.data == None:
+        if data['locations']== '':
+            data['locations']='[]'
+        form.links.data = data['locations']
+    return render_template('editentry.html', form=form, deleteform=deleteButton)
+
+@app.route('/admin/logs')
+@flask_login.login_required
+def logs():
+    red = Redis(unix_socket_path=get_socket_path('cache'), db=1)
+    logs = red.zrange('logs', 0, -1, desc=True, withscores=True)
+    print(logs)
+    return render_template('logs.html', logs=logs)
 
 if __name__ == "__main__":
 	app.run(debug=True)

@@ -5,7 +5,9 @@
 {{ render_messages(container=True, dismissible=True) }}
 
     <article id="main" class="markdown-section">
-        <h1>Welcome to 🦕 RansomLook 🦖 admin zone!</h1>
-        <p><em>You are logged as : {{current_user.get_id()}}</em></p>
+        <h1>Logs</h1>
+        {% for entry in logs %}
+        <p><em>{{ entry }}</em></p>
+        {% endfor %}
     </article>
 {% endblock %}

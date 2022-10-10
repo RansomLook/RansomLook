@@ -5,7 +5,7 @@
 	<h1>{{group['name'].title()}}</h1>
         <h3>Description</h3>
         {% if group['meta'] is not none %}
-        <p>{{group['meta']}}</p>
+        <p>{{group['meta']|safe}}</p>
         {% endif %}
         {% for profile in group['profile'] %}
         <p>{{profile}}</p>
