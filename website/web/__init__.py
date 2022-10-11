@@ -362,7 +362,7 @@ def edit():
 @app.route('/admin/edit/<database>/<name>', methods=['GET', 'POST'])
 @flask_login.login_required
 def editgroup(database, name):
-    score = int(round(dt.now().timestamp()))
+    score = dt.now().timestamp()
     deleteButton = DeleteForm()
     form = EditForm()
     red = Redis(unix_socket_path=get_socket_path('cache'), db=database)
@@ -403,7 +403,8 @@ def editgroup(database, name):
 def logs():
     red = Redis(unix_socket_path=get_socket_path('cache'), db=1)
     logs = red.zrange('logs', 0, -1, desc=True, withscores=True)
-    print(logs)
+    for i,s in enumerate(logs):
+       logs[i] = (s[0].decode(), dt.fromtimestamp(s[1]).strftime('%Y-%m-%d'))
     return render_template('logs.html', logs=logs)
 
 if __name__ == "__main__":
