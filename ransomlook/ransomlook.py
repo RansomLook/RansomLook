@@ -142,14 +142,14 @@ def adder(name: str, location: str, db: int) -> int:
     '''
     handles the addition of new providers to groups.json
     '''
-    if checkexisting(name):
+    if checkexisting(name.strip()):
         stdlog('ransomlook: ' + 'records for ' + name + \
             ' already exist, appending to avoid duplication')
-        return appender(name, location, db)
+        return appender(name.strip(), location, db)
     else:
         red = redis.Redis(unix_socket_path=get_socket_path('cache'), db=0)
         newrec = creategroup(location)
-        red.set(name, json.dumps(newrec))
+        red.set(name.strip(), json.dumps(newrec))
         stdlog('ransomlook: ' + 'record for ' + name + ' added to groups.json')
         return 0
 
@@ -159,12 +159,12 @@ def appender(name: str, location: str, db: int) -> int:
     to an existing group within groups.json
     '''
     red = redis.Redis(unix_socket_path=get_socket_path('cache'), db=0)
-    group = json.loads(red.get(name))
+    group = json.loads(red.get(name.strip()))
     success = bool()
     for loc in group['locations']:
         if location == loc['slug']:
             errlog('cannot append to non-existing provider or the location already exists')
             return 2
     group['locations'].append(siteschema(location))
-    red.set(name, json.dumps(group))
+    red.set(name.strip(), json.dumps(group))
     return 1
