@@ -50,6 +50,8 @@ jobs:
       
       - name: Run test
         run: |
+          poetry run tools/3rdparty.py
+          poetry run start
           poetry run add Google https://www.google.fr 0
           poetry run scrape
           poetry run parse
