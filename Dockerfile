@@ -15,9 +15,14 @@ WORKDIR ransomlook
 
 COPY ransomlook ransomlook/
 COPY bin bin/
+COPY tools tools/
+COPY cache cache/
+COPY config config/
+COPY website website/
 COPY pyproject.toml .
 COPY poetry.lock .
 
 RUN echo RANSOMLOOK_HOME="'`pwd`'" > .env
 RUN poetry install
 RUN poetry run playwright install
+RUN poetry run tools/3rdparty.py

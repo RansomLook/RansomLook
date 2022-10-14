@@ -148,13 +148,15 @@ poetry run tools/import_groups.py
 poetry run tools/malpedia.py
 ```
 
-### Add a group (cli only for the moment)
+### Add a group (we recommand to use the GUI in admin)
 
 ```bash
-poetry run add GROUPNAME URLTOCHECK
+poetry run add GROUPNAME URLTOCHECK DATABASE-NUMBER
 ```
 
 NB: if a parser exists in RansomLook/parsers/ be sure that GROUPNAME is the same of the .py file
+
+NB: DATABASE-NUMBER must be 0 or 3, depending if you are adding a Ransomware blog or a Market place.
 
 ### Scrape all groups
 

@@ -15,6 +15,7 @@ from ransomlook.default import get_homedir, get_socket_path
 
 def check_running(name: str) -> bool:
     socket_path = get_socket_path(name)
+    print(socket_path)
     if not os.path.exists(socket_path):
         return False
     try:
