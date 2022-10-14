@@ -9,12 +9,12 @@ on:
     branches: [ "main" ]
 
 jobs:
-  splash-container:
+  ransomlook-container:
      runs-on: ubuntu-latest
 
      strategy:
        matrix:
-         python-version: ["3.8", "3.9", "3.10"]
+         python-version: ["3.10"]
 
      steps:
       - uses: actions/checkout@v2
@@ -50,6 +50,7 @@ jobs:
       
       - name: Run test
         run: |
+          service tor start
           poetry run tools/3rdparty.py
           poetry run start
           poetry run add Google https://www.google.fr 0
