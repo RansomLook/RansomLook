@@ -38,6 +38,6 @@ jobs:
           poetry run playwright install
       - name: Run test
         run: |
-          poetry run add Google https://www.google.fr
+          poetry run add Google https://www.google.fr 0
           poetry run scrape
           poetry run parse
