@@ -33,7 +33,7 @@
         {% for location in group['locations'] %}
             <tr><td> {{location['slug']}} </td>
                 {% if 'screen' in location %}
-                <td><a href="{{ location['screen'] }}" rel="noopener noreferrer" target="_blank">Screen</a></td>
+                <td><center><a href="{{ location['screen'] }}" rel="noopener noreferrer" target="_blank">Screen</a></center></td>
                 {% else %}
                 <td> </td>
                 {% endif %}

@@ -24,7 +24,6 @@ services:
     volumes:
         - ./config:/ransomlook/config
         - ./data:/ransomlook/data
-        - ./docs:/ransomlook/docs
         - ./source:/ransomlook/source
         - ./cache:/ransomlook/cache
     ports:
