@@ -7,13 +7,41 @@
         {% if group['meta'] is not none %}
         <p>{{group['meta']|safe}}</p>
         {% endif %}
-        {% for profile in group['profile'] %}
-        <p>{{profile}}</p>
-        {% endfor %}
-        <h3>Links</h3>
+        {% if group['profile'][0] %}
+        <table id="table" class="table" style="display:table; table-layout:auto; width:100%">
+          <thead>
+            <tr>
+                <th> External Analysis </th>
+            </tr>
+          </thead>
+          <tbody>
+          {% for profile in group['profile'] %}
+          <tr><td>{{profile}}</td></tr>
+          {% endfor %}
+          </tbody>
+        </table>
+        {% endif %}
+
+        <table id="table" class="table" style="display:table; table-layout:auto; width:100%">
+          <thead>
+            <tr>
+                <th>Urls</th>
+                <th style="width:10%" ><center>Screen</center></th>
+            </tr>
+          </thead>
+          <tbody>
         {% for location in group['locations'] %}
-            <p> {{location['slug']}} </p>
+            <tr><td> {{location['slug']}} </td>
+                {% if 'screen' in location %}
+                <td><a href="{{ location['screen'] }}" rel="noopener noreferrer" target="_blank">Screen</a></td>
+                {% else %}
+                <td> </td>
+                {% endif %}
+            </tr>
         {% endfor %}
+          </tbody>
+        </table>
+
         <h3>Posts</h3>
         <table id="table" class="table" style="display:table; table-layout:auto; width:100%">
           <thead>

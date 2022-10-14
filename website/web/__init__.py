@@ -220,6 +220,10 @@ def group(name):
                         group['name']=key.decode()
                         if group['meta'] is not None:
                             group['meta']=group['meta'].replace('\n', '<br/>')
+                        for location in group['locations']:
+                            screenfile = '/screenshots/' + group['name'] + '-' + createfile(location['slug']) + '.png'
+                            if os.path.exists(str(get_homedir()) + '/source' + screenfile):
+                                location['screen']=screenfile
                         redpost = Redis(unix_socket_path=get_socket_path('cache'), db=2)
                         if key in redpost.keys():
                             posts=json.loads(redpost.get(key))
