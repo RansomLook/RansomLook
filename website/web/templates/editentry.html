@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+{% from 'bootstrap5/utils.html' import render_messages %}
+{% block title %}🦕 RansomLook 🦖{% endblock %}
+{% block content %}
+{{ render_messages(container=True, dismissible=True) }}
+
+    <article id="main" class="markdown-section">
+        <h1>Edit {{ form.groupname.label }}</h1>
+    <form action="" method="post" novalidate>
+        {{ form.hidden_tag() }}
+        <p>
+            {{ form.groupname }}<br>
+            {% for error in form.groupname.errors %}
+            <span style="color: red;">[{{ error }}]</span>
+            {% endfor %}
+        </p>
+        </p>Description</p>
+        <p>{{ form.description(style="width:100%; height: 150px;") }}</p>
+        </p>Profiles</p>
+        <p>{{ form.profiles(style="width:100%; height: 150px;", size=5) }}</p>
+        </p>Links</p>
+        <p>{{ form.links(style="width:100%; height: 150px;") }}</p>
+        <p>{{ form.submit }}</p>
+    </form>
+    <form action"" method="post" novalidate>
+        {{ deleteform.hidden_tag() }}
+        <p>{{ deleteform.delete() }} {{ deleteform.delete.label }} {{ deleteform.submit() }}</p>
+    </form>
+    </article>
+{% endblock %}

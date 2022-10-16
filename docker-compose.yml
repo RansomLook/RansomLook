@@ -1,0 +1,30 @@
+version: '3'
+services:
+  redis:
+    image: redis
+    working_dir: /cache
+    command: ./cache.conf --daemonize no
+    volumes:
+        - ./cache:/cache
+
+  ransomlook:
+    build: .
+    working_dir: /ransomlook
+    tty: true
+    command:
+        - /bin/sh
+        - -c
+        - |
+            sleep 10
+            service tor start
+            poetry run start
+            sleep 30
+            poetry run scrape
+            poetry run parse
+    volumes:
+        - ./config:/ransomlook/config
+        - ./data:/ransomlook/data
+        - ./source:/ransomlook/source
+        - ./cache:/ransomlook/cache
+    ports:
+        - 8000:8000

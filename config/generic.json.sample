@@ -1,0 +1,43 @@
+{
+    "email": {
+        "smtp_server": "localhost",
+        "smtp_port": 25,
+        "from": "RansomLook <ransomlook@myorg.local>",
+        "to": ["Team <team@myorg.local>"],
+        "to_bcc": [],
+        "subject": "New Notification from RansomLook",
+        "message_head": "Hello,\n\nPlease check the new entries in RansomLook:",
+        "message_foot": "Best regards,\n\nRansomlook Team"
+    },
+    "rocketchat": {
+        "enable": false,
+        "server": "localhost",
+        "ssl_verify": false,
+        "user_id": "",
+        "auth_token": "",
+        "channel_name": ""
+    },
+    "twitter": {
+        "enable": false,
+        "consumer_key": "",
+        "consumer_secret": "",
+        "access_token": "",
+        "access_token_secret": ""
+    },
+     "users": {},
+    "malpedia": "",
+    "thread": 4,
+    "website_listen_ip": "127.0.0.1",
+    "website_listen_port": 8000,
+    "_notes": {
+        "malpedia": "malpedia apikey",
+        "email": "Email configuration",
+        "rocketchat": "Informatin about rocketckat",
+        "twitter": "Allow to post new item to Twitter",
+        "website_listen_ip": "IP Flask will listen on. Defaults to 0.0.0.0, meaning all interfaces.",
+        "website_listen_port": "Port Flask will listen on.",
+        "thread": "Number of PW instances to run",
+        "users":  "It is some kind of an admin accounts. Format: {username: password}"
+    }
+
+}

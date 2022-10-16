@@ -1,0 +1,67 @@
+{% extends "base.html" %}
+{% block title %}{{group['name']}} details{% endblock %}
+{% block content %}
+    <article id="main" class="markdown-section">
+	<h1>{{group['name'].title()}}</h1>
+        <h3>Description</h3>
+        {% if group['meta'] is not none %}
+        <p>{{group['meta']|safe}}</p>
+        {% endif %}
+        {% if group['profile'][0] %}
+        <table id="table" class="table" style="display:table; table-layout:auto; width:100%">
+          <thead>
+            <tr>
+                <th> External Analysis </th>
+            </tr>
+          </thead>
+          <tbody>
+          {% for profile in group['profile'] %}
+          <tr><td>{{profile}}</td></tr>
+          {% endfor %}
+          </tbody>
+        </table>
+        {% endif %}
+
+        <table id="table" class="table" style="display:table; table-layout:auto; width:100%">
+          <thead>
+            <tr>
+                <th>Urls</th>
+                <th style="width:10%" ><center>Screen</center></th>
+            </tr>
+          </thead>
+          <tbody>
+        {% for location in group['locations'] %}
+            <tr><td> {{location['slug']}} </td>
+                {% if 'screen' in location %}
+                <td><center><a href="{{ location['screen'] }}" rel="noopener noreferrer" target="_blank">Screen</a></center></td>
+                {% else %}
+                <td> </td>
+                {% endif %}
+            </tr>
+        {% endfor %}
+          </tbody>
+        </table>
+
+        <h3>Posts</h3>
+        <table id="table" class="table" style="display:table; table-layout:auto; width:100%">
+          <thead>
+            <tr>
+                <th style="width:10%"> Date </th>
+                <th style="width:25%"> Titre </th>
+                <th> Description </th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for entry in posts %}
+                <tr>
+                    <td><center> {{entry['discovered'].split(' ')[0]}} </center></td>
+                    <td> {{entry['post_title']}} </td>
+                    {% if entry['description'] is not none %}
+                    <td> {{entry['description']}} </td>
+                    {% endif %}
+                </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+    </article>
+{% endblock %}

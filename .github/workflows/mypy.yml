@@ -1,0 +1,31 @@
+name: Python application - MyPy
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ['3.8', '3.9', '3.10']
+    name: Python ${{ matrix.python-version }} sample
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up Python
+      uses: actions/setup-python@v2
+      with:
+        python-version: ${{matrix.python-version}}
+
+    - name: Install poetry
+      run: |
+        python -m pip install --upgrade pip poetry
+        poetry install
+    - name: Test with MyPy
+      run: |
+        poetry run mypy .

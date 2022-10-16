@@ -1,0 +1,77 @@
+{% extends "base.html" %}
+
+{% block title %}🦕 RansomLook Search 🦖{% endblock %}
+
+{% block content %}
+    <article id="main" class="markdown-section">
+	<h1>Groups</h1>
+        {% if not groups %}
+        <p> No result </p>
+        {% else %}
+        <table  id="table" class="table" style="display:table; table-layout:auto; width:100%">
+          <thead>
+            <tr>
+                <th style="width:10%"> Group </th>
+                <th> Description </th>
+            </tr>
+          </thead>
+          <tbody>
+          {% for entry in groups %}
+            <tr>
+                <td><center><a href="/group/{{entry['name']}}">{{entry['name'].title()}}</a></center></td>
+                <td> {{entry['meta']}} </td>
+          {% endfor %}
+          </tbody>
+        </table>
+        {% endif %}
+
+	<h1>Markets</h1>
+        {% if not markets %}
+        <p> No result </p>
+        {% else %}
+        <table id="table" class="table" style="display:table; table-layout:auto; width:100%">
+          <thead>
+            <tr>
+                <th style="width:15%"> Group </th>
+                <th> Description </th>
+            </tr>
+          </thead>
+          <tbody>
+          {% for entry in markets %}
+            <tr>
+                <td><center><a href="/market/{{entry['name']}}">{{entry['name'].title()}}</a></center></td>
+                <td> {{entry['meta']}} </td>
+          {% endfor %}
+          </tbody>
+        </table>
+        {% endif %}
+      
+        <h2>Posts</h2>
+        {% if not posts %}
+        <p> No result </p>
+        {% else %}
+        <table  id="table" class="table" style="display:table; table-layout:auto; width:100%">
+          <thead>
+            <tr>
+                <th style="width:15%"> Group </th>
+                <th>Title</th>
+                <th style="width:10%"> Date </th>
+            </tr>
+          </thead>
+          <tbody>
+          {% for entry in posts %}
+            <tr>
+                <td><a href="/group/{{entry['group_name']}}">{{entry['group_name'].title()}}</a></td>
+                <td>{{entry['post_title']}}</td>
+                <td>{{entry['discovered'].split(' ')[0]}}</td>
+            <tr>
+                {% if 'description' in entry and entry['description'] is not none %}
+            <tr><td colspan="3"> {{entry['description']}} </td></tr>
+                {% endif %}
+
+          {% endfor %}
+          </tbody>
+        </table>
+        {% endif %}
+    </article>
+{% endblock %}

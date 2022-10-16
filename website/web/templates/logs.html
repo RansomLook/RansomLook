@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% from 'bootstrap5/utils.html' import render_messages %}
+{% block title %}🦕 RansomLook 🦖{% endblock %}
+{% block content %}
+{{ render_messages(container=True, dismissible=True) }}
+
+    <article id="main" class="markdown-section">
+        <h1>Logs</h1>
+        <table id="table" class="table" style="display:table; table-layout:auto; width:100%">
+          <thead>
+            <tr>
+                <th style="width:10%"> Date </th>
+                <th style="width:90%"> Titre </th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for entry in logs %}
+                <tr>
+                    <td><center> {{entry[1]}} </center></td>
+                    <td>{{ entry[0] }}</td>
+                </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+    </article>
+{% endblock %}
