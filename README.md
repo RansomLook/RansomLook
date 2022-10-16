@@ -91,8 +91,8 @@ echo RANSOMLOOK_HOME="`pwd`" >> .env
 
 Get web dependencies (css, font, js)
 ```bash
-python tools/3rdparty.py
-python tools/generate_sri.py
+poetry run tools/3rdparty.py
+poetry run tools/generate_sri.py
 ```
 Be aware that those are version-constrained because [SubResource Integrity (SRI)](https://developer.mozilla.org/en-US/docs/Web/Security/Subresource_Integrity) is used (set in website/web/sri.txt).
 
