@@ -35,6 +35,7 @@ def appender(entry, group_name):
     append a new post to posts.json
     '''
     rocketconfig = get_config('generic','rocketchat')
+    twitterconfig = get_config('generic','twitter')
     if type(entry) is str :
        post_title = entry
        description = ''
@@ -64,6 +65,8 @@ def appender(entry, group_name):
     red.set(group_name, json.dumps(posts))
     if rocketconfig['enable'] == True:
         rocketnotify(rocketconfig, group_name, post_title, description)
+    if twitter['enable'] == True:
+        twitternotify(twitterconfig, group_name, post_title)
 
 def main():
     modules = glob.glob(join(dirname('ransomlook/parsers/'), "*.py"))

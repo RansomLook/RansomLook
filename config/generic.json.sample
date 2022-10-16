@@ -17,6 +17,13 @@
         "auth_token": "",
         "channel_name": ""
     },
+    "twitter": {
+        "enable": false,
+        "consumer_key": "",
+        "consumer_secret": "",
+        "access_token": "",
+        "access_token_secret": "",
+    },
      "users": {},
     "malpedia": "",
     "thread": 4,
@@ -26,6 +33,7 @@
         "malpedia": "malpedia apikey",
         "email": "Email configuration",
         "rocketchat": "Informatin about rocketckat",
+        "twitter": "Allow to post new item to Twitter",
         "website_listen_ip": "IP Flask will listen on. Defaults to 0.0.0.0, meaning all interfaces.",
         "website_listen_port": "Port Flask will listen on.",
         "thread": "Number of PW instances to run",
