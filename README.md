@@ -47,7 +47,7 @@ cd ..
 Do the usual:
 
 ```bash
-git clone https://github.com/FafnerKeyZee/RansomLook.git
+git clone https://github.com/RansomLook/RansomLook.git
 ```
 
 ### Ready to install RansomLook ?
