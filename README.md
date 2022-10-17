@@ -130,7 +130,7 @@ You can stop it with
 poetry run stop
 ```
 
-With the default configuration, you can access the web interface on `http://0.0.0.0:6100`.
+With the default configuration, you can access the web interface on `http://127.0.0.1:8000`.
 
 # Commands
 
