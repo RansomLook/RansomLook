@@ -4,7 +4,14 @@ RansomLook is tool to monitor Ransomware groups and markets and extract their vi
 
 ## Features
 
-- Based on ransomwatch, there is a tool to import their groups and posts.
+- Based on ransomwatch https://github.com/joshhighet/ransomwatch, there is a tool to import their groups and posts.
+  - Important changes have been done:
+    - All data are stored into redis
+    - Scraping is multithreaded
+    - Scraping is done with PlayWright and screenshots are taken at the same time
+    - Parsers are now using BeautilfulSoup and are independant.
+    - If you create a local account, you will be able to add/edit/delete groups using the web interface
+    - All website is done using Flask so no need to regenerate any MD file
 - Details about the groups with data from malpedia.
 - Daily notification by email.
 - Notification on RocketChat when a new post  is created.
