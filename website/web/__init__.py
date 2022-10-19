@@ -20,7 +20,7 @@ from ransomlook.sharedutils import groupcount, hostcount, onlinecount, postslast
 from ransomlook.default.config import get_homedir
 from ransomlook.default import get_socket_path
 from .helpers import get_secret_key, sri_load, User, build_users_table, load_user_from_request
-from .forms import AddForm, LoginForm, SelectForm, EditForm, DeleteForm
+from .forms import AddForm, LoginForm, SelectForm, EditForm, DeleteForm, AlertForm
 
 app = Flask(__name__)
 
@@ -379,7 +379,6 @@ def editgroup(database, name):
     if form.validate_on_submit():
         data = json.loads(red.get(name))
         data['meta']=form.description.data
-        print(form.profiles.data)
         data['profile'] = ast.literal_eval(form.profiles.data)
         data['links'] = form.links.data
         red.set(name, json.dumps(data))
@@ -410,6 +409,24 @@ def logs():
     for i,s in enumerate(logs):
        logs[i] = (s[0].decode(), dt.fromtimestamp(s[1]).strftime('%Y-%m-%d'))
     return render_template('logs.html', logs=logs)
+
+@app.route('/admin/alerting', methods=['GET', 'POST'])
+@flask_login.login_required
+def alerting():
+    form = AlertForm()
+    red = Redis(unix_socket_path=get_socket_path('cache'), db=1)
+    keywords = red.get('keywords')
+    if keywords is not None:
+        keywords = keywords.decode()
+    if form.validate_on_submit():
+        keywords = str(form.keywords.data).splitlines()
+        keywords = list(dict.fromkeys(keywords))
+        keywords = '\n'.join(keywords)
+        print(keywords)
+        red.set('keywords',str(keywords))
+        flash(f'Success to update keywords', 'success')
+    form.keywords.data=keywords
+    return render_template('alerts.html', form=form)
 
 if __name__ == "__main__":
 	app.run(debug=True)

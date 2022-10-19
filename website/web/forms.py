@@ -8,6 +8,10 @@ class AddForm(FlaskForm):
     url  = StringField('Url', validators=[DataRequired()])
     submit = SubmitField('Add')
 
+class AlertForm(FlaskForm):
+    keywords = TextAreaField()
+    submit = SubmitField('Update Keywords')
+
 class DeleteForm(FlaskForm):
     delete = BooleanField('Check to delete', validators=[DataRequired()])
     submit = SubmitField('Delete this group')

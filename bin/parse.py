@@ -15,6 +15,7 @@ import redis
 from ransomlook.default.config import get_config, get_socket_path
 from ransomlook.rocket import rocketnotify
 from ransomlook.twitter import twitternotify
+from ransomlook.email import alertingnotify
 
 from ransomlook.sharedutils import dbglog, stdlog, errlog
 
@@ -37,6 +38,7 @@ def appender(entry, group_name):
     '''
     rocketconfig = get_config('generic','rocketchat')
     twitterconfig = get_config('generic','twitter')
+    emailconfig = get_config('generic', 'email')
     if type(entry) is str :
        post_title = entry
        description = ''
@@ -64,6 +66,18 @@ def appender(entry, group_name):
     stdlog('adding new post: ' + 'group: ' + group_name + ' title: ' + post_title)
     posts.append(newpost)
     red.set(group_name, json.dumps(posts))
+
+    # Notification zone
+    red = redis.Redis(unix_socket_path=get_socket_path('cache'), db=1)
+    keywords = red.get('keywords')
+    matching = []
+    if keywords is not None:
+        listkeywords = keywords.decode().splitlines()
+        for keyword in listkeywords:
+             if keyword.lower() in post_title.lower() or keyword.lower() in description.lower():
+                 matching.append(keyword)
+    if matching:
+        alertingnotify(emailconfig, group_name, post_title, description, matching)
     if rocketconfig['enable'] == True:
         rocketnotify(rocketconfig, group_name, post_title, description)
     if twitterconfig['enable'] == True:
