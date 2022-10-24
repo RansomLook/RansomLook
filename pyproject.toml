@@ -39,7 +39,7 @@ tweepy = "^4.10.1"
 mypy = "^0.982"
 types-setuptools = "^65.5.0"
 types-redis = "^4.3.21"
-pylint = "^2.15.4"
+pylint = "^2.15.5"
 
 
 [build-system]
