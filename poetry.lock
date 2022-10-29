@@ -693,7 +693,7 @@ python-versions = ">=3.6,<4.0"
 
 [[package]]
 name = "tweepy"
-version = "4.10.1"
+version = "4.12.0"
 description = "Twitter library for Python"
 category = "main"
 optional = false
@@ -798,7 +798,7 @@ testing = ["func-timeout", "jaraco.itertools", "pytest (>=6)", "pytest-black (>=
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.8,<3.11"
-content-hash = "6d05ba77688d1482832156f97a9b0e523d63dbfa27c1d0acfd0445fcec1f5181"
+content-hash = "0ce57fa1c1fda848a6f42deec95ced34f354d5fee2d58516601f6cb54f9cb30b"
 
 [metadata.files]
 astroid = [
@@ -1499,8 +1499,8 @@ tomlkit = [
     {file = "tomlkit-0.11.4.tar.gz", hash = "sha256:3235a9010fae54323e727c3ac06fb720752fe6635b3426e379daec60fbd44a83"},
 ]
 tweepy = [
-    {file = "tweepy-4.10.1-py3-none-any.whl", hash = "sha256:0a21396b646af4fcee69762d2908c104e1fe2e2c4e1dfd6e6078a41b38771382"},
-    {file = "tweepy-4.10.1.tar.gz", hash = "sha256:310193775d7fc381abd6f37021a9af27f7e9edfcce5ec51bd73ea5f30c21fa61"},
+    {file = "tweepy-4.12.0-py3-none-any.whl", hash = "sha256:c463fa147f75016e3a5ed3713580c7339a301b58f90895e696bfae068556d7cc"},
+    {file = "tweepy-4.12.0.tar.gz", hash = "sha256:274f91dfee6d4aed83d9178fbe338bbfd3c06a4220cfe14438159685db7569b7"},
 ]
 types-redis = [
     {file = "types-redis-4.3.21.3.tar.gz", hash = "sha256:2e1f184056188c8754ded0b5173dc01824d2bfe41975fe318068a68beedfb62c"},
