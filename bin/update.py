@@ -109,7 +109,7 @@ def main():
         try:
             p.check_returncode()
             print('Restarting Ransomlook with systemd...')
-            run_command('sudo service Ransomlook restart')
+            run_command('sudo service ransomlook restart')
             print('done.')
         except subprocess.CalledProcessError:
             print('Restarting Ransomlool with poetry...')
