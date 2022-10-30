@@ -45,6 +45,27 @@
           </tbody>
         </table>
         {% endif %}
+
+	<h1>Leaks</h1>
+        {% if not leaks %}
+        <p> No result </p>
+        {% else %}
+        <table id="table" class="table" style="display:table; table-layout:auto; width:100%">
+          <thead>
+            <tr>
+                <th style="width:15%"> Leak </th>
+                <th> Description </th>
+            </tr>
+          </thead>
+          <tbody>
+          {% for entry in leaks %}
+            <tr>
+                <td><center><a href="/market/{{entry['name']}}">{{entry['name'].title()}}</a></center></td>
+                <td> {{entry['meta']}} </td>
+          {% endfor %}
+          </tbody>
+        </table>
+        {% endif %}
       
         <h2>Posts</h2>
         {% if not posts %}

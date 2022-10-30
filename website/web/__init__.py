@@ -321,7 +321,16 @@ def search():
             if query.lower() in key.decode().lower() or group['meta'] is not None and query.lower() in group['meta'].lower():
                 group['name'] = key.decode().lower()
                 markets.append(group)
-        groups.sort(key=lambda x: x["name"].lower())
+        markets.sort(key=lambda x: x["name"].lower())
+
+        red = Redis(unix_socket_path=get_socket_path('cache'), db=4)
+        leaks = []
+        for key in red.keys():
+            group = json.loads(red.get(key))
+            if query.lower() in key.decode().lower() or group['meta'] is not None and query.lower() in group['meta'].lower():
+                group['name'] = key.decode().lower()
+                leaks.append(group)
+        leaks.sort(key=lambda x: x["name"].lower())
 
         red = Redis(unix_socket_path=get_socket_path('cache'), db=2)
         posts = []
@@ -332,7 +341,8 @@ def search():
                         entry['group_name']=key.decode()
                         posts.append(entry)
         posts.sort(key=lambda x: x["group_name"].lower())
-        return render_template("search.html", query=query,groups=groups, markets=markets, posts=posts)
+
+        return render_template("search.html", query=query,groups=groups, markets=markets, posts=posts, leaks=leaks)
     return redirect(url_for("home"))
 
 # Admin Zone
