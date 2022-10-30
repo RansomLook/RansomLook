@@ -277,6 +277,30 @@ def market(name):
                         return render_template("group.html", group = group, posts=sorted_posts)
         return redirect(url_for("home"))
 
+@app.route("/leaks")
+def leaks():
+        red = Redis(unix_socket_path=get_socket_path('cache'), db=4)
+
+        leaks = []
+        for key in red.keys():
+                entry= json.loads(red.get(key))
+                leaks.append(entry)
+        leaks.sort(key=lambda x: x["name"].lower())
+        return render_template("leaks.html", data=leaks)
+
+@app.route("/leak/<name>")
+def leak(name):
+        red = Redis(unix_socket_path=get_socket_path('cache'), db=4)
+        groups = []
+        for key in red.keys():
+                if key.decode().lower() == name.lower():
+                        group= json.loads(red.get(key))
+                        if 'meta' in group and group['meta'] is not None:
+                            group['meta']=group['meta'].replace('\n', '<br/>')
+                        return render_template("leak.html", group = group)
+
+        return redirect(url_for("home"))
+
 @app.route('/search', methods=['GET', 'POST'])
 def search():
     if request.method == 'POST':
