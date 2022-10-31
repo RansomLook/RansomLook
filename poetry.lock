@@ -604,14 +604,15 @@ requests = ">=2.0.0"
 rsa = ["oauthlib[signedtoken] (>=3.0.0)"]
 
 [[package]]
-name = "rocketchat-API"
-version = "1.27.0"
+name = "rocketchat-api"
+version = "1.28.1"
 description = "Python API wrapper for Rocket.Chat"
 category = "main"
 optional = false
 python-versions = "*"
 
 [package.dependencies]
+packaging = "*"
 requests = "*"
 
 [[package]]
@@ -798,7 +799,7 @@ testing = ["func-timeout", "jaraco.itertools", "pytest (>=6)", "pytest-black (>=
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.8,<3.11"
-content-hash = "0ce57fa1c1fda848a6f42deec95ced34f354d5fee2d58516601f6cb54f9cb30b"
+content-hash = "6f455c9ce01266780859625489469cffe08a33239ed81bd0d4039bf9cc94ad24"
 
 [metadata.files]
 astroid = [
@@ -1466,9 +1467,9 @@ requests-oauthlib = [
     {file = "requests-oauthlib-1.3.1.tar.gz", hash = "sha256:75beac4a47881eeb94d5ea5d6ad31ef88856affe2332b9aafb52c6452ccf0d7a"},
     {file = "requests_oauthlib-1.3.1-py2.py3-none-any.whl", hash = "sha256:2577c501a2fb8d05a304c09d090d6e47c306fef15809d102b327cf8364bddab5"},
 ]
-rocketchat-API = [
-    {file = "rocketchat_API-1.27.0-py3-none-any.whl", hash = "sha256:13a66bf94f01b5b0fcd5bd86cff4e09950e368e2579cff45a6e43ed1b5c61336"},
-    {file = "rocketchat_API-1.27.0.tar.gz", hash = "sha256:38b40cefa46709067ff1deec4b19aa8a905017b0e3bdd2b641a9ba1ee6d77f68"},
+rocketchat-api = [
+    {file = "rocketchat_API-1.28.1-py3-none-any.whl", hash = "sha256:0dd4a0a063fde3fe6ea95a98142da6dd58af6b75e09f3105e36c7f14130b0fc6"},
+    {file = "rocketchat_API-1.28.1.tar.gz", hash = "sha256:77683cb600b2da27f5334e490f24b88100ee25e943db14de74c102f769ad4778"},
 ]
 setuptools = [
     {file = "setuptools-65.4.0-py3-none-any.whl", hash = "sha256:c2d2709550f15aab6c9110196ea312f468f41cd546bceb24127a1be6fdcaeeb1"},
