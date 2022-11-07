@@ -14,6 +14,11 @@ import ast
 import flask_login  # type: ignore
 from werkzeug.security import check_password_hash
 
+from flask_cors import CORS  # type: ignore
+from flask_restx import Api  # type: ignore
+
+from importlib.metadata import version
+
 from ransomlook.ransomlook import adder
 from ransomlook.sharedutils import createfile
 from ransomlook.sharedutils import groupcount, hostcount, onlinecount, postslast24h, mounthlypostcount, currentmonthstr, postssince, poststhisyear,postcount,parsercount
@@ -21,6 +26,8 @@ from ransomlook.default.config import get_homedir
 from ransomlook.default import get_socket_path
 from .helpers import get_secret_key, sri_load, User, build_users_table, load_user_from_request
 from .forms import AddForm, LoginForm, SelectForm, EditForm, DeleteForm, AlertForm
+
+from .genericapi import api as generic_api
 
 app = Flask(__name__)
 
@@ -30,6 +37,8 @@ Bootstrap5(app)
 app.config['BOOTSTRAP_SERVE_LOCAL'] = True
 app.config['SESSION_COOKIE_NAME'] = 'ransomlook'
 app.config['SESSION_COOKIE_SAMESITE'] = 'Strict'
+
+pkg_version = version('ransomlook')
 
 flask_moment.Moment(app=app)
 
@@ -464,3 +473,22 @@ def alerting():
 
 if __name__ == "__main__":
 	app.run(debug=True)
+
+
+authorizations = {
+    'apikey': {
+        'type': 'apiKey',
+        'in': 'header',
+        'name': 'Authorization'
+    }
+}
+
+#CORS(app, resources={r"/recent": {"origins": "*"}})
+
+api = Api(app, title='Lookyloo API',
+          description='API to submit captures and query a lookyloo instance.',
+          doc='/doc/',
+          authorizations=authorizations,
+          version=pkg_version)
+
+api.add_namespace(generic_api)
