@@ -38,7 +38,7 @@ Flask-Cors = "^3.0.10"
 flask-restx = "^1.0.3"
 
 [tool.poetry.dev-dependencies]
-mypy = "^0.982"
+mypy = "^0.990"
 types-setuptools = "^65.5.0"
 types-redis = "^4.3.21"
 pylint = "^2.15.5"
