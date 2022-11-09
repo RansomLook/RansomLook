@@ -1,0 +1,18 @@
+[Unit]
+Description=uWSGI instance to serve ransomlook
+After=network.target
+
+[Service]
+User=$USER
+Group=$USER
+Type=forking
+WorkingDirectory=/opt/ransomlook/RansomLook
+Environment="PATH=/home/$USER/.local/bin:/usr/bin"
+ExecStart=/bin/bash -c "exec poetry run start"
+ExecStop=/bin/bash -c "exec poetry run stop"
+StandardOutput=append:/var/log/ransomlook_message.log
+StandardError=append:/var/log/ransomlook_error.log
+
+
+[Install]
+WantedBy=multi-user.target
