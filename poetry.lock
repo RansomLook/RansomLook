@@ -841,7 +841,7 @@ python-versions = "*"
 
 [[package]]
 name = "types-setuptools"
-version = "65.5.0.3"
+version = "65.6.0.0"
 description = "Typing stubs for setuptools"
 category = "dev"
 optional = false
@@ -919,7 +919,7 @@ testing = ["func-timeout", "jaraco.itertools", "pytest (>=6)", "pytest-black (>=
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.8,<3.11"
-content-hash = "6535b2fdabf1bf4c9ea6a145e9bc9833b70107e4b8ceafd30a8b839628213c06"
+content-hash = "051ffe936b5bc6035ee415e595aa4fe20705e11445e256c7b9f9a6e223887c63"
 
 [metadata.files]
 aniso8601 = [
@@ -1699,8 +1699,8 @@ types-redis = [
     {file = "types_redis-4.3.21.4-py3-none-any.whl", hash = "sha256:cf8a94ac9efbeb6459fd1aa05dbb977fc59c1022ebe8f72bc0bae57df136105d"},
 ]
 types-setuptools = [
-    {file = "types-setuptools-65.5.0.3.tar.gz", hash = "sha256:17769171f5f2a2dc69b25c0d3106552a5cda767bbf6b36cb6212b26dae5aa9fc"},
-    {file = "types_setuptools-65.5.0.3-py3-none-any.whl", hash = "sha256:9254c32b0cc91c486548e7d7561243b5bd185402a383e93c6691e1b9bc8d86e2"},
+    {file = "types-setuptools-65.6.0.0.tar.gz", hash = "sha256:3270beadb99bc6fa4b9a5cc35106e7144a5c33028ce48992b10e74adc8cc5c82"},
+    {file = "types_setuptools-65.6.0.0-py3-none-any.whl", hash = "sha256:9466c5c057dc8e5a0f0dc3b2b0b4b4284524d45bd1cd80ac62b96f19da1459b0"},
 ]
 typing-extensions = [
     {file = "typing_extensions-4.3.0-py3-none-any.whl", hash = "sha256:25642c956049920a5aa49edcdd6ab1e06d7e5d467fc00e0506c44ac86fbfca02"},
