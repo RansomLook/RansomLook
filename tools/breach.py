@@ -4,6 +4,7 @@ import os
 from ransomlook.default import get_socket_path, get_config
 
 from ransomlook.rocket import rocketnotifyleak
+from ransomlook.twitter import twitternotifyleak
 
 from bs4 import BeautifulSoup
 import requests
@@ -21,6 +22,7 @@ divs_name=soup.find('table', {"id": "datatables-indexed-breaches"})
 tbody = divs_name.find('tbody')
 trs = tbody.find_all('tr')
 rocketconfig = get_config('generic','rocketchat')
+twitterconfig = get_config('generic','twitter')
 for tr in trs:
   tds= tr.find_all('td')
   data = tds[3].div.div.a['data-id']
@@ -39,4 +41,6 @@ for tr in trs:
   red.set(data,json.dumps(datas))
   if rocketconfig['enable'] == True:
     rocketnotifyleak(rocketconfig, datas)
+  if twitterconfig['enable'] == True:
+    twitternotifyleak(twitterconfig, datas['name'])
 print('done')
