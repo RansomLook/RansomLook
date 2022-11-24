@@ -16,3 +16,12 @@ def rocketnotify(config, group, title, description) -> None :
         rocket.chat_post_message('New post from '+group+' : '+ title + ' => ' + description, room_id=config['channel_name'])
     except:
         errlog('Can not connect to Rocket')
+
+def rocketnotifyleak(config, datas) -> None :
+    try:
+        rocket = RocketChat(user_id=config['user_id'], auth_token=config['auth_token'], \
+            server_url=config['server'], ssl_verify=config['ssl_verify'])
+        rocket.chat_post_message('New DataBreach leak detected ' + datas['name'] + " : " + datas['columns'], room_id=config['channel_name'])
+    except:
+        errlog('Can not connect to Rocket')
+

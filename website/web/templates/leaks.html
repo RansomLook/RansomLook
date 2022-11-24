@@ -17,7 +17,7 @@
            <tbody>
              {% for entry in data %}
                 <tr>
-                <td> <a href="/leak/{{entry['name']}}">{{ entry['name'].title() }}</a>  </td>
+                <td> <a href="/leak/{{entry['id'].decode()}}">{{ entry['name'].title() }}</a>  </td>
                 <td><center> {{ entry['records'] }} </center></td>
                 <td> {{ entry['indexed'] }} </td>
                 </tr>

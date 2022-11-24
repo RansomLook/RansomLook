@@ -293,6 +293,7 @@ def leaks():
         leaks = []
         for key in red.keys():
                 entry= json.loads(red.get(key))
+                entry['id']=key
                 leaks.append(entry)
         leaks.sort(key=lambda x: x["name"].lower())
         return render_template("leaks.html", data=leaks)

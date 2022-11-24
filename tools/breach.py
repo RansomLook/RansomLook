@@ -2,6 +2,9 @@
 import redis
 import os
 from ransomlook.default import get_socket_path, get_config
+
+from ransomlook.rocket import rocketnotifyleak
+
 from bs4 import BeautifulSoup
 import requests
 import json
@@ -11,23 +14,30 @@ source = 'https://leak-lookup.com/breaches'
 
 list_div=[]
 red = redis.Redis(unix_socket_path=get_socket_path('cache'), db=4)
+keys = red.keys()
 res = requests.get(source)
 soup=BeautifulSoup(res.text,'html.parser')
 divs_name=soup.find('table', {"id": "datatables-indexed-breaches"})
 tbody = divs_name.find('tbody')
 trs = tbody.find_all('tr')
+rocketconfig = get_config('generic','rocketchat')
 for tr in trs:
   tds= tr.find_all('td')
   data = tds[3].div.div.a['data-id']
+  if data.encode() in keys:
+    print("skip : " + data)
+    continue
   x = requests.post(url, data={'id':data})
   datas=x.json()
   fields = BeautifulSoup(datas['columns'],'html.parser')
   spans = fields.find_all('span')
   columns=[]
   for span in spans:
-      columns.append(span.text.strip())
+    columns.append(span.text.strip())
   datas['columns']=columns
   datas['meta']=''
   datas['location']=[]
-  red.set(datas['name'],json.dumps(datas))
+  red.set(data,json.dumps(datas))
+  if rocketconfig['enable'] == True:
+    rocketnotifyleak(rocketconfig, datas)
 print('done')
