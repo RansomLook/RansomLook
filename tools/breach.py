@@ -25,7 +25,6 @@ for tr in trs:
   tds= tr.find_all('td')
   data = tds[3].div.div.a['data-id']
   if data.encode() in keys:
-    print("skip : " + data)
     continue
   x = requests.post(url, data={'id':data})
   datas=x.json()
