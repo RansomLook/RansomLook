@@ -311,6 +311,18 @@ def leak(name):
 
         return redirect(url_for("home"))
 
+@app.route("/telegram")
+def telegram():
+        red = Redis(unix_socket_path=get_socket_path('cache'), db=5)
+
+        telegram = []
+        for key in red.keys():
+                entry= json.loads(red.get(key))
+                telegram.append(entry)
+        telegram.sort(key=lambda x: x["name"].lower())
+        return render_template("telegram.html", data=telegram)
+
+
 @app.route('/search', methods=['GET', 'POST'])
 def search():
     if request.method == 'POST':

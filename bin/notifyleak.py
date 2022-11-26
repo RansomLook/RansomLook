@@ -33,7 +33,7 @@ def main() -> None :
 
     email_config = get_config('generic','email')
     newposts = getnewbreach(str(date.today() - timedelta(days =1)))
-    if newposts == {}:
+    if newposts == []:
         print('No new post')
         return
     message = '''Hello

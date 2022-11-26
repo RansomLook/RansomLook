@@ -50,6 +50,7 @@
               <li {% if request.path == '/markets' %} class="active" {% endif %}><a href="{{ url_for('markets') }}" title="Forums &amp; Market">Forums &amp; Market</a></li>
               {% if request.path == '/markets' %}{% block markets %}{% endblock %}{% endif %}
               <li {% if request.path == '/leaks' %} class="active" {% endif %}><a href="{{ url_for('leaks') }}" title="Leaks">Leaks</a></li>
+              <li {% if request.path == '/telegram' %} class="active" {% endif %}><a href="{{ url_for('telegram') }}" title="Telegram">Telegram</a></li>
               <li {% if request.path == '/' %} class="active" {% endif %}><a href="/" title="Stats &amp; graphs">Stats &amp; graphs</a></li></ul>
           {% if current_user.is_authenticated %}
           <ul><li>Admin Zone </li>
