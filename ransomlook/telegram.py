@@ -24,6 +24,8 @@ from .sharedutils import siteschema
 from .sharedutils import stdlog, errlog
 from .sharedutils import createfile
 
+from bs4 import BeautifulSoup
+
 # pylint: disable=W0703
 
 def threadscape(queuethread, lock):
@@ -97,4 +99,24 @@ def scraper() -> None:
 
 def parser():
     '''parsing telegram'''
+    red = redis.Redis(unix_socket_path=get_socket_path('cache'), db=5)
+    redmessage = redis.Redis(unix_socket_path=get_socket_path('cache'), db=6)
+    for key in red.keys():
+           html_doc='source/telegram/'+ key.decode() + '.html'
+           file=open(html_doc,'r')
+           soup = BeautifulSoup(file,'html.parser')
+           tgpost =  soup.find_all('div', {'class' : 'tgme_widget_message'})
+           if key in redmessage.keys():
+               posts = json.loads(redmessage.get(key))
+           else:
+               posts={}
+           for content in tgpost:
+               try:
+                   message = content.find('div', {'class':'tgme_widget_message_text'}).text
+                   timestamp = content.find('time', {'class' : 'time'})['datetime']
+                   if timestamp not in posts:
+                      posts.update({timestamp:message})
+               except:
+                  continue
+           redmessage.set(key,json.dumps(posts))
     print("ok")

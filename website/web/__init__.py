@@ -311,8 +311,8 @@ def leak(name):
 
         return redirect(url_for("home"))
 
-@app.route("/telegram")
-def telegram():
+@app.route("/telegrams")
+def telegrams():
         red = Redis(unix_socket_path=get_socket_path('cache'), db=5)
 
         telegram = []
@@ -323,8 +323,19 @@ def telegram():
                     entry['screen']=screenfile
                 telegram.append(entry)
         telegram.sort(key=lambda x: x["name"].lower())
-        return render_template("telegram.html", data=telegram)
+        return render_template("telegrams.html", data=telegram)
 
+@app.route("/telegram/<name>")
+def telegram(name):
+        red = Redis(unix_socket_path=get_socket_path('cache'), db=6)
+        groups = []
+        for key in red.keys():
+                print(key.decode())
+                if key.decode() == name:
+                        posts= json.loads(red.get(key))
+                        return render_template("telegram.html", posts = posts, name=name)
+
+        return redirect(url_for("home"))
 
 @app.route('/search', methods=['GET', 'POST'])
 def search():
