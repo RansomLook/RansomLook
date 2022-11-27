@@ -5,14 +5,25 @@
 {% block content %}
     <article id="main" class="markdown-section">
 	<h1>Telegram list</h1>
+        <div class="table-responsive">
+            <table id="table" class="table" style="display:table; table-layout:auto; width:100%">
+            <thead>
+                <tr>
+                    <th style="width:25%"> Name </th>
+                    <th> Description </th>
+                    <th style="width:10%"> Screen </th>
+                </tr>
+            </thead>
+            <tbody>
         {% for entry in data %}
-            <h2 id="{{entry['name'].title()}}"> {{ entry['name'].title() }}<h2>
-            <h4>Description</h4>
-            {% if entry['meta'] is not none %}
-            <p>{{ entry['meta'] }}</p>
-            {% endif %}
-            <h4>Links</h4>
-            <p>{{ entry['link'] }}</p>
+            <tr>
+               <td><a href="{{ entry['link'] }}" rel="noopener noreferrer" target="_blank">{{ entry['name'].title() }}</a></td>
+               <td>{{ entry['meta'] }}</td>
+               <td></td>
+            </tr>
         {% endfor %}
+            </tbody>
+            </table>
+        </div>
     </article>
 {% endblock %}
