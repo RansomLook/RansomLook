@@ -102,6 +102,7 @@ def parser():
     red = redis.Redis(unix_socket_path=get_socket_path('cache'), db=5)
     redmessage = redis.Redis(unix_socket_path=get_socket_path('cache'), db=6)
     for key in red.keys():
+        try:
            html_doc='source/telegram/'+ key.decode() + '.html'
            file=open(html_doc,'r')
            soup = BeautifulSoup(file,'html.parser')
@@ -119,4 +120,6 @@ def parser():
                except:
                   continue
            redmessage.set(key,json.dumps(posts))
+        except:
+           continue
     print("ok")
