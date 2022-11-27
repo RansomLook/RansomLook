@@ -318,6 +318,9 @@ def telegram():
         telegram = []
         for key in red.keys():
                 entry= json.loads(red.get(key))
+                screenfile = '/screenshots/telegram/' + entry['name'] + '.png'
+                if os.path.exists(str(get_homedir()) + '/source' + screenfile):
+                    entry['screen']=screenfile
                 telegram.append(entry)
         telegram.sort(key=lambda x: x["name"].lower())
         return render_template("telegram.html", data=telegram)

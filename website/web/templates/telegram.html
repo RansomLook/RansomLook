@@ -11,7 +11,7 @@
                 <tr>
                     <th style="width:25%"> Name </th>
                     <th> Description </th>
-                    <th style="width:10%"> Screen </th>
+                    <th style="width:10%"> <center>Screen </center></th>
                 </tr>
             </thead>
             <tbody>
@@ -19,7 +19,11 @@
             <tr>
                <td><a href="{{ entry['link'] }}" rel="noopener noreferrer" target="_blank">{{ entry['name'].title() }}</a></td>
                <td>{{ entry['meta'] }}</td>
+               {% if 'screen' in entry %}
+               <td><a href="{{ entry['screen'] }}" rel="noopener noreferrer" target="_blank"">Screen</a></td>
+               {% else %}
                <td></td>
+               {% endif %}
             </tr>
         {% endfor %}
             </tbody>
