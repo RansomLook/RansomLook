@@ -4,7 +4,7 @@ from ransomlook import telegram
 
 def main():
     print("Starting scraping")
-    #telegram.scraper()
+    telegram.scraper()
     telegram.parser()
 
 if __name__ == '__main__':
