@@ -10,7 +10,10 @@ __pycache__/
 <<<<<<< HEAD
 # Ignore local folders
 data/*
-source/
+source/*.html
+source/telegram/*
+source/screenshots/*
+source/screenshots/telegram
 cache/
 
 

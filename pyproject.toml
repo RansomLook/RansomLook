@@ -17,6 +17,7 @@ stop = "bin.stop:main"
 run_backend = "bin.run_backend:main"
 shutdown = "bin.shutdown:main"
 update = "bin.update:main"
+telegram = "bin.telegram:main"
 
 [tool.poetry.dependencies]
 python = "^3.8,<3.11"
