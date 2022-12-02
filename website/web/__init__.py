@@ -330,7 +330,6 @@ def telegram(name):
         red = Redis(unix_socket_path=get_socket_path('cache'), db=6)
         groups = []
         for key in red.keys():
-                print(key.decode())
                 if key.decode() == name:
                         posts= json.loads(red.get(key))
                         return render_template("telegram.html", posts = posts, name=name)
@@ -450,7 +449,7 @@ def editgroup(database, name):
         data = json.loads(red.get(name))
         data['meta']=form.description.data
         data['profile'] = ast.literal_eval(form.profiles.data)
-        data['links'] = form.links.data
+        data['locations'] = ast.literal_eval(form.links.data)
         red.set(name, json.dumps(data))
         redlogs.zadd('logs', {f'{flask_login.current_user.id} modified : {name}, {data["meta"]}, {data["profile"]}, {data["links"]}': score})
         if name != form.groupname.data:
@@ -492,7 +491,6 @@ def alerting():
         keywords = str(form.keywords.data).splitlines()
         keywords = list(dict.fromkeys(keywords))
         keywords = '\n'.join(keywords)
-        print(keywords)
         red.set('keywords',str(keywords))
         flash(f'Success to update keywords', 'success')
     form.keywords.data=keywords
