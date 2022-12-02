@@ -1,3 +1,4 @@
+
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 '''
@@ -18,6 +19,9 @@ from .default.config import get_config, get_homedir, get_socket_path
 
 import redis
 
+import smtplib
+from email.message import EmailMessage
+
 from .sharedutils import striptld
 from .sharedutils import openjson
 from .sharedutils import siteschema
@@ -26,6 +30,30 @@ from .sharedutils import createfile
 
 from bs4 import BeautifulSoup
 
+def alertingnotify(config, group, description, keyword) -> None :
+    '''
+    Posting message to RocketChat
+    '''
+    message = """Hello,
+A new message in telegram is matching your keywords:
+"""
+    message += str(keyword) +'\n'
+    message += 'Channel : ' + group.decode() + '\nMessage : ' + description
+    fromaddr = config['from']
+    toaddrs = config['to']
+    subject = "[RansomLook] New post matching your keywords"
+    msg = EmailMessage()
+    msg['Subject'] = subject
+    msg['From'] = fromaddr
+    msg['To'] = ', '.join(toaddrs)
+    msg.set_content(message)
+    try:
+        server = smtplib.SMTP(config['smtp_server'],config['smtp_port'])
+        server.send_message(msg)
+        server.quit()
+    except smtplib.SMTPException as e:
+        print(e)
+    except Exception as e: print(e)
 # pylint: disable=W0703
 
 def threadscape(queuethread, lock):
@@ -101,7 +129,16 @@ def parser():
     '''parsing telegram'''
     red = redis.Redis(unix_socket_path=get_socket_path('cache'), db=5)
     redmessage = redis.Redis(unix_socket_path=get_socket_path('cache'), db=6)
+    redmatch = redis.Redis(unix_socket_path=get_socket_path('cache'), db=1)
+    emailconfig = get_config('generic', 'email')
+
+    keywords = redmatch.get('keywords')
+    listkeywords = []
+    if keywords is not None:
+        listkeywords = keywords.decode().splitlines()
+
     for key in red.keys():
+        matching = []
         try:
            html_doc='source/telegram/'+ key.decode() + '.html'
            file=open(html_doc,'r')
@@ -117,9 +154,18 @@ def parser():
                    timestamp = content.find('time', {'class' : 'time'})['datetime']
                    if timestamp not in posts:
                       posts.update({timestamp:message})
+                      for keyword in listkeywords:
+                          if keyword.lower() in message.lower():
+                              matching.append(keyword)
+                      if matching :
+                          alertingnotify(emailconfig, key, message, matching)
                except:
+                  print('error with the channel:'+key.decode())
                   continue
            redmessage.set(key,json.dumps(posts))
         except:
+           print('error with :'+key.decode())
            continue
+
+
     print("ok")
