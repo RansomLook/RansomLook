@@ -377,7 +377,28 @@ def search():
                         posts.append(entry)
         posts.sort(key=lambda x: x["group_name"].lower())
 
-        return render_template("search.html", query=query,groups=groups, markets=markets, posts=posts, leaks=leaks)
+        red = Redis(unix_socket_path=get_socket_path('cache'), db=5)
+        channels = []
+        for key in red.keys():
+            group = json.loads(red.get(key))
+            if query.lower() in key.decode().lower() or group['meta'] is not None and query.lower() in group['meta'].lower():
+                channels.append(group)
+        print(channels)
+        channels.sort(key=lambda x: x["name"].lower())
+
+        red = Redis(unix_socket_path=get_socket_path('cache'), db=6)
+        messages = []
+        for key in red.keys():
+                entries = json.loads(red.get(key))
+                for entry in entries:
+                    if query.lower() in entries[entry].lower() :
+                        myentry={}
+                        myentry["group_name"] = key.decode()
+                        myentry["message"] = entries[entry]
+                        messages.append(myentry)
+        messages.sort(key=lambda x: x["group_name"].lower())
+
+        return render_template("search.html", query=query,groups=groups, markets=markets, posts=posts, leaks=leaks, channels=channels, messages=messages)
     return redirect(url_for("home"))
 
 # Admin Zone

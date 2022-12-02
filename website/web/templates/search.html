@@ -67,7 +67,7 @@
         </table>
         {% endif %}
       
-        <h2>Posts</h2>
+        <h1>Posts</h1>
         {% if not posts %}
         <p> No result </p>
         {% else %}
@@ -94,5 +94,48 @@
           </tbody>
         </table>
         {% endif %}
+
+	<h1>Channels</h1>
+        {% if not channels %}
+        <p> No result </p>
+        {% else %}
+        <table  id="table" class="table" style="display:table; table-layout:auto; width:100%">
+          <thead>
+            <tr>
+                <th style="width:10%"> Channel </th>
+                <th> Description </th>
+            </tr>
+          </thead>
+          <tbody>
+          {% for entry in channels %}
+            <tr>
+                <td><center><a href="/telegram/{{entry['name']}}">{{entry['name'].title()}}</a></center></td>
+                <td> {{entry['meta']}} </td>
+          {% endfor %}
+          </tbody>
+        </table>
+        {% endif %}
+
+	<h1>Messages</h1>
+        {% if not messages %}
+        <p> No result </p>
+        {% else %}
+        <table  id="table" class="table" style="display:table; table-layout:auto; width:100%">
+          <thead>
+            <tr>
+                <th style="width:10%"> Channel </th>
+                <th> Message </th>
+            </tr>
+          </thead>
+          <tbody>
+          {% for entry in messages %}
+            <tr>
+                <td><center><a href="/telegram/{{entry['group_name']}}">{{entry['group_name'].title()}}</a></center></td>
+                <td> {{entry['message']}} </td>
+          {% endfor %}
+          </tbody>
+        </table>
+        {% endif %}
+
     </article>
 {% endblock %}
