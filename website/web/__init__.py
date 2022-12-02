@@ -383,7 +383,6 @@ def search():
             group = json.loads(red.get(key))
             if query.lower() in key.decode().lower() or group['meta'] is not None and query.lower() in group['meta'].lower():
                 channels.append(group)
-        print(channels)
         channels.sort(key=lambda x: x["name"].lower())
 
         red = Redis(unix_socket_path=get_socket_path('cache'), db=6)
