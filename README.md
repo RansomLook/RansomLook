@@ -16,6 +16,8 @@ RansomLook is tool to monitor Ransomware groups and markets and extract their vi
 - Details about the groups with data from malpedia.
 - Daily notification by email.
 - Notification on RocketChat when a new post  is created.
+- Telegram monitoring
+- Dataleak monitoring
 
 # Install guide
 
@@ -142,12 +144,11 @@ With the default configuration, you can access the web interface on `http://127.
 
 # Commands
 
-### Import groups and posts from ransomwatch
+### Import data from the main instance 'https://www.ransomlook.io'
 
-Copy the groups.json and posts.json file in data then run the import script:
-
+This command will copy the DB of the official instance.
 ```bash
-poetry run tools/import_groups.py
+poetry run tools/import_from_instance.py
 ```
 
 ### Populate descriptions and profiles from malpedia
@@ -176,6 +177,18 @@ poetry run scrape
 
 ```bash
 poetry run parse
+```
+
+### Scrape for new dataleak
+
+```bash
+poetry run tools/breach.py
+```
+
+### Scrape and parse for Telegram messages
+
+```bash
+poetry run telegram
 ```
 
 It's recommanded to create a cron job to scrape and parse all groups every 2 hours.
