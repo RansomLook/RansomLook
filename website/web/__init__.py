@@ -490,6 +490,17 @@ def editgroup(database, name):
         form.links.data = data['locations']
     return render_template('editentry.html', form=form, deleteform=deleteButton)
 
+@app.route('/export/<database>')
+def exportdb(database):
+    if database not in ['0','2','3','4','5','6']:
+        flash(f'You are not allowed to dump this DataBase', 'error')
+        return redirect(url_for('home'))
+    red = Redis(unix_socket_path=get_socket_path('cache'), db=database)
+    dump={}
+    for key in red.keys():
+        dump[key.decode()]=json.loads(red.get(key))
+    return dump
+
 @app.route('/admin/logs')
 @flask_login.login_required
 def logs():
