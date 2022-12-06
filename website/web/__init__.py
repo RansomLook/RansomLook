@@ -471,7 +471,7 @@ def editgroup(database, name):
         data['profile'] = ast.literal_eval(form.profiles.data)
         data['locations'] = ast.literal_eval(form.links.data)
         red.set(name, json.dumps(data))
-        redlogs.zadd('logs', {f'{flask_login.current_user.id} modified : {name}, {data["meta"]}, {data["profile"]}, {data["links"]}': score})
+        redlogs.zadd('logs', {f'{flask_login.current_user.id} modified : {name}, {data["meta"]}, {data["profile"]}, {data["locations"]}': score})
         if name != form.groupname.data:
             red.rename(name, form.groupname.data.lower())
             redlogs.zadd('logs', {f'{flask_login.current_user.id} renamed : {name} to {form.groupname.data}': score})
