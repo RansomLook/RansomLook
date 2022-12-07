@@ -11,6 +11,7 @@ def main():
                 file=open(html_doc,'r')
                 soup=BeautifulSoup(file,'html.parser')
                 divs_name=soup.find_all('div', {"class": "blog-card p-3 col-md-9"})
+                print(divs_name)
                 for div in divs_name:
                     title = div.find('div', {'class': 'post-header col-md-12 no-pad px-3'}).a.text.strip()
                     description =  div.find('div', {'class': 'post-short-description col-md-12 no-pad px-3 mt-5'}).p.text.strip()
