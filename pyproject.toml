@@ -22,7 +22,7 @@ telegram = "bin.telegram:main"
 [tool.poetry.dependencies]
 python = "^3.8,<3.11"
 tldextract = "^3.4.0"
-lxml = "^4.9.1"
+lxml = "^4.9.2"
 matplotlib = "^3.6.2"
 playwright = "^1.28.0"
 bs4 = "^0.0.1"
