@@ -29,16 +29,21 @@ from .sharedutils import stdlog, errlog
 from .sharedutils import createfile
 
 from bs4 import BeautifulSoup
+from googletrans import Translator
 
 def alertingnotify(config, group, description, keyword) -> None :
     '''
     Posting message to RocketChat
     '''
+    translator = Translator()
+
     message = """Hello,
 A new message in telegram is matching your keywords:
 """
     message += str(keyword) +'\n'
     message += 'Channel : ' + group.decode() + '\nMessage : ' + description
+    if translator.detect(description).lang != 'en' :
+        message += '\n\nTranslated : ' + translator.translate(description, dest='en').text
     fromaddr = config['from']
     toaddrs = config['to']
     subject = "[RansomLook] New post matching your keywords"
@@ -54,7 +59,6 @@ A new message in telegram is matching your keywords:
     except smtplib.SMTPException as e:
         print(e)
     except Exception as e: print(e)
-# pylint: disable=W0703
 
 def threadscape(queuethread, lock):
     '''
@@ -66,8 +70,6 @@ def threadscape(queuethread, lock):
             stdlog('Starting : ' + host)
             try:
                 browser = play.chromium.launch()
-#proxy={"server": "socks5://127.0.0.1:9050"},
-#                          args=['--unsafely-treat-insecure-origin-as-secure='+host['link']])
                 context = browser.new_context(ignore_https_errors= True )
                 page = context.new_page()
                 link='https://t.me/s/'+host
@@ -120,11 +122,6 @@ def scraper() -> None:
     time.sleep(5)
     stdlog('Writing result')
 
-
-    #with open(file, 'w', encoding='utf-8') as groupsfile:
-    #    json.dump(groups, groupsfile, ensure_ascii=False, indent=4)
-    #    groupsfile.close()
-
 def parser():
     '''parsing telegram'''
     red = redis.Redis(unix_socket_path=get_socket_path('cache'), db=5)
@@ -159,13 +156,10 @@ def parser():
                               matching.append(keyword)
                       if matching :
                           alertingnotify(emailconfig, key, message, matching)
-               except:
+               except :
                   print('error with the channel:'+key.decode())
-                  continue
            redmessage.set(key,json.dumps(posts))
         except:
            print('error with :'+key.decode())
            continue
-
-
     print("ok")

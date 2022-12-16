@@ -38,6 +38,7 @@ Flask-WTF = "^1.0.1"
 tweepy = "^4.12.1"
 Flask-Cors = "^3.0.10"
 flask-restx = "^1.0.3"
+googletrans = "3.1.0a0"
 
 [tool.poetry.dev-dependencies]
 mypy = "^0.991"
