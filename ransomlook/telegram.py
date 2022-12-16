@@ -138,7 +138,6 @@ def parser():
         listkeywords = keywords.decode().splitlines()
 
     for key in red.keys():
-        matching = []
         try:
            html_doc='source/telegram/'+ key.decode() + '.html'
            file=open(html_doc,'r')
@@ -152,6 +151,7 @@ def parser():
                try:
                    message = content.find('div', {'class':'tgme_widget_message_text'}).text
                    timestamp = content.find('time', {'class' : 'time'})['datetime']
+                   matching = []
                    if timestamp not in posts:
                       posts.update({timestamp:message})
                       for keyword in listkeywords:
