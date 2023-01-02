@@ -119,5 +119,5 @@ class Exportdb(Resource):
         red = Redis(unix_socket_path=get_socket_path('cache'), db=database)
         dump={}
         for key in red.keys():
-            dump[key.decode()]=json.loads(red.get(key))
+            dump[key.decode()]=json.loads(red.get(key)) # type: ignore
         return dump
