@@ -1,4 +1,6 @@
-import tweepy
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+import tweepy # type: ignore
 from .sharedutils import errlog
 
 def twitternotify(config, group, title) -> None :

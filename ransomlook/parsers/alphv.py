@@ -1,5 +1,5 @@
 import os
-from bs4 import BeautifulSoup # type: ignore
+from bs4 import BeautifulSoup
 import json
 
 def main():
@@ -11,8 +11,8 @@ def main():
                 file=open(html_doc,'r')
                 soup=BeautifulSoup(file,'html.parser')
                 if 'api' in filename:
-                    jsonpart= soup.pre.contents
-                    data = json.loads(jsonpart[0])
+                    jsonpart= soup.pre.contents # type: ignore
+                    data = json.loads(jsonpart[0]) # type: ignore
                     for entry in data['items']:
                         title = entry['title'].strip()
                         description = entry['publication']['description'].strip()

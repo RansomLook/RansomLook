@@ -31,7 +31,7 @@ def creategroup(location: str) -> Dict[str, object] :
     create a new group for a new provider - added to groups.json
     '''
     mylocation = siteschema(location)
-    insertdata = {
+    insertdata: dict = {
         'captcha': bool(),
         'meta': None,
         'locations': [
@@ -100,7 +100,7 @@ def threadscape(queuethread, lock):
             browser.close()
             stdlog('leaving : ' + host['fqdn']+ ' --------- ' + group)
             red = redis.Redis(unix_socket_path=get_socket_path('cache'), db=base)
-            updated = json.loads(red.get(group))
+            updated = json.loads(red.get(group)) # type: ignore
             for loc in updated['locations']:
                 if loc['slug'] == host['slug']:
                     loc.update(host)
@@ -113,7 +113,7 @@ def scraper(base: int) -> None:
     red = redis.Redis(unix_socket_path=get_socket_path('cache'), db=base)
     groups=[]
     for key in red.keys():
-        group = json.loads(red.get(key))
+        group = json.loads(red.get(key)) # type: ignore
         group['name'] = key.decode()
         groups.append(group)
     groups.sort(key=lambda x: len(x['locations']), reverse=True)
@@ -159,7 +159,7 @@ def appender(name: str, location: str, db: int) -> int:
     to an existing group within groups.json
     '''
     red = redis.Redis(unix_socket_path=get_socket_path('cache'), db=0)
-    group = json.loads(red.get(name.strip()))
+    group = json.loads(red.get(name.strip())) # type: ignore
     success = bool()
     for loc in group['locations']:
         if location == loc['slug']:

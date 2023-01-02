@@ -1,5 +1,5 @@
 import os
-from bs4 import BeautifulSoup # type: ignore
+from bs4 import BeautifulSoup
 
 def main():
     list_div=[]

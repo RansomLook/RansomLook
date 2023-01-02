@@ -1,5 +1,5 @@
 import os
-from bs4 import BeautifulSoup # type: ignore
+from bs4 import BeautifulSoup
 
 def main():
     list_div=[]
@@ -19,5 +19,4 @@ def main():
         except:
             print("Failed during : " + filename)
             pass
-    print(list_div)
     return list_div

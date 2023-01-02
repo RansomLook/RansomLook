@@ -26,7 +26,7 @@ class RecentPost(Resource):
         posts = []
         red = Redis(unix_socket_path=get_socket_path('cache'), db=2)
         for key in red.keys():
-                entries = json.loads(red.get(key))
+                entries = json.loads(red.get(key)) # type: ignore
                 for entry in entries:
                     entry['group_name']=key.decode()
                     posts.append(entry)
@@ -75,18 +75,18 @@ class Groupinfo(Resource):
    def get(self, name):
         red = Redis(unix_socket_path=get_socket_path('cache'), db=0)
         group = {}
-        sorted_posts = {}
+        sorted_posts:list = []
         for key in red.keys():
                 if key.decode().lower() == name.lower():
-                        group= json.loads(red.get(key))
+                        group= json.loads(red.get(key)) # type: ignore
                         if group['meta'] is not None:
                             group['meta']=group['meta'].replace('\n', '<br/>')
                         redpost = Redis(unix_socket_path=get_socket_path('cache'), db=2)
                         if key in redpost.keys():
-                            posts=json.loads(redpost.get(key))
+                            posts=json.loads(redpost.get(key)) # type: ignore
                             sorted_posts = sorted(posts, key=lambda x: x['discovered'], reverse=True)
                         else:
-                            sorted_posts = {}
+                            sorted_posts = []
         return [group, sorted_posts]
 
 @api.route('/market/<string:name>')
@@ -96,16 +96,28 @@ class Marketinfo(Resource):
    def get(self, name):
         red = Redis(unix_socket_path=get_socket_path('cache'), db=3)
         group = {}
-        sorted_posts = {}
+        sorted_posts: list  = []
         for key in red.keys():
                 if key.decode().lower() == name.lower():
-                        group= json.loads(red.get(key))
+                        group= json.loads(red.get(key)) # type: ignore
                         if group['meta'] is not None:
                             group['meta']=group['meta'].replace('\n', '<br/>')
                         redpost = Redis(unix_socket_path=get_socket_path('cache'), db=2)
                         if key in redpost.keys():
-                            posts=json.loads(redpost.get(key))
+                            posts=json.loads(redpost.get(key)) # type: ignore
                             sorted_posts = sorted(posts, key=lambda x: x['discovered'], reverse=True)
                         else:
-                            sorted_posts = {}
+                            sorted_posts = []
         return [group, sorted_posts]
+
+
+@api.route('/export/<database>')
+class Exportdb(Resource):
+    def get(self, database):
+        if database not in ['0','2','3','4','5','6']:
+            return(['You are not allowed to dump this DataBase'])
+        red = Redis(unix_socket_path=get_socket_path('cache'), db=database)
+        dump={}
+        for key in red.keys():
+            dump[key.decode()]=json.loads(red.get(key))
+        return dump

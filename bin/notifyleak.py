@@ -17,14 +17,14 @@ from collections import defaultdict
 from ransomlook.sharedutils import dbglog, stdlog
 from ransomlook.default.config import get_config, get_socket_path
 
-def getnewbreach(date: str) -> Dict :
+def getnewbreach(date: str) -> List :
     '''
     check if a post already exists in posts.json
     '''
     red = redis.Redis(unix_socket_path=get_socket_path('cache'), db=4)
     notify = []
     for breaches in red.keys():
-        breach = json.loads(red.get(breaches))
+        breach = json.loads(red.get(breaches)) # type: ignore
         if breach['indexed'].split()[0] == date :
             notify.append(breach)
     return notify

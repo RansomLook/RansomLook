@@ -1,5 +1,5 @@
 import os
-from bs4 import BeautifulSoup # type: ignore
+from bs4 import BeautifulSoup
 import json
 
 def main():
@@ -12,8 +12,8 @@ def main():
                 file=open(html_doc,'r')
                 soup=BeautifulSoup(file,'html.parser')
                 if 'disclosed' in filename:
-                    jsonpart= soup.pre.contents
-                    data = json.loads(jsonpart[0])
+                    jsonpart= soup.pre.contents # type: ignore
+                    data = json.loads(jsonpart[0]) # type: ignore
                     for entry in data:
                        list_div.append({"title":entry['title'].strip(),"description":entry["description"].strip()})
                 else:

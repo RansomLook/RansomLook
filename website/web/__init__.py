@@ -1,5 +1,5 @@
 from flask import Flask, render_template, redirect, url_for, flash
-import flask_moment
+import flask_moment # type: ignore
 from flask import request
 from flask_bootstrap import Bootstrap5  # type: ignore
 
@@ -108,7 +108,7 @@ def home():
         data['online'] = onlinecount()
         data['24h'] = postslast24h()
         data['monthlypost'] = mounthlypostcount()
-        data['month'] = currentmonthstr()
+        data['month'] = currentmonthstr() # type: ignore
         data['90d'] = postssince(90)
         data['yearlypost'] = poststhisyear()
         data['year'] = dt.now().year
@@ -121,7 +121,7 @@ def recent():
         posts = []
         red = Redis(unix_socket_path=get_socket_path('cache'), db=2)
         for key in red.keys():
-                entries = json.loads(red.get(key))
+                entries = json.loads(red.get(key)) # type: ignore
                 for entry in entries:
                     entry['group_name']=key.decode()
                     posts.append(entry)
@@ -138,7 +138,7 @@ def status():
         red = Redis(unix_socket_path=get_socket_path('cache'), db=0)
         groups = []
         for key in red.keys():
-                entry= json.loads(red.get(key))
+                entry= json.loads(red.get(key)) # type: ignore
                 entry['name']=key.decode()
                 groups.append(entry)
         groups.sort(key=lambda x: x["name"].lower())
@@ -150,7 +150,7 @@ def status():
         red = Redis(unix_socket_path=get_socket_path('cache'), db=3)
         markets = []
         for key in red.keys():
-                entry= json.loads(red.get(key))
+                entry= json.loads(red.get(key)) # type: ignore
                 entry['name']=key.decode()
                 markets.append(entry)
         markets.sort(key=lambda x: x["name"].lower())
@@ -168,7 +168,7 @@ def alive():
         red = Redis(unix_socket_path=get_socket_path('cache'), db=0)
         groups = []
         for key in red.keys():
-                entry= json.loads(red.get(key))
+                entry= json.loads(red.get(key)) # type: ignore
                 entry['name']=key.decode()
                 groups.append(entry)
         groups.sort(key=lambda x: x["name"].lower())
@@ -180,7 +180,7 @@ def alive():
         red = Redis(unix_socket_path=get_socket_path('cache'), db=3)
         markets = []
         for key in red.keys():
-                entry= json.loads(red.get(key))
+                entry= json.loads(red.get(key)) # type: ignore
                 entry['name']=key.decode()
                 markets.append(entry)
         markets.sort(key=lambda x: x["name"].lower())
@@ -200,10 +200,10 @@ def groups():
 
         groups = []
         for key in red.keys():
-                entry= json.loads(red.get(key))
+                entry= json.loads(red.get(key)) # type: ignore
                 entry['name']=key.decode()
                 if key in redpost.keys():
-                    posts=json.loads(redpost.get(key))
+                    posts=json.loads(redpost.get(key)) # type: ignore
                     sorted_posts = sorted(posts, key=lambda x: x['discovered'], reverse=True)
                     entry['posts']= sorted_posts
                 else:
@@ -225,7 +225,7 @@ def group(name):
         groups = []
         for key in red.keys():
                 if key.decode().lower() == name.lower():
-                        group= json.loads(red.get(key))
+                        group= json.loads(red.get(key)) # type: ignore
                         group['name']=key.decode()
                         if group['meta'] is not None:
                             group['meta']=group['meta'].replace('\n', '<br/>')
@@ -235,10 +235,10 @@ def group(name):
                                 location['screen']=screenfile
                         redpost = Redis(unix_socket_path=get_socket_path('cache'), db=2)
                         if key in redpost.keys():
-                            posts=json.loads(redpost.get(key))
+                            posts=json.loads(redpost.get(key)) # type: ignore
                             sorted_posts = sorted(posts, key=lambda x: x['discovered'], reverse=True)
                         else:
-                            sorted_posts = {}
+                            sorted_posts = []
                         return render_template("group.html", group = group, posts=sorted_posts)
 
         return redirect(url_for("home"))
@@ -250,10 +250,10 @@ def markets():
 
         groups = []
         for key in red.keys():
-                entry= json.loads(red.get(key))
+                entry= json.loads(red.get(key)) # type: ignore
                 entry['name']=key.decode()
                 if key in redpost.keys():
-                    posts=json.loads(redpost.get(key))
+                    posts=json.loads(redpost.get(key)) # type: ignore
                     sorted_posts = sorted(posts, key=lambda x: x['discovered'], reverse=True)
                     entry['posts']= sorted_posts
                 else:
@@ -275,14 +275,14 @@ def market(name):
         groups = []
         for key in red.keys():
                 if key.decode().lower() == name.lower():
-                        group= json.loads(red.get(key))
+                        group= json.loads(red.get(key)) # type: ignore
                         group['name']=key.decode()
                         redpost = Redis(unix_socket_path=get_socket_path('cache'), db=2)
                         if key in redpost.keys():
-                            posts=json.loads(redpost.get(key))
+                            posts=json.loads(redpost.get(key)) # type: ignore
                             sorted_posts = sorted(posts, key=lambda x: x['discovered'], reverse=True)
                         else:
-                            sorted_posts = {}
+                            sorted_posts = []
                         return render_template("group.html", group = group, posts=sorted_posts)
         return redirect(url_for("home"))
 
@@ -292,7 +292,7 @@ def leaks():
 
         leaks = []
         for key in red.keys():
-                entry= json.loads(red.get(key))
+                entry= json.loads(red.get(key)) # type: ignore
                 entry['id']=key
                 leaks.append(entry)
         leaks.sort(key=lambda x: x["name"].lower())
@@ -304,7 +304,7 @@ def leak(name):
         groups = []
         for key in red.keys():
                 if key.decode().lower() == name.lower():
-                        group= json.loads(red.get(key))
+                        group= json.loads(red.get(key)) # type: ignore
                         if 'meta' in group and group['meta'] is not None:
                             group['meta']=group['meta'].replace('\n', '<br/>')
                         return render_template("leak.html", group = group)
@@ -317,7 +317,7 @@ def telegrams():
 
         telegram = []
         for key in red.keys():
-                entry= json.loads(red.get(key))
+                entry= json.loads(red.get(key)) # type: ignore
                 screenfile = '/screenshots/telegram/' + entry['name'] + '.png'
                 if os.path.exists(str(get_homedir()) + '/source' + screenfile):
                     entry['screen']=screenfile
@@ -331,7 +331,7 @@ def telegram(name):
         groups = []
         for key in red.keys():
                 if key.decode() == name:
-                        posts= json.loads(red.get(key))
+                        posts= json.loads(red.get(key)) # type: ignore
                         return render_template("telegram.html", posts = posts, name=name)
 
         return redirect(url_for("home"))
@@ -343,8 +343,8 @@ def search():
         red = Redis(unix_socket_path=get_socket_path('cache'), db=0)
         groups = []
         for key in red.keys():
-            group = json.loads(red.get(key))
-            if query.lower() in key.decode().lower() or group['meta'] is not None and query.lower() in group['meta'].lower():
+            group = json.loads(red.get(key)) # type: ignore
+            if query.lower() in key.decode().lower() or group['meta'] is not None and query.lower() in group['meta'].lower(): # type: ignore
                 group['name']=key.decode().lower()
                 groups.append(group)
         groups.sort(key=lambda x: x["name"].lower())
@@ -352,8 +352,8 @@ def search():
         red = Redis(unix_socket_path=get_socket_path('cache'), db=3)
         markets = []
         for key in red.keys():
-            group = json.loads(red.get(key))
-            if query.lower() in key.decode().lower() or group['meta'] is not None and query.lower() in group['meta'].lower():
+            group = json.loads(red.get(key)) # type: ignore
+            if query.lower() in key.decode().lower() or group['meta'] is not None and query.lower() in group['meta'].lower(): # type: ignore
                 group['name'] = key.decode().lower()
                 markets.append(group)
         markets.sort(key=lambda x: x["name"].lower())
@@ -361,8 +361,8 @@ def search():
         red = Redis(unix_socket_path=get_socket_path('cache'), db=4)
         leaks = []
         for key in red.keys():
-            group = json.loads(red.get(key))
-            if query.lower() in key.decode().lower() or group['meta'] is not None and query.lower() in group['meta'].lower():
+            group = json.loads(red.get(key)) # type: ignore
+            if query.lower() in key.decode().lower() or group['meta'] is not None and query.lower() in group['meta'].lower(): # type: ignore
                 group['name'] = key.decode().lower()
                 leaks.append(group)
         leaks.sort(key=lambda x: x["name"].lower())
@@ -370,9 +370,9 @@ def search():
         red = Redis(unix_socket_path=get_socket_path('cache'), db=2)
         posts = []
         for key in red.keys():
-                entries = json.loads(red.get(key))
+                entries = json.loads(red.get(key)) # type: ignore
                 for entry in entries:
-                    if query.lower() in entry['post_title'].lower() or 'description' in entry and entry['description'] is not None and query.lower() in entry['description'].lower():
+                    if query.lower() in entry['post_title'].lower() or 'description' in entry and entry['description'] is not None and query.lower() in entry['description'].lower(): # type: ignore
                         entry['group_name']=key.decode()
                         posts.append(entry)
         posts.sort(key=lambda x: x["group_name"].lower())
@@ -380,17 +380,17 @@ def search():
         red = Redis(unix_socket_path=get_socket_path('cache'), db=5)
         channels = []
         for key in red.keys():
-            group = json.loads(red.get(key))
-            if query.lower() in key.decode().lower() or group['meta'] is not None and query.lower() in group['meta'].lower():
+            group = json.loads(red.get(key)) # type: ignore
+            if query.lower() in key.decode().lower() or group['meta'] is not None and query.lower() in group['meta'].lower(): # type: ignore
                 channels.append(group)
         channels.sort(key=lambda x: x["name"].lower())
 
         red = Redis(unix_socket_path=get_socket_path('cache'), db=6)
         messages = []
         for key in red.keys():
-                entries = json.loads(red.get(key))
+                entries = json.loads(red.get(key)) # type: ignore
                 for entry in entries:
-                    if query.lower() in entries[entry].lower() :
+                    if query.lower() in entries[entry].lower() : # type: ignore
                         myentry={}
                         myentry["group_name"] = key.decode()
                         myentry["message"] = entries[entry]
@@ -466,7 +466,7 @@ def editgroup(database, name):
         flash(f'Success to delete : {name}', 'success')
         return redirect(url_for('admin'))
     if form.validate_on_submit():
-        data = json.loads(red.get(name))
+        data = json.loads(red.get(name)) # type: ignore
         data['meta']=form.description.data
         data['profile'] = ast.literal_eval(form.profiles.data)
         data['locations'] = ast.literal_eval(form.links.data)
@@ -479,7 +479,7 @@ def editgroup(database, name):
         return redirect(url_for('admin'))
     form.groupname.label=name
     form.groupname.data=name
-    data = json.loads(red.get(name))
+    data = json.loads(red.get(name)) # type: ignore
     if form.description.data == None:
         form.description.data = data['meta']
     if form.profiles.data == None:
@@ -498,7 +498,7 @@ def exportdb(database):
     red = Redis(unix_socket_path=get_socket_path('cache'), db=database)
     dump={}
     for key in red.keys():
-        dump[key.decode()]=json.loads(red.get(key))
+        dump[key.decode()]=json.loads(red.get(key)) # type: ignore
     return dump
 
 @app.route('/admin/logs')
@@ -506,22 +506,24 @@ def exportdb(database):
 def logs():
     red = Redis(unix_socket_path=get_socket_path('cache'), db=1)
     logs = red.zrange('logs', 0, -1, desc=True, withscores=True)
+    log = []
     for i,s in enumerate(logs):
-       logs[i] = (s[0].decode(), dt.fromtimestamp(s[1]).strftime('%Y-%m-%d'))
-    return render_template('logs.html', logs=logs)
+       log.append((s[0].decode(), dt.fromtimestamp(s[1]).strftime('%Y-%m-%d')))
+    return render_template('logs.html', logs=log)
 
 @app.route('/admin/alerting', methods=['GET', 'POST'])
 @flask_login.login_required
 def alerting():
     form = AlertForm()
     red = Redis(unix_socket_path=get_socket_path('cache'), db=1)
-    keywords = red.get('keywords')
-    if keywords is not None:
-        keywords = keywords.decode()
+    keywordsred = red.get('keywords')
+    keywords= None
+    if keywordsred is not None:
+        keywords = keywordsred.decode()
     if form.validate_on_submit():
-        keywords = str(form.keywords.data).splitlines()
-        keywords = list(dict.fromkeys(keywords))
-        keywords = '\n'.join(keywords)
+        keywordstmp = str(form.keywords.data).splitlines()
+        keywordslist = list(dict.fromkeys(keywordstmp))
+        keywords = '\n'.join(keywordslist)
         red.set('keywords',str(keywords))
         flash(f'Success to update keywords', 'success')
     form.keywords.data=keywords
@@ -539,10 +541,8 @@ authorizations = {
     }
 }
 
-#CORS(app, resources={r"/recent": {"origins": "*"}})
-
-api = Api(app, title='Lookyloo API',
-          description='API to submit captures and query a lookyloo instance.',
+api = Api(app, title='RansomLook API',
+          description='API to submit captures and query a RansomLook instance.',
           doc='/doc/',
           authorizations=authorizations,
           version=pkg_version)

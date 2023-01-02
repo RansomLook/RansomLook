@@ -1,6 +1,6 @@
-from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField, BooleanField, SubmitField, SelectField, TextAreaField
-from wtforms.validators import DataRequired
+from flask_wtf import FlaskForm # type: ignore
+from wtforms import StringField, PasswordField, BooleanField, SubmitField, SelectField, TextAreaField # type: ignore
+from wtforms.validators import DataRequired # type: ignore
 
 class AddForm(FlaskForm):
     category = SelectField('Database', choices=[('','Select a database'),(0, 'Group'),(3,'Market')],  default='', validators=[DataRequired()])

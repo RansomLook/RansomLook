@@ -9,6 +9,7 @@ from werkzeug.security import generate_password_hash
 from typing import Any, Dict, List, Optional, Union, TypedDict
 
 from ransomlook.default import get_config, get_homedir
+from pathlib import Path
 
 def load_user_from_request(request):
     api_key = request.headers.get('Authorization')

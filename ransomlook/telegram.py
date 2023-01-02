@@ -29,7 +29,7 @@ from .sharedutils import stdlog, errlog
 from .sharedutils import createfile
 
 from bs4 import BeautifulSoup
-from googletrans import Translator
+from googletrans import Translator # type: ignore
 
 def alertingnotify(config, group, description, keyword) -> None :
     '''
@@ -107,7 +107,7 @@ def scraper() -> None:
     red = redis.Redis(unix_socket_path=get_socket_path('cache'), db=5)
     groups=[]
     for key in red.keys():
-        group = json.loads(red.get(key))
+        group = json.loads(red.get(key)) # type: ignore
         groups.append(group)
     lock = Lock()
     queuethread = queue.Queue() # type: ignore
@@ -141,7 +141,7 @@ def parser():
            soup = BeautifulSoup(file,'html.parser')
            tgpost =  soup.find_all('div', {'class' : 'tgme_widget_message'})
            if key in redmessage.keys():
-               posts = json.loads(redmessage.get(key))
+               posts = json.loads(redmessage.get(key)) # type: ignore
            else:
                posts={}
            for content in tgpost:

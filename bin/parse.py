@@ -56,7 +56,7 @@ def appender(entry, group_name):
     posts=[]
 
     if group_name.encode() in red.keys():
-        posts = json.loads(red.get(group_name))
+        posts = json.loads(red.get(group_name)) # type: ignore
         for post in posts:
             if post['post_title'] == post_title:
                 stdlog('post already existing')

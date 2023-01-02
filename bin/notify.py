@@ -24,12 +24,12 @@ def getnewpost(date: str) -> Dict :
     red = redis.Redis(unix_socket_path=get_socket_path('cache'), db=2)
     notify = defaultdict(list)
     for group in red.keys():
-        posts = json.loads(red.get(group))
+        posts = json.loads(red.get(group)) # type: ignore
         for post in posts:
             if post['discovered'].split()[0] == date :
                 notify[group.decode()].append(post['post_title'])
-    notify =  dict(sorted(notify.items()))
-    return notify
+    ret =  dict(sorted(notify.items()))
+    return ret
 
 def main() -> None :
 

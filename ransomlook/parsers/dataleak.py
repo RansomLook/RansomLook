@@ -1,5 +1,5 @@
 import os
-from bs4 import BeautifulSoup # type: ignore
+from bs4 import BeautifulSoup
 import bs4
 
 def main():
@@ -16,7 +16,7 @@ def main():
                     title = div.find(text=lambda tag: isinstance(tag, bs4.CData)).string.strip()
                     print(title)
                     desc = BeautifulSoup(div.contents[9].find(text=lambda tag: isinstance(tag, bs4.CData)).string.strip(),'html.parser')
-                    description = desc.p.text.strip()
+                    description = desc.p.text.strip() # type: ignore
                     list_div.append({'title':title, 'description': description})
                 file.close()
         except:

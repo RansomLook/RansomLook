@@ -33,8 +33,7 @@ for family in families:
                print(alter)
            for url in families[family]['urls']:
                print(url)
-           group = json.loads(red.get(key))
+           group = json.loads(red.get(key)) # type: ignore
            group['meta'] = families[family]['description']
            group['profile'].extend(families[family]['urls'])
            red.set(key,json.dumps(group))
-        #exit()

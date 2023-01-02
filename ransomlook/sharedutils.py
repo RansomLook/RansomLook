@@ -72,7 +72,7 @@ def postcount() -> int :
     post_count = 0
     red = redis.Redis(unix_socket_path=get_socket_path('cache'), db=2)
     for group in red.keys():
-        grouppost = json.loads(red.get(group))
+        grouppost = json.loads(red.get(group)) # type: ignore
         post_count+=len(grouppost)
     return post_count
 
@@ -86,7 +86,7 @@ def hostcount() -> int :
     groups = red.keys()
     host_count = 0
     for entry in groups:
-        group = json.loads(red.get(entry))
+        group = json.loads(red.get(entry)) # type: ignore
         for host in group['locations']:
             host_count += 1
     return host_count
@@ -97,7 +97,7 @@ def postssince(days: int) -> int :
     red = redis.Redis(unix_socket_path=get_socket_path('cache'), db=2)
     groups = red.keys()
     for entry in groups:
-        posts = json.loads(red.get(entry))
+        posts = json.loads(red.get(entry)) # type: ignore
         for post in posts:
             datetime_object = datetime.strptime(post['discovered'], '%Y-%m-%d %H:%M:%S.%f')
             if datetime_object > datetime.now() - timedelta(days=days):
@@ -111,7 +111,7 @@ def poststhisyear() -> int :
     red = redis.Redis(unix_socket_path=get_socket_path('cache'), db=2)
     groups = red.keys()
     for entry in groups:
-        posts = json.loads(red.get(entry))
+        posts = json.loads(red.get(entry)) # type: ignore
         for post in posts:
             datetime_object = datetime.strptime(post['discovered'], '%Y-%m-%d %H:%M:%S.%f')
             if datetime_object.year == current_year:
@@ -124,7 +124,7 @@ def postslast24h() -> int :
     red = redis.Redis(unix_socket_path=get_socket_path('cache'), db=2)
     groups = red.keys()
     for entry in groups:
-        posts = json.loads(red.get(entry))
+        posts = json.loads(red.get(entry)) # type: ignore
         for post in posts:
             datetime_object = datetime.strptime(post['discovered'], '%Y-%m-%d %H:%M:%S.%f')
             if datetime_object > datetime.now() - timedelta(hours=24):
@@ -141,7 +141,7 @@ def onlinecount() -> int :
     groups = red.keys()
     online_count = 0
     for entry in groups:
-        group = json.loads(red.get(entry))
+        group = json.loads(red.get(entry)) # type: ignore
         for host in group['locations']:
             if host['available'] is True:
                 online_count += 1
@@ -163,7 +163,7 @@ def mounthlypostcount() -> int :
     date_today = datetime.now()
     month_first_day = date_today.replace(day=1, hour=0, minute=0, second=0, microsecond=0)
     for entry in groups:
-        posts = json.loads(red.get(entry))
+        posts = json.loads(red.get(entry)) # type: ignore
         for post in posts:
             datetime_object = datetime.strptime(post['discovered'], '%Y-%m-%d %H:%M:%S.%f')
             if datetime_object > month_first_day:
@@ -176,9 +176,9 @@ def countcaptchahosts() -> int :
     groups = red.keys()
     captcha_count = 0
     for entry in groups:
-        group = json.loads(red.get(entry))
+        group = json.loads(red.get(entry)) # type: ignore
         if group['captcha'] is True:
-            online_count += 1
+            captcha_count += 1
     return captcha_count
 
 '''

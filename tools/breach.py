@@ -13,14 +13,13 @@ import json
 url = 'https://leak-lookup.com/breaches/stats'
 source = 'https://leak-lookup.com/breaches'
 
-list_div=[]
 red = redis.Redis(unix_socket_path=get_socket_path('cache'), db=4)
 keys = red.keys()
 res = requests.get(source)
 soup=BeautifulSoup(res.text,'html.parser')
 divs_name=soup.find('table', {"id": "datatables-indexed-breaches"})
-tbody = divs_name.find('tbody')
-trs = tbody.find_all('tr')
+tbody = divs_name.find('tbody') # type: ignore
+trs = tbody.find_all('tr') # type: ignore
 rocketconfig = get_config('generic','rocketchat')
 twitterconfig = get_config('generic','twitter')
 for tr in trs:
