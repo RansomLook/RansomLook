@@ -20,7 +20,7 @@ from .helpers import build_users_table, load_user_from_request
 api = Namespace('GenericAPI', description='Generic Ransomlook API', path='/api')
 
 @api.route('/recent')
-@api.doc(description='Return the 100 last posts')
+@api.doc(description='Return the 100 last posts', tags=['generic'])
 class RecentPost(Resource):
     def get(self):
         posts = []
@@ -39,7 +39,7 @@ class RecentPost(Resource):
         return recentposts
 
 @api.route('/groups')
-@api.doc(description='Return list of groups')
+@api.doc(description='Return list of groups', tags=['groups'])
 class Groups(Resource):
     def get(self):
         groups = []
@@ -49,7 +49,7 @@ class Groups(Resource):
         return groups
 
 @api.route('/markets')
-@api.doc(description='Return list of markets')
+@api.doc(description='Return list of markets', tags=['markets'])
 class Markets(Resource):
     def get(self):
         groups = []
@@ -59,7 +59,7 @@ class Markets(Resource):
         return groups
 
 @api.route('/leaks')
-@api.doc(description='Return list of breaches')
+@api.doc(description='Return list of breaches', tags=['breaches'])
 class Leaks(Resource):
     def get(self):
         groups = []
@@ -69,7 +69,7 @@ class Leaks(Resource):
         return groups
 
 @api.route('/group/<string:name>')
-@api.doc(description='Return info about the group')
+@api.doc(description='Return info about the group', tags=['groups'])
 @api.doc(param={'name':'Name of the group'})
 class Groupinfo(Resource):
    def get(self, name):
@@ -90,7 +90,7 @@ class Groupinfo(Resource):
         return [group, sorted_posts]
 
 @api.route('/market/<string:name>')
-@api.doc(description='Return info about the market')
+@api.doc(description='Return info about the market', tags=['markets'])
 @api.doc(param={'name':'Name of the market'})
 class Marketinfo(Resource):
    def get(self, name):
@@ -112,6 +112,7 @@ class Marketinfo(Resource):
 
 
 @api.route('/export/<database>')
+@api.doc(description='Dump a databse to reimport it', tags=['generic'])
 class Exportdb(Resource):
     def get(self, database):
         if database not in ['0','2','3','4','5','6']:
