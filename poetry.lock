@@ -582,14 +582,14 @@ packaging = ">=14.1"
 
 [[package]]
 name = "flask-restx"
-version = "1.0.3"
+version = "1.0.5"
 description = "Fully featured framework for fast, easy and documented API development with Flask"
 category = "main"
 optional = false
 python-versions = "*"
 files = [
-    {file = "flask-restx-1.0.3.tar.gz", hash = "sha256:5fdacd23031d25ff4642f141a47a7fa877f07e3e261099ccc5ebc4fc254de84c"},
-    {file = "flask_restx-1.0.3-py2.py3-none-any.whl", hash = "sha256:d291910face4a4040fbdd87658f884bfd2161dc25f710598017e08894f265594"},
+    {file = "flask-restx-1.0.5.tar.gz", hash = "sha256:e23dc4ff24869c92faa719b7a58be1203ed741275ff32c9f03d0ab56ed01546c"},
+    {file = "flask_restx-1.0.5-py2.py3-none-any.whl", hash = "sha256:c4c5d3adbd8d2239f428c813b8c237322d6aada4b2d7454b777275338bf21e53"},
 ]
 
 [package.dependencies]
@@ -2291,4 +2291,4 @@ testing = ["flake8 (<5)", "func-timeout", "jaraco.functools", "jaraco.itertools"
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.8,<3.11"
-content-hash = "dd8e3c98b1aa3e2f3cd147986aecc652808dd86795cfa831bfb648655b7a5697"
+content-hash = "6a60e4357ab520c2b983b4128a180bcc52f16defad5b5f8c532f90f1e3b93d1c"
