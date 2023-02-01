@@ -40,7 +40,7 @@ Flask-Cors = "^3.0.10"
 flask-restx = "^1.0.5"
 googletrans-py = "^4.0.0"
 types-requests = "^2.28.11.8"
-types-beautifulsoup4 = "^4.11.6.4"
+types-beautifulsoup4 = "^4.11.6.5"
 types-flask = "^1.1.6"
 
 [tool.poetry.dev-dependencies]
