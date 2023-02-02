@@ -47,7 +47,7 @@ types-flask = "^1.1.6"
 mypy = "^0.991"
 types-setuptools = "^65.7.0.3"
 types-redis = "^4.4.0.3"
-pylint = "^2.15.10"
+pylint = "^2.16.1"
 
 
 [build-system]
