@@ -45,7 +45,7 @@ types-flask = "^1.1.6"
 
 [tool.poetry.dev-dependencies]
 mypy = "^0.991"
-types-setuptools = "^65.7.0.4"
+types-setuptools = "^67.2.0.0"
 types-redis = "^4.4.0.6"
 pylint = "^2.16.1"
 
