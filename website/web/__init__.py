@@ -344,7 +344,7 @@ def crypto():
         red = Redis(unix_socket_path=get_socket_path('cache'), db=7)
         groups = {}
         for key in red.keys():
-                groups[key.decode()]=json.loads(red.get(key))
+                groups[key.decode()]=json.loads(red.get(key)) # type: ignore
         crypto = OrderedDict(sorted(groups.items()))
         return render_template("crypto.html", data=crypto)
 
