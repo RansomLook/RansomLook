@@ -19,6 +19,8 @@ from flask_restx import Api  # type: ignore
 
 from importlib.metadata import version
 
+from collections import OrderedDict
+
 from ransomlook.ransomlook import adder
 from ransomlook.sharedutils import createfile
 from ransomlook.sharedutils import groupcount, hostcount, onlinecount, postslast24h, mounthlypostcount, currentmonthstr, postssince, poststhisyear,postcount,parsercount
@@ -336,6 +338,15 @@ def telegram(name):
                         return render_template("telegram.html", posts = posts, name=name)
 
         return redirect(url_for("home"))
+
+@app.route("/crypto")
+def crypto():
+        red = Redis(unix_socket_path=get_socket_path('cache'), db=7)
+        groups = {}
+        for key in red.keys():
+                groups[key.decode()]=json.loads(red.get(key))
+        crypto = OrderedDict(sorted(groups.items()))
+        return render_template("crypto.html", data=crypto)
 
 @app.route('/search', methods=['GET', 'POST'])
 def search():

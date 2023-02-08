@@ -4,7 +4,7 @@ RansomLook is tool to monitor Ransomware groups and markets and extract their vi
 
 ## Features
 
-- Based on ransomwatch https://github.com/joshhighet/ransomwatch, there is a tool to import their groups and posts.
+- Based on ransomwatch https://github.com/joshhighet/ransomwatch,
   - Important changes have been done:
     - All data are stored into redis
     - Scraping is multithreaded
@@ -18,6 +18,7 @@ RansomLook is tool to monitor Ransomware groups and markets and extract their vi
 - Notification on RocketChat when a new post  is created.
 - Telegram monitoring
 - Dataleak monitoring
+- Monitoring Cryptocurrencies, data are from: https://ransomwhe.re
 
 # Install guide
 
@@ -192,3 +193,24 @@ poetry run telegram
 ```
 
 It's recommanded to create a cron job to scrape and parse all groups every 2 hours.
+
+# License
+
+Copyright (C) 2022-2023 [Fafner \[_KeyZee_\]](https://github.com/FafnerKeyZee)
+
+Copyright (C) 2022-2023 [Alexandre Dulaunoy](https://github.com/adulau/)
+
+Copyright (C) 2012-2023 [CERT-AG](https://cert-ag.com/) - CERT AG
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU Affero General Public License as published
+by the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU Affero General Public License for more details.
+
+You should have received a copy of the GNU Affero General Public License
+along with this program.  If not, see <https://www.gnu.org/licenses/>.
