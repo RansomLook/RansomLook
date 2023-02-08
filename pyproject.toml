@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "ransomlook"
-version = "1.2.0"
+version = "1.2.1"
 description = "Yet An Other Ransom Looker"
 authors = ["Fafner KeyZee <fkz@p4nd4.land>"]
 
@@ -29,7 +29,7 @@ bs4 = "^0.0.1"
 rocketchat-API = "^1.28.1"
 Flask-Moment = "^1.0.5"
 Bootstrap-Flask = "^2.2.0"
-redis = "^4.5.0"
+redis = "^4.5.1"
 Flask = "^2.2.2"
 gunicorn = "^20.1.0"
 Flask-Login = "^0.6.2"

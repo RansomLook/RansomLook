@@ -1,4 +1,3 @@
-
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 '''
@@ -139,6 +138,11 @@ def parser():
            html_doc='source/telegram/'+ key.decode() + '.html'
            file=open(html_doc,'r')
            soup = BeautifulSoup(file,'html.parser')
+           titletag = soup.find('title')
+           title = titletag.string # type: ignore
+           data = json.loads(red.get(key)) # type: ignore
+           data['meta']=title
+           red.set(key, json.dumps(data))
            tgpost =  soup.find_all('div', {'class' : 'tgme_widget_message'})
            if key in redmessage.keys():
                posts = json.loads(redmessage.get(key)) # type: ignore
@@ -157,9 +161,22 @@ def parser():
                       if matching :
                           alertingnotify(emailconfig, key, message, matching)
                except :
-                  print('error with the channel:'+key.decode())
+                   print('error with the channel:'+key.decode())
            redmessage.set(key,json.dumps(posts))
         except:
            print('error with :'+key.decode())
            continue
     print("ok")
+
+def teladder(name, link):
+    red = redis.Redis(unix_socket_path=get_socket_path('cache'), db=5)
+    try:
+        data = {
+            'name': name,
+            'meta': None,
+            'link': link
+        }
+        red.set(name, json.dumps(data))
+        return 1
+    except:
+        return 0

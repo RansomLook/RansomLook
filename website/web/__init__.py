@@ -24,6 +24,7 @@ from ransomlook.sharedutils import createfile
 from ransomlook.sharedutils import groupcount, hostcount, onlinecount, postslast24h, mounthlypostcount, currentmonthstr, postssince, poststhisyear,postcount,parsercount
 from ransomlook.default.config import get_homedir
 from ransomlook.default import get_socket_path
+from ransomlook.telegram import teladder
 from .helpers import get_secret_key, sri_load, User, build_users_table, load_user_from_request
 from .forms import AddForm, LoginForm, SelectForm, EditForm, DeleteForm, AlertForm
 
@@ -414,7 +415,10 @@ def addgroup():
     score = int(round(dt.now().timestamp()))
     form = AddForm()
     if form.validate_on_submit():
-        res = adder(form.groupname.data.lower(), form.url.data, form.category.data)
+        if int(form.category.data) == 5:
+           res = teladder(form.groupname.data, form.url.data)
+        else:
+           res = adder(form.groupname.data.lower(), form.url.data, form.category.data)
         if res > 1:
            flash(f'Fail to add: {form.url.data} to {form.groupname.data}.  Url already exists for this group', 'error')
            return render_template('add.html',form=form)
