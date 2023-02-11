@@ -22,6 +22,25 @@
                 <td> {{ crypto['blockchain'] }}  </td>
                 <td> {{ crypto['address'] }}</td>
                 </tr>
+                <tr>
+                <td></td>
+                <td><table id="table" class="table" style="display:table; table-layout:auto; width:100%">
+                <thead>
+                   <tr>
+                       <th style="width:50%"> Transaction </th>
+                       <th style="width:25%"> Amount </th>
+                       <th style="width:25%"> Value </th>
+                   </tr>
+               </thead>
+
+                {% for transactions in crypto['transactions'] %}
+                    <tr><td>{{ transactions['hash'] }}</td>
+                    <td>{{ transactions['amount'] * 0.00000001}}</td>
+                    <td>$USD {{ transactions['amountUSD' ]|round(2, 'ceil') }}</td></tr>
+                {% endfor %}
+                </table></td>
+                </tr>
+
             {% endfor %}
            </tbody>
            </table>
