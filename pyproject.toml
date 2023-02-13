@@ -52,6 +52,9 @@ types-redis = "^4.5.1.0"
 pylint = "^2.16.1"
 
 
+[tool.poetry.group.dev.dependencies]
+types-setuptools = "^67.2.0.1"
+
 [build-system]
 requires = ["poetry-core>=1.0.0"]
 build-backend = "poetry.core.masonry.api"
