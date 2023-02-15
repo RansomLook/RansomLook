@@ -47,13 +47,13 @@ types-redis = "^4.5.1.0"
 
 [tool.poetry.dev-dependencies]
 mypy = "^1.0.0"
-types-setuptools = "^67.2.0.1"
+types-setuptools = "^67.3.0.1"
 types-redis = "^4.5.1.0"
 pylint = "^2.16.1"
 
 
 [tool.poetry.group.dev.dependencies]
-types-setuptools = "^67.2.0.1"
+types-setuptools = "^67.3.0.1"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
