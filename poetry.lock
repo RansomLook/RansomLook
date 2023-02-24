@@ -1580,19 +1580,19 @@ test = ["appdirs (==1.4.4)", "covdefaults (>=2.2.2)", "pytest (>=7.2.1)", "pytes
 
 [[package]]
 name = "playwright"
-version = "1.30.0"
+version = "1.31.0"
 description = "A high-level API to automate web browsers"
 category = "main"
 optional = false
 python-versions = ">=3.7"
 files = [
-    {file = "playwright-1.30.0-py3-none-macosx_10_13_x86_64.whl", hash = "sha256:2ea5d88880fbfa69f05ab758ddd66310079828d6c5c8efe497485c341d147a4e"},
-    {file = "playwright-1.30.0-py3-none-macosx_11_0_arm64.whl", hash = "sha256:228e07e1b2ef0790ec6d258897c50b83b0e8055b318fa2d33fcb86a8c5ba3525"},
-    {file = "playwright-1.30.0-py3-none-macosx_11_0_universal2.whl", hash = "sha256:115f5d77a21597200428411186ec72e10fed1cc4d7de3e6e705c415b781d344a"},
-    {file = "playwright-1.30.0-py3-none-manylinux1_x86_64.whl", hash = "sha256:24bb8fe1d7ae60ec971668812c0c6c21b2b12d320ff24da59cbb544a6a15a53c"},
-    {file = "playwright-1.30.0-py3-none-manylinux_2_17_aarch64.manylinux2014_aarch64.whl", hash = "sha256:62032a1da59524a7f8d8cb4ed998cf793310b67693d3df94d00ceb13b5a9eced"},
-    {file = "playwright-1.30.0-py3-none-win32.whl", hash = "sha256:07249da8375fa7d52cbcdbfc36f5773f91fa8305aa340215db173101d289e210"},
-    {file = "playwright-1.30.0-py3-none-win_amd64.whl", hash = "sha256:198c1d816e802c4c9bc048232ec344f4bdfe3229e73a3a28a8eac33c46dab201"},
+    {file = "playwright-1.31.0-py3-none-macosx_10_13_x86_64.whl", hash = "sha256:4073eab6856c0897219a8db9244e7911db23f087a0fd6dac0bad8ec67688476f"},
+    {file = "playwright-1.31.0-py3-none-macosx_11_0_arm64.whl", hash = "sha256:1a5e8142e3ab32a3011f9169b0981ce5784b8fa7a5404378978831bca89bd1b9"},
+    {file = "playwright-1.31.0-py3-none-macosx_11_0_universal2.whl", hash = "sha256:4ba1ec9b751c3ef24b0d98c63c93e3012a6abf5da2c1e027c5177f26c69549aa"},
+    {file = "playwright-1.31.0-py3-none-manylinux1_x86_64.whl", hash = "sha256:2d443d0757b1d2f5c222a9bbfd549b9dc89ca0d761a3c159162482763bb2bebd"},
+    {file = "playwright-1.31.0-py3-none-manylinux_2_17_aarch64.manylinux2014_aarch64.whl", hash = "sha256:529421030d43f5f5802556186e00af97d50f7bfce6bc53313f54ed98627e63f6"},
+    {file = "playwright-1.31.0-py3-none-win32.whl", hash = "sha256:847b89b19d5bb4d12dfc4603dc3e293ca479c8448251b08d49d053b997801003"},
+    {file = "playwright-1.31.0-py3-none-win_amd64.whl", hash = "sha256:93303193eccf85dc26adadff2593205d9906b11a908718e23c1695b2114e30ff"},
 ]
 
 [package.dependencies]
@@ -2300,4 +2300,4 @@ testing = ["flake8 (<5)", "func-timeout", "jaraco.functools", "jaraco.itertools"
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.8,<3.11"
-content-hash = "22a389326859121d1042b4076b0b4c53add508e63b96aac2a097a63c28e2a394"
+content-hash = "189045ee7ece259a694c672737d18d860afe44d94c73f829cfde82aecc0bce25"
