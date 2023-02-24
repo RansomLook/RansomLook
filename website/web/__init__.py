@@ -407,7 +407,7 @@ def search():
                         myentry={}
                         myentry["group_name"] = key.decode()
                         myentry["message"] = entries[entry]
-			myentry["date"] = entry
+                        myentry["date"] = entry
                         messages.append(myentry)
         messages.sort(key=lambda x: x["group_name"].lower())
 
