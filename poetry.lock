@@ -1964,14 +1964,14 @@ test = ["vcrpy (>=1.10.3)"]
 
 [[package]]
 name = "types-beautifulsoup4"
-version = "4.11.6.6"
+version = "4.11.6.7"
 description = "Typing stubs for beautifulsoup4"
 category = "main"
 optional = false
 python-versions = "*"
 files = [
-    {file = "types-beautifulsoup4-4.11.6.6.tar.gz", hash = "sha256:3eae9907ee46794a4e310f4dae63e5b4229e575d8c2e34955a57d1c0a774345a"},
-    {file = "types_beautifulsoup4-4.11.6.6-py3-none-any.whl", hash = "sha256:470b924035652f1a92b3c143f6cad2fc3b3eaf7dab89d04eb4833025110c0894"},
+    {file = "types-beautifulsoup4-4.11.6.7.tar.gz", hash = "sha256:ecca610052c5418a9a2ade28a0c1995ca0b90c8450a70de8dc26a118de2aca56"},
+    {file = "types_beautifulsoup4-4.11.6.7-py3-none-any.whl", hash = "sha256:49ada75863d0d89fc4ad29f064d75c022cb2ad389e17271f0517f8fb34080715"},
 ]
 
 [package.dependencies]
@@ -2300,4 +2300,4 @@ testing = ["flake8 (<5)", "func-timeout", "jaraco.functools", "jaraco.itertools"
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.8,<3.11"
-content-hash = "22a389326859121d1042b4076b0b4c53add508e63b96aac2a097a63c28e2a394"
+content-hash = "97477d7ea557d834459b8a192daf744eee907f42bb0fc0cf892cd8e8da354c06"
