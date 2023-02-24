@@ -125,6 +125,7 @@
             <tr>
                 <th style="width:10%"> Channel </th>
                 <th> Message </th>
+		<th style="width:10"> Date </th>
             </tr>
           </thead>
           <tbody>
@@ -132,6 +133,7 @@
             <tr>
                 <td><center><a href="/telegram/{{entry['group_name']}}">{{entry['group_name'].title()}}</a></center></td>
                 <td> {{entry['message']}} </td>
+		<td> {{entry['date']}} </td>
           {% endfor %}
           </tbody>
         </table>
