@@ -335,7 +335,7 @@ def telegram(name):
         for key in red.keys():
                 if key.decode() == name:
                         posts= json.loads(red.get(key)) # type: ignore
-			sorted_posts = OrderedDict(sorted(posts.items(),reverse=True))
+                        sorted_posts = OrderedDict(sorted(posts.items(),reverse=True))
                         return render_template("telegram.html", posts = sorted_posts, name=name)
 
         return redirect(url_for("home"))
