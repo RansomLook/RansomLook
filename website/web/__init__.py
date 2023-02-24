@@ -335,7 +335,8 @@ def telegram(name):
         for key in red.keys():
                 if key.decode() == name:
                         posts= json.loads(red.get(key)) # type: ignore
-                        return render_template("telegram.html", posts = posts, name=name)
+			sorted_posts = OrderedDict(sorted(posts.items(),reverse=True))
+                        return render_template("telegram.html", posts = sorted_posts, name=name)
 
         return redirect(url_for("home"))
 
@@ -406,6 +407,7 @@ def search():
                         myentry={}
                         myentry["group_name"] = key.decode()
                         myentry["message"] = entries[entry]
+			myentry["date"] = entry
                         messages.append(myentry)
         messages.sort(key=lambda x: x["group_name"].lower())
 
