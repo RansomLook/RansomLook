@@ -12,11 +12,11 @@ __pycache__/
 data/*
 source/*.html
 source/telegram/*
+source/twitter/*
 source/screenshots/*
-source/screenshots/telegram
+source/screenshots/twitter/*
+source/screenshots/telegram/*
 cache/
-
-
 
 # Json file
 *.json

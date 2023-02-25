@@ -27,6 +27,7 @@ from ransomlook.sharedutils import groupcount, hostcount, onlinecount, postslast
 from ransomlook.default.config import get_homedir
 from ransomlook.default import get_socket_path
 from ransomlook.telegram import teladder
+from ransomlook.twitter import twiadder
 from .helpers import get_secret_key, sri_load, User, build_users_table, load_user_from_request
 from .forms import AddForm, LoginForm, SelectForm, EditForm, DeleteForm, AlertForm
 
@@ -340,6 +341,39 @@ def telegram(name):
 
         return redirect(url_for("home"))
 
+@app.route("/twitters")
+def twitters():
+        red = Redis(unix_socket_path=get_socket_path('cache'), db=8)
+        twitter = []
+        for key in red.keys():
+                entry= json.loads(red.get(key)) # type: ignore
+                screenfile = '/screenshots/twitter/' + entry['name'] + '.png'
+                if os.path.exists(str(get_homedir()) + '/source' + screenfile):
+                    entry['screen']=screenfile
+                twitter.append(entry)
+        twitter.sort(key=lambda x: x["name"].lower())
+        return render_template("twitters.html", data=twitter)
+
+@app.route("/twitter/<name>")
+def twitter(name):
+        redprofile = Redis(unix_socket_path=get_socket_path('cache'), db=8)
+        red = Redis(unix_socket_path=get_socket_path('cache'), db=9)
+        profile = redprofile.get(name)
+        if profile is None:
+            return redirect(url_for("home"))
+        posts = json.loads(red.get(name))
+        if posts is not None:
+            sorted_posts = OrderedDict(sorted(posts.items(),reverse=True))
+        else:
+           posts = {}
+        return render_template("twitter.html", posts = sorted_posts, name=json.loads(profile))
+        #for key in red.keys():
+        #        if key.decode() == name:
+        #                posts= json.loads(red.get(key)) # type: ignore
+        #                return render_template("twitter.html", posts = sorted_posts, name=name)
+
+#        return redirect(url_for("home"))
+
 @app.route("/crypto")
 def crypto():
         red = Redis(unix_socket_path=get_socket_path('cache'), db=7)
@@ -430,6 +464,8 @@ def addgroup():
     if form.validate_on_submit():
         if int(form.category.data) == 5:
            res = teladder(form.groupname.data, form.url.data)
+        elif int(form.category.data) == 8:
+           res = twiadder(form.groupname.data, form.url.data)
         else:
            res = adder(form.groupname.data.lower(), form.url.data, form.category.data)
         if res > 1:

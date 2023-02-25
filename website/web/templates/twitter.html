@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% block title %}{{name.name}} details{% endblock %}
+{% block content %}
+    <article id="main" class="markdown-section">
+	<h1>{{name.displayname}} (@{{name.name}})</h1>
+        <p>{{name.description}}</p>       
+        <p>Followers : {{name.followers}}</p>
+        <p>Following : {{name.following}}</p>       
+        <h3>Posts</h3>
+        <table id="table" class="table" style="display:table; table-layout:auto; width:100%">
+          <thead>
+            <tr>
+                <th style="width:20%"> Date </th>
+                <th style="width:10%"> Author </th>
+                <th> Tweet </th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for entry in posts %}
+                <tr>
+                    <td><center> {{entry.split('+')[0].replace('T',' ')}} </center></td>
+                    <td> {{posts[entry][0]}} </td>
+                    <td> {{posts[entry][1]}} </td>
+                </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+    </article>
+{% endblock %}

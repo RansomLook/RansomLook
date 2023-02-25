@@ -18,6 +18,7 @@ run_backend = "bin.run_backend:main"
 shutdown = "bin.shutdown:main"
 update = "bin.update:main"
 telegram = "bin.telegram:main"
+twitter = "bin.twitter:main"
 cryptocur = "bin.cryptocur:main"
 
 [tool.poetry.dependencies]

@@ -3,7 +3,7 @@ from wtforms import StringField, PasswordField, BooleanField, SubmitField, Selec
 from wtforms.validators import DataRequired # type: ignore
 
 class AddForm(FlaskForm):
-    category = SelectField('Database', choices=[('','Select a database'),(0, 'Group'),(3,'Market'),(5,'Telegram')],  default='', validators=[DataRequired()])
+    category = SelectField('Database', choices=[('','Select a database'),(0, 'Group'),(3,'Market'),(5,'Telegram'),(8,'Twitter')],  default='', validators=[DataRequired()])
     groupname = StringField('Group name', validators=[DataRequired()])
     url  = StringField('Url', validators=[DataRequired()])
     submit = SubmitField('Add')
