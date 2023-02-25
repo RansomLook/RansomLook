@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "ransomlook"
-version = "1.2.1"
+version = "1.2.2"
 description = "Yet An Other Ransom Looker"
 authors = ["Fafner KeyZee <fkz@p4nd4.land>"]
 
