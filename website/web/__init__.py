@@ -31,6 +31,8 @@ from ransomlook.twitter import twiadder
 from .helpers import get_secret_key, sri_load, User, build_users_table, load_user_from_request
 from .forms import AddForm, LoginForm, SelectForm, EditForm, DeleteForm, AlertForm
 
+from typing import Dict, Any
+
 from .genericapi import api as generic_api
 
 app = Flask(__name__)
@@ -362,18 +364,11 @@ def twitter(name):
         if profile is None:
             return redirect(url_for("home"))
         posts = red.get(name)
+        sorted_posts : Dict[Any, Any]= {}
         if posts is not None:
             posts = json.loads(posts)
-            sorted_posts = OrderedDict(sorted(posts.items(),reverse=True))
-        else:
-            sorted_posts = {}
+            sorted_posts = OrderedDict(sorted(posts.items(),reverse=True)) # type: ignore
         return render_template("twitter.html", posts = sorted_posts, name=json.loads(profile))
-        #for key in red.keys():
-        #        if key.decode() == name:
-        #                posts= json.loads(red.get(key)) # type: ignore
-        #                return render_template("twitter.html", posts = sorted_posts, name=name)
-
-#        return redirect(url_for("home"))
 
 @app.route("/crypto")
 def crypto():

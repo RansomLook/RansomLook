@@ -57,22 +57,22 @@ def parser() -> None :
            html_doc='source/twitter/'+ key.decode() + '.html'
            file=open(html_doc,'r')
            soup = BeautifulSoup(file,'html.parser')
-           profile = json.loads(red.get(key)) 
-           name =  soup.find('div',{'data-testid':'UserName'})
-           profile['displayname'] = name.div.div.div.text
+           profile = json.loads(red.get(key)) # type: ignore
+           name =  soup.find('div',{'data-testid':'UserName'}) 
+           profile['displayname'] = name.div.div.div.text # type: ignore
            description = soup.find('div', {'data-testid':'UserDescription'})
            if description != None:
-               profile['meta'] = description.text
+               profile['meta'] = description.text # type: ignore
            location = soup.find('span',{'data-testid':'UserLocation'})
            if location != None:
-               profile['location'] = location.text
+               profile['location'] = location.text # type: ignore
            website = soup.find('a',{'data-testid':'UserUrl'})
            if website != None:
-               profile['link'] = website.text
-           join_date =soup.find('span',{'data-testid':'UserJoinDate'}).text
+               profile['link'] = website.text # type: ignore
+           join_date =soup.find('span',{'data-testid':'UserJoinDate'}).text # type: ignore
            profile['joindate'] = join_date
-           profile['following'] = soup.find('span', text = "Following").parent.span.text
-           profile['followers'] = soup.find('span', text = "Followers").parent.span.text
+           profile['following'] = soup.find('span', text = "Following").parent.span.text # type: ignore
+           profile['followers'] = soup.find('span', text = "Followers").parent.span.text # type: ignore
            red.set(key,json.dumps(profile))
            tweets = soup.find_all('article',{'data-testid':'tweet'})
            if key in redmessage.keys():
