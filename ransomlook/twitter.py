@@ -20,7 +20,6 @@ from .sharedutils import stdlog, errlog
 from .sharedutils import createfile
 
 from bs4 import BeautifulSoup
-from parsel import Selector
 
 import redis
 
