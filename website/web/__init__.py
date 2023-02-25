@@ -361,8 +361,9 @@ def twitter(name):
         profile = redprofile.get(name)
         if profile is None:
             return redirect(url_for("home"))
-        posts = json.loads(red.get(name))
+        posts = red.get(name)
         if posts is not None:
+            posts = json.loads(posts)
             sorted_posts = OrderedDict(sorted(posts.items(),reverse=True))
         else:
            posts = {}
