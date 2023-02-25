@@ -152,7 +152,7 @@ def twiadder(name, link):
         data = {
             'name': name,
             'meta': None,
-            'link': link,
+            'link': None,
             'displayname': None,
             'location': None,
             'joindate': None,
