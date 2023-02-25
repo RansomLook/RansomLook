@@ -80,11 +80,15 @@ def parser() -> None :
            else:
                posts={}
            for tweet  in tweets:
-               author = tweet.find('div',{'data-testid':'User-Names'}).find('span').text
-               timestamp = tweet.find('div',{'data-testid':'User-Names'}).find('time')['datetime']
-               message = tweet.find('div',{'data-testid':'tweetText'}).text
-               if timestamp not in posts:
-                   posts.update({timestamp:[author,message]})
+               try:
+                   author = tweet.find('div',{'data-testid':'User-Names'}).find('span').text
+                   timestamp = tweet.find('div',{'data-testid':'User-Names'}).find('time')['datetime']
+                   message = tweet.find('div',{'data-testid':'tweetText'}).text
+                   if timestamp not in posts:
+                       posts.update({timestamp:[author,message]})
+               except:
+                  errlog('Malformated message :( - ' + key.decode() )
+                  errlog(tweet.find('div',{'data-testid':'tweetText'}))
            redmessage.set(key,json.dumps(posts))
 
 def threadscape(queuethread, lock):
