@@ -366,7 +366,7 @@ def twitter(name):
             posts = json.loads(posts)
             sorted_posts = OrderedDict(sorted(posts.items(),reverse=True))
         else:
-           sorted_posts = {}
+            sorted_posts = {}
         return render_template("twitter.html", posts = sorted_posts, name=json.loads(profile))
         #for key in red.keys():
         #        if key.decode() == name:
