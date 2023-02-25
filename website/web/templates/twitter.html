@@ -3,7 +3,9 @@
 {% block content %}
     <article id="main" class="markdown-section">
 	<h1>{{name.displayname}} (@{{name.name}})</h1>
-        <p>{{name.description}}</p>       
+        <p>{{name.meta}}</p> 
+        <p>Location : {{name.location}}</p>
+        <p>Joined : {{name.joindate}}</p>      
         <p>Followers : {{name.followers}}</p>
         <p>Following : {{name.following}}</p>       
         <h3>Posts</h3>
