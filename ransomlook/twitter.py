@@ -99,7 +99,7 @@ def parser() -> None :
                        message = message.text
                    if timestamp not in posts:
                        posts.update({timestamp:{'author':author,'message':message, 'imgs':imgs}})
-               except Exception as e::
+               except Exception as e:
                   errlog('Malformated message :( - ' + key.decode() )
                   errlog(e)
            redmessage.set(key,json.dumps(posts))
