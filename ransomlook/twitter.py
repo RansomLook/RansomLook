@@ -99,9 +99,9 @@ def parser() -> None :
                        message = message.text
                    if timestamp not in posts:
                        posts.update({timestamp:{'author':author,'message':message, 'imgs':imgs}})
-               except:
+               except Exception as e::
                   errlog('Malformated message :( - ' + key.decode() )
-                  errlog(tweet.find('div',{'data-testid':'tweetText'}))
+                  errlog(e)
            redmessage.set(key,json.dumps(posts))
 
 def threadscape(queuethread, lock):
