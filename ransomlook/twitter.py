@@ -82,13 +82,17 @@ def parser() -> None :
            else:
                posts={}
            for tweet  in tweets:
-               try:
+               #try:
                    imgs=[]
                    author = tweet.find('div',{'data-testid':'User-Names'}).find('span').text
                    timestamp = tweet.find('div',{'data-testid':'User-Names'}).find('time')['datetime']
                    message = tweet.find('div',{'data-testid':'tweetText'})
                    imglist = tweet.find_all('div',{'data-testid':'tweetPhoto'})
+                   print(imglist)
                    for img in imglist:
+                       print(img)
+                       if not img in img:
+                          continue
                        image = img.img['src'].split('/')[4].split('?')[0]
                        imgs.append(image)
                        response = requests.get(img.img['src'], stream=True)
@@ -99,9 +103,9 @@ def parser() -> None :
                        message = message.text
                    if timestamp not in posts:
                        posts.update({timestamp:{'author':author,'message':message, 'imgs':imgs}})
-               except Exception as e:
-                  errlog('Malformated message :( - ' + key.decode() )
-                  errlog(e)
+               #except Exception as e:
+               #   errlog('Malformated message :( - ' + key.decode() )
+               #   errlog(e)
            redmessage.set(key,json.dumps(posts))
 
 def threadscape(queuethread, lock):

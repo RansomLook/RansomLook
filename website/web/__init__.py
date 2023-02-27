@@ -367,8 +367,6 @@ def twitter(name):
         sorted_posts : Dict[Any, Any]= {}
         if posts is not None:
             posts = json.loads(posts)
-            for post in posts:
-                print(posts[post])
             sorted_posts = OrderedDict(sorted(posts.items(),reverse=True)) # type: ignore
         return render_template("twitter.html", posts = sorted_posts, name=json.loads(profile))
 
