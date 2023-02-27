@@ -16,14 +16,20 @@
                 <th style="width:20%"> Date </th>
                 <th style="width:10%"> Author </th>
                 <th> Tweet </th>
+                <th style="width:10%"> Media </th>
             </tr>
           </thead>
           <tbody>
             {% for entry in posts %}
                 <tr>
                     <td><center> {{entry.split('+')[0].replace('T',' ')}} </center></td>
-                    <td> {{posts[entry][0]}} </td>
-                    <td> {{posts[entry][1]}} </td>
+                    <td> {{posts[entry]['author']}} </td>
+                    <td> {{posts[entry]['message']}} </td>
+                    <td>
+                    {% for img in posts[entry]['imgs'] %}
+                        <a href="screenshots/twitter/img/{{name.name}}-{{img}}.png" rel="noopener noreferrer" target="_blank"">Images</a>
+                    {% endfor %}
+                    </td>
                 </tr>
             {% endfor %}
           </tbody>

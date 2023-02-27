@@ -21,6 +21,8 @@ from .sharedutils import createfile
 
 from bs4 import BeautifulSoup
 
+import requests, shutil
+
 import redis
 
 def twitternotify(config, group, title) -> None :
@@ -81,11 +83,22 @@ def parser() -> None :
                posts={}
            for tweet  in tweets:
                try:
+                   imgs=[]
                    author = tweet.find('div',{'data-testid':'User-Names'}).find('span').text
                    timestamp = tweet.find('div',{'data-testid':'User-Names'}).find('time')['datetime']
-                   message = tweet.find('div',{'data-testid':'tweetText'}).text
+                   message = tweet.find('div',{'data-testid':'tweetText'})
+                   imglist = tweet.find_all('div',{'data-testid':'tweetPhoto'})
+                   for img in imglist:
+                       image = img.img['src'].split('/')[4].split('?')[0]
+                       imgs.append(image)
+                       response = requests.get(img.img['src'], stream=True)
+                       with open('source/screenshots/twitter/img/'+key.decode()+'-'+image+'.png','wb') as out_file:
+                           shutil.copyfileobj(response.raw, out_file)
+                       del response
+                   if message is not None:
+                       message = message.text
                    if timestamp not in posts:
-                       posts.update({timestamp:[author,message]})
+                       posts.update({timestamp:{'author':author,'message':message, 'imgs':imgs}})
                except:
                   errlog('Malformated message :( - ' + key.decode() )
                   errlog(tweet.find('div',{'data-testid':'tweetText'}))

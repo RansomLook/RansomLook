@@ -15,6 +15,7 @@ source/telegram/*
 source/twitter/*
 source/screenshots/*
 source/screenshots/twitter/*
+source/screenshots/twitter/img/*
 source/screenshots/telegram/*
 cache/
 
