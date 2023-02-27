@@ -438,12 +438,20 @@ def search():
         for key in red.keys():
                 entries = json.loads(red.get(key)) # type: ignore
                 for entry in entries:
-                    if query.lower() in entries[entry].lower() : # type: ignore
-                        myentry={}
-                        myentry["group_name"] = key.decode()
-                        myentry["message"] = entries[entry]
-                        myentry["date"] = entry
-                        messages.append(myentry)
+                    if isinstance(entries[entry], str):
+                        if query.lower() in entries[entry].lower() : # type: ignore
+                            myentry={}
+                            myentry["group_name"] = key.decode()
+                            myentry["message"] = entries[entry]
+                            myentry["date"] = entry
+                            messages.append(myentry)
+                    else:
+                        if entries[entry]['message'] is not None and query.lower() in entries[entry]['message'].lower() : # type: ignore
+                            myentry={}
+                            myentry["group_name"] = key.decode()
+                            myentry["message"] = entries[entry]['message']
+                            myentry["date"] = entry
+                            messages.append(myentry)
         messages.sort(key=lambda x: x["group_name"].lower())
 
         return render_template("search.html", query=query,groups=groups, markets=markets, posts=posts, leaks=leaks, channels=channels, messages=messages)
