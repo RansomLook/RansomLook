@@ -9,13 +9,19 @@
             <tr>
                 <th style="width:20%"> Date </th>
                 <th> Content </th>
+                <th style="width:10%"> Media </th>
             </tr>
           </thead>
           <tbody>
             {% for entry in posts %}
                 <tr>
                     <td><center> {{entry.split('+')[0].replace('T',' ')}} </center></td>
-                    <td> {{posts[entry]}} </td>
+                    <td> {{posts[entry]['message']}} </td>
+                    <td>
+                    {% for media in posts[entry]['image'] %}
+                        <a href="/screenshots/telegram/img/{{name}}-{{media}}.jpg" rel="noopener noreferrer" target="_blank"">Images</a>
+                    {% endfor %}
+                    </td>
                 </tr>
             {% endfor %}
           </tbody>

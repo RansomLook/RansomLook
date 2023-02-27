@@ -27,8 +27,12 @@ from .sharedutils import siteschema
 from .sharedutils import stdlog, errlog
 from .sharedutils import createfile
 
+import requests, shutil
+
 from bs4 import BeautifulSoup
 from googletrans import Translator # type: ignore
+
+import re
 
 def alertingnotify(config, group, description, keyword) -> None :
     '''
@@ -150,17 +154,31 @@ def parser():
                posts={}
            for content in tgpost:
                try:
-                   message = content.find('div', {'class':'tgme_widget_message_text'}).text
+                   message = content.find('div', {'class':'tgme_widget_message_text'})
+                   if message is not None:
+                       message = message.text
+                   imgs=[]
+                   imglist = content.find_all('a',{'class':'tgme_widget_message_photo_wrap'})
+                   for img in imglist:
+                       imagelink= re.findall(r"https://cdn4.*.*.jpg", img['style'])[0]
+                       image= img["href"].split('/')[-1]
+                       response = requests.get(imagelink, stream=True)
+                       imgs.append(image)
+                       with open('source/screenshots/telegram/img/'+key.decode()+'-'+image+'.jpg','wb') as out_file:
+                           shutil.copyfileobj(response.raw, out_file)
+                       del response
                    timestamp = content.find('time', {'class' : 'time'})['datetime']
                    matching = []
                    if timestamp not in posts:
-                      posts.update({timestamp:message})
+                      posts.update({timestamp:{'message':message,'image':imgs}})
                       for keyword in listkeywords:
                           if keyword.lower() in message.lower():
                               matching.append(keyword)
                       if matching :
                           alertingnotify(emailconfig, key, message, matching)
-               except :
+               except Exception as e:
+                   print(e)
+                   print(img)
                    print('error with the channel:'+key.decode())
            redmessage.set(key,json.dumps(posts))
         except:
