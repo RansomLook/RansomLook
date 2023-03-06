@@ -48,7 +48,7 @@ types-redis = "^4.5.1.4"
 
 [tool.poetry.dev-dependencies]
 mypy = "^1.0.1"
-types-setuptools = "^67.4.0.3"
+types-setuptools = "^67.5.0.0"
 types-redis = "^4.5.1.4"
 pylint = "^2.16.2"
 
