@@ -12,7 +12,6 @@ def main():
                 soup=BeautifulSoup(file,'html.parser')
                 divs_name=soup.find_all('div', {"class": "sm:w-1/2 mb-10 px-4"})
                 for div in divs_name:
-                    print (div)
                     title = div.find('h2').text.strip()
                     description = ''
                     list_div.append({"title" : title, "description" : description})
