@@ -37,7 +37,8 @@ def creategroup(location: str) -> Dict[str, object] :
         'locations': [
             mylocation
         ],
-        'profile': []
+        'profile': [],
+        'ransomware_galaxy_value': ''
     }
     return insertdata
 

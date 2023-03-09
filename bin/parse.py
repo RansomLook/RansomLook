@@ -15,6 +15,7 @@ import redis
 from ransomlook.default.config import get_config, get_socket_path
 from ransomlook.rocket import rocketnotify
 from ransomlook.twitter import twitternotify
+from ransomlook.misp import mispevent
 from ransomlook.email import alertingnotify
 
 from ransomlook.sharedutils import dbglog, stdlog, errlog
@@ -38,6 +39,7 @@ def appender(entry, group_name):
     '''
     rocketconfig = get_config('generic','rocketchat')
     twitterconfig = get_config('generic','twitter')
+    mispconfig = get_config('generic','misp')
     emailconfig = get_config('generic', 'email')
     if type(entry) is str :
        post_title = entry
@@ -82,6 +84,16 @@ def appender(entry, group_name):
         rocketnotify(rocketconfig, group_name, post_title, description)
     if twitterconfig['enable'] == True:
         twitternotify(twitterconfig, group_name, post_title)
+    if mispconfig['enable'] == True:
+        try:
+            groupred = redis.Redis(unix_socket_path=get_socket_path('cache'), db=0)
+            for key in groupred.keys():
+                if key.decode() == group_name:
+                       groupinfo = json.loads(groupred.get(key))
+            galaxyname = groupinfo['ransomware_galaxy_value']
+        except:
+            galaxyname = None
+        mispevent(mispconfig, group_name, post_title, description, galaxyname)
 
 def main():
     modules = glob.glob(join(dirname('ransomlook/parsers/'), "*.py"))

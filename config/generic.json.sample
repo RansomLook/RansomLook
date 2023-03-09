@@ -24,7 +24,14 @@
         "access_token": "",
         "access_token_secret": ""
     },
-     "users": {},
+    "misp": {
+        "enable": false,
+        "url": "",
+        "apikey": "",
+        "tls_verify": true,
+        "publish": true
+    },
+    "users": {},
     "malpedia": "",
     "thread": 4,
     "website_listen_ip": "127.0.0.1",
@@ -37,7 +44,8 @@
         "website_listen_ip": "IP Flask will listen on. Defaults to 0.0.0.0, meaning all interfaces.",
         "website_listen_port": "Port Flask will listen on.",
         "thread": "Number of PW instances to run",
-        "users":  "It is some kind of an admin accounts. Format: {username: password}"
+        "users":  "It is some kind of an admin accounts. Format: {username: password}",
+        "misp": "The MISP configuration"
     }
 
 }
