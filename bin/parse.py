@@ -89,7 +89,7 @@ def appender(entry, group_name):
             groupred = redis.Redis(unix_socket_path=get_socket_path('cache'), db=0)
             for key in groupred.keys():
                 if key.decode() == group_name:
-                       groupinfo = json.loads(groupred.get(key))
+                       groupinfo = json.loads(groupred.get(key)) # type: ignore
             galaxyname = groupinfo['ransomware_galaxy_value']
         except:
             galaxyname = None

@@ -20,7 +20,7 @@ def mispevent(config, group, title, description, galaxyname) -> None :
 
     misp_object = MISPObject('ransomware-group-post')
     misp_object.add_attribute('title', title)
-    misp_object.add_attribute('date',datetime.now())
+    misp_object.add_attribute('date',datetime.now().strftime("%m/%d/%Y"))
     if description is not None:
         misp_object.add_attribute('description', description)
     event = MISPEvent()
@@ -30,4 +30,4 @@ def mispevent(config, group, title, description, galaxyname) -> None :
         event.publish()
     if galaxyname != None:
         event.add_tag('misp-galaxy:Ransomware=\"'+galaxyname+'\"')
-    event = misp.add_event(event, pythonify=True )
+    pushedevent = misp.add_event(event, pythonify=True )
