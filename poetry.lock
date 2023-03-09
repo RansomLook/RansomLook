@@ -1892,14 +1892,14 @@ idna2008 = ["idna"]
 
 [[package]]
 name = "rocketchat-api"
-version = "1.28.1"
+version = "1.29.0"
 description = "Python API wrapper for Rocket.Chat"
 category = "main"
 optional = false
 python-versions = "*"
 files = [
-    {file = "rocketchat_API-1.28.1-py3-none-any.whl", hash = "sha256:0dd4a0a063fde3fe6ea95a98142da6dd58af6b75e09f3105e36c7f14130b0fc6"},
-    {file = "rocketchat_API-1.28.1.tar.gz", hash = "sha256:77683cb600b2da27f5334e490f24b88100ee25e943db14de74c102f769ad4778"},
+    {file = "rocketchat_API-1.29.0-py3-none-any.whl", hash = "sha256:e78c71640ee39dab9212e3a8be6b27ec9ca68e66c953e9c1bfbe8aa0c48deaec"},
+    {file = "rocketchat_API-1.29.0.tar.gz", hash = "sha256:ee3d4deefbc73c45843d8c4b83385ec590cd6416362b63ee7175343dab3542ed"},
 ]
 
 [package.dependencies]
@@ -2359,4 +2359,4 @@ testing = ["big-O", "flake8 (<5)", "jaraco.functools", "jaraco.itertools", "more
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.8,<3.11"
-content-hash = "144a6858236612e09aa5972517be31d97a73f7a5565c16cc105362e97318fcf3"
+content-hash = "997073902f63cc9b0fe622e86e53a4042aa85e8f7ef12df569e5ad53ecc284fb"
