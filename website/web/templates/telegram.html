@@ -19,7 +19,7 @@
                     <td> {{posts[entry]['message']}} </td>
                     <td>
                     {% for media in posts[entry]['image'] %}
-                        <a href="/screenshots/telegram/img/{{name}}-{{media}}.jpg" rel="noopener noreferrer" target="_blank"">Images</a>
+                        <a href="/screenshots/telegram/img/{{name}}-{{media|urlencode}}.jpg" rel="noopener noreferrer" target="_blank"">Images</a>
                     {% endfor %}
                     </td>
                 </tr>
