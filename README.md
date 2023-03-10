@@ -15,10 +15,11 @@ RansomLook is tool to monitor Ransomware groups and markets and extract their vi
     - Mail alerting for posts containing your keywords
 - Details about the groups with data from malpedia.
 - Daily notification by email.
-- Notification on RocketChat when a new post  is created.
+- Notification on RocketChat when a new post is created.
 - Telegram monitoring
 - Dataleak monitoring
 - Monitoring Cryptocurrencies, data are from: https://ransomwhe.re
+- [MISP](https://www.misp-project.org/) integration with the support of the MISP ransomware galaxy
 
 # Install guide
 
