@@ -1620,14 +1620,14 @@ testutils = ["gitpython (>3)"]
 
 [[package]]
 name = "pymisp"
-version = "2.4.168.1"
+version = "2.4.169.1"
 description = "Python API for MISP."
 category = "main"
 optional = false
 python-versions = ">=3.8,<4.0"
 files = [
-    {file = "pymisp-2.4.168.1-py3-none-any.whl", hash = "sha256:ba69aa40fd49b9a2674c75b5db03e46dca88268d8e2efa1b88f6b71ff8223d57"},
-    {file = "pymisp-2.4.168.1.tar.gz", hash = "sha256:70b77dddd55212eb40afff6f1890f20c746ca3ec45d955dc7a832ea7ceff3a2f"},
+    {file = "pymisp-2.4.169.1-py3-none-any.whl", hash = "sha256:7801addea702eed9e2b632f6e5f656f796f27488120535143879a7fa0fc0f0cc"},
+    {file = "pymisp-2.4.169.1.tar.gz", hash = "sha256:381678496454136be3753a3cffb5e232bcd4e6cbc9e29f131c18ff5761e9bedd"},
 ]
 
 [package.dependencies]
@@ -2273,4 +2273,4 @@ email = ["email-validator"]
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.10,<3.11"
-content-hash = "cf6a2ba45b6e55fb08f8c4b731fa286b5019d40cd359cb770e672220f66c1314"
+content-hash = "09ffc60d4f3deb57a72dee22d5d3cad73259f2d2f750a9fad1023d8f0d61d0ec"
