@@ -49,7 +49,7 @@ pymisp = "^2.4.169.1"
 
 [tool.poetry.dev-dependencies]
 mypy = "^1.1.1"
-types-setuptools = "^67.6.0.0"
+types-setuptools = "^67.6.0.5"
 types-redis = "^4.5.1.5"
 pylint = "^2.17.0"
 
