@@ -53,7 +53,7 @@
               <li {% if request.path == '/telegrams' %} class="active" {% endif %}><a href="{{ url_for('telegrams') }}" title="Telegrams">Telegrams</a></li>
               <li {% if request.path == '/twitters' %} class="active" {% endif %}><a href="{{ url_for('twitters') }}" title="Twitters">Twitters</a></li>
               <li {% if request.path == '/crypto' %} class="active" {% endif %}><a href="{{ url_for('crypto') }}" title="Cryptocurrencies">Cryptocurrencies</a></li>
-              <li {% if request.path == '/' %} class="active" {% endif %}><a href="/" title="Stats &amp; graphs">Stats &amp; graphs</a></li></ul>
+          </ul>
           {% if current_user.is_authenticated %}
           <ul><li>Admin Zone </li>
               <ul>

@@ -632,14 +632,14 @@ email = ["email-validator"]
 
 [[package]]
 name = "fonttools"
-version = "4.39.0"
+version = "4.39.2"
 description = "Tools to manipulate font files"
 category = "main"
 optional = false
 python-versions = ">=3.8"
 files = [
-    {file = "fonttools-4.39.0-py3-none-any.whl", hash = "sha256:f5e764e1fd6ad54dfc201ff32af0ba111bcfbe0d05b24540af74c63db4ed6390"},
-    {file = "fonttools-4.39.0.zip", hash = "sha256:909c104558835eac27faeb56be5a4c32694192dca123d073bf746ce9254054af"},
+    {file = "fonttools-4.39.2-py3-none-any.whl", hash = "sha256:85245aa2fd4cf502a643c9a9a2b5a393703e150a6eaacc3e0e84bb448053f061"},
+    {file = "fonttools-4.39.2.zip", hash = "sha256:e2d9f10337c9e3b17f9bce17a60a16a885a7d23b59b7f45ce07ea643e5580439"},
 ]
 
 [package.extras]
@@ -1620,14 +1620,14 @@ testutils = ["gitpython (>3)"]
 
 [[package]]
 name = "pymisp"
-version = "2.4.169.1"
+version = "2.4.169.2"
 description = "Python API for MISP."
 category = "main"
 optional = false
 python-versions = ">=3.8,<4.0"
 files = [
-    {file = "pymisp-2.4.169.1-py3-none-any.whl", hash = "sha256:7801addea702eed9e2b632f6e5f656f796f27488120535143879a7fa0fc0f0cc"},
-    {file = "pymisp-2.4.169.1.tar.gz", hash = "sha256:381678496454136be3753a3cffb5e232bcd4e6cbc9e29f131c18ff5761e9bedd"},
+    {file = "pymisp-2.4.169.2-py3-none-any.whl", hash = "sha256:6bb4ff09c1930a9b68c898264ed0e3ddc2c0c5dbf1ad2fbed58e597198e477cd"},
+    {file = "pymisp-2.4.169.2.tar.gz", hash = "sha256:9e3b51170efbe869d0d4c480e1df41ccba82feccc9e6f25e75dffaea7bd957d8"},
 ]
 
 [package.dependencies]
@@ -1638,7 +1638,7 @@ python-dateutil = ">=2.8.2,<3.0.0"
 requests = ">=2.28.2,<3.0.0"
 
 [package.extras]
-brotli = ["urllib3[brotli] (>=1.26.14,<2.0.0)"]
+brotli = ["urllib3[brotli] (>=1.26.15,<2.0.0)"]
 docs = ["recommonmark (>=0.7.1,<0.8.0)", "sphinx-autodoc-typehints (>=1.22,<2.0)"]
 email = ["RTFDE (>=0.0.2,<0.0.3)", "extract_msg (>=0.39.2,<0.40.0)", "oletools (>=0.60.1,<0.61.0)"]
 fileobjects = ["lief (>=0.12.3,<0.13.0)", "pydeep2 (>=0.5.1,<0.6.0)", "python-magic (>=0.4.27,<0.5.0)"]
@@ -2086,14 +2086,14 @@ types-urllib3 = "<1.27"
 
 [[package]]
 name = "types-setuptools"
-version = "67.6.0.0"
+version = "67.6.0.5"
 description = "Typing stubs for setuptools"
 category = "dev"
 optional = false
 python-versions = "*"
 files = [
-    {file = "types-setuptools-67.6.0.0.tar.gz", hash = "sha256:70b5e6a379e9fccf6579871a93ca3301a46252e3ae66957ec64281a2b6a812d9"},
-    {file = "types_setuptools-67.6.0.0-py3-none-any.whl", hash = "sha256:d669a80ee8e37eb1697dc31a23d41ea2c48a635464e2c7e6370dda811459b466"},
+    {file = "types-setuptools-67.6.0.5.tar.gz", hash = "sha256:3a708e66c7bdc620e4d0439f344c750c57a4340c895a4c3ed2d0fc4ae8eb9962"},
+    {file = "types_setuptools-67.6.0.5-py3-none-any.whl", hash = "sha256:dae5a4a659dbb6dba57773440f6e2dbdd8ef282dc136a174a8a59bd33d949945"},
 ]
 
 [[package]]
@@ -2273,4 +2273,4 @@ email = ["email-validator"]
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.10,<3.11"
-content-hash = "b893e827651f8e262e6b54d0ab6589467ea0d34d2091f1514ec769eba384f560"
+content-hash = "c921f80111f7f31a4276e9f3e13745e49527cb9ccca6cd14380e9e500d8728b8"
