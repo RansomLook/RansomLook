@@ -18,6 +18,7 @@ class DeleteForm(FlaskForm):
 
 class EditForm(FlaskForm):
     groupname = StringField(validators=[DataRequired()])
+    galaxy = StringField()
     description = TextAreaField()
     profiles = TextAreaField()
     links = TextAreaField()

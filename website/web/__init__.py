@@ -532,6 +532,7 @@ def editgroup(database, name):
     if form.validate_on_submit():
         data = json.loads(red.get(name)) # type: ignore
         data['meta']=form.description.data
+        data['ransomware_galaxy_value'] = form.galaxy.data
         data['profile'] = ast.literal_eval(form.profiles.data)
         data['locations'] = ast.literal_eval(form.links.data)
         red.set(name, json.dumps(data))
@@ -546,6 +547,11 @@ def editgroup(database, name):
     data = json.loads(red.get(name)) # type: ignore
     if form.description.data == None:
         form.description.data = data['meta']
+    if form.galaxy.data == None:
+        if 'ransomware_galaxy_value' in data:
+            form.galaxy.data = data['ransomware_galaxy_value']
+        else :
+            form.galaxy.data = ''
     if form.profiles.data == None:
         form.profiles.data = data['profile']
     if form.links.data == None:
