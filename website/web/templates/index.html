@@ -21,5 +21,8 @@
         <p>There have been <code>{{data['nbposts']}}</code> posts since the dawn of ransomlook</p>
 
         <p>There are <code>{{data['nbparsers']}}</code> custom parsers indexing posts</p>
+        {% if alert is true %}
+        <h1>Alerts within the last 24h</h1>
+        {% endif %}
     </article>
 {% endblock %}

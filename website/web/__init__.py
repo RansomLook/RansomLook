@@ -25,6 +25,7 @@ from ransomlook.ransomlook import adder
 from ransomlook.sharedutils import createfile
 from ransomlook.sharedutils import groupcount, hostcount, onlinecount, postslast24h, mounthlypostcount, currentmonthstr, postssince, poststhisyear,postcount,parsercount
 from ransomlook.default.config import get_homedir
+from ransomlook.default.config import get_config
 from ransomlook.default import get_socket_path
 from ransomlook.telegram import teladder
 from ransomlook.twitter import twiadder
@@ -120,7 +121,8 @@ def home():
         data['year'] = dt.now().year
         data['nbposts'] = postcount()
         data['nbparsers'] = parsercount()
-        return render_template("index.html", date=date, data=data)
+        alert=get_config('generic','alertondashboard')
+        return render_template("index.html", date=date, data=data,alert=alert)
 
 @app.route("/recent")
 def recent():
