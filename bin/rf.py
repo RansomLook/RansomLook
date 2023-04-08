@@ -32,7 +32,7 @@ def main() -> None :
         if next == False :
             red.set(entry['name'], json.dumps(entry))
         if rocketconfig['enable'] == True:
-            rocketnotifyleak(rocketconfig, entry)
+            rocketnotifyrf(rocketconfig, entry)
 
 if __name__ == '__main__':
     main()
