@@ -3,12 +3,15 @@ import redis
 import requests
 
 from ransomlook.default.config import get_config, get_socket_path
-from ransomlook.rocket import rocketnotifyleak
+from ransomlook.rocket import rocketnotifyrf
 
 def main() -> None :
 
     red = redis.Redis(unix_socket_path=get_socket_path('cache'), db=10)
     keys = red.keys()
+
+    rocketconfig = get_config('generic','rocketchat')
+
     rftoken = get_config('generic','rf')
 
     header = { "x-RFToken": rftoken,
@@ -28,6 +31,8 @@ def main() -> None :
                 continue
         if next == False :
             red.set(entry['name'], json.dumps(entry))
+        if rocketconfig['enable'] == True:
+            rocketnotifyleak(rocketconfig, entry)
 
 if __name__ == '__main__':
     main()
