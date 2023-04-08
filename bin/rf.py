@@ -26,13 +26,13 @@ def main() -> None :
     for entry in temp['dumps']:
         next = False
         for key in keys:
-            if entry['name'].encode == key:
+            if entry['name'] == key.decode():
                 next = True
                 continue
         if next == False :
             red.set(entry['name'], json.dumps(entry))
-        if rocketconfig['enable'] == True:
-            rocketnotifyrf(rocketconfig, entry)
+            if rocketconfig['enable'] == True:
+                rocketnotifyrf(rocketconfig, entry)
 
 if __name__ == '__main__':
     main()
