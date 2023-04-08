@@ -4,6 +4,7 @@ from flask import request
 from flask_bootstrap import Bootstrap5  # type: ignore
 
 from datetime import datetime as dt
+from datetime import timedelta
 import glob
 from os.path import dirname, basename, isfile, join
 import os
@@ -20,6 +21,7 @@ from flask_restx import Api  # type: ignore
 from importlib.metadata import version
 
 from collections import OrderedDict
+from collections import defaultdict
 
 from ransomlook.ransomlook import adder
 from ransomlook.sharedutils import createfile
@@ -121,8 +123,28 @@ def home():
         data['year'] = dt.now().year
         data['nbposts'] = postcount()
         data['nbparsers'] = parsercount()
+        alertposts= defaultdict(list)
+        alertleaks= defaultdict(list)
+        alerttelegrams= defaultdict(list)
+        alerttweets= defaultdict(list)
         alert=get_config('generic','alertondashboard')
-        return render_template("index.html", date=date, data=data,alert=alert)
+        if alert is True:
+            red = Redis(unix_socket_path=get_socket_path('cache'), db=1)
+            keywords = red.get('keywords')
+            listkeywords = keywords.decode().splitlines()
+            red = Redis(unix_socket_path=get_socket_path('cache'), db=2)
+            groups = red.keys()
+            for entry in groups:
+                posts = json.loads(red.get(entry)) # type: ignore
+                for post in posts:
+                    datetime_object = dt.strptime(post['discovered'], '%Y-%m-%d %H:%M:%S.%f')
+                    if datetime_object > dt.now() - timedelta(hours=24):
+                        for keyword in listkeywords:
+                            if keyword.lower() in post['post_title'].lower() or keyword.lower() in post['description'].lower():
+                                print(entry.decode())
+                                alertposts[entry.decode()].append(post)
+        print(alertposts)
+        return render_template("index.html", date=date, data=data,alert=alert, posts=alertposts, leaks=alertleaks, telegrams=alerttelegrams, tweets=alerttweets)
 
 @app.route("/recent")
 def recent():
