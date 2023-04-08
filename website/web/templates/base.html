@@ -50,6 +50,7 @@
               <li {% if request.path == '/markets' %} class="active" {% endif %}><a href="{{ url_for('markets') }}" title="Forums &amp; Market">Forums &amp; Market</a></li>
               {% if request.path == '/markets' %}{% block markets %}{% endblock %}{% endif %}
               <li {% if request.path == '/leaks' %} class="active" {% endif %}><a href="{{ url_for('leaks') }}" title="Leaks">Leaks</a></li>
+              <li {% if request.path == '/RF' %} class="active" {% endif %}><a href="{{ url_for('rf') }}" title="RF Dumps">RF Dumps</a></li>
               <li {% if request.path == '/telegrams' %} class="active" {% endif %}><a href="{{ url_for('telegrams') }}" title="Telegrams">Telegrams</a></li>
               <li {% if request.path == '/twitters' %} class="active" {% endif %}><a href="{{ url_for('twitters') }}" title="Twitters">Twitters</a></li>
               <li {% if request.path == '/crypto' %} class="active" {% endif %}><a href="{{ url_for('crypto') }}" title="Cryptocurrencies">Cryptocurrencies</a></li>

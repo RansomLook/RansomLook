@@ -20,6 +20,7 @@ update = "bin.update:main"
 telegram = "bin.telegram:main"
 twitter = "bin.twitter:main"
 cryptocur = "bin.cryptocur:main"
+rf = "bin.rf:main"
 
 [tool.poetry.dependencies]
 python = "^3.10,<3.11"

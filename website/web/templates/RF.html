@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+
+{% block title %}RF Dumps{% endblock %}
+
+{% block content %}
+    <article id="main" class="markdown-section">
+	<h1>Leaks listing</h1>
+           <div class="table-responsive">
+           <table id="table" class="table" style="display:table; table-layout:auto; width:100%">
+           <thead>
+               <tr>
+                   <th style="width:20%"> Dump </th>
+                   <th style="width:70%"> Description </th>
+                   <th style="width:10%"> Downloaded </th>
+               </tr>
+           </thead>
+           <tbody>
+             {% for entry in data %}
+                <tr>
+                <td> <a href="/RF/{{entry['name']}}">{{ entry['name'].title() }}</a>  </td>
+                <td> {{ entry['description'] }} </td>
+                <td> {{ entry['downloaded'].split('T')[0] }} </td>
+                </tr>
+             {% endfor %}
+           </tbody>
+           </table>
+           </div>
+
+    </article>
+{% endblock %}

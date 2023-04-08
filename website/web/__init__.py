@@ -341,6 +341,28 @@ def leak(name):
 
         return redirect(url_for("home"))
 
+@app.route("/RF")
+def rf():
+        red = Redis(unix_socket_path=get_socket_path('cache'), db=10)
+        leaks = []
+        for key in red.keys():
+                entry= json.loads(red.get(key)) # type: ignore
+                leaks.append(entry)
+        leaks.sort(key=lambda x: x["name"].lower())
+        return render_template("RF.html", data=leaks)
+
+@app.route("/RF/<name>")
+def rfdetails(name):
+        red = Redis(unix_socket_path=get_socket_path('cache'), db=10)
+        groups = []
+        for key in red.keys():
+                if key.decode().lower() == name.lower():
+                        group= json.loads(red.get(key)) # type: ignore
+                        return render_template("RFdetails.html", group = group)
+
+        return redirect(url_for("home"))
+
+
 @app.route("/telegrams")
 def telegrams():
         red = Redis(unix_socket_path=get_socket_path('cache'), db=5)
