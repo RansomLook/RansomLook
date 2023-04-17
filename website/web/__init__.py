@@ -124,14 +124,11 @@ def home():
         data['nbposts'] = postcount()
         data['nbparsers'] = parsercount()
         alertposts= defaultdict(list)
-        alertleaks= defaultdict(list)
-        alerttelegrams= defaultdict(list)
-        alerttweets= defaultdict(list)
         alert=get_config('generic','alertondashboard')
         if alert is True:
             red = Redis(unix_socket_path=get_socket_path('cache'), db=1)
             keywords = red.get('keywords')
-            listkeywords = keywords.decode().splitlines()
+            listkeywords = keywords.decode().splitlines() # type: ignore
             red = Redis(unix_socket_path=get_socket_path('cache'), db=2)
             groups = red.keys()
             for entry in groups:
@@ -144,7 +141,7 @@ def home():
                                 print(entry.decode())
                                 alertposts[entry.decode()].append(post)
         print(alertposts)
-        return render_template("index.html", date=date, data=data,alert=alert, posts=alertposts, leaks=alertleaks, telegrams=alerttelegrams, tweets=alerttweets)
+        return render_template("index.html", date=date, data=data,alert=alert, posts=alertposts)
 
 @app.route("/recent")
 def recent():
