@@ -46,7 +46,7 @@ types-requests = "^2.28.11.17"
 types-beautifulsoup4 = "^4.12.0.2"
 types-flask = "^1.1.6"
 types-redis = "^4.5.4.1"
-pymisp = "^2.4.169.3"
+pymisp = "^2.4.170.1"
 
 [tool.poetry.dev-dependencies]
 mypy = "^1.2.0"
