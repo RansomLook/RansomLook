@@ -495,7 +495,7 @@ def search():
                             myentry["message"] = entries[entry]['message']
                             myentry["date"] = entry
                             messages.append(myentry)
-        messages.sort(key=lambda x: x["group_name"].lower())
+        messages.sort(key=lambda x: x["date"].lower(),reverse=True)
 
         return render_template("search.html", query=query,groups=groups, markets=markets, posts=posts, leaks=leaks, channels=channels, messages=messages)
     return redirect(url_for("home"))
