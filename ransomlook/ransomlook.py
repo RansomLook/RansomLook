@@ -61,7 +61,11 @@ def threadscape(queuethread, lock):
             stdlog('Starting : ' + host['fqdn']+ ' --------- ' + group)
             host['available'] = bool()
             try:
-                browser = play.chromium.launch(proxy={"server": "socks5://127.0.0.1:9050"},
+                if group in ['blackbasta']:
+                    browser = play.firefox.launch(proxy={"server": "socks5://127.0.0.1:9050"},
+                          args=['--unsafely-treat-insecure-origin-as-secure='+host['slug']])
+                else:
+                    browser = play.chromium.launch(proxy={"server": "socks5://127.0.0.1:9050"},
                           args=['--unsafely-treat-insecure-origin-as-secure='+host['slug']])
                 context = browser.new_context(ignore_https_errors= True )
                 page = context.new_page()
