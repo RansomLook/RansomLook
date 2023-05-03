@@ -20,5 +20,4 @@ def main():
             print("Failed during : " + filename)
             pass
     print(list_div)
-    list_div=[]
     return list_div
