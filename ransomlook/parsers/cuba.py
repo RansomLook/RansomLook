@@ -12,7 +12,7 @@ def main():
                 soup=BeautifulSoup(file,'html.parser')
                 divs_name=soup.find_all('div', {'class':'list-text'})
                 for div in divs_name:
-                    title = div.a['href'].split('/')[4]
+                    title = div.a['href'].split('/')[2]
                     description = div.a.text.strip()
                     list_div.append({'title':title, 'description': description})
                 file.close()
