@@ -138,9 +138,9 @@ def home():
                     if datetime_object > dt.now() - timedelta(hours=24):
                         for keyword in listkeywords:
                             if keyword.lower() in post['post_title'].lower() or keyword.lower() in post['description'].lower():
-                                print(entry.decode())
+                                #print(entry.decode())
                                 alertposts[entry.decode()].append(post)
-        print(alertposts)
+        #print(alertposts)
         return render_template("index.html", date=date, data=data,alert=alert, posts=alertposts)
 
 @app.route("/recent")
@@ -453,8 +453,8 @@ def search():
         leaks = []
         for key in red.keys():
             group = json.loads(red.get(key)) # type: ignore
-            if query.lower() in key.decode().lower() or group['meta'] is not None and query.lower() in group['meta'].lower(): # type: ignore
-                group['name'] = key.decode().lower()
+            if query.lower() in group['name']:
+                group['key'] = key.decode().lower()
                 leaks.append(group)
         leaks.sort(key=lambda x: x["name"].lower())
 

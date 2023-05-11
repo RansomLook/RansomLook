@@ -60,7 +60,7 @@
           <tbody>
           {% for entry in leaks %}
             <tr>
-                <td><center><a href="/leak/{{entry['name']}}">{{entry['name'].title()}}</a></center></td>
+                <td><center><a href="/leak/{{entry['key']}}">{{entry['name'].title()}}</a></center></td>
                 <td> {{entry['meta']}} </td>
           {% endfor %}
           </tbody>
