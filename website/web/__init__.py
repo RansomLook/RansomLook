@@ -453,7 +453,7 @@ def search():
         leaks = []
         for key in red.keys():
             group = json.loads(red.get(key)) # type: ignore
-            if query.lower() in group['name']:
+            if query.lower() in group['name']: # type: ignore
                 group['key'] = key.decode().lower()
                 leaks.append(group)
         leaks.sort(key=lambda x: x["name"].lower())
