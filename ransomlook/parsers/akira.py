@@ -14,8 +14,8 @@ def main():
                 jsonpart= soup.pre.contents # type: ignore
                 data = json.loads(jsonpart[0]) # type: ignore
                 for entry in data:
-                    title = entry['title'].strip()
-                    description = entry['content'].strip()
+                    title = entry['title'].replace('\n','').strip()
+                    description = entry['content'].replace('\n','').strip()
                     list_div.append({"title" : title, "description" : description})
             file.close()
     print(list_div)
