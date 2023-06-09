@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+
+{% block title %}Notes ;-){% endblock %}
+
+{% block content %}
+    <article id="main" class="markdown-section">
+	<h1>Lists of notes</h1>
+        {% for entry in data %}
+        <h2> {{ entry['name'] }}</h2>
+        <table id="table" class="table" style="display:table; table-layout:auto; width:100%">
+          <tbody><td>
+            {% for para in  entry['content'].split('\n') %}
+               {{para}}<br>
+            {% endfor %}
+          </td></tbody>
+        </table>
+        {% endfor %}
+    </article>
+{% endblock %}

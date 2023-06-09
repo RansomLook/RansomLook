@@ -20,6 +20,7 @@ RansomLook is tool to monitor Ransomware groups and markets and extract their vi
 - Dataleak monitoring
 - Monitoring Cryptocurrencies, data are from: https://ransomwhe.re
 - [MISP](https://www.misp-project.org/) integration with the support of the MISP ransomware galaxy
+- Ransomnotes, from ThreatLabs (@Threatlabz) 
 
 # Install guide
 

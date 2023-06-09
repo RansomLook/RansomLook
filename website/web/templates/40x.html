@@ -1,0 +1,11 @@
+
+{% extends "base.html" %}
+
+{% block title %}{{error}}{% endblock %}
+
+{% block content %}
+    <article id="main" class="markdown-section">
+	<center><h1>{{message}}</h1>
+                <img src='{{ url_for('static', filename='ransomlook.svg') }}'></center>
+    </article>
+{% endblock %}

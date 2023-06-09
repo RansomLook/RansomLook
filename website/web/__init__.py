@@ -14,6 +14,7 @@ from redis import Redis
 import ast
 import flask_login  # type: ignore
 from werkzeug.security import check_password_hash
+from werkzeug.exceptions import HTTPException
 
 from flask_cors import CORS  # type: ignore
 from flask_restx import Api  # type: ignore
@@ -43,13 +44,24 @@ app = Flask(__name__)
 app.config['SECRET_KEY'] = get_secret_key()
 
 Bootstrap5(app)
-app.config['BOOTSTRAP_SERVE_LOCAL'] = True
-app.config['SESSION_COOKIE_NAME'] = 'ransomlook'
-app.config['SESSION_COOKIE_SAMESITE'] = 'Strict'
 
 pkg_version = version('ransomlook')
 
 flask_moment.Moment(app=app)
+
+# Getting the error
+#@app.errorhandler(Exception)
+def handle_error(e):
+    code = 500
+    if isinstance(e, HTTPException):
+        return render_template('40x.html', error=e.name, message=e.description), code
+    print(e)
+    return render_template("500_generic.html", e=e), 500
+
+@app.route('/favicon.ico')
+def favicon():
+    return send_from_directory(os.path.join(get_homedir(), 'website/web/static'),
+                               'ransomlook.svg', mimetype='image/svg+xml')
 
 # Auth stuff
 login_manager = flask_login.LoginManager()
@@ -244,7 +256,7 @@ def groups():
                     location['screen']=screenfile
         modules = glob.glob(join(dirname(str(get_homedir())+'/ransomlook/parsers/'), "*.py"))
         parserlist = [ basename(f)[:-3].split('.')[0] for f in modules if isfile(f) and not f.endswith('__init__.py')]
-        return render_template("groups.html", data=groups, parser=parserlist)
+        return render_template("groups.html", data=groups, parser=parserlist, type="groups")
 
 @app.route("/group/<name>")
 def group(name):
@@ -294,7 +306,7 @@ def markets():
                     location['screen']=screenfile
         modules = glob.glob(join(dirname(str(get_homedir())+'/ransomlook/parsers/'), "*.py"))
         parserlist = [ basename(f)[:-3].split('.')[0] for f in modules if isfile(f) and not f.endswith('__init__.py')]
-        return render_template("groups.html", data=groups, parser=parserlist)
+        return render_template("groups.html", data=groups, parser=parserlist, type="markets")
 
 @app.route("/market/<name>")
 def market(name):
@@ -337,6 +349,27 @@ def leak(name):
                         return render_template("leak.html", group = group)
 
         return redirect(url_for("home"))
+
+@app.route("/notes")
+def notes():
+        red = Redis(unix_socket_path=get_socket_path('cache'), db=11)
+        data = []
+        keys = []
+        for key in red.keys():
+            keys.append(key.decode())
+        keys.sort()
+        for i in range(0,len(keys),3):
+            data.append(keys[i:i+3])
+        return render_template("notes.html", data=data)
+
+@app.route("/notes/<name>")
+def notesdetails(name):
+        red = Redis(unix_socket_path=get_socket_path('cache'), db=11)
+        data = []
+        data = red.get(name.lower())
+        data = json.loads(data)
+        return render_template("notesdetails.html", data=data)
+
 
 @app.route("/RF")
 def rf():

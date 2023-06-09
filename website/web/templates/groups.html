@@ -21,7 +21,12 @@
     <article id="main" class="markdown-section">
 	<h1>Group profiles</h1>
         {% for entry in data %}
-            <h2 id="{{entry['name'].title()}}"> {{ entry['name'].title() }}<h2>
+            {% if type == "groups" %}
+            <h2 id="{{entry['name'].title()}}"> <a href="/group/{{entry['name']}}">{{entry['name'].title()}}</a><h2>
+            {% else %}
+            <h2 id="{{entry['name'].title()}}"> <a href="/market/{{entry['name']}}">{{entry['name'].title()}}</a><h2>
+            {% endif %}
+          
             <h4>Description</h2>
             {% if entry['meta'] is not none %}
             <p>{{ entry['meta'] }}</p>

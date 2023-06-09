@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+
+{% block title %}Notes from Groups{% endblock %}
+
+{% block content %}
+    <article id="main" class="markdown-section">
+	<h1>Lists of groups</h1>
+        <table id="table" class="table" style="display:table; table-layout:auto; width:100%">
+          <tbody>
+            {% for entry in data %}
+            <tr>
+            {% for item in entry %}
+              <td> <center><a href="/notes/{{ item }}">{{ item.title() }}</a></center> </td>
+            {% endfor %}
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+    </article>
+{% endblock %}

@@ -45,11 +45,11 @@
                       <li><a href={{ url_for('alive') }}>Alive</></li>
                   </ul>
               {% endif %}
-              <li {% if request.path == '/groups' %} class="active" {% endif %}><a href="{{ url_for('groups') }}" title="Group profiles">Group profiles</a></li>
+              <li {% if request.path.startswith('/group') %} class="active" {% endif %}><a href="{{ url_for('groups') }}" title="Group profiles">Group profiles</a></li>
               {% if request.path == '/groups' %}{% block groups %}{% endblock %}{% endif %}
+              <li {% if request.path.startswith('/notes') %} class="active" {% endif %}><a href="{{ url_for('notes') }}" title="Notes">Ransomware Notes</a></li>
               <li {% if request.path == '/markets' %} class="active" {% endif %}><a href="{{ url_for('markets') }}" title="Forums &amp; Market">Forums &amp; Market</a></li>
               {% if request.path == '/markets' %}{% block markets %}{% endblock %}{% endif %}
-              <li {% if request.path == '/leaks' %} class="active" {% endif %}><a href="{{ url_for('leaks') }}" title="Leaks">Leaks</a></li>
               <li {% if request.path == '/RF' %} class="active" {% endif %}><a href="{{ url_for('rf') }}" title="RF Dumps">RF Dumps</a></li>
               <li {% if request.path == '/telegrams' %} class="active" {% endif %}><a href="{{ url_for('telegrams') }}" title="Telegrams">Telegrams</a></li>
               <li {% if request.path == '/twitters' %} class="active" {% endif %}><a href="{{ url_for('twitters') }}" title="Twitters">Twitters</a></li>
