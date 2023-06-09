@@ -1,6 +1,6 @@
 from flask import Flask, render_template, redirect, url_for, flash
 import flask_moment # type: ignore
-from flask import request
+from flask import request, send_from_directory
 from flask_bootstrap import Bootstrap5  # type: ignore
 
 from datetime import datetime as dt
@@ -499,6 +499,18 @@ def search():
 
         return render_template("search.html", query=query,groups=groups, markets=markets, posts=posts, leaks=leaks, channels=channels, messages=messages)
     return redirect(url_for("home"))
+
+@app.route("/screenshots/<file>")
+def screenshots(file):
+    return send_from_directory( str(get_homedir())+ '/source/screenshots', file, mimetype='image/gif')
+
+@app.route("/screenshots/telegram/<file>")
+def screenshotstelegram(file):
+    return send_from_directory( str(get_homedir())+ '/source/screenshots/telegram', file, mimetype='image/gif')
+
+@app.route("/screenshots/twitter/<file>")
+def screenshotstwitter(file):
+    return send_from_directory( str(get_homedir())+ '/source/screenshots/twitter', file, mimetype='image/gif')
 
 # Admin Zone
 
