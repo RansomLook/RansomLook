@@ -366,8 +366,7 @@ def notes():
 def notesdetails(name):
         red = Redis(unix_socket_path=get_socket_path('cache'), db=11)
         data = []
-        data = red.get(name.lower())
-        data = json.loads(data)
+        data = json.loads(red.get(name.lower())) # type: ignore
         return render_template("notesdetails.html", data=data)
 
 
