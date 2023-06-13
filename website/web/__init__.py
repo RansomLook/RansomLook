@@ -34,6 +34,7 @@ from ransomlook.telegram import teladder
 from ransomlook.twitter import twiadder
 from .helpers import get_secret_key, sri_load, User, build_users_table, load_user_from_request
 from .forms import AddForm, LoginForm, SelectForm, EditForm, DeleteForm, AlertForm
+from .ldap import global_ldap_authentication
 
 from typing import Dict, Any
 
@@ -62,15 +63,17 @@ def handle_error(e):
 def favicon():
     return send_from_directory(os.path.join(get_homedir(), 'website/web/static'),
                                'ransomlook.svg', mimetype='image/svg+xml')
-
+ldap_config = get_config('generic','ldap')
+ldap = ldap_config['enable']
 # Auth stuff
 login_manager = flask_login.LoginManager()
 login_manager.init_app(app)
 
 @login_manager.user_loader
 def user_loader(username):
-    if username not in build_users_table():
-        return None
+    if not ldap:
+        if username not in build_users_table():
+            return None
     user = User()
     user.id = username
     return user
@@ -83,19 +86,28 @@ def _load_user_from_request(request):
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
-
     form = LoginForm()
     if form.validate_on_submit():
         username = form.username.data
-        users_table = build_users_table()
-        if username in users_table and check_password_hash(users_table[username]['password'], form.password.data):
-            user = User()
-            user.id = username
-            flask_login.login_user(user)
-            flash(f'Logged in as: {flask_login.current_user.id}', 'success')
-            return redirect(url_for('admin'))
+        if not ldap_config['enable']:
+            users_table = build_users_table()
+            if username in users_table and check_password_hash(users_table[username]['password'], form.password.data):
+                user = User()
+                user.id = username
+                flask_login.login_user(user)
+                flash(f'Logged in as: {flask_login.current_user.id}', 'success')
+                return redirect(url_for('admin'))
+            else:
+                flash(f'Unable to login as: {username}', 'error')
         else:
-            flash(f'Unable to login as: {username}', 'error')
+            if global_ldap_authentication(username, form.password.data, ldap_config):
+                user = User()
+                user.id = username
+                flask_login.login_user(user)
+                flash(f'Logged in as: {flask_login.current_user.id}', 'success')
+                return redirect(url_for('admin'))
+            else:
+                flash(f'Unable to login as: {username}', 'error')
     return render_template('login.html', form=form)
 
 

@@ -17,6 +17,14 @@
         "auth_token": "",
         "channel_name": ""
     },
+    "ldap": {
+        "enable": false,
+        "server": "localhost",
+        "root_dn": "ou=Users,dc=my,dc=domain,dc=tld",
+        "base_dn": "uid",
+        "ssl": true,
+        "verify": false
+    },
     "twitter": {
         "enable": false,
         "consumer_key": "",
@@ -49,7 +57,8 @@
         "users":  "It is some kind of an admin accounts. Format: {username: password}",
         "misp": "The MISP configuration",
         "alertondashboard": "Enable to view alerts on dashboard",
-        "rf": "API Key for Identity Module"
+        "rf": "API Key for Identity Module",
+        "ldap": "Ldap configuration for login"
     }
 
 }
