@@ -19,11 +19,12 @@
     },
     "ldap": {
         "enable": false,
-        "server": "localhost",
+        "server": "ldpas://localhost",
         "root_dn": "ou=Users,dc=my,dc=domain,dc=tld",
         "base_dn": "uid",
         "ssl": true,
-        "verify": false
+        "verify": true,
+        "cert": "/path/to/cert.ext"
     },
     "twitter": {
         "enable": false,

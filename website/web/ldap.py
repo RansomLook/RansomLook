@@ -22,15 +22,16 @@ def global_ldap_authentication(user_name, user_pwd, ldap_config):
     # user
     user = f'{base_dn}={ldap_user_name},{root_dn}'
     if ldap_config['verify']:
-        tls_configuration = Tls(validate=ssl.CERT_REQUIRED)
+        tls_configuration = Tls(validate=ssl.CERT_REQUIRED, ca_certs_file=ldap_config['cert'])
     else :
         tls_configuration = Tls(validate=ssl.CERT_NONE)
-    server = Server(ldsp_server, use_ssl=ldap_config['ssl'],tls=tls_configuration)
+    server = Server(ldsp_server,tls=tls_configuration)
     connection = Connection(server,
                             user=user,
                             password=ldap_user_pwd,
                             client_strategy=SAFE_SYNC
                             )
     connection.open()
+
     res = connection.bind()
     return res[0]
