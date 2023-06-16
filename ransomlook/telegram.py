@@ -34,7 +34,7 @@ from googletrans import Translator # type: ignore
 
 import re
 
-def alertingnotify(config, group, description, keyword) -> None :
+def alertingnotify(config, group, description, keyword, timestamp) -> None :
     '''
     Posting message to RocketChat
     '''
@@ -44,7 +44,7 @@ def alertingnotify(config, group, description, keyword) -> None :
 A new message in telegram is matching your keywords:
 """
     message += str(keyword) +'\n'
-    message += 'Channel : ' + group.decode() + '\nMessage : ' + description
+    message += 'Channel : ' + group.decode() +'\nTimestamp : ' + timestamp+ '\nMessage : ' + description
     if translator.detect(description).lang != 'en' :
         message += '\n\nTranslated : ' + translator.translate(description, dest='en').text
     fromaddr = config['from']
@@ -175,7 +175,7 @@ def parser():
                           if keyword.lower() in message.lower():
                               matching.append(keyword)
                       if matching :
-                          alertingnotify(emailconfig, key, message, matching)
+                          alertingnotify(emailconfig, key, message, matching, timestamp)
                except Exception as e:
                    print(e)
                    print(img)
