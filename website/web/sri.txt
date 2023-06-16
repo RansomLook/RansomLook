@@ -1,10 +1,11 @@
 {
   "static": {
-    "d3.v7.min.js": "oKI0pS1ut+mxQZdqnD3w9fqArLyILRsT3Dx0B+8RVEXzEk3aNK3J3pWlaGJ8MtTs1oiwyXDAH6hG6jy1sY0YqA==",
+    "d3.v7.min.js": "M7nHCiNUOwFt6Us3r8alutZLm9qMt4s9951uo8jqO4UwJ1hziseL6O3ndFyigx6+LREfZqnhHxYjKRJ8ZQ69DQ==",
     "datatables.min.css": "ACFzyS/pMaB3CoarK7aekHljDkNfixvotP0GnePbD6PFbvn7PT4v3nM2uDXyM13ceqESH9CJ7aCRz19rNInvgg==",
     "datatables.min.js": "VUgHTv8zUr1K/xtRWvjLwZx2RiyuMfhxefJuDMNFQ2KYT9Y/qGKxgLJ2PBSQzyqbb9uoCzYzccAeF2hC7Qa91Q==",
     "generic.css": "aRqh2zXqttrxGDka6eEQaygd+/nWkokZVEPk69q8Ra+ogTZpMIsEg16aKWYv0j7EujZ5k9dzhCLJoYTyLNFC+w==",
     "generic.js": "UmFl4fHmB/UjMdUuYdFy9BfzQlJTyeImNHCFyBO4SdLxBCwCGxkF3NQvel1PKqW8JTnoPlPpq/n9d+vCfPeegA==",
-    "jquery.min.js": "aVKKRRi/Q/YV+4mjoKBsE4x3H+BkegoM/em46NNlCqNTmUYADjBbeNefNxYV7giUp0VxICtqdrbqU7iVaeZNXA=="
+    "jquery.min.js": "aVKKRRi/Q/YV+4mjoKBsE4x3H+BkegoM/em46NNlCqNTmUYADjBbeNefNxYV7giUp0VxICtqdrbqU7iVaeZNXA==",
+    "ransomlook.svg": "m2HqEodLkkyXcCJyVPRunzg8f9jYwPzp9Zen22/52429Xb+3Vnbo6AaYKCY9Knydkhz8/zGmsUC48uwl88f7Bg=="
   }
 }
