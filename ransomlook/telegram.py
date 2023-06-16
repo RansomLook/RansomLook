@@ -46,7 +46,10 @@ A new message in telegram is matching your keywords:
     message += str(keyword) +'\n'
     message += 'Channel : ' + group.decode() +'\nTimestamp : ' + timestamp+ '\nMessage : ' + description
     if translator.detect(description).lang != 'en' :
-        message += '\n\nTranslated : ' + translator.translate(description, dest='en').text
+        try :
+            message += '\n\nTranslated : ' + translator.translate(description, dest='en').text
+        except :
+            message += '\n\nError while translating'
     fromaddr = config['from']
     toaddrs = config['to']
     subject = "[RansomLook] New post matching your keywords"
@@ -177,14 +180,11 @@ def parser():
                       if matching :
                           alertingnotify(emailconfig, key, message, matching, timestamp)
                except Exception as e:
-                   print(e)
-                   print(img)
                    print('error with the channel:'+key.decode())
            redmessage.set(key,json.dumps(posts))
         except:
            print('error with :'+key.decode())
            continue
-    print("ok")
 
 def teladder(name, link):
     red = redis.Redis(unix_socket_path=get_socket_path('cache'), db=5)
