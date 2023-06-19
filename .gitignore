@@ -19,6 +19,7 @@ source/screenshots/twitter/img/*
 source/screenshots/telegram/*
 source/screenshots/telegram/img/*
 cache/
+web/website/stats/*.png
 
 # Json file
 *.json

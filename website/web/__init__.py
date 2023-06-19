@@ -184,6 +184,10 @@ def recent():
                         break
         return render_template("recent.html", data=recentposts)
 
+@app.route("/stats")
+def stats():
+        return render_template("stats.html")
+
 @app.route("/status")
 def status():
         red = Redis(unix_socket_path=get_socket_path('cache'), db=0)
@@ -543,6 +547,10 @@ def search():
 
         return render_template("search.html", query=query,groups=groups, markets=markets, posts=posts, leaks=leaks, channels=channels, messages=messages)
     return redirect(url_for("home"))
+
+@app.route("/stats/<file>")
+def screenshotsstats(file):
+    return send_from_directory( str(get_homedir())+ '/source/screenshots/stats', file, mimetype='image/gif')
 
 @app.route("/screenshots/<file>")
 def screenshots(file):
