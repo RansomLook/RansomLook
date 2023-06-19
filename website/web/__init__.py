@@ -552,9 +552,17 @@ def screenshots(file):
 def screenshotstelegram(file):
     return send_from_directory( str(get_homedir())+ '/source/screenshots/telegram', file, mimetype='image/gif')
 
+@app.route("/screenshots/telegram/img/<file>")
+def screenshotstelegramimg(file):
+    return send_from_directory( str(get_homedir())+ '/source/screenshots/telegram/img', file, mimetype='image/gif')
+
 @app.route("/screenshots/twitter/<file>")
 def screenshotstwitter(file):
-    return send_from_directory( str(get_homedir())+ '/source/screenshots/twitter', file, mimetype='image/gif')
+    return send_from_directory( str(get_homedir())+ '/source/screenshots/twitter/', file, mimetype='image/gif')
+
+@app.route("/screenshots/twitter/img/<file>")
+def screenshotstwitterimg(file):
+    return send_from_directory( str(get_homedir())+ '/source/screenshots/twitter/img', file, mimetype='image/gif')
 
 # Admin Zone
 
