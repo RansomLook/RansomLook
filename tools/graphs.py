@@ -38,7 +38,7 @@ def run_data_viz(days_filter):
 
 
     # Use Plotly's Scatter plot to create the scatter plot
-    fig2 = px.scatter(df_sorted, x='timestamp', y='group_name', color='group_name', title='Posting Frequency by group', color_continuous_scale='Plotly3')
+    fig2 = px.scatter(df_sorted, x='timestamp', y='group_name', color='group_name', title='Posting Frequency by group', color_continuous_scale='Plotly3', width=1050, height=750)
     #fig2 = px.scatter(df_sorted, x='group_name', y='count', title='Posting Frequency by Group', template='plotly_dark')
     filename = os.path.join(get_homedir(),"source/screenshots/stats","scatter_plot_"+ str(days_filter)+".png")
     fig2.write_image(filename)
@@ -51,12 +51,12 @@ def run_data_viz(days_filter):
     df_sorted = df.groupby('group_name').size().reset_index(name='count').sort_values(by='count', ascending=True)
 
     # Use Plotly's Pie plot to create the pie chart
-    fig3 = px.pie(df_sorted, values='count', names='group_name', title='Posting Frequency by Group')
+    fig3 = px.pie(df_sorted, values='count', names='group_name', title='Posting Frequency by Group', width=1050, height=750)
     filename = os.path.join(get_homedir(),"source/screenshots/stats","pie_chart_"+ str(days_filter)+".png")
     fig3.write_image(filename)
 
     # Use Plotly's Scatter plot to visualize the data
-    fig4 = px.bar(df_sorted, x='group_name', y='count', color='count', title='Posting Frequency by Group', color_continuous_scale='Portland')
+    fig4 = px.bar(df_sorted, x='group_name', y='count', color='count', title='Posting Frequency by Group', color_continuous_scale='Portland',width=1050, height=750)
     filename = os.path.join(get_homedir(),"source/screenshots/stats","bar_chart_"+ str(days_filter)+".png")
     fig4.write_image(filename)
 
