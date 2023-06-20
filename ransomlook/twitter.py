@@ -83,25 +83,25 @@ def parser() -> None :
                posts={}
            for tweet  in tweets:
                try:
+                   #print(tweet)
                    imgs=[]
                    try:
-                       author = tweet.find('div',{'data-testid':'User-Names'}).find('span').text
+                       author = tweet.find('div',{'dir':'ltr'}).find('span').text
                    except:
                        author = ""
                    try:
-                       timestamp = tweet.find('div',{'data-testid':'User-Names'}).find('time')['datetime']
+                       timestamp = tweet.find('time')['datetime']
                    except:
                        timestamp = 0
                    message = tweet.find('div',{'data-testid':'tweetText'})
                    imglist = tweet.find_all('div',{'data-testid':'tweetPhoto'})
-                   print(imglist)
-                   for img in imglist:
-                       print(img)
-                       if not img in img:
-                          continue
-                       image = img.img['src'].split('/')[4].split('?')[0]
+                   for imag in imglist:
+                       img = imag.find('img')
+                       if img is None:
+                           continue
+                       image = img['src'].split('/')[4].split('?')[0]
                        imgs.append(image)
-                       response = requests.get(img.img['src'], stream=True)
+                       response = requests.get(imag.img['src'], stream=True)
                        with open('source/screenshots/twitter/img/'+key.decode()+'-'+image+'.png','wb') as out_file:
                            shutil.copyfileobj(response.raw, out_file)
                        del response
