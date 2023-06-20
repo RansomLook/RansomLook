@@ -1,6 +1,5 @@
 {
   "static": {
-    "bootstrap.min.css": "ACFzyS/pMaB3CoarK7aekHljDkNfixvotP0GnePbD6PFbvn7PT4v3nM2uDXyM13ceqESH9CJ7aCRz19rNInvgg==",
     "d3.v7.min.js": "M7nHCiNUOwFt6Us3r8alutZLm9qMt4s9951uo8jqO4UwJ1hziseL6O3ndFyigx6+LREfZqnhHxYjKRJ8ZQ69DQ==",
     "datatables.min.css": "ACFzyS/pMaB3CoarK7aekHljDkNfixvotP0GnePbD6PFbvn7PT4v3nM2uDXyM13ceqESH9CJ7aCRz19rNInvgg==",
     "datatables.min.js": "VUgHTv8zUr1K/xtRWvjLwZx2RiyuMfhxefJuDMNFQ2KYT9Y/qGKxgLJ2PBSQzyqbb9uoCzYzccAeF2hC7Qa91Q==",

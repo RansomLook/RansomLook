@@ -45,6 +45,10 @@ app = Flask(__name__)
 app.config['SECRET_KEY'] = get_secret_key()
 
 Bootstrap5(app)
+app.config['BOOTSTRAP_SERVE_LOCAL'] = True
+app.config['SESSION_COOKIE_NAME'] = 'RansomLook'
+app.config['SESSION_COOKIE_SAMESITE'] = 'Strict'
+app.debug = False
 
 pkg_version = version('ransomlook')
 
