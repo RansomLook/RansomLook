@@ -158,7 +158,6 @@ def home():
             groups = red.keys()
             for entry in groups:
                 post = json.loads(red.get(entry)) # type: ignore
-                print(post)
                 alertposts[post['type']].append(post)
         #print(alertposts)
         return render_template("index.html", date=date, data=data,alert=alert, posts=alertposts)
