@@ -7,6 +7,7 @@ from ransomlook.default import get_homedir
 d3js_version = '7'
 jquery_version = "3.6.1"
 datatables_version = "1.12.1"
+bootstrap_version = "5.2.2"
 
 
 if __name__ == '__main__':
@@ -31,5 +32,10 @@ if __name__ == '__main__':
     with (dest_dir / 'datatables.min.css').open('wb') as f:
         f.write(datatables_css.content)
         print(f'Downloaded datatables_css v{datatables_version}.')
+
+    bootstrap_css = requests.get(f'https://cdn.jsdelivr.net/npm/bootstrap@{bootstrap_version}/dist/css/bootstrap.min.css')
+    with (dest_dir / 'bootstrap.min.css').open('wb') as f:
+        f.write(datatables_css.content)
+        print(f'Downladed bootstrap_css v{datatables_version}.')
 
     print('All 3rd party modules for the website were downloaded.')
