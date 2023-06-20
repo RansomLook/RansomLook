@@ -11,6 +11,7 @@ from datetime import timedelta
 import collections
 
 import redis
+import uuid
 
 from ransomlook.default.config import get_config, get_socket_path
 from ransomlook.rocket import rocketnotify
@@ -78,8 +79,14 @@ def appender(entry, group_name):
         for keyword in listkeywords:
              if keyword.lower() in post_title.lower() or keyword.lower() in description.lower():
                  matching.append(keyword)
-    if matching:
-        alertingnotify(emailconfig, group_name, post_title, description, matching)
+        if matching:
+            alertingnotify(emailconfig, group_name, post_title, description, matching)
+            alertdb = redis.Redis(unix_socket_path=get_socket_path('cache'), db=12)
+            uuidkey = str(uuid.uuid4())
+            value = {'type': 'group', 'group_name': group_name, 'post_title': post_title, 'description': description, 'matching': matching}
+            alertdb.set(uuidkey,json.dumps(value))
+            alertdb.expire(uuidkey, 60 * 60 * 24)
+
     if rocketconfig['enable'] == True:
         rocketnotify(rocketconfig, group_name, post_title, description)
     if twitterconfig['enable'] == True:

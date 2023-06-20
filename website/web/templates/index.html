@@ -22,7 +22,71 @@
 
         <p>There are <code>{{data['nbparsers']}}</code> custom parsers indexing posts</p>
         {% if alert is true %}
-        <h1>Alerts within the last 24h</h1>
+           <h1>Alerts within the last 24h</h1>
+           {% if 'group' in posts %}
+           <h3>Groups and Markets</h3>
+           <div class="table-responsive">
+            <table id="table" class="table" style="display:table; table-layout:auto; width:100%">
+            <thead>
+                <tr>
+                    <th style="width:15%"> Name </th>
+                    <th style="width:15%"> Title </th>
+                    <th> Description </th>
+                </tr>
+            </thead>
+            <tbody>
+              {% for item in posts['group'] %}
+                 <tr>
+                  <td> {{ item['group_name'] }} </td><td> {{ item['post_title'] }} </td><td> {{ item['description'] }} </td>
+                 </tr>
+              {% endfor %}
+            </tbody>
+            </table>
+           </div>
+           {% endif %}
+
+           {% if 'telegram' in posts %}
+           <h3>Telegram</h3>
+           <div class="table-responsive">
+            <table id="table" class="table" style="display:table; table-layout:auto; width:100%">
+            <thead>
+                <tr>
+                    <th style="width:15%"> Name </th>
+                    <th> Message </th>
+                </tr>
+            </thead>
+            <tbody>
+              {% for item in posts['telegram'] %}
+                 <tr>
+                  <td> {{ item['group_name'] }} </td><td> {{ item['description'] }} </td>
+                 </tr>
+              {% endfor %}
+            </tbody>
+            </table>
+           </div>
+           {% endif %}
+
+           {% if 'twitter' in posts %}
+           <h3>Twitter</h3>
+           <div class="table-responsive">
+            <table id="table" class="table" style="display:table; table-layout:auto; width:100%">
+            <thead>
+                <tr>
+                    <th style="width:15%"> Name </th>
+                    <th> Tweet </th>
+                </tr>
+            </thead>
+            <tbody>
+              {% for item in posts['twitter'] %}
+                 <tr>
+                  <td> {{ item['group_name'] }} </td><td> {{ item['description'] }} </td>
+                 </tr>
+              {% endfor %}
+            </tbody>
+            </table>
+           </div>
+           {% endif %}
+
         {% endif %}
     </article>
 {% endblock %}

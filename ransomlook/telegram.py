@@ -16,6 +16,7 @@ from playwright.sync_api import sync_playwright, TimeoutError as PlaywrightTimeo
 
 from .default.config import get_config, get_homedir, get_socket_path
 
+import uuid
 import redis
 
 import smtplib
@@ -179,6 +180,11 @@ def parser():
                               matching.append(keyword)
                       if matching :
                           alertingnotify(emailconfig, key, message, matching, timestamp)
+                          alertdb = redis.Redis(unix_socket_path=get_socket_path('cache'), db=12)
+                          uuidkey = str(uuid.uuid4())
+                          value = {'type': 'telegram', 'group_name': key.decode(), 'description': message, 'matching': matching}
+                          alertdb.set(uuidkey,json.dumps(value))
+                          alertdb.expire(uuidkey, 60 * 60 * 24)
                except Exception as e:
                    print('error with the channel:'+key.decode())
            redmessage.set(key,json.dumps(posts))

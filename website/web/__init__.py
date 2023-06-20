@@ -154,20 +154,12 @@ def home():
         alertposts= defaultdict(list)
         alert=get_config('generic','alertondashboard')
         if alert is True:
-            red = Redis(unix_socket_path=get_socket_path('cache'), db=1)
-            keywords = red.get('keywords')
-            listkeywords = keywords.decode().splitlines() # type: ignore
-            red = Redis(unix_socket_path=get_socket_path('cache'), db=2)
+            red = Redis(unix_socket_path=get_socket_path('cache'), db=12)
             groups = red.keys()
             for entry in groups:
-                posts = json.loads(red.get(entry)) # type: ignore
-                for post in posts:
-                    datetime_object = dt.strptime(post['discovered'], '%Y-%m-%d %H:%M:%S.%f')
-                    if datetime_object > dt.now() - timedelta(hours=24):
-                        for keyword in listkeywords:
-                            if keyword.lower() in post['post_title'].lower() or keyword.lower() in post['description'].lower():
-                                #print(entry.decode())
-                                alertposts[entry.decode()].append(post)
+                post = json.loads(red.get(entry)) # type: ignore
+                print(post)
+                alertposts[post['type']].append(post)
         #print(alertposts)
         return render_template("index.html", date=date, data=data,alert=alert, posts=alertposts)
 
