@@ -36,6 +36,11 @@ def run_data_viz(days_filter):
     df_sorted = df.groupby(['group_name', 'timestamp']).size().reset_index(name='count')
     df_sorted = df_sorted.sort_values(by='count', ascending=False)
 
+    # Use Plotly's Heatmap plot to create the density heatmap
+    fig1 = px.density_heatmap(df_sorted, x='timestamp', y='group_name', z='count', title='Posting Frequency by group')
+    fig1.update_layout(font=dict(family='Roboto'))
+    filename = os.path.join(get_homedir(),"source/screenshots/stats","density_heatmap_"+ str(days_filter)+".png")
+    fig1.write_image(filename)
 
     # Use Plotly's Scatter plot to create the scatter plot
     fig2 = px.scatter(df_sorted, x='timestamp', y='group_name', color='group_name', title='Posting Frequency by group', color_continuous_scale='Plotly3', width=1050, height=750)
