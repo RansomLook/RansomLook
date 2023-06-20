@@ -1822,6 +1822,22 @@ test = ["hypothesis (>=6.34.2)", "pytest (>=7.0.0)", "pytest-asyncio (>=0.17.0)"
 xml = ["lxml (>=4.6.3)"]
 
 [[package]]
+name = "pandas-stubs"
+version = "2.0.2.230605"
+description = "Type annotations for pandas"
+category = "main"
+optional = false
+python-versions = ">=3.8"
+files = [
+    {file = "pandas_stubs-2.0.2.230605-py3-none-any.whl", hash = "sha256:39106b602f3cb6dc5f728b84e1b32bde6ecf41ee34ee714c66228009609fbada"},
+    {file = "pandas_stubs-2.0.2.230605.tar.gz", hash = "sha256:624c7bb06d38145a44b61be459ccd19b038e0bf20364a025ecaab78fea65e858"},
+]
+
+[package.dependencies]
+numpy = ">=1.24.3"
+types-pytz = ">=2022.1.1"
+
+[[package]]
 name = "pillow"
 version = "9.5.0"
 description = "Python Imaging Library (Fork)"
@@ -2515,6 +2531,21 @@ types-Jinja2 = "*"
 types-Werkzeug = "*"
 
 [[package]]
+name = "types-flask-cors"
+version = "3.0.10.5"
+description = "Typing stubs for Flask-Cors"
+category = "main"
+optional = false
+python-versions = "*"
+files = [
+    {file = "types-Flask-Cors-3.0.10.5.tar.gz", hash = "sha256:6c8f1e62a3dd8001f08cfe39258101e879eccafb8c0a8342b617f11a7884e3db"},
+    {file = "types_Flask_Cors-3.0.10.5-py3-none-any.whl", hash = "sha256:ccfabd36bde7df3f5465c42d776d7bebc3f2ba5f2bf2d2b055850869755b78b2"},
+]
+
+[package.dependencies]
+Flask = ">=2.0.0"
+
+[[package]]
 name = "types-html5lib"
 version = "1.1.11.14"
 description = "Typing stubs for html5lib"
@@ -2594,6 +2625,18 @@ files = [
 
 [package.dependencies]
 cryptography = ">=35.0.0"
+
+[[package]]
+name = "types-pytz"
+version = "2023.3.0.0"
+description = "Typing stubs for pytz"
+category = "main"
+optional = false
+python-versions = "*"
+files = [
+    {file = "types-pytz-2023.3.0.0.tar.gz", hash = "sha256:ecdc70d543aaf3616a7e48631543a884f74205f284cefd6649ddf44c6a820aac"},
+    {file = "types_pytz-2023.3.0.0-py3-none-any.whl", hash = "sha256:4fc2a7fbbc315f0b6630e0b899fd6c743705abe1094d007b0e612d10da15e0f3"},
+]
 
 [[package]]
 name = "types-redis"
@@ -2828,4 +2871,4 @@ email = ["email-validator"]
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.10,<3.11"
-content-hash = "ad50bc555ea2e52e9d3e46b0d20cd66338faea206dc63dcb56821e7f70387b1c"
+content-hash = "80466b2fe8c907a3e47e59f13c0394869b7ddb4c6090ff4c287596b76657ab1c"

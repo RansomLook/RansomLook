@@ -16,7 +16,7 @@ import flask_login  # type: ignore
 from werkzeug.security import check_password_hash
 from werkzeug.exceptions import HTTPException
 
-from flask_cors import CORS  # type: ignore
+from flask_cors import CORS
 from flask_restx import Api  # type: ignore
 
 from importlib.metadata import version

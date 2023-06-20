@@ -8,8 +8,8 @@ import json
 import csv
 import datetime
 
-import plotly.express as px
-import plotly.io as pio
+import plotly.express as px # type: ignore
+import plotly.io as pio     # type: ignore
 import pandas as pd
 
 from typing import Dict
@@ -22,7 +22,7 @@ def run_data_viz(days_filter):
     group_names = []
     timestamps = []
     for key in red.keys():
-        posts = json.loads(red.get(key))
+        posts = json.loads(red.get(key)) # type: ignore
         for post in posts:
             postdate = datetime.datetime.fromisoformat(post['discovered'])
             if (now - postdate).days < days_filter:
