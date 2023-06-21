@@ -24,7 +24,7 @@ div#app:empty:before {
  vertical-align:middle
 }
 .progress {
- background-color:var(--theme-color,#42b983);
+ background-color:var(--theme-color,#6ad37a);
  height:2px;
  left:0;
  position:fixed;
@@ -35,10 +35,10 @@ div#app:empty:before {
  z-index:999999
 }
 .search a:hover {
- color:var(--theme-color,#42b983)
+ color:var(--theme-color,#6ad37a)
 }
 .search .search-keyword {
- color:var(--theme-color,#42b983);
+ color:var(--theme-color,#6ad37a);
  font-style:normal;
  font-weight:700
 }
@@ -49,7 +49,7 @@ html {
 body {
  -moz-osx-font-smoothing:grayscale;
  -webkit-font-smoothing:antialiased;
- color:#34495e;
+ color:#aeaeae;
  font-family:Source Sans Pro,Helvetica Neue,Arial,sans-serif;
  font-size:15px;
  letter-spacing:0;
@@ -107,11 +107,11 @@ li input[type=checkbox] {
  transition:color .3s
 }
 .app-nav a:hover {
- color:var(--theme-color,#42b983)
+ color:var(--theme-color,#6ad37a)
 }
 .app-nav a.active {
- border-bottom:2px solid var(--theme-color,#42b983);
- color:var(--theme-color,#42b983)
+ border-bottom:2px solid var(--theme-color,#6ad37a);
+ color:var(--theme-color,#6ad37a)
 }
 .app-nav li {
  display:inline-block;
@@ -169,7 +169,7 @@ li input[type=checkbox] {
 }
 .github-corner svg {
  color:#fff;
- fill:var(--theme-color,#42b983);
+ fill:var(--theme-color,#6ad37a);
  height:80px;
  width:80px
 }
@@ -189,7 +189,7 @@ main.hidden {
  transition:all .3s
 }
 .anchor span {
- color:#34495e
+ color:#aeaeae
 }
 .anchor:hover {
  text-decoration:underline
@@ -278,7 +278,7 @@ main.hidden {
  opacity:.4
 }
 .sidebar-toggle span {
- background-color:var(--theme-color,#42b983);
+ background-color:var(--theme-color,#6ad37a);
  display:block;
  margin-bottom:4px;
  width:16px;
@@ -341,10 +341,10 @@ body.sticky .sidebar-toggle {
  border-top:1px solid #ccc
 }
 .markdown-section tr:nth-child(2n) {
- background-color:#f8f8f8
+ background-color:#4f4a4a
 }
 .markdown-section p.tip {
- background-color:#f8f8f8;
+ background-color:#4f4a4a;
  border-bottom-right-radius:2px;
  border-left:4px solid #f66;
  border-top-right-radius:2px;
@@ -372,7 +372,7 @@ body.sticky .sidebar-toggle {
  background-color:#efefef
 }
 .markdown-section p.tip em {
- color:#34495e
+ color:#aeaeae
 }
 .markdown-section p.warn {
  background:rgba(66,185,131,.1);
@@ -555,9 +555,9 @@ section.cover ul {
 }
 section.cover .cover-main>p:last-child a {
  border-radius:2rem;
- border:1px solid var(--theme-color,#42b983);
+ border:1px solid var(--theme-color,#6ad37a);
  box-sizing:border-box;
- color:var(--theme-color,#42b983);
+ color:var(--theme-color,#6ad37a);
  display:inline-block;
  font-size:1.05rem;
  letter-spacing:.1rem;
@@ -567,7 +567,7 @@ section.cover .cover-main>p:last-child a {
  transition:all .15s ease
 }
 section.cover .cover-main>p:last-child a:last-child {
- background-color:var(--theme-color,#42b983);
+ background-color:var(--theme-color,#6ad37a);
  color:#fff
 }
 section.cover .cover-main>p:last-child a:last-child:hover {
@@ -578,11 +578,11 @@ section.cover .cover-main>p:last-child a:hover {
  color:inherit
 }
 section.cover blockquote>p>a {
- border-bottom:2px solid var(--theme-color,#42b983);
+ border-bottom:2px solid var(--theme-color,#6ad37a);
  transition:color .3s
 }
 section.cover blockquote>p>a:hover {
- color:var(--theme-color,#42b983)
+ color:var(--theme-color,#6ad37a)
 }
 .sidebar,
 body {
@@ -611,7 +611,7 @@ body {
 }
 .sidebar ul li.active>a {
  border-right:2px solid;
- color:var(--theme-color,#42b983);
+ color:var(--theme-color,#6ad37a);
  font-weight:600
 }
 .app-sub-sidebar li:before {
@@ -624,11 +624,11 @@ body {
 .markdown-section h3,
 .markdown-section h4,
 .markdown-section strong {
- color:#2c3e50;
+ color:#a2a2a2;
  font-weight:600
 }
 .markdown-section a {
- color:var(--theme-color,#42b983);
+ color:var(--theme-color,#6ad37a);
  font-weight:600
 }
 .markdown-section h1 {
@@ -668,7 +668,7 @@ body {
  padding-left:1.5rem
 }
 .markdown-section blockquote {
- border-left:4px solid var(--theme-color,#42b983);
+ border-left:4px solid var(--theme-color,#6ad37a);
  color:#858585;
  margin:2em 0;
  padding-left:20px
@@ -690,7 +690,7 @@ body {
 }
 .markdown-section code,
 .markdown-section pre {
- background-color:#f8f8f8
+ background-color:#4f4a4a
 }
 .markdown-section output,
 .markdown-section pre {
@@ -709,7 +709,7 @@ body {
 }
 .markdown-section code {
  border-radius:2px;
- color:#42b983;
+ color:#6ad37a;
  margin:0 2px;
  padding:3px 5px;
  white-space:pre-wrap
@@ -790,7 +790,7 @@ body {
  color:#2973b7
 }
 .token.string {
- color:var(--theme-color,#42b983)
+ color:var(--theme-color,#6ad37a)
 }
 .token.selector {
  color:#6679cc
@@ -808,7 +808,7 @@ body {
 .token.control,
 .token.directive,
 .token.unit {
- color:var(--theme-color,#42b983)
+ color:var(--theme-color,#6ad37a)
 }
 .token.function,
 .token.keyword {

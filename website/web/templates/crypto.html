@@ -8,8 +8,8 @@
         {% for entry in data %}
             <h2 id="{{entry.title}}"> {{ entry.title() }}<h2>
             <h3>Wallets</h2>
-            <div class="table-responsive">
-            <table id="table" class="table" style="display:table; table-layout:auto; width:100%">
+            <div class="table table-dark table-striped-columns-responsive">
+            <table id="table" class="table table-dark table-striped-columns" style="display:table; table-layout:auto; width:100%">
             <thead>
                 <tr>
                     <th style="width:25%"> Type </th>
@@ -25,7 +25,7 @@
                 {% if crypto['transactions']|length > 0 %}
                 <tr>
                 <td></td>
-                <td><table id="table" class="table" style="display:table; table-layout:auto; width:100%">
+                <td><table id="table" class="table table-dark table-striped-columns" style="display:table; table-layout:auto; width:100%">
                 <thead>
                    <tr>
                        <th style="width:65%"> Transaction </th>

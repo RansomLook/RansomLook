@@ -24,15 +24,15 @@
 
     {% endblock %}
   </head>
-  <body class="ready sticky">
-  <aside class="sidebar">
-         <div class="search">
+  <body class="ready sticky bg-dark">
+  <aside class="sidebar bg-dark">
+         <div class="search bg-dark">
            <div class="input-wrap">
             <center><form action="{{ url_for('search') }}" method="post"><input type="text" name="search" value="" aria-label="Search text" placeholder="type to search"></form></center>
            </div>
          </div>
     </br>
-    <h1 class="app-name"><a class="app-name-link" data-nosearch="" href="/">🦕 RansomLook 🦖</a></h1>
+    <h1 class="app-name"><a class="app-name-link" data-nosearch="" href="/"><img src="https://image.noelshack.com/fichiers/2023/23/5/1686321362-yami.png" alt="Yami No Kagami Logo"></a></h1>
     <div class="sidebar-nav">
 
           <ul><li {% if request.path == '/' %} class="active" {% endif %}><a href="{{ url_for('home') }}" title="Dashboard">Dashboard</a></li>
@@ -51,7 +51,7 @@
               <li {% if request.path == '/markets' %} class="active" {% endif %}><a href="{{ url_for('markets') }}" title="Forums &amp; Market">Forums &amp; Market</a></li>
               {% if request.path == '/markets' %}{% block markets %}{% endblock %}{% endif %}
               <li {% if request.path == '/leaks' %} class="active" {% endif %}><a href="{{ url_for('leaks') }}" title="Leaks">Leaks</a></li>
-              <li {% if request.path == '/RF' %} class="active" {% endif %}><a href="{{ url_for('rf') }}" title="RF Dumps">RF Dumps</a></li>
+              <li {% if request.path == '/bfleak' %} class="active" {% endif %}><a href="{{ url_for('bfleak') }}" title="Breach Forums Leak">Breach Forums Leak</a></li>
               <li {% if request.path == '/telegrams' %} class="active" {% endif %}><a href="{{ url_for('telegrams') }}" title="Telegrams">Telegrams</a></li>
               <li {% if request.path == '/twitters' %} class="active" {% endif %}><a href="{{ url_for('twitters') }}" title="Twitters">Twitters</a></li>
               <li {% if request.path == '/crypto' %} class="active" {% endif %}><a href="{{ url_for('crypto') }}" title="Cryptocurrencies">Cryptocurrencies</a></li>
@@ -69,7 +69,7 @@
           {% endif %}          
     </div>
   </aside>
-    <section class="content">
+    <section class="content bg-dark">
       {% block content %}{% endblock%}
     </section>
     {% block scripts %}

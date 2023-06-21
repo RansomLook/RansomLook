@@ -707,6 +707,24 @@ def alerting():
     form.keywords.data=keywords
     return render_template('alerts.html', form=form)
 
+@app.route('/bfleak', methods=['GET', 'POST'])
+def bfleak():
+    if request.method == 'POST':
+        search_query = request.form['search_query']
+        results = search_data(search_query)
+        return render_template('bfleak.html', results=results)
+    return render_template('bfleak.html')
+
+
+def search_data(search_query):
+    results = []
+    with open('/root/Yami-No-Kagami/website/web/leak/breachforums.txt', 'r', encoding='utf-8') as file:
+        for line in file:
+            data = line.split()
+            if search_query in data:
+                results.append(data)
+    return results
+
 if __name__ == "__main__":
 	app.run(debug=True)
 
