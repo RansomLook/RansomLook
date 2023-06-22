@@ -47,6 +47,7 @@
     "website_listen_ip": "127.0.0.1",
     "website_listen_port": 8000,
     "alertondashboard": false,
+    "darkmode": false,
     "_notes": {
         "malpedia": "malpedia apikey",
         "email": "Email configuration",
@@ -59,7 +60,8 @@
         "misp": "The MISP configuration",
         "alertondashboard": "Enable to view alerts on dashboard",
         "rf": "API Key for Identity Module",
-        "ldap": "Ldap configuration for login"
+        "ldap": "Ldap configuration for login",
+        "darkmode": "Display a dark GUI"
     }
 
 }

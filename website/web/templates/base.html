@@ -10,9 +10,15 @@
     {% block styles %}
     <!-- Bootstrap CSS -->
     {{ bootstrap.load_css() }}
+    {% if darkmode %}
+    <link rel="stylesheet" href="{{ url_for('static', filename='generic-dark.css') }}"
+          integrity="{{get_sri('static', 'generic-dark.css')}}"
+          crossorigin="anonymous">
+    {% else %}
     <link rel="stylesheet" href="{{ url_for('static', filename='generic.css') }}"
           integrity="{{get_sri('static', 'generic.css')}}"
           crossorigin="anonymous">
+    {% endif %}
     <link rel="stylesheet" href="{{ url_for('static', filename='datatables.min.css') }}"
           integrity="{{get_sri('static', 'datatables.min.css')}}"
           crossorigin="anonymous">
@@ -24,8 +30,8 @@
 
     {% endblock %}
   </head>
-  <body class="ready sticky">
-  <aside class="sidebar">
+  <body class="ready sticky {% if darkmode %}bg-dark{% endif %}">
+  <aside class="sidebar {% if darkmode %}bg-dark{% endif %}">
          <div class="search">
            <div class="input-wrap">
             <center><form action="{{ url_for('search') }}" method="post"><input type="text" name="search" value="" aria-label="Search text" placeholder="type to search"></form></center>

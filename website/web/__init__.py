@@ -48,12 +48,20 @@ Bootstrap5(app)
 app.config['BOOTSTRAP_SERVE_LOCAL'] = True
 app.config['SESSION_COOKIE_NAME'] = 'RansomLook'
 app.config['SESSION_COOKIE_SAMESITE'] = 'Strict'
+if get_config('generic','darkmode'):
+    app.config['BOOTSTRAP_BOOTSWATCH_THEME'] = 'slate'
 app.debug = False
 
 pkg_version = version('ransomlook')
 
 flask_moment.Moment(app=app)
 
+
+@app.context_processor
+def inject_global_vars():
+    if get_config('generic','darkmode'):
+        return {'darkmode': True}
+    return {'darkmode': False}
 # Getting the error
 #@app.errorhandler(Exception)
 def handle_error(e):

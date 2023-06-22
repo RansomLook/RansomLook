@@ -77,7 +77,7 @@
             </thead>
             <tbody>
                 {% for post in entry['posts'] %}
-                    <tr><td><code> {{post['post_title']}} </code></td>
+                    <tr><td> {{post['post_title']}} </td>
                         <td><center> {{post['discovered'].split(' ')[0]}} </center></td>
                     </tr>
                 {% endfor %}
