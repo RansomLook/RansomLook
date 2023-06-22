@@ -59,9 +59,13 @@ flask_moment.Moment(app=app)
 
 @app.context_processor
 def inject_global_vars():
+    darkmode = False
+    activatedRF = False
     if get_config('generic','darkmode'):
-        return {'darkmode': True}
-    return {'darkmode': False}
+        darkmode = True
+    if get_config('generic','rf') != "" :
+        activatedRF = True
+    return {'darkmode': darkmode, 'activatedRF': activatedRF}
 # Getting the error
 #@app.errorhandler(Exception)
 def handle_error(e):
