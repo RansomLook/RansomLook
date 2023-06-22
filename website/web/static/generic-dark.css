@@ -214,7 +214,8 @@ main.hidden {
 }
 .sidebar>h1 a {
  color:inherit;
- text-decoration:none
+ text-decoration:none;
+ color:#a2a2a2
 }
 .sidebar>h1 .app-nav {
  display:block;
@@ -595,7 +596,7 @@ body {
  margin:6px 0
 }
 .sidebar ul li a {
- color:#505d6b;
+ color:#7f8c8d;
  font-size:14px;
  font-weight:400;
  overflow:hidden;
