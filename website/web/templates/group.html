@@ -3,8 +3,8 @@
 {% block content %}
     <article id="main" class="markdown-section">
 	<h1>{{group['name'].title()}}</h1>
-        <h3>Description</h3>
         {% if group['meta'] is not none %}
+        <h4>Description</h4>
         <p>{{group['meta']|safe}}</p>
         {% endif %}
         {% if group['profile'][0] %}
@@ -44,7 +44,7 @@
         {% if posts %}
         <center><img src="/stats/{{ group['name'] }}.png"></center>
         
-        <h3>Posts</h3>
+        <h4>Posts</h4>
         <table id="table" class="table" style="display:table; table-layout:auto; width:100%">
           <thead>
             <tr>

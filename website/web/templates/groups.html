@@ -22,19 +22,18 @@
 	<h1>Group profiles</h1>
         {% for entry in data %}
             {% if type == "groups" %}
-            <h2 id="{{entry['name'].title()}}"> <a href="/group/{{entry['name']}}">{{entry['name'].title()}}</a><h2>
+            <h3 id="{{entry['name'].title()}}"> <a href="/group/{{entry['name']}}">{{entry['name'].title()}}</a></h3>
             {% else %}
-            <h2 id="{{entry['name'].title()}}"> <a href="/market/{{entry['name']}}">{{entry['name'].title()}}</a><h2>
+            <h3 id="{{entry['name'].title()}}"> <a href="/market/{{entry['name']}}">{{entry['name'].title()}}</a></h3>
             {% endif %}
-          
-            <h4>Description</h2>
-            {% if entry['meta'] is not none %}
+            {% if entry['meta'] is not none %}  
+            <h4>Description</h4>
             <p>{{ entry['meta'] }}</p>
             {% endif %}
             {% if entry['name'].lower() in parser %}
             <p><em>parsing : <code>enabled</code></em></p>
             {% endif %}
-            <h3>Links</h2>
+            <h4>Links</h4>
             <div class="table-responsive">
             <table id="table" class="table" style="display:table; table-layout:auto; width:100%">
             <thead>
@@ -66,7 +65,7 @@
            </table>
            </div>
             {% if entry['posts'] %}
-            <h4>Posts</h2>
+            <h4>Posts</h4>
             <div class="table-responsive">
             <table id="table" class="table" style="display:table; table-layout:auto; width:100%">
             <thead>

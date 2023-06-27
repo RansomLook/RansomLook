@@ -17,7 +17,7 @@ import pandas as pd
 
 from typing import Dict, List, Tuple, Any
 
-from ransomlook.default.config import get_homedir, get_socket_path
+from ransomlook.default.config import get_homedir, get_socket_path, get_config
 
 import tldextract
 from urllib.parse import urlparse, urlsplit
@@ -79,24 +79,38 @@ def statsgroup(group):
     # Extract the dates and counts for plotting
     dates, counts = zip(*sorted_counts)
     # Plot the graph
+    
     plt.clf()
     # Create a new figure and axes for each group with a larger figure size
     px = 1/plt.rcParams['figure.dpi']
-    fig,ax = plt.subplots(figsize=(1050*px, 750*px))  
+    if get_config("generic","darkmode"):
+        fig,ax = plt.subplots(figsize=(1050*px, 750*px), facecolor='#272b30')
+    else: 
+        fig,ax = plt.subplots(figsize=(1050*px, 750*px))
     # plt.plot(dates, counts)
-    ax.bar(dates, counts, color = '#42b983')
-    ax.set_xlabel('New daily discovery when parsing', color = '#42b983')
-    ax.set_ylabel('Number of Victims', color = '#42b983')
-    ax.set_title('Number of Victims for Group: ' + group.decode().title(), color = '#42b983')
+    color = '#505d6b'
+    if get_config("generic","darkmode"):
+        color ='#ddd'
+    ax.bar(dates, counts, color = '#6ad37a')
+    ax.set_xlabel('New daily discovery when parsing', color = color)
+    ax.set_ylabel('Number of Victims', color = color)
+    ax.set_title('Number of Victims for Group: ' + group.decode().title(), color = color)
     ax.tick_params(axis='x', bottom=False, labelbottom=False)
+    if get_config("generic","darkmode"):
+        #ax.set_xtick
+        for pos in ['top', 'bottom', 'right', 'left']:
+            ax.spines[pos].set_edgecolor(color)
+        ax.tick_params(colors=color)
+        ax.set_facecolor("#272b30")
+
     # Set the x-axis limits
     #ax.set_xlim(str(dates[0]), str(dates[-1:]))
     # Format y-axis ticks as whole numbers without a comma separator
+
     plt.tight_layout()
 
     # Save the graph as an image file
     plt.savefig(str(get_homedir()) +'/source/screenshots/stats/' + group.decode() + '.png')
-    print(str(get_homedir()) +'/source/screenshots/stats/' + group.decode() + '.png')
     plt.close(fig)
 
 def run_data_viz(days_filter):
