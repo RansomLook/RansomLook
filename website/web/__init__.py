@@ -301,7 +301,10 @@ def group(name):
                             sorted_posts = sorted(posts, key=lambda x: x['discovered'], reverse=True)
                         else:
                             sorted_posts = []
-                        return render_template("group.html", group = group, posts=sorted_posts)
+                        modules = glob.glob(join(dirname(str(get_homedir())+'/ransomlook/parsers/'), "*.py"))
+                        parserlist = [ basename(f)[:-3].split('.')[0] for f in modules if isfile(f) and not f.endswith('__init__.py')]
+
+                        return render_template("group.html", group = group, posts=sorted_posts, parser=parserlist)
 
         return redirect(url_for("home"))
 

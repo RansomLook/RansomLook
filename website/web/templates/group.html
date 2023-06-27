@@ -3,6 +3,9 @@
 {% block content %}
     <article id="main" class="markdown-section">
 	<h1>{{group['name'].title()}}</h1>
+        {% if group['name'].lower() in parser %}
+        <p><em>parsing : <code>enabled</code></em></p>
+        {% endif %} 
         {% if group['meta'] is not none %}
         <h4>Description</h4>
         <p>{{group['meta']|safe}}</p>
