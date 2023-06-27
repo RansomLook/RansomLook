@@ -41,7 +41,9 @@
         {% endfor %}
           </tbody>
         </table>
-
+        {% if posts %}
+        <center><img src="/stats/{{ group['name'] }}.png"></center>
+        
         <h3>Posts</h3>
         <table id="table" class="table" style="display:table; table-layout:auto; width:100%">
           <thead>
@@ -63,5 +65,6 @@
             {% endfor %}
           </tbody>
         </table>
+        {% endif %}
     </article>
 {% endblock %}

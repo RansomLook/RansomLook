@@ -61,7 +61,7 @@ def threadscape(queuethread, lock):
             stdlog('Starting : ' + host['fqdn']+ ' --------- ' + group)
             host['available'] = bool()
             try:
-                if group in ['blackbasta']:
+                if group in ['blackbasta', 'clop']:
                     browser = play.firefox.launch(proxy={"server": "socks5://127.0.0.1:9050"},
                           args=['--unsafely-treat-insecure-origin-as-secure='+host['slug']])
                 else:

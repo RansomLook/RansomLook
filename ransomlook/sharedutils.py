@@ -1,4 +1,3 @@
-
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
@@ -10,6 +9,11 @@ import glob
 from os.path import dirname, basename, isfile, join
 import sys
 import redis
+
+import matplotlib.pyplot as plt
+import plotly.express as px # type: ignore
+import plotly.io as pio     # type: ignore
+import pandas as pd
 
 from typing import Dict, List, Tuple, Any
 
@@ -56,6 +60,96 @@ def honk(msg: Any) -> None :
 '''
 Graphs
 '''
+def statsgroup(group):
+    # Reset variables
+    victim_counts = {}
+    dates = []
+    counts = []
+
+    red = redis.Redis(unix_socket_path=get_socket_path('cache'), db=2)
+    post_data = json.loads(red.get(group)) # type; ignore
+    # Count the number of victims per day
+    for post in post_data:
+        date = post['discovered'].split(' ')[0]
+        victim_counts[date] = victim_counts.get(date, 0) + 1 
+
+    # Sort the victim counts by date
+    sorted_counts = sorted(victim_counts.items())
+
+    # Extract the dates and counts for plotting
+    dates, counts = zip(*sorted_counts)
+    # Plot the graph
+    plt.clf()
+    # Create a new figure and axes for each group with a larger figure size
+    px = 1/plt.rcParams['figure.dpi']
+    fig,ax = plt.subplots(figsize=(1050*px, 750*px))  
+    # plt.plot(dates, counts)
+    ax.bar(dates, counts, color = '#42b983')
+    ax.set_xlabel('New daily discovery when parsing', color = '#42b983')
+    ax.set_ylabel('Number of Victims', color = '#42b983')
+    ax.set_title('Number of Victims for Group: ' + group.decode().title(), color = '#42b983')
+    ax.tick_params(axis='x', bottom=False, labelbottom=False)
+    # Set the x-axis limits
+    #ax.set_xlim(str(dates[0]), str(dates[-1:]))
+    # Format y-axis ticks as whole numbers without a comma separator
+    plt.tight_layout()
+
+    # Save the graph as an image file
+    plt.savefig(str(get_homedir()) +'/source/screenshots/stats/' + group.decode() + '.png')
+    print(str(get_homedir()) +'/source/screenshots/stats/' + group.decode() + '.png')
+    plt.close(fig)
+
+def run_data_viz(days_filter):
+    now = datetime.now()
+
+    red = redis.Redis(unix_socket_path=get_socket_path('cache'), db=2)
+
+    group_names = []
+    timestamps = []
+    for key in red.keys():
+        posts = json.loads(red.get(key)) # type: ignore
+        for post in posts:
+            postdate = datetime.fromisoformat(post['discovered'])
+            if (now - postdate).days < days_filter:
+                group_names.append(key.decode())
+                timestamps.append(post['discovered'])
+    df = pd.DataFrame({'group_name': group_names, 'timestamp': timestamps})
+    # Convert the timestamps into a datetime format
+    df['timestamp'] = pd.to_datetime(df['timestamp'])
+
+    # Group and sort the data by the number of postings in each group
+    df_sorted = df.groupby(['group_name', 'timestamp']).size().reset_index(name='count')
+    df_sorted = df_sorted.sort_values(by='count', ascending=False)
+
+    # Use Plotly's Heatmap plot to create the density heatmap
+    fig1 = px.density_heatmap(df_sorted, x='timestamp', y='group_name', z='count', title='Posting Frequency by group', width=1050, height=750)
+    fig1.update_layout(font=dict(family='Roboto'))
+    filename = join(get_homedir(),"source/screenshots/stats","density_heatmap_"+ str(days_filter)+".png")
+    fig1.write_image(filename)
+
+    # Use Plotly's Scatter plot to create the scatter plot
+    fig2 = px.scatter(df_sorted, x='timestamp', y='group_name', color='group_name', title='Posting Frequency by group', color_continuous_scale='Plotly3', width=1050, height=750)
+    #fig2 = px.scatter(df_sorted, x='group_name', y='count', title='Posting Frequency by Group', template='plotly_dark')
+    filename = join(get_homedir(),"source/screenshots/stats","scatter_plot_"+ str(days_filter)+".png")
+    fig2.write_image(filename)
+
+    # Use Plotly's Bar plot to create the bar chart
+    #fig4 = px.bar(df_sorted, x='group_name', y='count', color='count', title='Posting Frequency by Group', template='plotly_dark', color_continuous_scale='Portland')
+    #fig4.show()
+
+    # Group and sort the data by the number of postings in each group
+    df_sorted = df.groupby('group_name').size().reset_index(name='count').sort_values(by='count', ascending=True)
+
+    # Use Plotly's Pie plot to create the pie chart
+    fig3 = px.pie(df_sorted, values='count', names='group_name', title='Posting Frequency by Group', width=1050, height=750)
+    filename = join(get_homedir(),"source/screenshots/stats","pie_chart_"+ str(days_filter)+".png")
+    fig3.write_image(filename)
+
+    # Use Plotly's Scatter plot to visualize the data
+    fig4 = px.bar(df_sorted, x='group_name', y='count', color='count', title='Posting Frequency by Group', color_continuous_scale='Portland',width=1050, height=750)
+    filename = join(get_homedir(),"source/screenshots/stats","bar_chart_"+ str(days_filter)+".png")
+    fig4.write_image(filename)
+
 def gcount(posts: List) -> Dict[str, int]:
     group_counts: Dict[str, int] = {}
     for post in posts:

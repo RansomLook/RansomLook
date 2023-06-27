@@ -26,7 +26,7 @@ from collections import defaultdict
 
 from ransomlook.ransomlook import adder
 from ransomlook.sharedutils import createfile
-from ransomlook.sharedutils import groupcount, hostcount, onlinecount, postslast24h, mounthlypostcount, currentmonthstr, postssince, poststhisyear,postcount,parsercount
+from ransomlook.sharedutils import groupcount, hostcount, onlinecount, postslast24h, mounthlypostcount, currentmonthstr, postssince, poststhisyear, postcount, parsercount, statsgroup
 from ransomlook.default.config import get_homedir
 from ransomlook.default.config import get_config
 from ransomlook.default import get_socket_path

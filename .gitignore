@@ -11,6 +11,7 @@ __pycache__/
 # Ignore local folders
 data/*
 source/*.html
+source/*.png
 source/telegram/*
 source/twitter/*
 source/screenshots/*

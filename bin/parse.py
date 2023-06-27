@@ -19,7 +19,7 @@ from ransomlook.twitter import twitternotify
 from ransomlook.misp import mispevent
 from ransomlook.email import alertingnotify
 
-from ransomlook.sharedutils import dbglog, stdlog, errlog
+from ransomlook.sharedutils import dbglog, stdlog, errlog, statsgroup, run_data_viz
 
 def posttemplate(victim, description, timestamp):
     '''
@@ -116,7 +116,13 @@ def main():
             print("Error with : " + parser)
             print(e)
             pass
-
+    red = redis.Redis(unix_socket_path=get_socket_path('cache'), db=2)
+    for key in red.keys():
+        statsgroup(key)
+    run_data_viz(7)
+    run_data_viz(14)
+    run_data_viz(30)
+    run_data_viz(90)
 
 if __name__ == '__main__':
     main()

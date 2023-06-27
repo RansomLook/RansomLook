@@ -65,7 +65,7 @@
            </tbody>
            </table>
            </div>
-
+            {% if entry['posts'] %}
             <h4>Posts</h2>
             <div class="table-responsive">
             <table id="table" class="table" style="display:table; table-layout:auto; width:100%">
@@ -84,6 +84,7 @@
             </tbody>
             </table>
             </div>
+            {% endif %}
         {% endfor %}
     </article>
 {% endblock %}
