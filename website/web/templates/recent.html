@@ -18,7 +18,7 @@
             {% for entry in data %}
                 <tr><td><center> {{entry['discovered'].split(' ')[0]}} </center></td><td> {{entry['post_title'] }} </td><td> <a href="/group/{{entry['group_name']}}">{{entry['group_name']}}</a></td></tr>
             {% endfor %}
-          <tbody>
+          </tbody>
         </table>
     </article>
 {% endblock %}
