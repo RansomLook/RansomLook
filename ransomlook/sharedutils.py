@@ -10,7 +10,7 @@ from os.path import dirname, basename, isfile, join
 import sys
 import redis
 
-import matplotlib.pyplot as plt
+import matplotlib.pyplot as plt # type: ignore
 import plotly.express as px # type: ignore
 import plotly.io as pio     # type: ignore
 import pandas as pd
@@ -60,14 +60,14 @@ def honk(msg: Any) -> None :
 '''
 Graphs
 '''
-def statsgroup(group):
+def statsgroup(group) -> None :
     # Reset variables
-    victim_counts = {}
-    dates = []
-    counts = []
+    victim_counts: Dict[str, int] = {}
+    dates = (Any)
+    counts = (Any)
 
     red = redis.Redis(unix_socket_path=get_socket_path('cache'), db=2)
-    post_data = json.loads(red.get(group)) # type; ignore
+    post_data = json.loads(red.get(group)) # type: ignore
     # Count the number of victims per day
     for post in post_data:
         date = post['discovered'].split(' ')[0]
@@ -79,7 +79,6 @@ def statsgroup(group):
     # Extract the dates and counts for plotting
     dates, counts = zip(*sorted_counts)
     # Plot the graph
-    
     plt.clf()
     # Create a new figure and axes for each group with a larger figure size
     px = 1/plt.rcParams['figure.dpi']
