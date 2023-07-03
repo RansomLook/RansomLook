@@ -5,7 +5,7 @@ from ransomlook.default import get_socket_path, get_config
 
 from ransomlook.rocket import rocketnotifyleak
 from ransomlook.twitter import twitternotifyleak
-from ransomlook.mastodon import mastodonnotifyleak
+from ransomlook.mastodon import tootnotifyleak
 
 from bs4 import BeautifulSoup
 import requests
