@@ -33,6 +33,11 @@
         "access_token": "",
         "access_token_secret": ""
     },
+    "mastodon":{
+        "enable": false,
+        "url": "",
+        "token": ""
+    },
     "misp": {
         "enable": false,
         "url": "",
@@ -61,7 +66,8 @@
         "alertondashboard": "Enable to view alerts on dashboard",
         "rf": "API Key for Identity Module",
         "ldap": "Ldap configuration for login",
-        "darkmode": "Display a dark GUI"
+        "darkmode": "Display a dark GUI",
+        "mastodon": "As Twitter but for Mastodon"
     }
 
 }

@@ -5,6 +5,7 @@ from ransomlook.default import get_socket_path, get_config
 
 from ransomlook.rocket import rocketnotifyleak
 from ransomlook.twitter import twitternotifyleak
+from ransomlook.mastodon import mastodonnotifyleak
 
 from bs4 import BeautifulSoup
 import requests
@@ -22,6 +23,7 @@ tbody = divs_name.find('tbody') # type: ignore
 trs = tbody.find_all('tr') # type: ignore
 rocketconfig = get_config('generic','rocketchat')
 twitterconfig = get_config('generic','twitter')
+mastodonconfig = get_config('generic','mastodon')
 for tr in trs:
   tds= tr.find_all('td')
   data = tds[3].div.div.a['data-id']
@@ -42,4 +44,6 @@ for tr in trs:
     rocketnotifyleak(rocketconfig, datas)
   if twitterconfig['enable'] == True:
     twitternotifyleak(twitterconfig, datas['name'])
+  if mastodonconfig['enable'] == True:
+    tootnotifyleak(mastodonconfig, datas['name'])
 print('done')

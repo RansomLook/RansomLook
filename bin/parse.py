@@ -16,6 +16,7 @@ import uuid
 from ransomlook.default.config import get_config, get_socket_path
 from ransomlook.rocket import rocketnotify
 from ransomlook.twitter import twitternotify
+from ransomlook.mastodon import tootnotify
 from ransomlook.misp import mispevent
 from ransomlook.email import alertingnotify
 
@@ -40,6 +41,7 @@ def appender(entry, group_name):
     '''
     rocketconfig = get_config('generic','rocketchat')
     twitterconfig = get_config('generic','twitter')
+    mastodonconfig = get_config('generic','mastodon')
     mispconfig = get_config('generic','misp')
     emailconfig = get_config('generic', 'email')
     if type(entry) is str :
@@ -91,6 +93,8 @@ def appender(entry, group_name):
         rocketnotify(rocketconfig, group_name, post_title, description)
     if twitterconfig['enable'] == True:
         twitternotify(twitterconfig, group_name, post_title)
+    if mastodonconfig['enable'] == True:
+        tootnotify(mastodonconfig, group_name, post_title)
     if mispconfig['enable'] == True:
         try:
             groupred = redis.Redis(unix_socket_path=get_socket_path('cache'), db=0)
