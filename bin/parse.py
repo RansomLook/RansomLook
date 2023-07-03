@@ -44,6 +44,7 @@ def appender(entry, group_name):
     mastodonconfig = get_config('generic','mastodon')
     mispconfig = get_config('generic','misp')
     emailconfig = get_config('generic', 'email')
+    siteurl = get_config('generic', 'siteurl')
     if type(entry) is str :
        post_title = entry
        description = ''
@@ -94,7 +95,7 @@ def appender(entry, group_name):
     if twitterconfig['enable'] == True:
         twitternotify(twitterconfig, group_name, post_title)
     if mastodonconfig['enable'] == True:
-        tootnotify(mastodonconfig, group_name, post_title)
+        tootnotify(mastodonconfig, group_name, post_title, siteurl)
     if mispconfig['enable'] == True:
         try:
             groupred = redis.Redis(unix_socket_path=get_socket_path('cache'), db=0)

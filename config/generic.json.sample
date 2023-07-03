@@ -53,6 +53,7 @@
     "website_listen_port": 8000,
     "alertondashboard": false,
     "darkmode": false,
+    "siteurl": "http://domain.tld",
     "_notes": {
         "malpedia": "malpedia apikey",
         "email": "Email configuration",
@@ -67,7 +68,8 @@
         "rf": "API Key for Identity Module",
         "ldap": "Ldap configuration for login",
         "darkmode": "Display a dark GUI",
-        "mastodon": "As Twitter but for Mastodon"
+        "mastodon": "As Twitter but for Mastodon",
+        "siteurl": "Url of your domain"
     }
 
 }
