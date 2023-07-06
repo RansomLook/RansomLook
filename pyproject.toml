@@ -58,7 +58,7 @@ psutil = "^5.9.5"
 kaleido = "0.2.1"
 types-pytz = "^2023.3.0.0"
 pandas-stubs = "^2.0.2.230605"
-types-flask-cors = "^3.0.10.5"
+types-flask-cors = "^4.0.0.0"
 mastodon-py = "^1.8.1"
 
 [tool.poetry.dev-dependencies]
