@@ -12,7 +12,7 @@ def main():
                 soup=BeautifulSoup(file,'html.parser')
                 divs_name=soup.find_all('div', {"class": "card mb-4 box-shadow"})
                 for div in divs_name:
-                    title = div.find('h5',{"class": "card-title"}).text.strip()
+                    title = div.find('h4',{"class": "card-title"}).text.strip()
                     description = ''
                     for p in div.find_all('p'):
                         description+=p.text+'\n'
