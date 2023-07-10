@@ -122,3 +122,19 @@ class Exportdb(Resource):
         for key in red.keys():
             dump[key.decode()]=json.loads(red.get(key)) # type: ignore
         return dump
+
+@api.route('/posts/<year>/<month>')
+@api.doc(description='Dump posts for a month', tags=['posts'])
+class PostPerMonth(Resource):
+    def get(self, year, month):
+        posts = []
+        date = str(year)+'-'+str(month)
+        red = Redis(unix_socket_path=get_socket_path('cache'), db=2)
+        for key in red.keys():
+                entries = json.loads(red.get(key)) # type: ignore
+                for entry in entries:
+                    if entry['discovered'].startswith(date):
+                        entry['group_name']=key.decode()
+                        posts.append(entry)
+        sorted_posts = sorted(posts, key=lambda x: x['discovered'], reverse=True)
+        return sorted_posts
