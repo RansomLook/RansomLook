@@ -15,6 +15,11 @@ def main():
                     title = div.find('p', {"class": "h1"}).text
                     description = div.find("p", {"class": "description"}).text.strip()
                     list_div.append({"title" : title, "description" : description})
+                divs_name=soup.find_all('div', {"class": "item-details"})
+                for div in divs_name:
+                    title = div.find('h3').text
+                    description = div.find("p").text.strip()
+                    list_div.append({"title" : title, "description" : description})
                 file.close()
         except:
             print("Failed during : " + filename)
