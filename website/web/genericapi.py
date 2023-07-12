@@ -25,12 +25,14 @@ import plotly.express as px # type: ignore
 import plotly.io as pio     # type: ignore
 import pandas as pd
 
+from datetime import datetime, timedelta
+
 api = Namespace('GenericAPI', description='Generic Ransomlook API', path='/api')
 
-@api.route('/recent')
-@api.doc(description='Return the 100 last posts', tags=['generic'])
+@api.route('/recent', '/recent/<int:number>')
+@api.doc(description='Return the X last posts, by default 100', tags=['generic'])
 class RecentPost(Resource):
-    def get(self):
+    def get(self, number: int=100):
         posts = []
         red = Redis(unix_socket_path=get_socket_path('cache'), db=2)
         for key in red.keys():
@@ -42,9 +44,26 @@ class RecentPost(Resource):
         recentposts = []
         for post in sorted_posts:
                 recentposts.append(post)
-                if len(recentposts) == 100:
+                if len(recentposts) == number:
                         break
         return recentposts
+
+@api.route('/last', '/last/<int:number>')
+@api.doc(description='Return posts for the last X days, by default 1', tags=['generic'])
+class LastPost(Resource):
+    def get(self, number: int=1):
+        posts = []
+        actualdate = datetime.now() + timedelta(days = -number)
+        red = Redis(unix_socket_path=get_socket_path('cache'), db=2)
+        for key in red.keys():
+                entries = json.loads(red.get(key)) # type: ignore
+                for entry in entries:
+                    if datetime.strptime(entry['discovered'], '%Y-%m-%d %H:%M:%S.%f') > actualdate:
+                        entry['group_name']=key.decode()
+                        posts.append(entry)
+        sorted_posts = sorted(posts, key=lambda x: x['discovered'], reverse=True)
+        return sorted_posts
+
 
 @api.route('/groups')
 @api.doc(description='Return list of groups', tags=['groups'])
