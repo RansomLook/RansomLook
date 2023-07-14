@@ -10,10 +10,11 @@ def main():
                 html_doc='source/'+filename
                 file=open(html_doc,'r')
                 soup=BeautifulSoup(file,'html.parser')
-                divs_name=soup.find_all('div', {"class": "MuiBox-root css-0"})
+                divs_name=soup.find_all('a')
                 for div in divs_name:
-                    title = div.find('h5').text
-                    description = div.find("div", {"class": "css-1j63rwj"}).text.strip()
+                    section = div.find('div', {"class": "MuiBox-root css-0"})
+                    title = section.text.strip()
+                    description = ""
                     list_div.append({"title" : title, "description" : description})
                 file.close()
         except:
