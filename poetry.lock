@@ -2002,13 +2002,13 @@ test = ["enum34", "ipaddress", "mock", "pywin32", "wmi"]
 
 [[package]]
 name = "publicsuffixlist"
-version = "0.10.0.20230719"
+version = "0.10.0.20230730"
 description = "publicsuffixlist implement"
 optional = false
 python-versions = ">=2.6"
 files = [
-    {file = "publicsuffixlist-0.10.0.20230719-py2.py3-none-any.whl", hash = "sha256:62a8d1523726b6a89b1d971b1a687c9b3f1b1daec0ab5ba3bca1ee66bc748254"},
-    {file = "publicsuffixlist-0.10.0.20230719.tar.gz", hash = "sha256:9b53fdfe06e07e6da5e6575dabe10698ceb82105057dbcdd98865ee1e5fe0a6d"},
+    {file = "publicsuffixlist-0.10.0.20230730-py2.py3-none-any.whl", hash = "sha256:3a23efc4416474a7ad1db7e85d04f7af24db76a34cec6d82e6e3392b3dd6d8f1"},
+    {file = "publicsuffixlist-0.10.0.20230730.tar.gz", hash = "sha256:1cd3847ec1ebc02069715630958ad67bdfeb7e7f9f35f699d30fc41298ceedac"},
 ]
 
 [package.extras]
@@ -2089,26 +2089,26 @@ testutils = ["gitpython (>3)"]
 
 [[package]]
 name = "pymisp"
-version = "2.4.173"
+version = "2.4.174"
 description = "Python API for MISP."
 optional = false
 python-versions = ">=3.8,<4.0"
 files = [
-    {file = "pymisp-2.4.173-py3-none-any.whl", hash = "sha256:97a63a71d301612cbe0cb4b2a52a302741aa57aba8b564db6d97071bcc9f0ec6"},
-    {file = "pymisp-2.4.173.tar.gz", hash = "sha256:3ca48556860fd67555c51d8aeaa633e334444534876c4d9c533ec1d4a30c4c2b"},
+    {file = "pymisp-2.4.174-py3-none-any.whl", hash = "sha256:2030402737a7f656ec17814fa92a220b8b6fc973e5a99abe644b62a4e8b9a375"},
+    {file = "pymisp-2.4.174.tar.gz", hash = "sha256:173247f368e78c9069d201621f3d7746b41cc478d76b923e1a4c1e7f29ada287"},
 ]
 
 [package.dependencies]
 deprecated = ">=1.2.14,<2.0.0"
-jsonschema = ">=4.18.0,<5.0.0"
-publicsuffixlist = ">=0.10.0.20230702,<0.11.0.0"
+jsonschema = ">=4.18.4,<5.0.0"
+publicsuffixlist = ">=0.10.0.20230730,<0.11.0.0"
 python-dateutil = ">=2.8.2,<3.0.0"
 requests = ">=2.31.0,<3.0.0"
 
 [package.extras]
 brotli = ["urllib3[brotli]"]
-docs = ["recommonmark (>=0.7.1,<0.8.0)", "sphinx-autodoc-typehints (>=1.23.3,<2.0.0)"]
-email = ["RTFDE (>=0.0.2,<0.0.3)", "extract_msg (>=0.41.5,<0.42.0)", "oletools (>=0.60.1,<0.61.0)"]
+docs = ["recommonmark (>=0.7.1,<0.8.0)", "sphinx-autodoc-typehints (>=1.24.0,<2.0.0)"]
+email = ["RTFDE (>=0.1.0,<0.2.0)", "extract_msg (>=0.42.0,<0.43.0)", "oletools (>=0.60.1,<0.61.0)"]
 fileobjects = ["lief (>=0.13.2,<0.14.0)", "pydeep2 (>=0.5.1,<0.6.0)", "python-magic (>=0.4.27,<0.5.0)"]
 openioc = ["beautifulsoup4 (>=4.12.2,<5.0.0)"]
 pdfexport = ["reportlab (>=4.0.4,<5.0.0)"]
@@ -2916,4 +2916,4 @@ email = ["email-validator"]
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.10,<3.11"
-content-hash = "7d56358b0d21398dd07ea13b5e95a7d7d8d66f114f259425fc8d8599b3200708"
+content-hash = "901c7d4e618efc469e75c9825c639aff63c2fc9697c3e7a3c0bfc1c649a61cbd"
