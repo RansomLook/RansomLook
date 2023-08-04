@@ -17,9 +17,7 @@ def main():
                     list_div.append({"title" : title, "description" : description})
                 divs_name=soup.find_all('div', {"class": "flex flex-col space-y-8"})
                 for div in divs_name:
-                    print(div)
                     title = div.find('span', {"class": "text-5xl font-semibold"}).text.strip()
-                    print(title)
                     description = div.find('span', {'class':"text-xl font-normal"}).text.strip()
                     list_div.append({"title" : title, "description" : description})
                 file.close()
