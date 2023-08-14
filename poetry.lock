@@ -2555,13 +2555,13 @@ test = ["vcrpy (>=1.10.3)"]
 
 [[package]]
 name = "types-beautifulsoup4"
-version = "4.12.0.5"
+version = "4.12.0.6"
 description = "Typing stubs for beautifulsoup4"
 optional = false
 python-versions = "*"
 files = [
-    {file = "types-beautifulsoup4-4.12.0.5.tar.gz", hash = "sha256:d9be456416a62a5b9740559592e1063a69d4b0a1b83911d878558c8ae8e07074"},
-    {file = "types_beautifulsoup4-4.12.0.5-py3-none-any.whl", hash = "sha256:718364c8e6787884501c700b1d22b6c0a8711bf9d6c9bf96e1fba81495bc46a8"},
+    {file = "types-beautifulsoup4-4.12.0.6.tar.gz", hash = "sha256:045ab285d3e540186e16133612f43f67e31f910e6d7578906b43a0ad8f811347"},
+    {file = "types_beautifulsoup4-4.12.0.6-py3-none-any.whl", hash = "sha256:3da00d754e73afae0ec2793253af0cb9aa1ff2c730e34b31c60313da781b4f6f"},
 ]
 
 [package.dependencies]
@@ -2916,4 +2916,4 @@ email = ["email-validator"]
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.10,<3.11"
-content-hash = "7d56358b0d21398dd07ea13b5e95a7d7d8d66f114f259425fc8d8599b3200708"
+content-hash = "fad841eba571a7b1062ea8ad1c02651c10549e9905a5ecebc2e42cafb978c3bb"
