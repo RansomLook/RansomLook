@@ -62,7 +62,7 @@ types-flask-cors = "^4.0.0.1"
 mastodon-py = "^1.8.1"
 
 [tool.poetry.dev-dependencies]
-mypy = "^1.4.1"
+mypy = "^1.5.1"
 types-setuptools = "^67.8.0.0"
 types-redis = "^4.6.0.3"
 pylint = "^2.17.5"
