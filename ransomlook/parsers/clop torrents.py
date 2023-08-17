@@ -11,7 +11,7 @@ def main():
                 file=open(html_doc,'r')
                 soup=BeautifulSoup(file,'html.parser')
                 tbody = soup.find('tbody')
-                divs_name=tbody.find_all('tr')
+                divs_name = tbody.find_all('tr') # type: ignore
                 for div in divs_name:
                     print(div)
                     tds = div.find_all('td')
