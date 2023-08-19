@@ -14,10 +14,9 @@ def main():
                 for div in divs_name:
                     for item in div.contents :
                         list_div.append({"title": item.text.strip(), "description": ""})
-                divs_name=soup.find_all("article", {"class": "post"})
+                divs_name=soup.find_all("div", {"class": "post-content markdown-body"})
                 for div in divs_name:
                     data = div.find_all("code", {"class": "language-text"})
-                    print(data)
                     title = data[0].text.strip()
                     description = data[1].text.strip()
                     list_div.append({"title": title, "description": description})
