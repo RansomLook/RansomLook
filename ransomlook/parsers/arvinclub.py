@@ -16,8 +16,10 @@ def main():
                         list_div.append({"title": item.text.strip(), "description": ""})
                 divs_name=soup.find_all("article", {"class": "post"})
                 for div in divs_name:
-                    title = div.find("h1", {"class": "post-title"}).text.strip()
-                    description = div.find("code", {"class": "language-text"}).text.strip()
+                    data = div.find_all("code", {"class": "language-text"})
+                    print(data)
+                    title = data[0].text.strip()
+                    description = data[1].text.strip()
                     list_div.append({"title": title, "description": description})
                 file.close()
         except:
