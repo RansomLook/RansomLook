@@ -12,9 +12,12 @@ def main():
                 soup=BeautifulSoup(file,'html.parser')
                 divs_name=soup.find_all('center')
                 for div in divs_name:
-                    title = div.find('p', {"class": "h1"}).text
-                    description = div.find("p", {"class": "description"}).text.strip()
-                    list_div.append({"title" : title, "description" : description})
+                    try:
+                        title = div.find('p', {"class": "h1"}).text
+                        description = div.find("p", {"class": "description"}).text.strip()
+                        list_div.append({"title" : title, "description" : description})
+                    except:
+                        pass
                 divs_name=soup.find_all('div', {"class": "item-details"})
                 for div in divs_name:
                     title = div.find('h3').text
