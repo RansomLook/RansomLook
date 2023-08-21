@@ -10,11 +10,10 @@ def main():
             file=open(html_doc,'r')
             soup=BeautifulSoup(file,'html.parser')
             div = soup.find('div',{"class":"di"})
-            print(div)
             divs_name=div.find_all('a')
             for a in divs_name:
                 if a.text.strip() != "{Censored}":
-                    list_div.append(a.text.strip())
+                    list_div.append(a.text.strip().replace('{','').replace('}',''))
             file.close()
     print(list_div)
     list_div = list(dict.fromkeys(list_div))
