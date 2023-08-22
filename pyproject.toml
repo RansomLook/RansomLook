@@ -46,7 +46,7 @@ googletrans-py = "^4.0.0"
 types-requests = "^2.31.0.2"
 types-beautifulsoup4 = "^4.12.0.6"
 types-flask = "^1.1.6"
-types-redis = "^4.6.0.4"
+types-redis = "^4.6.0.5"
 pymisp = "^2.4.174"
 gitpython = "^3.1.32"
 ldap3 = "^2.9.1"
@@ -64,7 +64,7 @@ mastodon-py = "^1.8.1"
 [tool.poetry.dev-dependencies]
 mypy = "^1.5.1"
 types-setuptools = "^67.8.0.0"
-types-redis = "^4.6.0.4"
+types-redis = "^4.6.0.5"
 pylint = "^2.17.5"
 
 
