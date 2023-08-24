@@ -723,7 +723,7 @@ def alerting():
     return render_template('alerts.html', form=form)
 
 if __name__ == "__main__":
-	app.run(debug=True)
+	app.run()
 
 
 authorizations = {
