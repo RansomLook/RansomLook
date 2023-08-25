@@ -19,7 +19,8 @@ def main():
                 for div in divs_name:
                     title = div.find('h2', {"title": "Company name"}).text.strip()
                     description = div.find('div',{"class" : "mb-2 text-justify"}).text.strip()
-                    list_div.append({"title" : title, "description" : description})
+                    link = div.find('div',{"class": "d-flex align-items-center justify-content-between"}).a["href"]
+                    list_div.append({"title" : title, "description" : description, "link": link, "slug": filename})
                 file.close()
         except:
             print("Failed during : " + filename)

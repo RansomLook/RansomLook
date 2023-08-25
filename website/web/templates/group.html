@@ -53,7 +53,8 @@
             <tr>
                 <th style="width:10%"> Date </th>
                 <th style="width:25%"> Title </th>
-                <th> Description </th>
+                <th style="word-break:break-word width:55%"> Description </th>
+                <th style="width:10%"> Screen </th>
             </tr>
           </thead>
           <tbody>
@@ -63,7 +64,16 @@
                     <td> {{entry['post_title']}} </td>
                     {% if entry['description'] is not none %}
                     <td> {{entry['description']}} </td>
+                    {% else %}
+                    <td> </td>
                     {% endif %}
+                    
+                    {% if 'screen' in entry and entry['screen'] is not none %}
+                    <td><center><a href="/{{ entry['screen'] }}" rel="noopener noreferrer" target="_blank">Screen</a></center></td>
+                    {% else %}
+                    <td> </td>
+                    {% endif %}
+
                 </tr>
             {% endfor %}
           </tbody>

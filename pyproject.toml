@@ -7,6 +7,7 @@ authors = ["Fafner KeyZee <fkz@p4nd4.land>"]
 [tool.poetry.scripts]
 scrape = "bin.scrape:main"
 parse = "bin.parse:main"
+screen = "bin.screen:main"
 markdown = "bin.markdown:main"
 notify = "bin.notify:main"
 notifyleak = "bin.notifyleak:main"

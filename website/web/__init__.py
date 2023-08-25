@@ -566,6 +566,10 @@ def screenshotsstats(file):
 def screenshots(file):
     return send_from_directory( str(get_homedir())+ '/source/screenshots', file, mimetype='image/gif')
 
+@app.route("/screenshots/<group>/<file>")
+def screenshotspost(group, file):
+    return send_from_directory( str(get_homedir())+ '/source/screenshots/' + group, file, mimetype='image/gif')
+
 @app.route("/screenshots/telegram/<file>")
 def screenshotstelegram(file):
     return send_from_directory( str(get_homedir())+ '/source/screenshots/telegram', file, mimetype='image/gif')

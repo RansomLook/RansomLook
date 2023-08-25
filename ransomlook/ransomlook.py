@@ -10,6 +10,7 @@ import json
 import queue
 from threading import Thread, Lock
 from datetime import datetime
+import urllib.parse
 import time
 from typing import Dict
 from playwright.sync_api import sync_playwright, TimeoutError as PlaywrightTimeoutError
@@ -173,3 +174,80 @@ def appender(name: str, location: str, db: int) -> int:
     group['locations'].append(siteschema(location))
     red.set(name.strip(), json.dumps(group))
     return 1
+
+def threadscreen(queuethread, lock) -> None:
+    with sync_playwright() as play:
+        while True:
+            host, group, title = queuethread.get()
+            stdlog('Starting : ' + host['slug']+ ' --------- ' + group)
+            try:
+                browser = play.firefox.launch(proxy={"server": "socks5://127.0.0.1:9050"},
+                    args=['--unsafely-treat-insecure-origin-as-secure='+host['slug']])
+                context = browser.new_context(ignore_https_errors= True )
+                page = context.new_page()
+                if 'timeout' in host and host['timeout'] is not None:
+                    page.goto(host['slug'], wait_until='load', timeout = host['timeout']*1000)
+                else:
+                    page.goto(host['slug'], wait_until='load', timeout = 120000)
+                page.bring_to_front()
+                delay = host['delay']*1000 if ( 'delay' in host and host['delay'] is not None ) \
+                    else 15000
+                page.wait_for_timeout(delay)
+                page.mouse.move(x=500, y=400)
+                page.wait_for_load_state('networkidle')
+                page.mouse.wheel(delta_y=2000, delta_x=0)
+                page.wait_for_load_state('networkidle')
+                page.wait_for_timeout(5000)
+                filename = createfile(title) + '.png'
+                path = os.path.join(get_homedir(), 'source/screenshots', group)
+                if not os.path.exists(path):
+                    os.mkdir(path)
+                name = os.path.join(path, filename)
+                page.screenshot(path=name, full_page=True)
+                lock.acquire()
+                red = redis.Redis(unix_socket_path=get_socket_path('cache'), db=2)
+                updated = json.loads(red.get(group)) # type: ignore
+                for post in updated:
+                    if post['post_title'] == title:
+                        post['screen'] = str(os.path.join('screenshots', group, filename))
+                        post.update(post)
+                red.set(group, json.dumps(updated))
+                redtoscreen = redis.Redis(unix_socket_path=get_socket_path('cache'), db=1)
+                toscreen = json.loads(redtoscreen.get('toscan')) # type: ignore
+                for idx, item in enumerate(toscreen):
+                    if item['group'] == group and item['title'] == title:
+                        toscreen.pop(idx)
+                        break
+                redtoscreen.set('toscan', json.dumps(toscreen))
+                lock.release()
+            except PlaywrightTimeoutError:
+                stdlog('Timeout!')
+            except Exception as exception:
+                errlog(exception)
+                errlog("error")
+            browser.close()
+            time.sleep(5)
+            queuethread.task_done()
+
+def screen() -> None:
+    red = redis.Redis(unix_socket_path=get_socket_path('cache'), db=1)
+    if 'toscan'.encode() not in red.keys():
+        stdlog('No screen to do !')
+        return
+    lock = Lock()
+    queuethread = queue.Queue() # type: ignore
+    for _ in range(get_config('generic','thread')):
+        thread1 = Thread(target=threadscreen, args=(queuethread,lock), daemon=True)
+        thread1.start()
+
+    captures = json.loads(red.get('toscan')) # type: ignore
+    redgroup = redis.Redis(unix_socket_path=get_socket_path('cache'), db=0)
+    for capture in captures:
+        group = json.loads(redgroup.get(capture['group'].encode())) # type: ignore
+        for host in group['locations']:
+            if '-'.join(capture['slug'].split('-')[1:-1]) in striptld(host['slug']):
+                host['slug'] = urllib.parse.urljoin(host['slug'], capture['link'])
+                data=[host,capture['group'],capture['title']]
+                queuethread.put(data)
+    queuethread.join()
+    time.sleep(5)

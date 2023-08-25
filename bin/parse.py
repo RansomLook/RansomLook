@@ -22,14 +22,16 @@ from ransomlook.email import alertingnotify
 
 from ransomlook.sharedutils import dbglog, stdlog, errlog, statsgroup, run_data_viz
 
-def posttemplate(victim, description, timestamp):
+def posttemplate(victim, description, link, timestamp):
     '''
     assuming we have a new post - form the template we will use for the new entry in posts.json
     '''
     schema = {
         'post_title': victim,
         'discovered': timestamp,
-        'description' : description
+        'description' : description,
+        'link' : link,
+        'screen' : None
     }
     stdlog('new post: ' + victim)
     dbglog(schema)
@@ -48,9 +50,14 @@ def appender(entry, group_name):
     if type(entry) is str :
        post_title = entry
        description = ''
+       link = ''
     else :
        post_title=entry['title']
        description = entry['description']
+       if 'link' in entry: 
+           link = entry['link']
+       else:
+           link = ''
     if len(post_title) == 0:
         errlog('post_title is empty')
         return
@@ -68,11 +75,18 @@ def appender(entry, group_name):
                 stdlog('post already existing')
                 print(post)
                 return
-    newpost = posttemplate(post_title, description, str(datetime.today()))
+    newpost = posttemplate(post_title, description, link, str(datetime.today()))
     stdlog('adding new post: ' + 'group: ' + group_name + ' title: ' + post_title)
     posts.append(newpost)
     red.set(group_name, json.dumps(posts))
-
+    if link != '':
+        screenred = redis.Redis(unix_socket_path=get_socket_path('cache'), db=1)
+        if 'toscan'.encode() not in screenred.keys():
+           toscan=[]
+        else: 
+           toscan = json.loads(screenred.get('toscan')) # type: ignore
+        toscan.append({'group': group_name, 'title': entry['title'], 'slug': entry['slug'], 'link': entry['link']})
+        screenred.set('toscan', json.dumps(toscan))
     # Notification zone
     red = redis.Redis(unix_socket_path=get_socket_path('cache'), db=1)
     keywords = red.get('keywords')

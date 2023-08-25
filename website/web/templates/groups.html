@@ -72,12 +72,18 @@
                 <tr>
                     <th>Title</th>
                     <th style="width:10%">Date</th>
+                    <th style="width:10%">Screen</th>
                 </tr>
             </thead>
             <tbody>
                 {% for post in entry['posts'] %}
                     <tr><td> {{post['post_title']}} </td>
                         <td><center> {{post['discovered'].split(' ')[0]}} </center></td>
+                        {% if 'screen' in post and post['screen'] is not none %}
+                            <td><a href="{{ post['screen'] }}" rel="noopener noreferrer" target="_blank"">Screen</a></td>
+                        {% else %}
+                            <td> </td>
+                        {% endif %}
                     </tr>
                 {% endfor %}
             </tbody>
