@@ -53,7 +53,7 @@
             <tr>
                 <th style="width:10%"> Date </th>
                 <th style="width:25%"> Title </th>
-                <th style="word-break:break-word width:55%"> Description </th>
+                <th style="word-break:break-all width:55%"> Description </th>
                 <th style="width:10%"> Screen </th>
             </tr>
           </thead>
@@ -63,7 +63,7 @@
                     <td><center> {{entry['discovered'].split(' ')[0]}} </center></td>
                     <td> {{entry['post_title']}} </td>
                     {% if entry['description'] is not none %}
-                    <td> {{entry['description']}} </td>
+                    <td style="word-break:break-all"> {{entry['description']}} </td>
                     {% else %}
                     <td> </td>
                     {% endif %}
