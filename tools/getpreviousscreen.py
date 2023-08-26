@@ -66,6 +66,7 @@ def appender(entry, group_name):
         else: 
            toscan = json.loads(screenred.get('toscan')) # type: ignore
         toscan.append({'group': group_name, 'title': entry['title'], 'slug': entry['slug'], 'link': entry['link']})
+        toscan = [dict(t) for t in {tuple(d.items()) for d in toscan}]
         screenred.set('toscan', json.dumps(toscan))
     # Notification zone
 
