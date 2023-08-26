@@ -14,7 +14,13 @@ def main():
                 for div in divs_name:
                     title = div.next_element.strip()
                     description = ""
-                    list_div.append({"title" : title, "description" : description})
+                    link = None
+                    try :
+                        link = div['onclick'].split("'")[1]
+                        link = 'topic.php?id='+link
+                    except:
+                        pass
+                    list_div.append({"title" : title, "description" : description, "link": link, "slug": filename})
                 file.close()
         except:
             print("Failed during : " + filename)

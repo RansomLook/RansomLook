@@ -198,6 +198,15 @@ def threadscreen(queuethread, lock) -> None:
                 page.mouse.wheel(delta_y=2000, delta_x=0)
                 page.wait_for_load_state('networkidle')
                 page.wait_for_timeout(5000)
+                filename = createfile(title) + '.html'
+                path = os.path.join(get_homedir(), 'source/', group)
+                if not os.path.exists(path):
+                    os.mkdir(path)
+                name = os.path.join(path, filename)
+                with open(name, 'w', encoding='utf-8') as sitesource:
+                    sitesource.write(page.content())
+                    sitesource.close()
+
                 filename = createfile(title) + '.png'
                 path = os.path.join(get_homedir(), 'source/screenshots', group)
                 if not os.path.exists(path):
@@ -242,12 +251,15 @@ def screen() -> None:
 
     captures = json.loads(red.get('toscan')) # type: ignore
     redgroup = redis.Redis(unix_socket_path=get_socket_path('cache'), db=0)
+    toscan =[]
     for capture in captures:
         group = json.loads(redgroup.get(capture['group'].encode())) # type: ignore
         for host in group['locations']:
-            if '-'.join(capture['slug'].split('-')[1:-1]) in striptld(host['slug']):
+            if capture['slug'].split('-')[1].split('.')[0] in striptld(host['slug']):
                 host['slug'] = urllib.parse.urljoin(host['slug'], capture['link'])
-                data=[host,capture['group'],capture['title']]
-                queuethread.put(data)
+                if host['slug'] not in toscan:
+                    toscan.append(host['slug'])
+                    data=[host,capture['group'],capture['title']]
+                    queuethread.put(data)
     queuethread.join()
     time.sleep(5)

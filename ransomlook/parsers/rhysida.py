@@ -14,7 +14,11 @@ def main():
                 for div in divs_name:
                     title = div.find('div',{"class", "m-2 h4"}).a.text.strip()
                     description = div.find('div',{"class" : "m-2"}).text.strip()
-                    list_div.append({"title" : title, "description" : description})
+                    try:
+                        link = 'archive.php?company=' + div.find('button')['data-company']
+                        list_div.append({"title" : title, "description" : description, "link": link, "slug": filename})
+                    except:
+                        list_div.append({"title" : title, "description" : description})
                 file.close()
         except:
             print("Failed during : " + filename)
