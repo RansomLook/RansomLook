@@ -54,6 +54,12 @@ def appender(entry, group_name):
     if len(post_title) > 90:
         post_title = post_title[:90]
     if link != '':
+        red = redis.Redis(unix_socket_path=get_socket_path('cache'), db=2)
+        posts = json.loads(red.get(group_name.encode()))
+        for post in posts:
+            if post['post_title'] == post_title:
+                 if 'screen' in post and post['screen'] is not None:
+                      return
         screenred = redis.Redis(unix_socket_path=get_socket_path('cache'), db=1)
         if 'toscan'.encode() not in screenred.keys():
            toscan=[]
