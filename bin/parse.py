@@ -50,14 +50,14 @@ def appender(entry, group_name):
     if type(entry) is str :
        post_title = entry
        description = ''
-       link = ''
+       link = None
     else :
        post_title=entry['title']
        description = entry['description']
        if 'link' in entry: 
            link = entry['link']
        else:
-           link = ''
+           link = None
     if len(post_title) == 0:
         errlog('post_title is empty')
         return
@@ -79,7 +79,7 @@ def appender(entry, group_name):
     stdlog('adding new post: ' + 'group: ' + group_name + ' title: ' + post_title)
     posts.append(newpost)
     red.set(group_name, json.dumps(posts))
-    if link != '':
+    if link != None and link != '':
         screenred = redis.Redis(unix_socket_path=get_socket_path('cache'), db=1)
         if 'toscan'.encode() not in screenred.keys():
            toscan=[]
