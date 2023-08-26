@@ -55,7 +55,7 @@ def appender(entry, group_name):
         post_title = post_title[:90]
     if link != '':
         red = redis.Redis(unix_socket_path=get_socket_path('cache'), db=2)
-        posts = json.loads(red.get(group_name.encode()))
+        posts = json.loads(red.get(group_name.encode())) # type: ignore
         for post in posts:
             if post['post_title'] == post_title:
                  if 'screen' in post and post['screen'] is not None:

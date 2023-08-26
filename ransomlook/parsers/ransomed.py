@@ -11,7 +11,7 @@ def main():
                 file=open(html_doc,'r')
                 soup=BeautifulSoup(file,'html.parser')
                 div = soup.find_all('div',{"style":"text-align: center;"})
-                divs_name=div[2].find_all('a', {"style":"margin-bottom: 10px; color: #ccc; font-family: monospace; text-decoration: underline; cursor: pointer;"}) # type: ignore
+                divs_name=div[2].find_all('a', {"style":"margin-bottom: 10px; color: #ccc; font-family: monospace; text-decoration: underline; cursor: pointer;"})
                 for a in divs_name:
                     list_div.append({"title": a.text.strip(), "description": "", "link": a['href'], "slug": filename})
                 file.close()
