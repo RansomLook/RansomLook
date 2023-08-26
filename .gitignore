@@ -12,6 +12,7 @@ __pycache__/
 data/*
 source/*.html
 source/*.png
+source/**/*.html
 source/telegram/*
 source/twitter/*
 source/screenshots/*

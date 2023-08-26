@@ -18,6 +18,8 @@ from playwright.sync_api import sync_playwright, TimeoutError as PlaywrightTimeo
 from .default.config import get_config, get_homedir, get_socket_path
 
 import redis
+from PIL import Image
+from PIL.PngImagePlugin import PngInfo
 
 from .sharedutils import striptld
 from .sharedutils import openjson
@@ -92,6 +94,10 @@ def threadscape(queuethread, lock):
                 filename = group + '-' + createfile(host['slug']) + '.png'
                 name = os.path.join(get_homedir(), 'source/screenshots', filename)
                 page.screenshot(path=name, full_page=True)
+                targetImage = Image.open(name)
+                metadata = PngInfo()
+                metadata.add_text("Source", "RansomLook.io")
+                targetImage.save(name, pnginfo=metadata)
                 lock.acquire()
                 host['available'] = True
                 host['title'] = page.title()
@@ -213,6 +219,10 @@ def threadscreen(queuethread, lock) -> None:
                     os.mkdir(path)
                 name = os.path.join(path, filename)
                 page.screenshot(path=name, full_page=True)
+                targetImage = Image.open(name)
+                metadata = PngInfo()
+                metadata.add_text("Source", "RansomLook.io")
+                targetImage.save(name, pnginfo=metadata)
                 lock.acquire()
                 red = redis.Redis(unix_socket_path=get_socket_path('cache'), db=2)
                 updated = json.loads(red.get(group)) # type: ignore
