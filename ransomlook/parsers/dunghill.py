@@ -10,9 +10,14 @@ def main():
                 html_doc='source/'+filename
                 file=open(html_doc,'r')
                 soup=BeautifulSoup(file,'html.parser')
-                title = soup.find('div', {"class": "block-heading pt-4 mt-5"}).text.strip() # type: ignore
-                description = soup.find("div", {"class": ""}).text.strip() # type: ignore
-                list_div.append({"title" : title, "description" : description})
+                divs = soup.find_all('div',{"class": "custom-container"})
+                for div in divs:
+                    title = div.find('div', {"class": "ibody_title"}).text.strip()
+                    description = div.find("div", {"class": "ibody_body"}).find_all('p')
+                    print(description)
+                    description = description[2].text.strip()
+                    link = div.find('div', {"class": "ibody_ft_right"}).a['href']
+                    list_div.append({"title" : title, "description" : description, 'link': link, 'slug': filename})
                 file.close()
         except:
             print("Failed during : " + filename)

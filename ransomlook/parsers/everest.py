@@ -14,7 +14,8 @@ def main():
                 for item in divs_name:
                     title = item.find('h2', {"class": "entry-title heading-size-1"}).a.string.text.strip()
                     description = item.find('div', {"class": "entry-content"}).p.text.strip()
-                    list_div.append({'title':title, 'description': description})
+                    link = item.find('h2', {"class": "entry-title heading-size-1"}).a['href']
+                    list_div.append({'title':title, 'description': description, 'link': link, 'slug': filename})
                 file.close()
         except:
             print("Failed during : " + filename)
