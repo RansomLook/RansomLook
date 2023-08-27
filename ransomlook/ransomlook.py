@@ -265,7 +265,7 @@ def screen() -> None:
     for capture in captures:
         group = json.loads(redgroup.get(capture['group'].encode())) # type: ignore
         for host in group['locations']:
-            if capture['slug'].split('-')[1].split('.')[0] in striptld(host['slug']):
+            if capture['slug'].removeprefix(capture['group']+'-').split('.')[0] in striptld(host['slug']):
                 host['slug'] = urllib.parse.urljoin(host['slug'], capture['link'])
                 if host['slug'] not in toscan:
                     toscan.append(host['slug'])
