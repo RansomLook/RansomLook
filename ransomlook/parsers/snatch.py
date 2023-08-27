@@ -14,7 +14,8 @@ def main():
                 for div in divs_name:
                     title = div.find('div', {'class': 'a-b-n-name'}).text.strip()
                     description = div.find('div', {'class': 'a-b-text'}).text.strip()
-                    list_div.append({'title':title, 'description': description})
+                    link = div.find('button')['onclick'].split("'")[1]
+                    list_div.append({'title':title, 'description': description, 'link':link, 'slug': filename})
                 file.close()
         except:
             print("Failed during : " + filename)

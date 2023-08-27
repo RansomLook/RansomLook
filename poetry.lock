@@ -2695,6 +2695,17 @@ files = [
 ]
 
 [[package]]
+name = "types-pillow"
+version = "10.0.0.2"
+description = "Typing stubs for Pillow"
+optional = false
+python-versions = "*"
+files = [
+    {file = "types-Pillow-10.0.0.2.tar.gz", hash = "sha256:fe09380ab22d412ced989a067e9ee4af719fa3a47ba1b53b232b46514a871042"},
+    {file = "types_Pillow-10.0.0.2-py3-none-any.whl", hash = "sha256:29d51a3ce6ef51fabf728a504d33b4836187ff14256b2e86996d55c91ab214b1"},
+]
+
+[[package]]
 name = "types-pyasn1"
 version = "0.4.0.6"
 description = "Typing stubs for pyasn1"
@@ -2952,4 +2963,4 @@ email = ["email-validator"]
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.10,<3.11"
-content-hash = "859c6929e7846dfedd4ce094e1cc8912bce79bf4ad1e1c8618479c9499a28df1"
+content-hash = "7fb0879a6d0a19110a06b8f9fa9e9a96f04e6bc52ef68b9635a8b1d12ac91d53"
