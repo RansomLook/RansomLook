@@ -12,8 +12,10 @@ def main():
             divs_name=soup.find_all('div', {"class": "row"})
             for div in divs_name:
                 for item in div.find_all('a') :
-                    list_div.append(item.text.strip())
+                    title = item.text.strip()
+                    description = ''
+                    link = item['href']
+                    list_div.append({ 'title': item.text.strip() , 'description': description, 'link': link, 'slug': filename})
             file.close()
-    list_div = list(dict.fromkeys(list_div))
     print(list_div)
     return list_div
