@@ -12,9 +12,11 @@ def main():
                 soup=BeautifulSoup(file,'html.parser')
                 divs_name=soup.find_all('div', {"class": "card-body p-3 pt-2"})
                 for div in divs_name:
-                    title = div.find('a',{"class":"h5"}).text
+                    a = div.find('a',{"class":"h5"})
+                    title = a.text.strip()
                     description = div.find("p").text.strip()
-                    list_div.append({"title" : title, "description" : description})
+                    link = a['href']
+                    list_div.append({"title" : title, "description" : description, 'link': link, 'slug': filename})
                 file.close()
         except:
             print("Failed during : " + filename)
