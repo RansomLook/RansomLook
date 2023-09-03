@@ -11,7 +11,7 @@ def main():
                 file=open(html_doc,'r')
                 soup=BeautifulSoup(file,'html.parser')
                 prereleases = soup.find('div', {"id": "companies_prereleases"})
-                divs_name = prereleases.find_all('div', {"class": "col-md-4 col-sm-4 col-xs-12"})
+                divs_name = prereleases.find_all('div', {"class": "col-md-4 col-sm-4 col-xs-12"}) # type: ignore
                 for div in divs_name:
                     h3 = div.find('h3')
                     title = h3.text.strip()
