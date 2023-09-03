@@ -568,7 +568,10 @@ def screenshots(file):
 
 @app.route("/screenshots/<group>/<file>")
 def screenshotspost(group, file):
-    return send_from_directory( str(get_homedir())+ '/source/screenshots/' + group, file, mimetype='image/gif')
+    fullpath = os.path.normpath(os.path.join(str(get_homedir())+ '/source/screenshots/', group))
+    if not fullpath.startswith(str(get_homedir())):
+        raise Exception("not allowed")
+    return send_from_directory( fullpath, file, mimetype='image/gif')
 
 @app.route("/screenshots/telegram/<file>")
 def screenshotstelegram(file):
