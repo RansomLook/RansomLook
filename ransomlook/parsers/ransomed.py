@@ -10,10 +10,13 @@ def main():
                 print(filename)
                 file=open(html_doc,'r')
                 soup=BeautifulSoup(file,'html.parser')
-                div = soup.find_all('div',{"style":"text-align: center;"})
-                divs_name=div[2].find_all('a', {"style":"margin-bottom: 10px; color: #ccc; font-family: monospace; text-decoration: underline; cursor: pointer;"})
-                for a in divs_name:
-                    list_div.append({"title": a.text.strip(), "description": "", "link": a['href'], "slug": filename})
+                divs_name = soup.find_all('div',{"class":"card"})
+                for div in divs_name:
+                    print(div)
+                    title = div.b.u.text.strip()
+                    print(title)
+                    description = div.find('ul').text.strip()
+                    list_div.append({"title": title, "description": description})
                 file.close()
             except:
                 pass
