@@ -15,7 +15,8 @@ def main():
                     section = div.find('div', {"class": "MuiBox-root css-0"})
                     title = section.text.strip()
                     description = ""
-                    list_div.append({"title" : title, "description" : description})
+                    link = div['href']
+                    list_div.append({"title" : title, "description" : description, "link": link, "slug": filename})
                 file.close()
         except:
             print("Failed during : " + filename)

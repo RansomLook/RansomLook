@@ -22,7 +22,7 @@ from ransomlook.email import alertingnotify
 
 from ransomlook.sharedutils import dbglog, stdlog, errlog, statsgroup, run_data_viz
 
-def posttemplate(victim, description, link, timestamp):
+def posttemplate(victim, description, link, timestamp, magnet):
     '''
     assuming we have a new post - form the template we will use for the new entry in posts.json
     '''
@@ -31,6 +31,7 @@ def posttemplate(victim, description, link, timestamp):
         'discovered': timestamp,
         'description' : description,
         'link' : link,
+        'magnet': magnet,
         'screen' : None
     }
     stdlog('new post: ' + victim)
@@ -51,13 +52,18 @@ def appender(entry, group_name):
        post_title = entry
        description = ''
        link = None
+       magnet = None
     else :
        post_title=entry['title']
        description = entry['description']
-       if 'link' in entry: 
+       if 'link' in entry:
            link = entry['link']
        else:
            link = None
+       if 'magnet' in entry:
+           magnet = entry['magnet']
+       else:
+           magnet = None
     if len(post_title) == 0:
         errlog('post_title is empty')
         return
@@ -75,10 +81,11 @@ def appender(entry, group_name):
                 stdlog('post already existing')
                 print(post)
                 return
-    newpost = posttemplate(post_title, description, link, str(datetime.today()))
+    newpost = posttemplate(post_title, description, link, str(datetime.today()), magnet)
     stdlog('adding new post: ' + 'group: ' + group_name + ' title: ' + post_title)
     posts.append(newpost)
     red.set(group_name, json.dumps(posts))
+    # preparing to screen
     if link != None and link != '':
         screenred = redis.Redis(unix_socket_path=get_socket_path('cache'), db=1)
         if 'toscan'.encode() not in screenred.keys():
@@ -87,6 +94,15 @@ def appender(entry, group_name):
            toscan = json.loads(screenred.get('toscan')) # type: ignore
         toscan.append({'group': group_name, 'title': entry['title'], 'slug': entry['slug'], 'link': entry['link']})
         screenred.set('toscan', json.dumps(toscan))
+    # preparing to torrent
+    if magnet != None and magnet != '':
+        torrentred = redis.Redis(unix_socket_path=get_socket_path('cache'), db=1)
+        if 'totorrent'.encode() not in torrentred.keys():
+           totorrent=[]
+        else: 
+           totorrent = json.loads(torrentred.get('totorrent')) # type: ignore
+        totorrent.append({'group': group_name, 'title': entry['title'], 'magnet': entry['magnet']})
+        torrentred.set('totorrent', json.dumps(totorrent))
     # Notification zone
     red = redis.Redis(unix_socket_path=get_socket_path('cache'), db=1)
     keywords = red.get('keywords')

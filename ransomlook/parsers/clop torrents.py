@@ -13,11 +13,12 @@ def main():
                 tbody = soup.find('tbody')
                 divs_name = tbody.find_all('tr') # type: ignore
                 for div in divs_name:
-                    print(div)
                     tds = div.find_all('td')
                     title = tds[0].text.strip()
                     description = tds[2].text.strip()
-                    list_div.append({"title" : title, "description" : description})
+                    magnets = tds[2].find_all('span',{'class', 'magnet_link'})
+                    for magnet in magnets:
+                        list_div.append({"title" : title, "description" : description, "magnet": magnet.text.strip()})
                 file.close()
         except:
             print("Failed during : " + filename)

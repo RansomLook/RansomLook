@@ -23,7 +23,8 @@ def main():
                     for div in divs_name:
                         title = div.a['title'].strip()
                         description = ""
-                        list_div.append({"title" : title, "description" : description})
+                        link = div.a['href']
+                        list_div.append({"title" : title, "description" : description, "link": link, "slug": filename})
                 file.close()
         except:
             print("Failed during : " + filename)
