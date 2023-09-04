@@ -14,7 +14,8 @@ def main():
                 for div in divs_name:
                     title = div.find('h2', {'class': 'blog-post-title'}).text.strip()
                     description =  div.p.text.strip()
-                    list_div.append({'title':title, 'description': description})
+                    link = div.a['href']
+                    list_div.append({'title':title, 'description': description, "link": link, "slug": filename})
                 file.close()
         except:
             print("Failed during : " + filename)
