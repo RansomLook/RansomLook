@@ -16,7 +16,8 @@ def main():
                     for entry in data['items']:
                         title = entry['title'].strip()
                         description = entry['publication']['description'].strip()
-                        list_div.append({'title':title, 'description': description})
+                        link = entry['id']
+                        list_div.append({'title':title, 'description': description, 'link': link, 'slug': filename})
                 else :
                     divs_name=soup.find_all('div', {'class': 'post'})
                     for div in divs_name:
