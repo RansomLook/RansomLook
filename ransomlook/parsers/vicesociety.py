@@ -13,9 +13,10 @@ def main():
                 divs_name=soup.find_all('td',{"valign":"top"})
                 for div in divs_name:
                     title = div.find("font", {"size":4}).text.strip()
+                    link = div.find("a", {"style": "text-decoration: none;"})['href']
                     for description in div.find_all("font", {"size":2, "color":"#5B61F6"}):
                         if not description.b.text.strip().startswith("http"):
-                            list_div.append({"title" : title, "description" : description.b.text.strip()})
+                            list_div.append({"title" : title, "description" : description.b.text.strip(), "link": link, "slug": filename})
                             break
                 file.close()
         except:

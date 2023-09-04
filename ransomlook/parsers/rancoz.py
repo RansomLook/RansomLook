@@ -14,7 +14,8 @@ def main():
                 for div in divs_name:
                     title = div.find_all('td')[0].text.strip()
                     description = div.find_all('td')[2].text.strip()
-                    list_div.append({"title" : title, "description" : description})
+                    link = div.find_all('td')[5].a['href']
+                    list_div.append({"title" : title, "description" : description, "link": link, "slug": filename })
                 file.close()
         except:
             print("Failed during : " + filename)

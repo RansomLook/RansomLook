@@ -14,7 +14,8 @@ def main():
                 for div in divs_name:
                     title = div.find('h5').text.strip()
                     description = div.find_all('p', {"class", "card-text"})[1].text.strip()
-                    list_div.append({'title':title, 'description': description})
+                    link = div.find('a', {"class": "btn btn-outline-primary"})['href']
+                    list_div.append({'title':title, 'description': description, 'link': link, 'slug': filename})
                 file.close()
         except:
             print("Failed during : " + filename)

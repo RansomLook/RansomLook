@@ -9,11 +9,12 @@ def main():
             html_doc='source/'+filename
             file=open(html_doc,'r')
             soup=BeautifulSoup(file,'html.parser')
-            divs_name=soup.find_all('div', {"class": "cls_recordTop"})
+            divs_name=soup.find_all('div', {"class": "cls_record"})
             for div in divs_name:
-                for item in div.contents :
-                    list_div.append(item.text.strip())
+                title = div.find('div',{"class": "cls_recordTop"}).text.strip()
+                description = ""
+                link = div.a['href']
+                list_div.append({"title": title, "description": description, "link": link, "slug": filename})
             file.close()
-    list_div = list(dict.fromkeys(list_div))
     print(list_div)
     return list_div
