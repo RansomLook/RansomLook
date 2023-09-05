@@ -10,11 +10,14 @@ def main():
                 html_doc='source/'+filename
                 file=open(html_doc,'r')
                 soup=BeautifulSoup(file,'html.parser')
-                divs_name=soup.find_all('div', {"class": "auction-item-info"})
+
+                div=soup.find('div', {"class": "grid"})
+                divs_name = div.find_all('a')
                 for div in divs_name:
-                    title = div.find('a').text
-                    description = div.find("div", {"class": "auction-item-info-text__content"}).text.strip()
-                    list_div.append({"title" : title, "description" : description})
+                    title = div.find('div', {"class": "grid-caption__title"}).contents[0].strip()
+                    description = ''
+                    link = div['href']
+                    list_div.append({"title" : title, "description" : description, "link": link, "slug": filename})
                 file.close()
         except:
             print("Failed during : " + filename)
