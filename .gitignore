@@ -13,6 +13,7 @@ data/*
 source/*.html
 source/*.png
 source/**/*.html
+source/**/*.torrent
 source/telegram/*
 source/twitter/*
 source/screenshots/*

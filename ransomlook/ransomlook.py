@@ -307,6 +307,17 @@ def threadtorrent(queuethread, lock) -> None:
         with open(name, 'w', encoding='utf-8') as listing:
             listing.write(files)
             listing.close()
+
+        # Saving torrent file
+        path = os.path.join(get_homedir(), 'source/', torrent['group'])
+        if not os.path.exists(path):
+            os.mkdir(path)
+        filetorrent = createfile(torrent['title']) + '.torrent'
+        nametorrent = os.path.join(path, filetorrent)
+        f = open(nametorrent, "wb")
+        f.write(lt.bencode(lt.create_torrent(tinf).generate()))
+        f.close()
+
         red = redis.Redis(unix_socket_path=get_socket_path('cache'), db=2)
         updated = json.loads(red.get(torrent['group'])) # type: ignore
         for post in updated:
