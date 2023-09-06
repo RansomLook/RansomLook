@@ -43,32 +43,38 @@ def appender(entry, group_name):
     else :
        post_title=entry['title']
        description = entry['description']
-       if 'link' in entry: 
+       if 'link' in entry:
            link = entry['link']
        else:
-           link = ''
+           link = None
+       if 'magnet' in entry:
+           magnet = entry['magnet']
+       else:
+           magnet = None
     if len(post_title) == 0:
         errlog('post_title is empty')
         return
     # limit length of post_title to 90 chars
     if len(post_title) > 90:
         post_title = post_title[:90]
-    if link != '':
-        red = redis.Redis(unix_socket_path=get_socket_path('cache'), db=2)
-        posts = json.loads(red.get(group_name.encode())) # type: ignore
-        for post in posts:
-            if post['post_title'] == post_title:
-                 if 'screen' in post and post['screen'] is not None:
-                      return
+ 
+    if link != None and link != '':
         screenred = redis.Redis(unix_socket_path=get_socket_path('cache'), db=1)
         if 'toscan'.encode() not in screenred.keys():
            toscan=[]
         else: 
            toscan = json.loads(screenred.get('toscan')) # type: ignore
         toscan.append({'group': group_name, 'title': entry['title'], 'slug': entry['slug'], 'link': entry['link']})
-        toscan = [dict(t) for t in {tuple(d.items()) for d in toscan}]
         screenred.set('toscan', json.dumps(toscan))
-    # Notification zone
+    # preparing to torrent
+    if magnet != None and magnet != '':
+        torrentred = redis.Redis(unix_socket_path=get_socket_path('cache'), db=1)
+        if 'totorrent'.encode() not in torrentred.keys():
+           totorrent=[]
+        else: 
+           totorrent = json.loads(torrentred.get('totorrent')) # type: ignore
+        totorrent.append({'group': group_name, 'title': entry['title'], 'magnet': entry['magnet']})
+        torrentred.set('totorrent', json.dumps(totorrent))
 
 def main():
     if len(sys.argv) != 2:
