@@ -8,6 +8,7 @@ authors = ["Fafner KeyZee <fkz@p4nd4.land>"]
 scrape = "bin.scrape:main"
 parse = "bin.parse:main"
 screen = "bin.screen:main"
+torrent = "bin.torrent:main"
 markdown = "bin.markdown:main"
 notify = "bin.notify:main"
 notifyleak = "bin.notifyleak:main"
@@ -62,6 +63,7 @@ pandas-stubs = "^2.0.3.230814"
 types-flask-cors = "^4.0.0.1"
 mastodon-py = "^1.8.1"
 types-pillow = "^10.0.0.2"
+libtorrent = "^2.0.9"
 
 [tool.poetry.dev-dependencies]
 mypy = "^1.5.1"

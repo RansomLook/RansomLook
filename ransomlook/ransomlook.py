@@ -15,6 +15,8 @@ import time
 from typing import Dict
 from playwright.sync_api import sync_playwright, TimeoutError as PlaywrightTimeoutError
 
+import libtorrent as lt
+
 from .default.config import get_config, get_homedir, get_socket_path
 
 import redis
@@ -26,6 +28,7 @@ from .sharedutils import openjson
 from .sharedutils import siteschema
 from .sharedutils import stdlog, errlog
 from .sharedutils import createfile
+from .sharedutils import format_bytes
 
 # pylint: disable=W0703
 
@@ -271,5 +274,72 @@ def screen() -> None:
                     toscan.append(host['slug'])
                     data=[host,capture['group'],capture['title']]
                     queuethread.put(data)
+    queuethread.join()
+    time.sleep(5)
+
+def threadtorrent(queuethread, lock) -> None:
+    while True:
+        sess, torrent = queuethread.get()
+        print(torrent)
+        atp = lt.parse_magnet_uri(torrent['magnet'])
+        atp.save_path = "."
+        atp.flags = lt.torrent_flags.upload_mode
+        torr = sess.add_torrent(atp)
+        while not torr.status().has_metadata:
+            time.sleep(1)
+        torr.pause()
+        tinf = torr.torrent_file()
+        # Workaround for empty torrent_info.trackers() in
+        # libtorrent-rasterbar-2.0.7:
+        trn = 0
+        for t in tinf.trackers(): trn += 1
+        if trn == 0:
+            for t in atp.trackers:
+                tinf.add_tracker(t)
+        files = ""
+        for x in range(tinf.files().num_files()):
+            files += format_bytes(tinf.files().file_size(x)) + '    ' + tinf.files().file_path(x) + '\n'
+        filename = createfile(torrent['title']) + '.txt'
+        path = os.path.join(get_homedir(), 'source/screenshots', torrent['group'])
+        if not os.path.exists(path):
+            os.mkdir(path)
+        name = os.path.join(path, filename)
+        with open(name, 'w', encoding='utf-8') as listing:
+            listing.write(files)
+            listing.close()
+        red = redis.Redis(unix_socket_path=get_socket_path('cache'), db=2)
+        updated = json.loads(red.get(torrent['group'])) # type: ignore
+        for post in updated:
+            if post['post_title'] == torrent['title']:
+                post['screen'] = str(os.path.join('screenshots', torrent['group'], filename))
+                post.update(post)
+        red.set(torrent['group'], json.dumps(updated))
+        red = redis.Redis(unix_socket_path=get_socket_path('cache'), db=1)
+        totorrent = json.loads(red.get('totorrent')) # type: ignore
+        for idx, item in enumerate(totorrent):
+            if item['group'] == torrent['group'] and item['title'] == torrent['title']:
+                totorrent.pop(idx)
+                break
+        red.set('totorrent', json.dumps(totorrent))
+        print('Done with: ' + torrent['title'])
+        sess.remove_torrent(torr)
+        queuethread.task_done()
+
+def gettorrentinfo() -> None :
+    red = redis.Redis(unix_socket_path=get_socket_path('cache'), db=1)
+    if 'totorrent'.encode() not in red.keys():
+        stdlog('No torrent to get !')
+        return
+    sess = lt.session()
+    lock = Lock()
+    queuethread = queue.Queue() # type: ignore
+    for _ in range(get_config('generic','thread')):
+        t = Thread(target=threadtorrent, args=(queuethread,lock), daemon=True)
+        t.start()
+
+    torrents = json.loads(red.get('totorrent')) # type: ignore
+    for torrent in torrents:
+        data = [sess,torrent]
+        queuethread.put(data)
     queuethread.join()
     time.sleep(5)
