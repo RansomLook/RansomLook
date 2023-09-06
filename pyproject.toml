@@ -62,7 +62,7 @@ types-pytz = "^2023.3.0.1"
 pandas-stubs = "^2.0.3.230814"
 types-flask-cors = "^4.0.0.1"
 mastodon-py = "^1.8.1"
-types-pillow = "^10.0.0.2"
+types-pillow = "^10.0.0.3"
 libtorrent = "^2.0.9"
 
 [tool.poetry.dev-dependencies]
