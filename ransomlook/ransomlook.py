@@ -15,7 +15,7 @@ import time
 from typing import Dict
 from playwright.sync_api import sync_playwright, TimeoutError as PlaywrightTimeoutError
 
-import libtorrent as lt
+import libtorrent as lt # type: ignore
 
 from .default.config import get_config, get_homedir, get_socket_path
 
