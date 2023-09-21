@@ -11,7 +11,7 @@ def tootnotify(config, group, title, siteurl) -> None :
     '''
     try:
         m = Mastodon(access_token=config['token'], api_base_url=config['url'])
-        m.toot("New post from " + group.title() + " : " + title.title() + "\nMore at : "+ siteurl + "/group/" + group.title().replace(" ","%20") + " #Ransomware")
+        m.toot("New post from #" + group.title() + " : " + title.title() + "\nMore at : "+ siteurl + "/group/" + group.title().replace(" ","%20") + " #Ransomware")
     except:
         errlog('Can not toot :(')
 
