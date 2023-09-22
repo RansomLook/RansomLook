@@ -20,7 +20,7 @@ from .helpers import build_users_table, load_user_from_request
 
 import tempfile
 
-import matplotlib.pyplot as plt # type: ignore
+import matplotlib.pyplot as plt
 import plotly.express as px # type: ignore
 import plotly.io as pio     # type: ignore
 import pandas as pd

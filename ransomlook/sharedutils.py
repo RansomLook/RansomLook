@@ -10,7 +10,7 @@ from os.path import dirname, basename, isfile, join
 import sys
 import redis
 
-import matplotlib.pyplot as plt # type: ignore
+import matplotlib.pyplot as plt
 import plotly.express as px # type: ignore
 import plotly.io as pio     # type: ignore
 import pandas as pd
