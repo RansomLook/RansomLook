@@ -16,8 +16,8 @@
             {% for entry in posts %}
                 <tr>
                     <td><center> {{entry.split('+')[0].replace('T',' ')}} </center></td>
-                    <td> {{posts[entry]['message']}} </td>
-                    <td style="word-break:break-all">
+                    <td style="word-break:break-all"> {{posts[entry]['message']}} </td>
+                    <td>
                     {% for media in posts[entry]['image'] %}
                         <a href="/screenshots/telegram/img/{{name}}-{{media|urlencode}}.jpg" rel="noopener noreferrer" target="_blank"">Images</a>
                     {% endfor %}
