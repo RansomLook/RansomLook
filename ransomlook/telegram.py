@@ -164,7 +164,7 @@ def parser():
                    imgs=[]
                    imglist = content.find_all('a',{'class':'tgme_widget_message_photo_wrap'})
                    for img in imglist:
-                       imagelink= re.findall(r"https://cdn4.*.*.jpg", img['style'])[0]
+                       imagelink= re.findall(r"https://cdn?.*.*.jpg", img['style'])[0]
                        image= img["href"].split('/')[-1]
                        response = requests.get(imagelink, stream=True)
                        imgs.append(image)
