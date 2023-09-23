@@ -31,8 +31,8 @@
         </div>
     </div>
 
-
         {% if alert is true %}
+        <div>
            <h1>Alerts within the last 24h</h1>
            {% if 'group' in posts %}
            <h3>Groups and Markets</h3>
@@ -97,7 +97,7 @@
             </table>
            </div>
            {% endif %}
-
+        </div>
         {% endif %}
     </article>
 {% endblock %}
