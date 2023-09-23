@@ -5,7 +5,11 @@
 {{ render_messages(container=True, dismissible=True) }}
 
     <article id="main" class="markdown-section">
-        <h1>Welcome to 🦕 RansomLook 🦖 !</h1>
+        <center>
+                <h1>Welcome to 🦕 RansomLook 🦖 !</h1>
+        </center>
+    <div class="container" style="display: flex; height: 100px;">
+        <div style="width: 50%;">
         <p><em>{{ date.title() }}</em></p>
 
         <p>Currently tracking <code>{{data['nbgroups']}}</code> groups across <code>{{data['nblocations']}}</code> relays & mirrors - <em><code>{{data['online']}}</code> currently online</em>
@@ -21,6 +25,13 @@
         <p>There have been <code>{{data['nbposts']}}</code> posts since the dawn of ransomlook</p>
 
         <p>There are <code>{{data['nbparsers']}}</code> custom parsers indexing posts</p>
+        </div>
+        <div style="flex-grow: 1;">
+                <center><img src="/static/ransomlook.svg"      width="400" /></center>
+        </div>
+    </div>
+
+
         {% if alert is true %}
            <h1>Alerts within the last 24h</h1>
            {% if 'group' in posts %}
