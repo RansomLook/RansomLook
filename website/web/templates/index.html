@@ -8,7 +8,7 @@
         <center>
                 <h1>Welcome to 🦕 RansomLook 🦖 !</h1>
         </center>
-    <div class="container" style="display: flex; height: 100px;">
+    <div class="container" style="display: flex;">
         <div style="width: 50%;">
         <p><em>{{ date.title() }}</em></p>
 
@@ -32,7 +32,6 @@
     </div>
 
         {% if alert is true %}
-        <div>
            <h1>Alerts within the last 24h</h1>
            {% if 'group' in posts %}
            <h3>Groups and Markets</h3>
@@ -97,7 +96,6 @@
             </table>
            </div>
            {% endif %}
-        </div>
         {% endif %}
     </article>
 {% endblock %}
