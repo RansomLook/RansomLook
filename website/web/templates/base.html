@@ -1,4 +1,3 @@
-
 <!doctype html>
 <html lang="en">
   <head>
@@ -37,7 +36,7 @@
             <center><form action="{{ url_for('search') }}" method="post"><input type="text" name="search" value="" aria-label="Search text" placeholder="type to search"></form></center>
            </div>
          </div>
-    </br>
+    <br/>
     <h1 class="app-name"><a class="app-name-link" data-nosearch="" href="/">🦕 RansomLook 🦖</a></h1>
     <div class="sidebar-nav">
 
@@ -75,11 +74,13 @@
               </ul>
           </ul>
           {% endif %}          
-          <div class="fixed-bottom" {% if request.path == '/about' %} class="active" {% endif %}><a href="{{ url_for('about') }}" title="About">About...</a></div>
     </div>
   </aside>
     <section class="content">
       {% block content %}{% endblock%}
+    <footer position="absolute" bottom="0">
+    <center><a href="{{ url_for('about') }}" title="About">About...</a> - Follow us on <a href='https://social.circl.lu/@Ransomlook' target="_blank">Mastodon</a> - Contribute on <a href='https://github.com/RansomLook/RansomLook' target="_blank">GitHub</a> - RansomLook © 2022-2023</center>
+    </footer>
     </section>
     {% block scripts %}
     <!-- Optional JavaScript -->
