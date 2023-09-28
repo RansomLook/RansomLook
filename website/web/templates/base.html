@@ -75,6 +75,7 @@
               </ul>
           </ul>
           {% endif %}          
+          <div class="fixed-bottom" {% if request.path == '/about' %} class="active" {% endif %}><a href="{{ url_for('about') }}" title="About">About...</a></div>
     </div>
   </aside>
     <section class="content">

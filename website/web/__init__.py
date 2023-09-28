@@ -195,6 +195,10 @@ def recent():
 def stats():
         return render_template("stats.html")
 
+@app.route("/about")
+def about():
+        return render_template("about.html")
+
 @app.route("/status")
 def status():
         red = Redis(unix_socket_path=get_socket_path('cache'), db=0)
