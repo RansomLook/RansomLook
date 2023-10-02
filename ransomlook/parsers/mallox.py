@@ -16,8 +16,12 @@ def main():
                     description = ''
                     for p in div.find_all('p'):
                         description+=p.text+'\n'
-                    link = div.find('a', {"class" :"btn btn-primary btn-sm"})['href']
-                    list_div.append({"title" : title, "description" : description, "link": link, "slug": filename})
+                    linktmp = div.find('a', {"class" :"btn btn-primary btn-sm"})
+                    if linktmp != None:
+                        link = linktmp['href']
+                        list_div.append({"title" : title, "description" : description, "link": link, "slug": filename})
+                    else:
+                        list_div.append({"title" : title, "description" : description})
                 file.close()
         except:
             print("Failed during : " + filename)
