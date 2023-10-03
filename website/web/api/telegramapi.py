@@ -46,7 +46,7 @@ class Channnelinfo(Resource):
     def get(self, name):
         red = Redis(unix_socket_path=get_socket_path('cache'), db=5)
         group = {}
-        sorted_posts = {}
+        sorted_posts:Dict = {}
         for key in red.keys():
                 if key.decode().lower() == name.lower():
                         group= json.loads(red.get(key)) # type: ignore
