@@ -16,7 +16,6 @@ from werkzeug.security import check_password_hash
 from ransomlook import ransomlook
 from ransomlook.default import get_socket_path
 
-from .helpers import build_users_table, load_user_from_request
 
 import tempfile
 
