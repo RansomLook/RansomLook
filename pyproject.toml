@@ -39,7 +39,7 @@ redis = "^5.0.1"
 Flask = "^2.3.3"
 gunicorn = "^21.2.0"
 Flask-Login = "^0.6.2"
-Werkzeug = "^2.3.7"
+Werkzeug = "^3.0.0"
 Flask-WTF = "^1.2.1"
 tweepy = "^4.14.0"
 Flask-Cors = "^4.0.0"
@@ -64,12 +64,13 @@ types-flask-cors = "^4.0.0.1"
 mastodon-py = "^1.8.1"
 types-pillow = "^10.0.0.3"
 libtorrent = "^2.0.9"
+urllib3 = "^2.0.6"
 
 [tool.poetry.dev-dependencies]
 mypy = "^1.5.1"
 types-setuptools = "^67.8.0.0"
 types-redis = "^4.6.0.7"
-pylint = "^2.17.7"
+pylint = "^3.0.0"
 
 
 [tool.poetry.group.dev.dependencies]
