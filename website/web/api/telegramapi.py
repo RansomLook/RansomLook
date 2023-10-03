@@ -31,7 +31,7 @@ api = Namespace('TelegramAPI', description='Telegram Ransomlook API', path='/api
 
 @api.route('/channels')
 @api.doc(description='Return list of groups', tags=['channels'])
-class Groups(Resource):
+class Channels(Resource):
     def get(self):
         groups = []
         red = Redis(unix_socket_path=get_socket_path('cache'), db=5)
@@ -42,7 +42,7 @@ class Groups(Resource):
 @api.route('/channel/<string:name>')
 @api.doc(description='Return info about the group', tags=['channels'])
 @api.doc(param={'name':'Name of the group'})
-class Groupinfo(Resource):
+class Channnelinfo(Resource):
     def get(self, name):
         red = Redis(unix_socket_path=get_socket_path('cache'), db=5)
         group = {}
@@ -58,12 +58,14 @@ class Groupinfo(Resource):
                             sorted_posts = OrderedDict(sorted(posts.items(), key=lambda t: t[0], reverse=True))
                         else:
                             sorted_posts = {}
+        if group == {}:
+            return
         return [group, sorted_posts]
 
 @api.route('/channel/<string:name>/image/<string:image>')
 @api.doc(description='Return the requested image from the channel', tags=['channels'])
 @api.doc(param={'name':'Name of the group', 'image':'Image to get'})
-class Groupinfo(Resource):
+class Channelimg(Resource):
     def get(self, name, image):
         return send_from_directory( str(get_homedir())+ '/source/screenshots/telegram/img',name+'-'+image+'.jpg')
 
