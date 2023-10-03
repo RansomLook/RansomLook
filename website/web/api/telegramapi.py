@@ -59,7 +59,7 @@ class Channnelinfo(Resource):
                         else:
                             sorted_posts = {}
         if group == {}:
-            return
+            return {}
         return [group, sorted_posts]
 
 @api.route('/channel/<string:name>/image/<string:image>')
