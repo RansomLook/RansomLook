@@ -752,7 +752,7 @@ authorizations = {
 }
 
 api = Api(app, title='RansomLook API',
-          description='API to submit captures and query a RansomLook instance.',
+          description='API to query a RansomLook instance.',
           doc='/doc/',
           authorizations=authorizations,
           version=pkg_version)
