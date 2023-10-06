@@ -41,6 +41,7 @@ from typing import Dict, Any
 from .api.genericapi import api as generic_api
 from .api.telegramapi import api as telegram_api
 from .api.rfapi import api as rf_api
+from .api.leaksapi import api as leaks_api
 
 app = Flask(__name__)
 
@@ -758,5 +759,6 @@ api = Api(app, title='RansomLook API',
           version=pkg_version)
 
 api.add_namespace(generic_api)
+api.add_namespace(leaks_api)
 api.add_namespace(rf_api)
 api.add_namespace(telegram_api)

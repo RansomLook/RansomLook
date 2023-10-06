@@ -10,11 +10,13 @@ def main():
                 print(filename)
                 file=open(html_doc,'r')
                 soup=BeautifulSoup(file,'html.parser')
-                divs_name = soup.find_all('div',{"class":"card"})
+                divs_name = soup.find_all('li',{"class":"wp-block-post"})
                 for div in divs_name:
-                    title = div.b.u.text.strip()
-                    description = div.find('ul').text.strip()
-                    list_div.append({"title": title, "description": description})
+                    meta = div.find('a')
+                    title = meta.text.strip()
+                    description = div.find('div',{"class":"wp-block-post-excerpt"}).text.strip()
+                    link = meta["href"]
+                    list_div.append({"title": title, "description": description, "link": link, "slug": filename})
                 file.close()
             except:
                 pass

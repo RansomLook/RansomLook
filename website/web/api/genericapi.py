@@ -84,16 +84,6 @@ class Markets(Resource):
             groups.append(key.decode())
         return groups
 
-@api.route('/leaks')
-@api.doc(description='Return list of breaches', tags=['breaches'])
-class Leaks(Resource):
-    def get(self):
-        groups = []
-        red = Redis(unix_socket_path=get_socket_path('cache'), db=4)
-        for key in red.keys():
-            groups.append(key.decode())
-        return groups
-
 @api.route('/group/<string:name>')
 @api.doc(description='Return info about the group', tags=['groups'])
 @api.doc(param={'name':'Name of the group'})

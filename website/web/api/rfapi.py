@@ -1,31 +1,14 @@
 #!/usr/bin/env python3
 
-import base64
-import hashlib
 import json
-from typing import Any, Dict, Optional
 from redis import Redis
 
-import flask_login  # type: ignore
-from flask import request
-from flask import send_file, send_from_directory
-
-from flask_restx import Api, Namespace, Resource, abort, fields  # type: ignore
-from werkzeug.security import check_password_hash
+from flask_restx import Namespace, Resource # type: ignore
 
 from ransomlook import ransomlook
 from ransomlook.default import get_socket_path, get_homedir
 
-import tempfile
-
-import matplotlib.pyplot as plt
-import plotly.express as px # type: ignore
-import plotly.io as pio     # type: ignore
-import pandas as pd
-
 from collections import OrderedDict
-
-from datetime import datetime, timedelta
 
 api = Namespace('RecordedFutureAPI', description='RecordedFuture Ransomlook API', path='/api/rf')
 
