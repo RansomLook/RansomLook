@@ -67,7 +67,7 @@ libtorrent = "^2.0.9"
 urllib3 = "^2.0.6"
 
 [tool.poetry.dev-dependencies]
-mypy = "^1.5.1"
+mypy = "^1.6.0"
 types-setuptools = "^67.8.0.0"
 types-redis = "^4.6.0.7"
 pylint = "^3.0.0"
