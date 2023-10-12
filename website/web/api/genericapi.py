@@ -14,10 +14,11 @@ from flask_restx import Api, Namespace, Resource, abort, fields  # type: ignore
 from werkzeug.security import check_password_hash
 
 from ransomlook import ransomlook
-from ransomlook.default import get_socket_path
-
+from ransomlook.default import get_socket_path, get_homedir
+from ransomlook.sharedutils import createfile, striptld
 
 import tempfile
+import os
 
 import matplotlib.pyplot as plt
 import plotly.express as px # type: ignore
@@ -97,6 +98,19 @@ class Groupinfo(Resource):
                         group= json.loads(red.get(key)) # type: ignore
                         if group['meta'] is not None:
                             group['meta']=group['meta'].replace('\n', '<br/>')
+                        for location in group['locations']:
+                            screenfile = '/screenshots/' + name.lower() + '-' + createfile(location['slug']) + '.png'
+                            screenpath = str(get_homedir()) + '/source' + screenfile
+                            if os.path.exists(screenpath):
+                                with open(screenpath, "rb") as image_file:
+                                     screenencoded = base64.b64encode(image_file.read()).decode("ascii")
+                                location.update({'screen':screenencoded})
+                            source = name.lower() + '-' + striptld(location['slug']) + '.html'
+                            sourcepath = str(get_homedir()) + '/source/' + source
+                            if os.path.exists(sourcepath):
+                                with open(sourcepath, "rb") as text_file:
+                                     sourceencoded = base64.b64encode(text_file.read()).decode("ascii")
+                                location.update({'source':sourceencoded})
                         redpost = Redis(unix_socket_path=get_socket_path('cache'), db=2)
                         if key in redpost.keys():
                             posts=json.loads(redpost.get(key)) # type: ignore
@@ -104,6 +118,33 @@ class Groupinfo(Resource):
                         else:
                             sorted_posts = []
         return [group, sorted_posts]
+
+@api.route('/post/<string:name>/<string:postname>')
+@api.doc(description='Return details about the post', tags=['groups'])
+@api.doc(param={'name':'Name of the group or market', 'postname':'Post title'})
+class GroupPost(Resource):
+   def get(self, name,postname):
+        red = Redis(unix_socket_path=get_socket_path('cache'), db=2)
+        for key in red.keys():
+            if key.decode().lower() == name.lower():
+                posts = json.loads(red.get(key)) # type: ignore
+                for post in posts:
+                    if post['post_title'] == postname:
+                        if 'screen' in post and post['screen'] != None :
+                            screenpath = str(get_homedir()) + '/source/' + post['screen']
+                            if os.path.exists(screenpath):
+                                with open(screenpath, "rb") as image_file:
+                                     screenencoded = base64.b64encode(image_file.read()).decode("ascii")
+                                post.update({'screen':screenencoded})
+                        if 'link' in post and post['link'] != None :
+                            filepath = str(get_homedir()) + '/source/' + name + '/' + createfile(postname)+'.html'
+                            if os.path.exists(filepath):
+                                with open(filepath, "rb") as src_file:
+                                     srcencoded = base64.b64encode(src_file.read()).decode("ascii")
+                                post.update({'source':srcencoded})
+
+                        return(post)
+        return({})
 
 @api.route('/market/<string:name>')
 @api.doc(description='Return info about the market', tags=['markets'])
@@ -118,6 +159,19 @@ class Marketinfo(Resource):
                         group= json.loads(red.get(key)) # type: ignore
                         if group['meta'] is not None:
                             group['meta']=group['meta'].replace('\n', '<br/>')
+                        for location in group['locations']:
+                            screenfile = '/screenshots/' + name.lower() + '-' + createfile(location['slug']) + '.png'
+                            screenpath = str(get_homedir()) + '/source' + screenfile
+                            if os.path.exists(screenpath):
+                                with open(screenpath, "rb") as image_file:
+                                     screenencoded = base64.b64encode(image_file.read()).decode("ascii")
+                                location.update({'screen':screenencoded})
+                            source = name.lower() + '-' + striptld(location['slug']) + '.html'
+                            sourcepath = str(get_homedir()) + '/source/' + source
+                            if os.path.exists(sourcepath):
+                                with open(sourcepath, "rb") as text_file:
+                                     sourceencoded = base64.b64encode(text_file.read()).decode("ascii")
+                                location.update({'source':sourceencoded})
                         redpost = Redis(unix_socket_path=get_socket_path('cache'), db=2)
                         if key in redpost.keys():
                             posts=json.loads(redpost.get(key)) # type: ignore

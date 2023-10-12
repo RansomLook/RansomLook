@@ -48,11 +48,11 @@ def creategroup(location: str) -> Dict[str, object] :
     }
     return insertdata
 
-def checkexisting(provider: str) -> bool:
+def checkexisting(provider: str, db: int) -> bool:
     '''
     check if group already exists within groups.json
     '''
-    red = redis.Redis(unix_socket_path=get_socket_path('cache'), db=0)
+    red = redis.Redis(unix_socket_path=get_socket_path('cache'), db=db)
     if provider.encode() in red.keys():
         return True
     return False
@@ -157,12 +157,12 @@ def adder(name: str, location: str, db: int) -> int:
     '''
     handles the addition of new providers to groups.json
     '''
-    if checkexisting(name.strip()):
+    if checkexisting(name.strip(), db):
         stdlog('ransomlook: ' + 'records for ' + name + \
             ' already exist, appending to avoid duplication')
         return appender(name.strip(), location, db)
     else:
-        red = redis.Redis(unix_socket_path=get_socket_path('cache'), db=0)
+        red = redis.Redis(unix_socket_path=get_socket_path('cache'), db=db)
         newrec = creategroup(location)
         red.set(name.strip(), json.dumps(newrec))
         stdlog('ransomlook: ' + 'record for ' + name + ' added to groups.json')
@@ -173,7 +173,7 @@ def appender(name: str, location: str, db: int) -> int:
     handles the addition of new mirrors and relays for the same site
     to an existing group within groups.json
     '''
-    red = redis.Redis(unix_socket_path=get_socket_path('cache'), db=0)
+    red = redis.Redis(unix_socket_path=get_socket_path('cache'), db=db)
     group = json.loads(red.get(name.strip())) # type: ignore
     success = bool()
     for loc in group['locations']:
