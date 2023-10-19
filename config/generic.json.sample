@@ -38,6 +38,12 @@
         "url": "",
         "token": ""
     },
+    "bluesky":{
+        "enable": false,
+        "url": "https://bsky.social/xrpc/com.atproto.server.createSession",
+        "BLUESKY_HANDLE": "",
+        "BLUESKY_APP_PASSWORD":""
+    },
     "misp": {
         "enable": false,
         "url": "",
@@ -69,6 +75,7 @@
         "ldap": "Ldap configuration for login",
         "darkmode": "Display a dark GUI",
         "mastodon": "As Twitter but for Mastodon",
+        "bluesky": "As Twitter but for BlueSky",
         "siteurl": "Url of your domain"
     }
 
