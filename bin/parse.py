@@ -130,7 +130,6 @@ def appender(entry, group_name):
         tootnotify(mastodonconfig, group_name, post_title, siteurl)
     if blueskyconfig['enable'] == True:
         blueskynotify(blueskyconfig, group_name, post_title, siteurl)
-        exit(0)
     if mispconfig['enable'] == True:
         try:
             groupred = redis.Redis(unix_socket_path=get_socket_path('cache'), db=0)
