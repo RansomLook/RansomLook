@@ -19,11 +19,28 @@ def blueskynotify(config, group, title, siteurl) -> None :
         session = resp.json()
         now = datetime.now(timezone.utc).isoformat().replace("+00:00", "Z")
 
+        text= "New post from #" + group.title() + " : " + title.title() + "\nMore at : "
+        startoffset = len(text)
+        uri = siteurl + "/group/" + group.title().replace(" ","%20")
+        text+= uri
+        endoffset = len(text)
+        text+= " #Ransomware"
+
         # Required fields that each post must include
         post = {
             "$type": "app.bsky.feed.post",
-            "text": "New post from #" + group.title() + " : " + title.title() + "\nMore at : "+ siteurl + "/group/" + group.title().replace(" ","%20") + " #Ransomware",
+            "text": text,
             "createdAt": now,
+            "facets": [{
+                        "index": {
+                          "byteStart": startoffset,
+                          "byteEnd": endoffset,
+                         },
+                         "features": [{
+                           "$type": "app.bsky.richtext.facet#link",
+                           "uri": uri,
+                          }],
+                      }],
         }
         resp = requests.post("https://bsky.social/xrpc/com.atproto.repo.createRecord",
                    headers={"Authorization": "Bearer " + session["accessJwt"]},
@@ -31,7 +48,7 @@ def blueskynotify(config, group, title, siteurl) -> None :
                        "repo": session["did"],
                        "collection": "app.bsky.feed.post",
                        "record": post,
-                   },
+                      },
                )
     except:
         errlog('Can not post :(')
