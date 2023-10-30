@@ -68,13 +68,13 @@ urllib3 = "^2.0.7"
 
 [tool.poetry.dev-dependencies]
 mypy = "^1.6.1"
-types-setuptools = "^67.8.0.0"
+types-setuptools = "^68.2.0.0"
 types-redis = "^4.6.0.8"
 pylint = "^3.0.2"
 
 
 [tool.poetry.group.dev.dependencies]
-types-setuptools = "^67.2.0.1"
+types-setuptools = "^68.2.0.0"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
