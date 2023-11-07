@@ -2311,13 +2311,13 @@ rsa = ["oauthlib[signedtoken] (>=3.0.0)"]
 
 [[package]]
 name = "rocketchat-api"
-version = "1.30.0"
+version = "1.31.0"
 description = "Python API wrapper for Rocket.Chat"
 optional = false
 python-versions = "*"
 files = [
-    {file = "rocketchat_API-1.30.0-py3-none-any.whl", hash = "sha256:58b21b14b2186324e5d0c91b87e928822f55fbd6d3bfc14af308e4db0740fc4d"},
-    {file = "rocketchat_API-1.30.0.tar.gz", hash = "sha256:1f521289598c7fd7fa5762adcd90b387b1c9ec9cb969b2ab793ec8010bd7b5fd"},
+    {file = "rocketchat_API-1.31.0-py3-none-any.whl", hash = "sha256:85a7cbe497ba96da98957f894ab785e7f58b9284cc720952a003aabee5a68bbf"},
+    {file = "rocketchat_API-1.31.0.tar.gz", hash = "sha256:eb9660e0493fa57400282d381ebd196fe8747b5d58733c7edfecac6d6cd96164"},
 ]
 
 [package.dependencies]
@@ -2892,4 +2892,4 @@ email = ["email-validator"]
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.10,<3.11"
-content-hash = "4128939294570247d384a7f96bb099fc9af99862deb6c3ce91685dec123b2785"
+content-hash = "b175e67ad46ffb35255ee68fd93e0d268c212e376f8a8b5b78665814314621bb"
