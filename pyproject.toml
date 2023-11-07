@@ -27,7 +27,7 @@ notes = "bin.notes:main"
 
 [tool.poetry.dependencies]
 python = "^3.10,<3.11"
-tldextract = "^5.0.1"
+tldextract = "^5.1.0"
 lxml = "^4.9.3"
 matplotlib = "^3.8.0"
 playwright = "^1.39.0"
