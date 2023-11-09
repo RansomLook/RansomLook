@@ -13,7 +13,7 @@ from datetime import datetime
 import time
 from typing import Dict
 from playwright.sync_api import sync_playwright, TimeoutError as PlaywrightTimeoutError
-from playwright_stealth import stealth_sync
+from playwright_stealth import stealth_sync # type: ignore
 
 from .default.config import get_config, get_homedir, get_socket_path
 
