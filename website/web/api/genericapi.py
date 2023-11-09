@@ -210,12 +210,16 @@ class PostPerMonth(Resource):
         return sorted_posts
 
 @api.route('/graphs/heatmap/<year>/<month>')
+@api.route('/graphs/heatmap/<year>')
 @api.doc(description='Density heatmap for a month', tags=['posts'])
 class DensityHeatmap(Resource):
-    def get(self, year, month):
+    def get(self, year, month=None):
         group_names = []
         timestamps = []
-        date = str(year)+'-'+str(month)
+        if month != None:
+            date = str(year)+'-'+str(month)
+        else :
+            date = str(year)+'-'
         red = Redis(unix_socket_path=get_socket_path('cache'), db=2)
         for key in red.keys():
                 entries = json.loads(red.get(key)) # type: ignore
@@ -235,13 +239,17 @@ class DensityHeatmap(Resource):
         filename.seek(0)
         return send_file(filename, mimetype='image/gif')
 
+@api.route('/graphs/scatter/<year>')
 @api.route('/graphs/scatter/<year>/<month>')
 @api.doc(description='Distribution per days for a month', tags=['posts'])
 class Scatter(Resource):
-    def get(self, year, month):
+    def get(self, year, month=None):
         group_names = []
         timestamps = []
-        date = str(year)+'-'+str(month)
+        if month != None:
+            date = str(year)+'-'+str(month)
+        else:
+            date = str(year)+'-'
         red = Redis(unix_socket_path=get_socket_path('cache'), db=2)
         for key in red.keys():
                 entries = json.loads(red.get(key)) # type: ignore
@@ -261,13 +269,17 @@ class Scatter(Resource):
         filename.seek(0)
         return send_file(filename, mimetype='image/gif')
 
+@api.route('/graphs/pie/<year>')
 @api.route('/graphs/pie/<year>/<month>')
 @api.doc(description='Percentage of total post during the month', tags=['posts'])
 class Pie(Resource):
-    def get(self, year, month):
+    def get(self, year, month=None):
         group_names = []
         timestamps = []
-        date = str(year)+'-'+str(month)
+        if month != None:
+            date = str(year)+'-'+str(month)
+        else:
+            date = str(year)+'-'
         red = Redis(unix_socket_path=get_socket_path('cache'), db=2)
         for key in red.keys():
                 entries = json.loads(red.get(key)) # type: ignore
@@ -288,13 +300,17 @@ class Pie(Resource):
         filename.seek(0)
         return send_file(filename, mimetype='image/gif')
 
+@api.route('/graphs/bar/<year>')
 @api.route('/graphs/bar/<year>/<month>')
 @api.doc(description='Posts per group during the month', tags=['posts'])
 class Bar(Resource):
-    def get(self, year, month):
+    def get(self, year, month=None):
         group_names = []
         timestamps = []
-        date = str(year)+'-'+str(month)
+        if month != None:
+            date = str(year)+'-'+str(month)
+        else:
+            date = str(year)+'-'
         red = Redis(unix_socket_path=get_socket_path('cache'), db=2)
         for key in red.keys():
                 entries = json.loads(red.get(key)) # type: ignore

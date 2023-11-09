@@ -578,7 +578,6 @@ def screenshotspost(group, file):
     fullpath = os.path.normpath(os.path.join(str(get_homedir())+ '/source/screenshots/', group))
     if not fullpath.startswith(str(get_homedir())):
         raise Exception("not allowed")
-    print(file)
     if file.endswith('.txt'):
         print(file+ ' ' + file)
         return send_from_directory( fullpath, file, as_attachment=True)
