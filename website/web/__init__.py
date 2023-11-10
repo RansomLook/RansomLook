@@ -206,10 +206,11 @@ def feeds():
         recentposts = []
         for post in sorted_posts:
                 post['discovered'] = dt.strptime(post['discovered'].split('.')[0], "%Y-%m-%d %H:%M:%S").strftime("%a, %d %b %Y %T")
+                post['uuid'] = post['group_name']+post['post_title']+post['discovered']
                 recentposts.append(post)
                 if len(recentposts) == 50:
                         break
-        return render_template("rss.xml", posts=recentposts, build_date=dt.now())
+        return render_template("rss.xml", posts=recentposts, build_date=dt.now()), {'Content-Type': 'application/xml'}
 
 @app.route("/stats")
 def stats():
