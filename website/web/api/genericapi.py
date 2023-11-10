@@ -202,7 +202,7 @@ class PostPerMonth(Resource):
         if month != None:
             date = str(year)+'-'+str(month)
         else:
-            date = str(yeah)+'-'
+            date = str(year)+'-'
         red = Redis(unix_socket_path=get_socket_path('cache'), db=2)
         for key in red.keys():
                 entries = json.loads(red.get(key)) # type: ignore
