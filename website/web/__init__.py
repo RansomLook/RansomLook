@@ -207,9 +207,9 @@ def feeds():
         recentposts = []
         for post in sorted_posts:
                 recentposts.append(post)
-                if len(recentposts) == 100:
+                if len(recentposts) == 50:
                         break
-        return render_template("rss.xml", posts=posts, build_date=dt.now())
+        return render_template("rss.xml", posts=recentposts, build_date=dt.now())
 
 @app.route("/stats")
 def stats():
