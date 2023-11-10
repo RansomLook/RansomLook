@@ -194,6 +194,23 @@ def recent():
                         break
         return render_template("recent.html", data=recentposts)
 
+@app.route("/rss.xml")
+def feeds():
+        posts = []
+        red = Redis(unix_socket_path=get_socket_path('cache'), db=2)
+        for key in red.keys():
+                entries = json.loads(red.get(key)) # type: ignore
+                for entry in entries:
+                    entry['group_name']=key.decode()
+                    posts.append(entry)
+        sorted_posts = sorted(posts, key=lambda x: x['discovered'], reverse=True)
+        recentposts = []
+        for post in sorted_posts:
+                recentposts.append(post)
+                if len(recentposts) == 100:
+                        break
+        return render_template("rss.xml", posts=posts, build_date=dt.now())
+
 @app.route("/stats")
 def stats():
         return render_template("stats.html")

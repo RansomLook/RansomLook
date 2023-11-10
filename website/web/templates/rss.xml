@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+<channel>
+  <title>RansomLook – Last entries</title>
+  <atom:link href="https://ransomlook.io/rss.xml" rel="self" type="application/rss+xml" />
+  <link>https://ransomlook.io</link>
+  <description>Most recents entries in Ransomlook.io</description>
+  <lastBuildDate>{{ build_date.strftime("%Y-%m-%d %H:%M:%S") }} </lastBuildDate>
+  <language>en-US</language>
+  {% for post in posts %}
+  <item>
+  <title>{{ post["post_title"] }} By {{ post['group_name'] }}</title>
+  <link>https://ransomlook.io/group/{{ post['group_name'] }}</link>
+  <description>{{ post["description"] }}</description>
+  <pubDate>{{ post["discovered"] }}</pubDate>
+  </item>
+  {% endfor %}
+</channel>
+</rss>
