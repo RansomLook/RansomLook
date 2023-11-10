@@ -2,17 +2,17 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
 <channel>
   <title>RansomLook – Last entries</title>
-  <atom:link href="https://ransomlook.io/rss.xml" rel="self" type="application/rss+xml" />
+  <atom:link href="https://ransomlook.io/rss.xml" rel="self" type="application/atom+xml" />
   <link>https://ransomlook.io</link>
   <description>Most recents entries in Ransomlook.io</description>
-  <lastBuildDate>{{ build_date.strftime("%Y-%m-%d %H:%M:%S") }} CET</lastBuildDate>
+  <lastBuildDate>{{ build_date.strftime("%a, %d %b %Y %T") }} +0200</lastBuildDate>
   <language>en-US</language>
   {% for post in posts %}
   <item>
   <title>{{ post["post_title"] }} By {{ post['group_name'] }}</title>
   <link>https://ransomlook.io/group/{{ post['group_name'] }}</link>
   <description>{{ post["description"] }}</description>
-  <pubDate>{{ post["discovered"] }} CET</pubDate>
+  <pubDate>{{ post["discovered"] }} +0200</pubDate>
   </item>
   {% endfor %}
 </channel>
