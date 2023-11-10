@@ -194,16 +194,35 @@ class Exportdb(Resource):
         return dump
 
 @api.route('/posts/<year>/<month>')
-@api.doc(description='Dump posts for a month', tags=['posts'])
+@api.route('/posts/<year>')
+@api.doc(description='Dump posts for a month/year', tags=['posts'])
 class PostPerMonth(Resource):
-    def get(self, year, month):
+    def get(self, year, month=None):
         posts = []
-        date = str(year)+'-'+str(month)
+        if month != None:
+            date = str(year)+'-'+str(month)
+        else:
+            date = str(yeah)+'-'
         red = Redis(unix_socket_path=get_socket_path('cache'), db=2)
         for key in red.keys():
                 entries = json.loads(red.get(key)) # type: ignore
                 for entry in entries:
                     if entry['discovered'].startswith(date):
+                        entry['group_name']=key.decode()
+                        posts.append(entry)
+        sorted_posts = sorted(posts, key=lambda x: x['discovered'], reverse=True)
+        return sorted_posts
+
+@api.route('/posts/period/<start_date>/<end_date>')
+@api.doc(description='Dump posts for a month/year', tags=['posts'])
+class PostPerPeriod(Resource):
+    def get(self, start_date, end_date):
+        posts = []
+        red = Redis(unix_socket_path=get_socket_path('cache'), db=2)
+        for key in red.keys():
+                entries = json.loads(red.get(key)) # type: ignore
+                for entry in entries:
+                    if start_date <= entry['discovered'].split(' ')[0] <= end_date:
                         entry['group_name']=key.decode()
                         posts.append(entry)
         sorted_posts = sorted(posts, key=lambda x: x['discovered'], reverse=True)
@@ -342,7 +361,7 @@ class PeriodDensityHeatmap(Resource):
         for key in red.keys():
                 entries = json.loads(red.get(key)) # type: ignore
                 for entry in entries:
-                    if start_date <= entry['discovered'] <= end_date:
+                    if start_date <= entry['discovered'].split(' ')[0] <= end_date:
                         group_names.append(key.decode())
                         timestamps.append(entry['discovered'])
         df = pd.DataFrame({'group_name': group_names, 'timestamp': timestamps})
@@ -368,7 +387,7 @@ class PeriodScatter(Resource):
         for key in red.keys():
                 entries = json.loads(red.get(key)) # type: ignore
                 for entry in entries:
-                    if start_date <= entry['discovered'] <= end_date:
+                    if start_date <= entry['discovered'].split(' ')[0] <= end_date:
                         group_names.append(key.decode())
                         timestamps.append(entry['discovered'])
         df = pd.DataFrame({'group_name': group_names, 'timestamp': timestamps})
@@ -393,7 +412,7 @@ class PeriodPie(Resource):
         for key in red.keys():
                 entries = json.loads(red.get(key)) # type: ignore
                 for entry in entries:
-                    if start_date <= entry['discovered'] <= end_date:
+                    if start_date <= entry['discovered'].split(' ')[0] <= end_date:
                         group_names.append(key.decode())
                         timestamps.append(entry['discovered'])
         df = pd.DataFrame({'group_name': group_names, 'timestamp': timestamps})
@@ -419,7 +438,7 @@ class PeriodBar(Resource):
         for key in red.keys():
                 entries = json.loads(red.get(key)) # type: ignore
                 for entry in entries:
-                    if start_date <= entry['discovered'] <= end_date:
+                    if start_date <= entry['discovered'].split(' ')[0] <= end_date:
                         group_names.append(key.decode())
                         timestamps.append(entry['discovered'])
         df = pd.DataFrame({'group_name': group_names, 'timestamp': timestamps})
