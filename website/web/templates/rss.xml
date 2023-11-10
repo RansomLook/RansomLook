@@ -12,7 +12,6 @@
   <title>{{ post["post_title"] }} By {{ post['group_name'] }}</title>
   <link>https://ransomlook.io/group/{{ post['group_name'] }}</link>
   <description>{{ post["description"] }}</description>
-  <guid>{{ post["link"] }}</guid>
   <pubDate>{{ post["discovered"] }} +0200</pubDate>
   </item>
   {% endfor %}
