@@ -174,7 +174,6 @@ def home():
             for entry in groups:
                 post = json.loads(red.get(entry)) # type: ignore
                 alertposts[post['type']].append(post)
-        #print(alertposts)
         return render_template("index.html", date=date, data=data,alert=alert, posts=alertposts)
 
 @app.route("/recent")
@@ -206,6 +205,7 @@ def feeds():
         sorted_posts = sorted(posts, key=lambda x: x['discovered'], reverse=True)
         recentposts = []
         for post in sorted_posts:
+                post['discovered'] = dt.strptime(post['discovered'].split('.')[0], "%Y-%m-%d %H:%M:%S").strftime("%a, %d %b %Y %T")
                 recentposts.append(post)
                 if len(recentposts) == 50:
                         break

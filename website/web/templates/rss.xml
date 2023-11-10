@@ -5,14 +5,14 @@
   <atom:link href="https://ransomlook.io/rss.xml" rel="self" type="application/rss+xml" />
   <link>https://ransomlook.io</link>
   <description>Most recents entries in Ransomlook.io</description>
-  <lastBuildDate>{{ build_date.strftime("%Y-%m-%d %H:%M:%S") }}</lastBuildDate>
+  <lastBuildDate>{{ build_date.strftime("%Y-%m-%d %H:%M:%S") }} CET</lastBuildDate>
   <language>en-US</language>
   {% for post in posts %}
   <item>
   <title>{{ post["post_title"] }} By {{ post['group_name'] }}</title>
   <link>https://ransomlook.io/group/{{ post['group_name'] }}</link>
   <description>{{ post["description"] }}</description>
-  <pubDate>{{ post["discovered"].split('.')[0] }}</pubDate>
+  <pubDate>{{ post["discovered"] }} CET</pubDate>
   </item>
   {% endfor %}
 </channel>
