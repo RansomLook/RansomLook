@@ -64,7 +64,7 @@ types-flask-cors = "^4.0.0.1"
 mastodon-py = "^1.8.1"
 types-pillow = "^10.1.0.1"
 libtorrent = "^2.0.9"
-urllib3 = "^2.0.7"
+urllib3 = "^2.1.0"
 playwright-stealth = "^1.0.6"
 setuptools = "^68.2.2"
 
