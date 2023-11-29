@@ -73,7 +73,7 @@ def threadscape(queuethread, lock):
                           args=['--unsafely-treat-insecure-origin-as-secure='+host['slug']])
                 else:
                     browser = play.chromium.launch(proxy={"server": "socks5://127.0.0.1:9050"},
-                          args=['--unsafely-treat-insecure-origin-as-secure='+host['slug']])
+                          args=['--unsafely-treat-insecure-origin-as-secure='+host['slug'], "--headless=new"])
                 context = browser.new_context(ignore_https_errors= True )
                 page = context.new_page()
                 stealth_sync(page)
@@ -192,8 +192,12 @@ def threadscreen(queuethread, lock) -> None:
             host, group, title = queuethread.get()
             stdlog('Starting : ' + host['slug']+ ' --------- ' + group)
             try:
-                browser = play.firefox.launch(proxy={"server": "socks5://127.0.0.1:9050"},
-                    args=['--unsafely-treat-insecure-origin-as-secure='+host['slug']])
+                if group in ['knight']:
+                    browser = play.chromium.launch(proxy={"server": "socks5://127.0.0.1:9050"},
+                          args=['--unsafely-treat-insecure-origin-as-secure='+host['slug'], "--headless=new"])
+                else:
+                    browser = play.firefox.launch(proxy={"server": "socks5://127.0.0.1:9050"},
+                        args=['--unsafely-treat-insecure-origin-as-secure='+host['slug']])
                 context = browser.new_context(ignore_https_errors= True )
                 page = context.new_page()
                 stealth_sync(page)
