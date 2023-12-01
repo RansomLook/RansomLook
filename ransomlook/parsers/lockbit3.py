@@ -22,6 +22,18 @@ def main():
                     description = div.find('div',{"class" : "post-block-text"}).text.strip()
                     link = div['onclick'].split("'")[1]
                     list_div.append({"title" : title, "description" : description, "link": link, "slug": filename})
+                divs_name=soup.find_all('a', {"class": "post-block bad"})
+                for div in divs_name:
+                    title = div.find('div',{"class": "post-title"}).text.strip()
+                    description = div.find('div',{"class" : "post-block-text"}).text.strip()
+                    link = div['href']
+                    list_div.append({"title" : title, "description" : description, "link": link, "slug": filename})
+                divs_name=soup.find_all('a', {"class": "post-block good"})
+                for div in divs_name:
+                    title = div.find('div',{"class": "post-title"}).text.strip()
+                    description = div.find('div',{"class" : "post-block-text"}).text.strip()
+                    link = div['href']
+                    list_div.append({"title" : title, "description" : description, "link": link, "slug": filename})
                 file.close()
         except:
             print("Failed during : " + filename)
