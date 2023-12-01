@@ -192,7 +192,7 @@ def threadscreen(queuethread, lock) -> None:
             host, group, title = queuethread.get()
             stdlog('Starting : ' + host['slug']+ ' --------- ' + group)
             try:
-                if group in ['knight']:
+                if group in ['knight','lockbit3']:
                     browser = play.chromium.launch(proxy={"server": "socks5://127.0.0.1:9050"},
                           args=['--unsafely-treat-insecure-origin-as-secure='+host['slug'], "--headless=new"])
                 else:
