@@ -18,6 +18,14 @@ def main():
                     description = description[2].text.strip()
                     link = div.find('div', {"class": "ibody_ft_right"}).a['href']
                     list_div.append({"title" : title, "description" : description, 'link': link, 'slug': filename})
+                divs = soup.find_all('div',{"class": "custom-container2"})
+                for div in divs:
+                    title = div.find('div', {"class": "ibody_title"}).text.strip()
+                    description = div.find("div", {"class": "ibody_body"}).find_all('p')
+                    print(description)
+                    description = description[2].text.strip()
+                    link = div.find('div', {"class": "ibody_ft_right"}).a['href']
+                    list_div.append({"title" : title, "description" : description, 'link': link, 'slug': filename})
                 file.close()
         except:
             print("Failed during : " + filename)
