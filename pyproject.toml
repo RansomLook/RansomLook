@@ -49,7 +49,7 @@ types-requests = "^2.31.0.10"
 types-beautifulsoup4 = "^4.12.0.7"
 types-flask = "^1.1.6"
 types-redis = "^4.6.0.11"
-pymisp = "^2.4.179"
+pymisp = "^2.4.182"
 gitpython = "^3.1.40"
 ldap3 = "^2.9.1"
 types-ldap3 = "^2.9.13.15"
@@ -66,17 +66,14 @@ types-pillow = "^10.1.0.2"
 libtorrent = "^2.0.9"
 urllib3 = "^2.1.0"
 playwright-stealth = "^1.0.6"
-setuptools = "^68.2.2"
+setuptools = "^69.0.2"
 
 [tool.poetry.dev-dependencies]
 mypy = "^1.7.1"
-types-setuptools = "^68.2.0.2"
+types-setuptools = "^69.0.0.0"
 types-redis = "^4.6.0.11"
 pylint = "^3.0.3"
 
-
-[tool.poetry.group.dev.dependencies]
-types-setuptools = "^68.2.0.0"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
