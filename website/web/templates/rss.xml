@@ -13,6 +13,7 @@
   <link>https://ransomlook.io/group/{{ post['group_name'] }}</link>
   <description>{{ post["description"] }}</description>
   <pubDate>{{ post["discovered"] }} +0200</pubDate>
+  <guid isPermaLink="false">{{ post["guid"] }}</guid>
   </item>
   {% endfor %}
 </channel>

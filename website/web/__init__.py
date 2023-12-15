@@ -21,6 +21,8 @@ from flask_restx import Api  # type: ignore
 
 from importlib.metadata import version
 
+import hashlib
+
 from collections import OrderedDict
 from collections import defaultdict
 
@@ -206,6 +208,7 @@ def feeds():
         recentposts = []
         for post in sorted_posts:
                 post['discovered'] = dt.strptime(post['discovered'].split('.')[0], "%Y-%m-%d %H:%M:%S").strftime("%a, %d %b %Y %T")
+                post['guid'] = hashlib.sha256(post['post_title'].encode()+post['group_name'].encode()).hexdigest()
                 recentposts.append(post)
                 if len(recentposts) == 50:
                         break
