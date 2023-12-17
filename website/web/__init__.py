@@ -2,6 +2,7 @@ from flask import Flask, render_template, redirect, url_for, flash
 import flask_moment # type: ignore
 from flask import request, send_from_directory
 from flask_bootstrap import Bootstrap5  # type: ignore
+from urllib.parse import quote
 
 from datetime import datetime as dt
 from datetime import timedelta
@@ -46,7 +47,7 @@ from .api.rfapi import api as rf_api
 from .api.leaksapi import api as leaks_api
 
 app = Flask(__name__)
-
+app.jinja_env.filters['quote_plus'] = lambda u: quote(u)
 app.config['SECRET_KEY'] = get_secret_key()
 
 Bootstrap5(app)
@@ -599,7 +600,6 @@ def screenshotspost(group, file):
     if not fullpath.startswith(str(get_homedir())):
         raise Exception("not allowed")
     if file.endswith('.txt'):
-        print(file+ ' ' + file)
         return send_from_directory( fullpath, file, as_attachment=True)
     return send_from_directory( fullpath, file, mimetype='image/gif')
 

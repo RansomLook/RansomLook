@@ -69,7 +69,7 @@
                     {% endif %}
                     
                     {% if 'screen' in entry and entry['screen'] is not none %}
-                    <td><center><a href="/{{ entry['screen'] }}" rel="noopener noreferrer" target="_blank">Screen</a></center></td>
+                    <td><center><a href="/{{ entry['screen']|quote_plus }}" rel="noopener noreferrer" target="_blank">Screen</a></center></td>
                     {% else %}
                     <td> </td>
                     {% endif %}

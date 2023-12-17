@@ -13,7 +13,11 @@ def main():
                 divs_name=soup.find_all('article')
                 for div in divs_name:
                     title = div.find('a').text.strip()
-                    description = div.find('p').text.strip()
+                    try:
+                        description = div.find('p').text.strip()
+                    except:
+                        description = ''
+                        pass
                     link = div.find('a')['href']
                     list_div.append({"title" : title, "description" : description, 'link': link, 'slug': filename})
                 file.close()
