@@ -111,7 +111,8 @@ def appender(entry, group_name):
     matching = []
     if keywords is not None:
         listkeywords = keywords.decode().splitlines()
-        for keyword in listkeywords:
+        for keywordfull in listkeywords:
+             keyword=keywordfull.split('|')[0]
              if keyword.lower() in post_title.lower() or keyword.lower() in description.lower():
                  matching.append(keyword)
         if matching:

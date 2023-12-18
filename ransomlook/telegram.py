@@ -177,7 +177,8 @@ def parser():
                    matching = []
                    if timestamp not in posts:
                       posts.update({timestamp:{'message':message,'image':imgs}})
-                      for keyword in listkeywords:
+                      for keywordfull in listkeywords:
+                          keyword = keywordfull.split('|')[0]
                           if keyword.lower() in message.lower():
                               matching.append(keyword)
                       if matching :
