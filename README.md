@@ -36,7 +36,7 @@ You need poetry installed, see the [install guide](https://python-poetry.org/doc
 
 [Redis](https://redis.io/): An open source (BSD licensed), in-memory data structure store, used as a database, cache and message broker.
 
-NOTE: Redis should be installed from the source, and the repository must be in the same directory as the one you will be cloning Pandora into.
+NOTE: Redis should be installed from the source, and the repository must be in the same directory as the one you will be cloning RansomLook into.
 
 In order to compile and test redis, you will need a few packages:
 
