@@ -14,7 +14,10 @@ def main():
                 for div in divs_name:
                     title = div.find('h2').text.strip()
                     description = div.find('div',{"class" : "cart-block__content"}).text.strip()
-                    list_div.append({"title" : title, "description" : description, "link" : div.a['href'], "slug": filename})
+                    try:
+                        list_div.append({"title" : title, "description" : description, "link" : div.a['href'], "slug": filename})
+                    except:
+                        list_div.append({"title" : title, "description" : description})
                 file.close()
         except:
             print("Failed during : " + filename)
