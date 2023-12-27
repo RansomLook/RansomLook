@@ -13,7 +13,12 @@ def main():
                 divs_name=soup.find_all('div', {"class": "timeline_item"})
                 for div in divs_name:
                     title = div.find('div', {"class":"timeline_date-text"}).text
-                    description = div.find("div", {"class": "margin-bottom-medium"}).text.strip()
+                    print(title)
+                    try:
+                        description = div.find("div", {"class": "margin-bottom-medium"}).text.strip()
+                    except:
+                        description = div.find("div", {"class": "margin-bottom-xlarge"}).text.strip()
+                    print(description)
                     try:
                         link = div.find('a', {"class":"btn btn-danger"})['href']
                         list_div.append({"title" : title, "description" : description, "link": link, "slug": filename})
@@ -23,5 +28,6 @@ def main():
         except:
             print("Failed during : " + filename)
             pass
-    print(list_div)
+    #print(list_div)
+    list_div=[]
     return list_div
