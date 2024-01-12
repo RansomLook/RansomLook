@@ -11,7 +11,7 @@ from ransomlook.default import get_homedir
 if __name__ == '__main__':
     dest_dir = get_homedir() / 'website' / 'web'
 
-    to_save: Dict = {'static': {}}
+    to_save: Dict[str, Dict[str, str]] = {'static': {}}
 
     for resource in (dest_dir / 'static').glob('*'):
         if resource.name[0] == '.':

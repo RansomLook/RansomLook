@@ -11,13 +11,13 @@ logging.basicConfig(format='%(asctime)s %(name)s %(levelname)s:%(message)s',
 
 class Website(AbstractManager):
 
-    def __init__(self, loglevel: int=logging.INFO):
+    def __init__(self, loglevel: int=logging.INFO) -> None:
         super().__init__(loglevel)
         self.script_name = 'website'
         self.process = self._launch_website()
         self.set_running()
 
-    def _launch_website(self):
+    def _launch_website(self) -> Popen: # type: ignore[type-arg]
         website_dir = get_homedir() / 'website'
         ip = get_config('generic', 'website_listen_ip')
         port = get_config('generic', 'website_listen_port')
@@ -28,7 +28,7 @@ class Website(AbstractManager):
                      cwd=website_dir)
 
 
-def main():
+def main() -> None:
     w = Website()
     w.run(sleep_in_sec=10)
 

@@ -13,12 +13,14 @@ from ransomlook.default import get_socket_path, get_homedir
 
 from collections import OrderedDict
 
+from typing import List, Any, Dict
+
 api = Namespace('TelegramAPI', description='Telegram Ransomlook API', path='/api/telegram')
 
 @api.route('/channels')
 @api.doc(description='Return list of groups', tags=['channels'])
-class Channels(Resource):
-    def get(self):
+class Channels(Resource): # type: ignore[misc]
+    def get(self): # type: ignore
         groups = []
         red = Redis(unix_socket_path=get_socket_path('cache'), db=5)
         for key in red.keys():
@@ -28,11 +30,11 @@ class Channels(Resource):
 @api.route('/channel/<string:name>')
 @api.doc(description='Return info about the group', tags=['channels'])
 @api.doc(param={'name':'Name of the group'})
-class Channnelinfo(Resource):
-    def get(self, name):
+class Channnelinfo(Resource): # type: ignore[misc]
+    def get(self, name: str) -> List[Any]:
         red = Redis(unix_socket_path=get_socket_path('cache'), db=5)
         group = {}
-        sorted_posts:Dict = {}
+        sorted_posts:Dict[str, Any] = {}
         for key in red.keys():
                 if key.decode().lower() == name.lower():
                         group= json.loads(red.get(key)) # type: ignore
@@ -45,13 +47,13 @@ class Channnelinfo(Resource):
                         else:
                             sorted_posts = {}
         if group == {}:
-            return {}
+            return []
         return [group, sorted_posts]
 
 @api.route('/channel/<string:name>/image/<string:image>')
 @api.doc(description='Return the requested image from the channel', tags=['channels'])
 @api.doc(param={'name':'Name of the group', 'image':'Image to get'})
-class Channelimg(Resource):
-    def get(self, name, image):
+class Channelimg(Resource): # type: ignore[misc]
+    def get(self, name: str, image: str): # type: ignore[no-untyped-def]
         return send_from_directory( str(get_homedir())+ '/source/screenshots/telegram/img',name+'-'+image+'.jpg')
 

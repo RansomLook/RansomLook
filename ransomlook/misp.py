@@ -3,12 +3,14 @@
 '''
 Misp module
 '''
-from pymisp import MISPObject, MISPEvent, PyMISP, MISPGalaxy
+from pymisp import MISPObject, MISPEvent, PyMISP, MISPGalaxy # type: ignore[attr-defined]
 from .sharedutils import errlog
 from datetime import datetime
 import json
 
-def mispevent(config, group, title, description, galaxyname) -> None :
+from typing import Dict, Any
+
+def mispevent(config: Dict[str, Any], group: str, title: str, description: str, galaxyname: str) -> None :
     '''
     Creating a new event into misp
     '''
@@ -27,7 +29,7 @@ def mispevent(config, group, title, description, galaxyname) -> None :
     event.info = group.title() + ' new post : ' + title
     event.add_object(misp_object)
     if config['publish']:
-        event.publish()
+        event.publish() # type: ignore[no-untyped-call]
     if galaxyname != None and galaxyname != "" :
         event.add_tag('misp-galaxy:Ransomware=\"'+galaxyname+'\"')
     pushedevent = misp.add_event(event, pythonify=True )

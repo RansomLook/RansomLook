@@ -1,8 +1,9 @@
 from ldap3 import Server, Connection, SAFE_SYNC, Tls
 from ldap3.core.exceptions import LDAPException, LDAPBindError
 import ssl
+from typing import Dict, Any
 
-def global_ldap_authentication(user_name, user_pwd, ldap_config):
+def global_ldap_authentication(user_name: str, user_pwd: str, ldap_config: Dict[str, Any]): # type: ignore[no-untyped-def]
     """
       Function: global_ldap_authentication
        Purpose: Make a connection to encrypted LDAP server.

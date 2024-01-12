@@ -17,7 +17,7 @@ from collections import defaultdict
 from ransomlook.sharedutils import dbglog, stdlog
 from ransomlook.default.config import get_config, get_socket_path
 
-def getnewpost(date: str) -> Dict :
+def getnewpost(date: str) -> Dict[str, List[str]] :
     '''
     check if a post already exists in posts.json
     '''

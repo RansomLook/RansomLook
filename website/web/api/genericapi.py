@@ -3,7 +3,7 @@
 import base64
 import hashlib
 import json
-from typing import Any, Dict, Optional
+from typing import Any, Dict, Optional, List
 from redis import Redis
 
 import flask_login  # type: ignore
@@ -31,8 +31,8 @@ api = Namespace('GenericAPI', description='Generic Ransomlook API', path='/api')
 
 @api.route('/recent', '/recent/<int:number>')
 @api.doc(description='Return the X last posts, by default 100', tags=['generic'])
-class RecentPost(Resource):
-    def get(self, number: int=100):
+class RecentPost(Resource): # type: ignore[misc]
+    def get(self, number: int=100) -> List[str]:
         posts = []
         red = Redis(unix_socket_path=get_socket_path('cache'), db=2)
         for key in red.keys():
@@ -50,8 +50,8 @@ class RecentPost(Resource):
 
 @api.route('/last', '/last/<int:number>')
 @api.doc(description='Return posts for the last X days, by default 1', tags=['generic'])
-class LastPost(Resource):
-    def get(self, number: int=1):
+class LastPost(Resource): # type: ignore[misc]
+    def get(self, number: int=1) -> List[Dict[str, Any]]:
         posts = []
         actualdate = datetime.now() + timedelta(days = -number)
         red = Redis(unix_socket_path=get_socket_path('cache'), db=2)
@@ -67,8 +67,8 @@ class LastPost(Resource):
 
 @api.route('/groups')
 @api.doc(description='Return list of groups', tags=['groups'])
-class Groups(Resource):
-    def get(self):
+class Groups(Resource): # type: ignore[misc]
+    def get(self) -> List[str]:
         groups = []
         red = Redis(unix_socket_path=get_socket_path('cache'), db=0)
         for key in red.keys():
@@ -77,8 +77,8 @@ class Groups(Resource):
 
 @api.route('/markets')
 @api.doc(description='Return list of markets', tags=['markets'])
-class Markets(Resource):
-    def get(self):
+class Markets(Resource): # type: ignore[misc]
+    def get(self) -> List[str]:
         groups = []
         red = Redis(unix_socket_path=get_socket_path('cache'), db=3)
         for key in red.keys():
@@ -88,11 +88,11 @@ class Markets(Resource):
 @api.route('/group/<string:name>')
 @api.doc(description='Return info about the group', tags=['groups'])
 @api.doc(param={'name':'Name of the group'})
-class Groupinfo(Resource):
-   def get(self, name):
+class Groupinfo(Resource): # type: ignore[misc]
+   def get(self, name: str) -> List[Any]:
         red = Redis(unix_socket_path=get_socket_path('cache'), db=0)
         group = {}
-        sorted_posts:list = []
+        sorted_posts:list[Dict[str, Any]] = []
         for key in red.keys():
                 if key.decode().lower() == name.lower():
                         group= json.loads(red.get(key)) # type: ignore
@@ -122,8 +122,8 @@ class Groupinfo(Resource):
 @api.route('/post/<string:name>/<string:postname>')
 @api.doc(description='Return details about the post', tags=['groups'])
 @api.doc(param={'name':'Name of the group or market', 'postname':'Post title'})
-class GroupPost(Resource):
-   def get(self, name,postname):
+class GroupPost(Resource): # type: ignore[misc]
+   def get(self, name: str, postname: str) -> Dict[str, Any]:
         red = Redis(unix_socket_path=get_socket_path('cache'), db=2)
         for key in red.keys():
             if key.decode().lower() == name.lower():
@@ -149,11 +149,11 @@ class GroupPost(Resource):
 @api.route('/market/<string:name>')
 @api.doc(description='Return info about the market', tags=['markets'])
 @api.doc(param={'name':'Name of the market'})
-class Marketinfo(Resource):
-   def get(self, name):
+class Marketinfo(Resource): # type: ignore[misc]
+   def get(self, name: str) -> List[Any]:
         red = Redis(unix_socket_path=get_socket_path('cache'), db=3)
         group = {}
-        sorted_posts: list  = []
+        sorted_posts: List[Dict[str, Any]]  = []
         for key in red.keys():
                 if key.decode().lower() == name.lower():
                         group= json.loads(red.get(key)) # type: ignore
@@ -183,9 +183,9 @@ class Marketinfo(Resource):
 
 @api.route('/export/<database>')
 @api.doc(description='Dump a databse to reimport it', tags=['generic'])
-class Exportdb(Resource):
-    def get(self, database):
-        if database not in ['0','2','3','4','5','6']:
+class Exportdb(Resource): # type: ignore[misc]
+    def get(self, database: int) -> Any:
+        if str(database) not in ['0','2','3','4','5','6']:
             return(['You are not allowed to dump this DataBase'])
         red = Redis(unix_socket_path=get_socket_path('cache'), db=database)
         dump={}
@@ -196,8 +196,8 @@ class Exportdb(Resource):
 @api.route('/posts/<year>/<month>')
 @api.route('/posts/<year>')
 @api.doc(description='Dump posts for a month/year', tags=['posts'])
-class PostPerMonth(Resource):
-    def get(self, year, month=None):
+class PostPerMonth(Resource): # type: ignore[misc]
+    def get(self, year: int, month: Optional[int]=None) -> List[Dict[str, Any]]:
         posts = []
         if month != None:
             date = str(year)+'-'+str(month)
@@ -215,8 +215,8 @@ class PostPerMonth(Resource):
 
 @api.route('/posts/period/<start_date>/<end_date>')
 @api.doc(description='Dump posts for a month/year', tags=['posts'])
-class PostPerPeriod(Resource):
-    def get(self, start_date, end_date):
+class PostPerPeriod(Resource): # type: ignore[misc]
+    def get(self, start_date: str, end_date: str) -> List[Dict[str, Any]]:
         posts = []
         red = Redis(unix_socket_path=get_socket_path('cache'), db=2)
         for key in red.keys():
@@ -231,8 +231,8 @@ class PostPerPeriod(Resource):
 @api.route('/graphs/heatmap/<year>/<month>')
 @api.route('/graphs/heatmap/<year>')
 @api.doc(description='Density heatmap for a month', tags=['posts'])
-class DensityHeatmap(Resource):
-    def get(self, year, month=None):
+class DensityHeatmap(Resource): # type: ignore[misc]
+    def get(self, year: int, month: Optional[int]=None): # type: ignore[no-untyped-def]
         group_names = []
         timestamps = []
         if month != None:
@@ -261,8 +261,8 @@ class DensityHeatmap(Resource):
 @api.route('/graphs/scatter/<year>')
 @api.route('/graphs/scatter/<year>/<month>')
 @api.doc(description='Distribution per days for a month', tags=['posts'])
-class Scatter(Resource):
-    def get(self, year, month=None):
+class Scatter(Resource): # type: ignore[misc]
+    def get(self, year: int, month: Optional[int]=None): # type: ignore[no-untyped-def]
         group_names = []
         timestamps = []
         if month != None:
@@ -291,8 +291,8 @@ class Scatter(Resource):
 @api.route('/graphs/pie/<year>')
 @api.route('/graphs/pie/<year>/<month>')
 @api.doc(description='Percentage of total post during the month', tags=['posts'])
-class Pie(Resource):
-    def get(self, year, month=None):
+class Pie(Resource): # type: ignore[misc]
+    def get(self, year: int, month: Optional[int]=None): # type: ignore[no-untyped-def]
         group_names = []
         timestamps = []
         if month != None:
@@ -322,8 +322,8 @@ class Pie(Resource):
 @api.route('/graphs/bar/<year>')
 @api.route('/graphs/bar/<year>/<month>')
 @api.doc(description='Posts per group during the month', tags=['posts'])
-class Bar(Resource):
-    def get(self, year, month=None):
+class Bar(Resource): # type: ignore[misc]
+    def get(self, year: int, month: Optional[int]=None): # type: ignore[no-untyped-def]
         group_names = []
         timestamps = []
         if month != None:
@@ -352,8 +352,8 @@ class Bar(Resource):
 
 @api.route('/graphs/period/heatmap/<start_date>/<end_date>')
 @api.doc(description='Density heatmap for a period', tags=['posts'])
-class PeriodDensityHeatmap(Resource):
-    def get(self, start_date, end_date):
+class PeriodDensityHeatmap(Resource): # type: ignore[misc]
+    def get(self, start_date: str, end_date: str ): # type: ignore[no-untyped-def]
         group_names = []
         timestamps = []
 
@@ -378,8 +378,8 @@ class PeriodDensityHeatmap(Resource):
 
 @api.route('/graphs/period/scatter/<start_date>/<end_date>')
 @api.doc(description='Distribution per days for a period', tags=['posts'])
-class PeriodScatter(Resource):
-    def get(self, start_date, end_date):
+class PeriodScatter(Resource): # type: ignore[misc]
+    def get(self, start_date: str, end_date: str): # type: ignore[no-untyped-def]
         group_names = []
         timestamps = []
 
@@ -404,8 +404,8 @@ class PeriodScatter(Resource):
 
 @api.route('/graphs/period/pie/<start_date>/<end_date>')
 @api.doc(description='Percentage of total post during the period', tags=['posts'])
-class PeriodPie(Resource):
-    def get(self, start_date, end_date):
+class PeriodPie(Resource): # type: ignore[misc]
+    def get(self, start_date: str, end_date: str): # type: ignore[no-untyped-def]
         group_names = []
         timestamps = []
         red = Redis(unix_socket_path=get_socket_path('cache'), db=2)
@@ -430,8 +430,8 @@ class PeriodPie(Resource):
 
 @api.route('/graphs/period/bar/<start_date>/<end_date>')
 @api.doc(description='Posts per group during the period', tags=['posts'])
-class PeriodBar(Resource):
-    def get(self, start_date, end_date):
+class PeriodBar(Resource): # type: ignore[misc]
+    def get(self, start_date: str, end_date: str): # type: ignore[no-untyped-def]
         group_names = []
         timestamps = []
         red = Redis(unix_socket_path=get_socket_path('cache'), db=2)

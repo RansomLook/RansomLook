@@ -8,7 +8,7 @@ from ransomlook.default import get_socket_path, get_config
 
 
 
-def main():
+def main() -> None:
     print("Getting CryptoCurrency Transactions")
     response =  requests.get('https://api.ransomwhe.re/export')
     if response.status_code != 200:

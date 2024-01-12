@@ -5,7 +5,9 @@ from mastodon import Mastodon
 
 from .sharedutils import errlog
 
-def tootnotify(config, group, title, siteurl) -> None :
+from typing import Dict, Any
+
+def tootnotify(config: Dict[str, Any], group: str, title: str, siteurl: str) -> None :
     '''
     Posting message to Mastodon
     '''
@@ -15,7 +17,7 @@ def tootnotify(config, group, title, siteurl) -> None :
     except:
         errlog('Can not toot :(')
 
-def tootnotifyleak(config, name) -> None :
+def tootnotifyleak(config: Dict[str, Any], name: str) -> None :
     '''
     Posting message to Mastodon
     '''

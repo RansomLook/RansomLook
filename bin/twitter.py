@@ -3,7 +3,7 @@
 #!/usr/bin/env python3
 from ransomlook import twitter
 
-def main():
+def main() -> None:
     print("Starting scraping")
     twitter.scraper()
     twitter.parser()

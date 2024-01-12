@@ -12,7 +12,7 @@ from threading import Thread, Lock
 from datetime import datetime
 import urllib.parse
 import time
-from typing import Dict
+from typing import Dict, Any, Optional
 from playwright.sync_api import sync_playwright, TimeoutError as PlaywrightTimeoutError
 from playwright_stealth import stealth_sync # type: ignore
 
@@ -25,7 +25,6 @@ from PIL import Image
 from PIL.PngImagePlugin import PngInfo
 
 from .sharedutils import striptld
-from .sharedutils import openjson
 from .sharedutils import siteschema
 from .sharedutils import stdlog, errlog
 from .sharedutils import createfile
@@ -38,7 +37,7 @@ def creategroup(location: str) -> Dict[str, object] :
     create a new group for a new provider - added to groups.json
     '''
     mylocation = siteschema(location)
-    insertdata: dict = {
+    insertdata: dict[str, Optional[Any]] = {
         'captcha': bool(),
         'meta': None,
         'locations': [
@@ -58,7 +57,7 @@ def checkexisting(provider: str, db: int) -> bool:
         return True
     return False
 
-def threadscape(queuethread, lock):
+def threadscape(queuethread, lock) -> None: # type: ignore[no-untyped-def]
     '''
     Thread used to scrape our website
     '''
@@ -186,7 +185,7 @@ def appender(name: str, location: str, db: int) -> int:
     red.set(name.strip(), json.dumps(group))
     return 1
 
-def threadscreen(queuethread, lock) -> None:
+def threadscreen(queuethread, lock) -> None: # type: ignore[no-untyped-def]
     with sync_playwright() as play:
         while True:
             host, group, title = queuethread.get()
@@ -284,7 +283,7 @@ def screen() -> None:
     queuethread.join()
     time.sleep(5)
 
-def threadtorrent(queuethread, lock) -> None:
+def threadtorrent(queuethread, lock) -> None: # type: ignore[no-untyped-def]
     while True:
         sess, torrent = queuethread.get()
         print(torrent)

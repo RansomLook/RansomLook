@@ -28,7 +28,7 @@ Run the following command (assuming you run the code from the clonned repository
     export {env_global_name}='{guessed_home}'")
     return Path(os.environ[env_global_name])
 
-def load_configs(path_to_config_files: Optional[Union[str, Path]]=None):
+def load_configs(path_to_config_files: Optional[Union[str, Path]]=None) -> None:
     global configs
     if configs:
         return

@@ -23,7 +23,9 @@ from ransomlook.email import alertingnotify
 
 from ransomlook.sharedutils import dbglog, stdlog, errlog, statsgroup, run_data_viz
 
-def posttemplate(victim, description, link, timestamp, magnet):
+from typing import Dict, Optional, Union, Any, List
+
+def posttemplate(victim: str, description: str, link: Optional[str], timestamp: str , magnet: Optional[str]) -> Dict[str, Optional[str]]:
     '''
     assuming we have a new post - form the template we will use for the new entry in posts.json
     '''
@@ -39,7 +41,7 @@ def posttemplate(victim, description, link, timestamp, magnet):
     dbglog(schema)
     return schema
 
-def appender(entry, group_name):
+def appender(entry: Union[Dict[str, str], str], group_name: str) -> None :
     '''
     append a new post to posts.json
     '''
@@ -56,14 +58,14 @@ def appender(entry, group_name):
        link = None
        magnet = None
     else :
-       post_title=entry['title']
-       description = entry['description']
+       post_title =entry['title'] # type: ignore
+       description = entry['description'] # type: ignore
        if 'link' in entry:
-           link = entry['link']
+           link = entry['link'] # type: ignore
        else:
            link = None
        if 'magnet' in entry:
-           magnet = entry['magnet']
+           magnet = entry['magnet'] # type: ignore
        else:
            magnet = None
     if len(post_title) == 0:
@@ -94,7 +96,7 @@ def appender(entry, group_name):
            toscan=[]
         else: 
            toscan = json.loads(screenred.get('toscan')) # type: ignore
-        toscan.append({'group': group_name, 'title': entry['title'], 'slug': entry['slug'], 'link': entry['link']})
+        toscan.append({'group': group_name, 'title': entry['title'], 'slug': entry['slug'], 'link': entry['link']}) # type: ignore
         screenred.set('toscan', json.dumps(toscan))
     # preparing to torrent
     if magnet != None and magnet != '':
@@ -103,7 +105,7 @@ def appender(entry, group_name):
            totorrent=[]
         else: 
            totorrent = json.loads(torrentred.get('totorrent')) # type: ignore
-        totorrent.append({'group': group_name, 'title': entry['title'], 'magnet': entry['magnet']})
+        totorrent.append({'group': group_name, 'title': entry['title'], 'magnet': entry['magnet']}) # type: ignore
         torrentred.set('totorrent', json.dumps(totorrent))
     # Notification zone
     red = redis.Redis(unix_socket_path=get_socket_path('cache'), db=1)
@@ -142,7 +144,7 @@ def appender(entry, group_name):
             galaxyname = None
         mispevent(mispconfig, group_name, post_title, description, galaxyname)
 
-def main():
+def main() -> None:
     modules = glob.glob(join(dirname('ransomlook/parsers/'), "*.py"))
     __all__ = [ basename(f)[:-3] for f in modules if isfile(f) and not f.endswith('__init__.py')]
     for parser in __all__:

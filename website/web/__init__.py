@@ -39,7 +39,7 @@ from .helpers import get_secret_key, sri_load, User, build_users_table, load_use
 from .forms import AddForm, LoginForm, SelectForm, EditForm, DeleteForm, AlertForm
 from .ldap import global_ldap_authentication
 
-from typing import Dict, Any
+from typing import Dict, Any, Optional
 
 from .api.genericapi import api as generic_api
 from .api.telegramapi import api as telegram_api
@@ -64,7 +64,7 @@ flask_moment.Moment(app=app)
 
 
 @app.context_processor
-def inject_global_vars():
+def inject_global_vars() -> Dict[str, bool]:
     darkmode = False
     activatedRF = False
     if get_config('generic','darkmode'):
@@ -74,7 +74,7 @@ def inject_global_vars():
     return {'darkmode': darkmode, 'activatedRF': activatedRF}
 # Getting the error
 #@app.errorhandler(Exception)
-def handle_error(e):
+def handle_error(e): # type: ignore[no-untyped-def]
     code = 500
     if isinstance(e, HTTPException):
         return render_template('40x.html', error=e.name, message=e.description), code
@@ -82,17 +82,18 @@ def handle_error(e):
     return render_template("500_generic.html", e=e), 500
 
 @app.route('/favicon.ico')
-def favicon():
+def favicon(): # type: ignore[no-untyped-def]
     return send_from_directory(os.path.join(get_homedir(), 'website/web/static'),
                                'ransomlook.svg', mimetype='image/svg+xml')
+
 ldap_config = get_config('generic','ldap')
 ldap = ldap_config['enable']
 # Auth stuff
 login_manager = flask_login.LoginManager()
 login_manager.init_app(app)
 
-@login_manager.user_loader
-def user_loader(username):
+@login_manager.user_loader # type: ignore[misc]
+def user_loader(username: str) -> Optional[str]:
     if not ldap:
         if username not in build_users_table():
             return None
@@ -102,18 +103,18 @@ def user_loader(username):
 
 
 @login_manager.request_loader
-def _load_user_from_request(request):
-    return load_user_from_request(request)
+def _load_user_from_request(request): # type: ignore
+    return load_user_from_request(request) # type: ignore[no-untyped-call]
 
 
 @app.route('/login', methods=['GET', 'POST'])
-def login():
+def login(): # type: ignore[no-untyped-def]
     form = LoginForm()
     if form.validate_on_submit():
         username = form.username.data
         if not ldap_config['enable']:
             users_table = build_users_table()
-            if username in users_table and check_password_hash(users_table[username]['password'], form.password.data):
+            if username in users_table and check_password_hash(users_table[username]['password'], form.password.data): # type: ignore[no-untyped-call]
                 user = User()
                 user.id = username
                 flask_login.login_user(user)
@@ -134,7 +135,7 @@ def login():
 
 
 @app.route('/logout')
-@flask_login.login_required
+@flask_login.login_required # type: ignore[no-untyped-def]
 def logout():
     flask_login.logout_user()
     flash('Successfully logged out.', 'success')
@@ -151,11 +152,11 @@ app.jinja_env.globals.update(get_sri=get_sri)
 def suffix(d: int) -> str :
     return 'th' if 11<=d<=13 else {1:'st',2:'nd',3:'rd'}.get(d%10, 'th')
 
-def custom_strftime(fmt, t):
+def custom_strftime(fmt, t) -> str: # type: ignore
     return t.strftime(fmt).replace('{S}', str(t.day) + suffix(t.day))
 
 @app.route('/')
-def home():
+def home(): # type: ignore[no-untyped-def]
         date = custom_strftime('%B {S}, %Y', dt.now()).lower()
         data = {}
         data['nbgroups'] = groupcount()
@@ -180,7 +181,7 @@ def home():
         return render_template("index.html", date=date, data=data,alert=alert, posts=alertposts)
 
 @app.route("/recent")
-def recent():
+def recent(): # type: ignore[no-untyped-def]
         posts = []
         red = Redis(unix_socket_path=get_socket_path('cache'), db=2)
         for key in red.keys():
@@ -197,7 +198,7 @@ def recent():
         return render_template("recent.html", data=recentposts)
 
 @app.route("/rss.xml")
-def feeds():
+def feeds(): # type: ignore[no-untyped-def]
         posts = []
         red = Redis(unix_socket_path=get_socket_path('cache'), db=2)
         for key in red.keys():
@@ -216,15 +217,15 @@ def feeds():
         return render_template("rss.xml", posts=recentposts, build_date=dt.now()), {'Content-Type': 'application/xml'}
 
 @app.route("/stats")
-def stats():
+def stats(): # type: ignore[no-untyped-def]
         return render_template("stats.html")
 
 @app.route("/about")
-def about():
+def about(): # type: ignore[no-untyped-def]
         return render_template("about.html")
 
 @app.route("/status")
-def status():
+def status(): # type: ignore[no-untyped-def]
         red = Redis(unix_socket_path=get_socket_path('cache'), db=0)
         groups = []
         for key in red.keys():
@@ -254,7 +255,7 @@ def status():
 
 @app.route("/alive")
 
-def alive():
+def alive(): # type: ignore[no-untyped-def]
         red = Redis(unix_socket_path=get_socket_path('cache'), db=0)
         groups = []
         for key in red.keys():
@@ -284,7 +285,7 @@ def alive():
 
 
 @app.route("/groups")
-def groups():
+def groups(): # type: ignore[no-untyped-def]
         red = Redis(unix_socket_path=get_socket_path('cache'), db=0)
         redpost = Redis(unix_socket_path=get_socket_path('cache'), db=2)
 
@@ -310,9 +311,8 @@ def groups():
         return render_template("groups.html", data=groups, parser=parserlist, type="groups")
 
 @app.route("/group/<name>")
-def group(name):
+def group(name: str): # type: ignore[no-untyped-def]
         red = Redis(unix_socket_path=get_socket_path('cache'), db=0)
-        groups = []
         for key in red.keys():
                 if key.decode().lower() == name.lower():
                         group= json.loads(red.get(key)) # type: ignore
@@ -337,7 +337,7 @@ def group(name):
         return redirect(url_for("home"))
 
 @app.route("/markets")
-def markets():
+def markets(): # type: ignore[no-untyped-def]
         red = Redis(unix_socket_path=get_socket_path('cache'), db=3)
         redpost = Redis(unix_socket_path=get_socket_path('cache'), db=2)
 
@@ -363,9 +363,8 @@ def markets():
         return render_template("groups.html", data=groups, parser=parserlist, type="markets")
 
 @app.route("/market/<name>")
-def market(name):
+def market(name: str): # type: ignore[no-untyped-def]
         red = Redis(unix_socket_path=get_socket_path('cache'), db=3)
-        groups = []
         for key in red.keys():
                 if key.decode().lower() == name.lower():
                         group= json.loads(red.get(key)) # type: ignore
@@ -380,7 +379,7 @@ def market(name):
         return redirect(url_for("home"))
 
 @app.route("/leaks")
-def leaks():
+def leaks(): # type: ignore[no-untyped-def]
         red = Redis(unix_socket_path=get_socket_path('cache'), db=4)
 
         leaks = []
@@ -392,10 +391,9 @@ def leaks():
         return render_template("leaks.html", data=leaks)
 
 @app.route("/leak/<name>")
-def leak(name):
-        red = Redis(unix_socket_path=get_socket_path('cache'), db=4)
-        groups = []
-        for key in red.keys():
+def leak(name: str): # type: ignore[no-untyped-def]
+        red = Redis(unix_socket_path=get_socket_path('cache'), db=4) 
+        for key in red.keys(): 
                 if key.decode().lower() == name.lower():
                         group= json.loads(red.get(key)) # type: ignore
                         if 'meta' in group and group['meta'] is not None:
@@ -405,7 +403,7 @@ def leak(name):
         return redirect(url_for("home"))
 
 @app.route("/notes")
-def notes():
+def notes(): # type: ignore[no-untyped-def]
         red = Redis(unix_socket_path=get_socket_path('cache'), db=11)
         data = []
         keys = []
@@ -417,7 +415,7 @@ def notes():
         return render_template("notes.html", data=data)
 
 @app.route("/notes/<name>")
-def notesdetails(name):
+def notesdetails(name: str): # type: ignore[no-untyped-def]
         red = Redis(unix_socket_path=get_socket_path('cache'), db=11)
         data = []
         data = json.loads(red.get(name.lower())) # type: ignore
@@ -425,7 +423,7 @@ def notesdetails(name):
 
 
 @app.route("/RF")
-def rf():
+def rf(): # type: ignore[no-untyped-def]
         red = Redis(unix_socket_path=get_socket_path('cache'), db=10)
         leaks = []
         for key in red.keys():
@@ -435,9 +433,8 @@ def rf():
         return render_template("RF.html", data=leaks)
 
 @app.route("/RF/<name>")
-def rfdetails(name):
+def rfdetails(name: str): # type: ignore[no-untyped-def]
         red = Redis(unix_socket_path=get_socket_path('cache'), db=10)
-        groups = []
         for key in red.keys():
                 if key.decode().lower() == name.lower():
                         group= json.loads(red.get(key)) # type: ignore
@@ -447,7 +444,7 @@ def rfdetails(name):
 
 
 @app.route("/telegrams")
-def telegrams():
+def telegrams(): # type: ignore[no-untyped-def]
         red = Redis(unix_socket_path=get_socket_path('cache'), db=5)
 
         telegram = []
@@ -461,9 +458,8 @@ def telegrams():
         return render_template("telegrams.html", data=telegram)
 
 @app.route("/telegram/<name>")
-def telegram(name):
+def telegram(name: str): # type: ignore[no-untyped-def]
         red = Redis(unix_socket_path=get_socket_path('cache'), db=6)
-        groups = []
         for key in red.keys():
                 if key.decode() == name:
                         posts= json.loads(red.get(key)) # type: ignore
@@ -478,7 +474,7 @@ def telegram(name):
         return redirect(url_for("home"))
 
 @app.route("/twitters")
-def twitters():
+def twitters(): # type: ignore[no-untyped-def]
         red = Redis(unix_socket_path=get_socket_path('cache'), db=8)
         twitter = []
         for key in red.keys():
@@ -491,7 +487,7 @@ def twitters():
         return render_template("twitters.html", data=twitter)
 
 @app.route("/twitter/<name>")
-def twitter(name):
+def twitter(name: str): # type: ignore[no-untyped-def]
         redprofile = Redis(unix_socket_path=get_socket_path('cache'), db=8)
         red = Redis(unix_socket_path=get_socket_path('cache'), db=9)
         profile = redprofile.get(name)
@@ -505,7 +501,7 @@ def twitter(name):
         return render_template("twitter.html", posts = sorted_posts, name=json.loads(profile))
 
 @app.route("/crypto")
-def crypto():
+def crypto(): # type: ignore[no-untyped-def]
         red = Redis(unix_socket_path=get_socket_path('cache'), db=7)
         groups = {}
         for key in red.keys():
@@ -514,7 +510,7 @@ def crypto():
         return render_template("crypto.html", data=crypto)
 
 @app.route('/search', methods=['GET', 'POST'])
-def search():
+def search(): # type: ignore[no-untyped-def]
     if request.method == 'POST':
         query = request.form.get('search')
         red = Redis(unix_socket_path=get_socket_path('cache'), db=0)
@@ -587,15 +583,15 @@ def search():
     return redirect(url_for("home"))
 
 @app.route("/stats/<file>")
-def screenshotsstats(file):
+def screenshotsstats(file: str): # type: ignore[no-untyped-def]
     return send_from_directory( str(get_homedir())+ '/source/screenshots/stats', file, mimetype='image/gif')
 
 @app.route("/screenshots/<file>")
-def screenshots(file):
+def screenshots(file: str): # type: ignore[no-untyped-def]
     return send_from_directory( str(get_homedir())+ '/source/screenshots', file, mimetype='image/gif')
 
 @app.route("/screenshots/<group>/<file>")
-def screenshotspost(group, file):
+def screenshotspost(group: str, file: str): # type: ignore[no-untyped-def]
     fullpath = os.path.normpath(os.path.join(str(get_homedir())+ '/source/screenshots/', group))
     if not fullpath.startswith(str(get_homedir())):
         raise Exception("not allowed")
@@ -604,19 +600,19 @@ def screenshotspost(group, file):
     return send_from_directory( fullpath, file, mimetype='image/gif')
 
 @app.route("/screenshots/telegram/<file>")
-def screenshotstelegram(file):
+def screenshotstelegram(file: str): # type: ignore[no-untyped-def]
     return send_from_directory( str(get_homedir())+ '/source/screenshots/telegram', file, mimetype='image/gif')
 
 @app.route("/screenshots/telegram/img/<file>")
-def screenshotstelegramimg(file):
+def screenshotstelegramimg(file: str): # type: ignore[no-untyped-def]
     return send_from_directory( str(get_homedir())+ '/source/screenshots/telegram/img', file, mimetype='image/gif')
 
 @app.route("/screenshots/twitter/<file>")
-def screenshotstwitter(file):
+def screenshotstwitter(file: str): # type: ignore[no-untyped-def]
     return send_from_directory( str(get_homedir())+ '/source/screenshots/twitter/', file, mimetype='image/gif')
 
 @app.route("/screenshots/twitter/img/<file>")
-def screenshotstwitterimg(file):
+def screenshotstwitterimg(file: str): # type: ignore[no-untyped-def]
     return send_from_directory( str(get_homedir())+ '/source/screenshots/twitter/img', file, mimetype='image/gif')
 
 # Admin Zone
@@ -624,12 +620,12 @@ def screenshotstwitterimg(file):
 @app.route('/admin/')
 @app.route('/admin')
 @flask_login.login_required
-def admin():
+def admin(): # type: ignore[no-untyped-def]
     return render_template('admin.html')
 
 @app.route('/admin/add', methods=['GET', 'POST'])
 @flask_login.login_required
-def addgroup():
+def addgroup(): # type: ignore[no-untyped-def]
     score = int(round(dt.now().timestamp()))
     form = AddForm()
     if form.validate_on_submit():
@@ -651,7 +647,7 @@ def addgroup():
 
 @app.route('/admin/edit', methods=['GET', 'POST'])
 @flask_login.login_required
-def edit():
+def edit(): # type: ignore[no-untyped-def]
     formSelect = SelectForm()
     formMarkets = SelectForm()
     red = Redis(unix_socket_path=get_socket_path('cache'), db=0)
@@ -677,8 +673,8 @@ def edit():
     return render_template('edit.html', form=formSelect, formMarkets=formMarkets)
 
 @app.route('/admin/edit/<database>/<name>', methods=['GET', 'POST'])
-@flask_login.login_required
-def editgroup(database, name):
+@flask_login.login_required # type: ignore
+def editgroup(database: int, name: str): 
     score = dt.now().timestamp()
     deleteButton = DeleteForm()
     form = EditForm()
@@ -698,7 +694,7 @@ def editgroup(database, name):
         red.set(name, json.dumps(data))
         redlogs.zadd('logs', {f'{flask_login.current_user.id} modified : {name}, {data["meta"]}, {data["profile"]}, {data["locations"]}': score})
         if name != form.groupname.data:
-            red.rename(name, form.groupname.data.lower())
+            red.rename(name, form.groupname.data.lower()) # type: ignore[no-untyped-call]
             redlogs.zadd('logs', {f'{flask_login.current_user.id} renamed : {name} to {form.groupname.data}': score})
         flash(f'Success to edit : {form.groupname.data}', 'success')
         return redirect(url_for('admin'))
@@ -721,8 +717,8 @@ def editgroup(database, name):
     return render_template('editentry.html', form=form, deleteform=deleteButton)
 
 @app.route('/export/<database>')
-def exportdb(database):
-    if database not in ['0','2','3','4','5','6','7']:
+def exportdb(database: int): # type: ignore[no-untyped-def]
+    if str(database) not in ['0','2','3','4','5','6','7']:
         flash(f'You are not allowed to dump this DataBase', 'error')
         return redirect(url_for('home'))
     red = Redis(unix_socket_path=get_socket_path('cache'), db=database)
@@ -733,7 +729,7 @@ def exportdb(database):
 
 @app.route('/admin/logs')
 @flask_login.login_required
-def logs():
+def logs(): # type: ignore[no-untyped-def]
     red = Redis(unix_socket_path=get_socket_path('cache'), db=1)
     logs = red.zrange('logs', 0, -1, desc=True, withscores=True)
     log = []
@@ -743,7 +739,7 @@ def logs():
 
 @app.route('/admin/alerting', methods=['GET', 'POST'])
 @flask_login.login_required
-def alerting():
+def alerting(): # type: ignore[no-untyped-def]
     form = AlertForm()
     red = Redis(unix_socket_path=get_socket_path('cache'), db=1)
     keywordsred = red.get('keywords')

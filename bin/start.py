@@ -5,7 +5,7 @@ from subprocess import Popen, run
 from ransomlook.default import get_config, get_homedir
 
 
-def main():
+def main() -> None:
     # Just fail if the env isn't set.
     get_homedir()
     print('Start backend (redis)...')

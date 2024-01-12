@@ -2,7 +2,7 @@
 from ransomlook import ransomlook
 import sys
 
-def main():
+def main() -> None :
     print("Adding location")
     if len(sys.argv) != 4 :
         print('usage : poetry run add [group url DB(0or3)]')

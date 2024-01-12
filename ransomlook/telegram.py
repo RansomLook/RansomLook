@@ -11,7 +11,7 @@ import queue
 from threading import Thread, Lock
 from datetime import datetime
 import time
-from typing import Dict
+from typing import Dict, List, Any
 from playwright.sync_api import sync_playwright, TimeoutError as PlaywrightTimeoutError
 from playwright_stealth import stealth_sync # type: ignore
 
@@ -24,7 +24,6 @@ import smtplib
 from email.message import EmailMessage
 
 from .sharedutils import striptld
-from .sharedutils import openjson
 from .sharedutils import siteschema
 from .sharedutils import stdlog, errlog
 from .sharedutils import createfile
@@ -36,7 +35,7 @@ from googletrans import Translator # type: ignore
 
 import re
 
-def alertingnotify(config, group, description, keyword, timestamp) -> None :
+def alertingnotify(config: Dict[str, Any], group: bytes, description: str, keyword: List[str], timestamp: str) -> None :
     '''
     Posting message to RocketChat
     '''
@@ -68,7 +67,7 @@ A new message in telegram is matching your keywords:
         print(e)
     except Exception as e: print(e)
 
-def threadscape(queuethread, lock):
+def threadscape(queuethread, lock): # type: ignore
     '''
     Thread used to scrape our website
     '''
@@ -131,7 +130,7 @@ def scraper() -> None:
     time.sleep(5)
     stdlog('Writing result')
 
-def parser():
+def parser() -> None:
     '''parsing telegram'''
     red = redis.Redis(unix_socket_path=get_socket_path('cache'), db=5)
     redmessage = redis.Redis(unix_socket_path=get_socket_path('cache'), db=6)
@@ -195,7 +194,7 @@ def parser():
            print('error with :'+key.decode())
            continue
 
-def teladder(name, link):
+def teladder(name: str, link: str) -> int:
     red = redis.Redis(unix_socket_path=get_socket_path('cache'), db=5)
     try:
         data = {

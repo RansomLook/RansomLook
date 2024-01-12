@@ -25,14 +25,14 @@ def check_running(name: str) -> bool:
         return False
 
 
-def launch_cache(storage_directory: Optional[Path]=None):
+def launch_cache(storage_directory: Optional[Path]=None) -> None:
     if not storage_directory:
         storage_directory = get_homedir()
     if not check_running('cache'):
         Popen(["./run_redis.sh"], cwd=(storage_directory / 'cache'))
 
 
-def shutdown_cache(storage_directory: Optional[Path]=None):
+def shutdown_cache(storage_directory: Optional[Path]=None) -> None:
     if not storage_directory:
         storage_directory = get_homedir()
     r = Redis(unix_socket_path=get_socket_path('cache'))
@@ -40,11 +40,11 @@ def shutdown_cache(storage_directory: Optional[Path]=None):
     print('Redis cache database shutdown.')
 
 
-def launch_all():
+def launch_all() -> None:
     launch_cache()
 
 
-def check_all(stop: bool=False):
+def check_all(stop: bool=False) -> None:
     backends: Dict[str, bool] = {'cache': False}
     while True:
         for db_name in backends.keys():
@@ -66,11 +66,11 @@ def check_all(stop: bool=False):
         time.sleep(1)
 
 
-def stop_all():
+def stop_all() -> None:
     shutdown_cache()
 
 
-def main():
+def main() -> None:
     parser = argparse.ArgumentParser(description='Manage backend DBs.')
     parser.add_argument("--start", action='store_true', default=False, help="Start all")
     parser.add_argument("--stop", action='store_true', default=False, help="Stop all")

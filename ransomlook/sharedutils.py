@@ -15,7 +15,7 @@ import plotly.express as px # type: ignore
 import plotly.io as pio     # type: ignore
 import pandas as pd
 
-from typing import Dict, List, Tuple, Any
+from typing import Dict, List, Tuple, Any, Optional
 
 from ransomlook.default.config import get_homedir, get_socket_path, get_config
 
@@ -40,18 +40,6 @@ def errlog(msg: Any) -> None :
     '''standard error logging'''
     logging.error(msg)
 
-def openjson(file: str) -> List :
-    '''
-    opens a file and returns the json as a dict
-    '''
-    try:
-        filename=file
-        with open(str(get_homedir())+'/'+filename, encoding='utf-8') as jsonfile:
-            data = json.load(jsonfile)
-    except:
-        data = []
-    return data
-
 def honk(msg: Any) -> None :
     '''critical error logging with termination'''
     logging.critical(msg)
@@ -60,7 +48,7 @@ def honk(msg: Any) -> None :
 '''
 Graphs
 '''
-def statsgroup(group) -> None :
+def statsgroup(group: bytes) -> None :
     # Reset variables
     victim_counts: Dict[str, int] = {}
     dates = (Any)
@@ -112,7 +100,7 @@ def statsgroup(group) -> None :
     plt.savefig(str(get_homedir()) +'/source/screenshots/stats/' + group.decode() + '.png')
     plt.close(fig)
 
-def run_data_viz(days_filter):
+def run_data_viz(days_filter: int) -> None:
     now = datetime.now()
 
     red = redis.Redis(unix_socket_path=get_socket_path('cache'), db=2)
@@ -163,7 +151,7 @@ def run_data_viz(days_filter):
     filename = join(get_homedir(),"source/screenshots/stats","bar_chart_"+ str(days_filter)+".png")
     fig4.write_image(filename)
 
-def gcount(posts: List) -> Dict[str, int]:
+def gcount(posts: List[Dict[str, Any]]) -> Dict[str, int]:
     group_counts: Dict[str, int] = {}
     for post in posts:
         if post['group_name'] in group_counts:
@@ -291,7 +279,7 @@ def countcaptchahosts() -> int :
 '''
 Ransomlook
 '''
-def siteschema(location) -> Dict :
+def siteschema(location: str) -> Dict[str, Optional[Any]] :
     '''
     returns a dict with the site schema
     '''

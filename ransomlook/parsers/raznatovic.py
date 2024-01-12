@@ -1,7 +1,8 @@
 import os
 from bs4 import BeautifulSoup
+from typing import Dict, List
 
-def main():
+def main() -> List[Dict[str, str]] :
     list_div=[]
     for filename in os.listdir('source'):
         if filename.startswith(__name__.split('.')[-1]+'-'):

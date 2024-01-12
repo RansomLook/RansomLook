@@ -20,12 +20,12 @@ class AbstractManager(ABC):
 
     script_name: str
 
-    def __init__(self, loglevel: int=logging.DEBUG):
+    def __init__(self, loglevel: int=logging.DEBUG) -> None:
         self.loglevel = loglevel
         self.logger = logging.getLogger(f'{self.__class__.__name__}')
         self.logger.setLevel(loglevel)
         self.logger.info(f'Initializing {self.__class__.__name__}')
-        self.process: Optional[Popen] = None
+        self.process: Optional[Popen] = None # type: ignore[type-arg]
         self.__redis = Redis(unix_socket_path=get_socket_path('cache'), db=1, decode_responses=True)
 
         self.force_stop = False
@@ -52,7 +52,7 @@ class AbstractManager(ABC):
             return []
 
     @staticmethod
-    def clear_running():
+    def clear_running() -> None:
         try:
             r = Redis(unix_socket_path=get_socket_path('cache'), db=1, decode_responses=True)
             r.delete('running')
@@ -60,7 +60,7 @@ class AbstractManager(ABC):
             print('Unable to connect to redis, the system is down.')
 
     @staticmethod
-    def force_shutdown():
+    def force_shutdown() -> None:
         try:
             r = Redis(unix_socket_path=get_socket_path('cache'), db=1, decode_responses=True)
             r.set('shutdown', 1)
@@ -105,7 +105,7 @@ class AbstractManager(ABC):
     def _to_run_forever(self) -> None:
         raise NotImplementedError('This method must be implemented by the child')
 
-    def _kill_process(self):
+    def _kill_process(self) -> None:
         if self.process is None:
             return
         kill_order = [signal.SIGWINCH, signal.SIGTERM, signal.SIGINT, signal.SIGKILL]
@@ -157,7 +157,7 @@ class AbstractManager(ABC):
                 pass
             self.logger.info(f'Shutting down {self.__class__.__name__}')
 
-    async def stop(self):
+    async def stop(self) -> None:
         self.force_stop = True
 
     async def _to_run_forever_async(self) -> None:
@@ -166,7 +166,7 @@ class AbstractManager(ABC):
     async def _wait_to_finish(self) -> None:
         self.logger.info('Not implemented, nothing to wait for.')
 
-    async def stop_async(self):
+    async def stop_async(self) -> None:
         """Method to pass the signal handler:
             loop.add_signal_handler(signal.SIGTERM, lambda: loop.create_task(p.stop()))
         """

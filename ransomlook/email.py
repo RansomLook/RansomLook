@@ -8,7 +8,9 @@ from email.message import EmailMessage
 
 from .sharedutils import errlog
 
-def alertingnotify(config, group, title, description, keyword) -> None :
+from typing import Dict, Any, List
+
+def alertingnotify(config: Dict[str, Any], group: str, title: str, description: str, keyword: List[str]) -> None :
     '''
     Posting message to RocketChat
     '''

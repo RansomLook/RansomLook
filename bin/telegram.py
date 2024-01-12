@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 from ransomlook import telegram
 
-def main():
+def main() -> None:
     print("Starting scraping")
     telegram.scraper()
     telegram.parser()

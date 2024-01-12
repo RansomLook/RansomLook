@@ -17,7 +17,9 @@ from ransomlook.default.config import get_config, get_socket_path
 
 from ransomlook.sharedutils import dbglog, stdlog, errlog, statsgroup, run_data_viz
 
-def posttemplate(victim, description, link, timestamp):
+from typing import Dict, Optional
+
+def posttemplate(victim: str, description: str, link: str, timestamp: str) -> Dict[str, Optional[str]]:
     '''
     assuming we have a new post - form the template we will use for the new entry in posts.json
     '''
@@ -32,7 +34,7 @@ def posttemplate(victim, description, link, timestamp):
     dbglog(schema)
     return schema
 
-def appender(entry, group_name):
+def appender(entry, group_name: str) -> None: # type: ignore
     '''
     append a new post to posts.json
     '''
@@ -76,7 +78,7 @@ def appender(entry, group_name):
         totorrent.append({'group': group_name, 'title': entry['title'], 'magnet': entry['magnet']})
         torrentred.set('totorrent', json.dumps(totorrent))
 
-def main():
+def main() -> None:
     if len(sys.argv) != 2:
         modules = glob.glob(join(dirname('ransomlook/parsers/'), "*.py"))
         __all__ = [ basename(f)[:-3] for f in modules if isfile(f) and not f.endswith('__init__.py')]

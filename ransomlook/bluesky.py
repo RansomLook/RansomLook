@@ -4,7 +4,9 @@ import requests
 from .sharedutils import errlog
 from datetime import datetime, timezone
 
-def blueskynotify(config, group, title, siteurl) -> None :
+from typing import Dict
+
+def blueskynotify(config: Dict['str','str'], group: str, title: str, siteurl: str) -> None :
     '''
     Posting message to bluesky
     '''

@@ -5,8 +5,9 @@ RocketChat module
 '''
 from rocketchat_API.rocketchat import RocketChat # type: ignore
 from .sharedutils import errlog
+from typing import Dict, Any
 
-def rocketnotify(config, group, title, description) -> None :
+def rocketnotify(config: Dict[str, Any], group: str, title: str, description: str) -> None :
     '''
     Posting message to RocketChat
     '''
@@ -17,7 +18,7 @@ def rocketnotify(config, group, title, description) -> None :
     except:
         errlog('Can not connect to Rocket')
 
-def rocketnotifyleak(config, datas) -> None :
+def rocketnotifyleak(config: Dict[str, Any], datas: Dict[str, Any]) -> None :
     try:
         rocket = RocketChat(user_id=config['user_id'], auth_token=config['auth_token'], \
             server_url=config['server'], ssl_verify=config['ssl_verify'])
@@ -25,7 +26,7 @@ def rocketnotifyleak(config, datas) -> None :
     except:
         errlog('Can not connect to Rocket')
 
-def rocketnotifyrf(config, datas) -> None :
+def rocketnotifyrf(config: Dict[str, Any], datas: Dict[str, str]) -> None :
     try:
         rocket = RocketChat(user_id=config['user_id'], auth_token=config['auth_token'], \
             server_url=config['server'], ssl_verify=config['ssl_verify'])

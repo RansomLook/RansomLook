@@ -14,7 +14,6 @@ from .default.config import get_config, get_homedir, get_socket_path
 import tweepy # type: ignore
 
 from .sharedutils import striptld
-from .sharedutils import openjson
 from .sharedutils import siteschema
 from .sharedutils import stdlog, errlog
 from .sharedutils import createfile
@@ -25,7 +24,7 @@ import requests, shutil
 
 import redis
 
-def twitternotify(config, group, title) -> None :
+def twitternotify(config: Dict[str, str], group: str, title:str) -> None :
     '''
     Posting message to Twitter
     '''
@@ -38,7 +37,7 @@ def twitternotify(config, group, title) -> None :
     except:
         errlog('Can not tweet :(')
 
-def twitternotifyleak(config, name) -> None :
+def twitternotifyleak(config: Dict[str, str], name: str) -> None :
     '''
     Posting message to Twitter
     '''
@@ -114,7 +113,7 @@ def parser() -> None :
                   errlog(e)
            redmessage.set(key,json.dumps(posts))
 
-def threadscape(queuethread, lock):
+def threadscape(queuethread, lock): # type: ignore
     '''
     Thread used to scrape our website
     '''
@@ -173,7 +172,7 @@ def scraper() -> None:
     stdlog('Writing result')
 
 
-def twiadder(name, link):
+def twiadder(name: str, link: str) -> int:
     red = redis.Redis(unix_socket_path=get_socket_path('cache'), db=8)
     try:
         data = {

@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 from ransomlook import ransomlook
 
-def main():
+def main() -> None:
     print("Starting torrent")
     ransomlook.gettorrentinfo()
     print("Stopping torrent")

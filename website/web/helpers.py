@@ -11,7 +11,7 @@ from typing import Any, Dict, List, Optional, Union, TypedDict
 from ransomlook.default import get_config, get_homedir
 from pathlib import Path
 
-def load_user_from_request(request):
+def load_user_from_request(request): # type: ignore
     api_key = request.headers.get('Authorization')
     if not api_key:
         return None
@@ -23,7 +23,7 @@ def load_user_from_request(request):
         return user
     return None
 
-class User(flask_login.UserMixin):
+class User(flask_login.UserMixin): # type: ignore
     pass
 
 @lru_cache(64)
@@ -36,7 +36,7 @@ def build_keys_table() -> Dict[str, str]:
 
 
 @lru_cache(64)
-def get_users() -> Dict[str, Union[str, List[str]]]:
+def get_users() -> Any:
     try:
         # Use legacy user mgmt, no need to print a warning, and it will fail on new install.
         return get_config('generic', 'cache_clean_user', quiet=True)
@@ -77,6 +77,6 @@ def get_secret_key() -> bytes:
         return f.read()
 
 @lru_cache(64)
-def sri_load() -> Dict[str, Dict[str, str]]:
+def sri_load() -> Any:
     with (get_homedir() / 'website' / 'web' / 'sri.txt').open() as f:
         return json.load(f)
