@@ -13,6 +13,8 @@ def main() -> List[Dict[str, str]] :
                 soup=BeautifulSoup(file,'html.parser')
                 divs_name=soup.find_all('a')
                 for div in divs_name:
+                    if div['href'] == 'Insane.html':
+                        continue
                     if '.html' in div['href']:
                         title = div.text.strip()
                         description =  ''
