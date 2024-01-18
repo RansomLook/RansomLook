@@ -14,7 +14,7 @@ def main() -> List[Dict[str, str]] :
                 divs_name=soup.find_all('article', {"class": "uagb-post__inner-wrap"})
                 for div in divs_name:
                     title = div.find('h4').text.strip()
-                    description = div.find('div',{"class" : "hurrytimer-campaign-message"}).text.strip()
+                    description = list(div.find('div',{"class" : "uagb-post__text uagb-post__excerpt"}).stripped_strings)[-1]
                     list_div.append({"title" : title, "description" : description, "link" : div.h4.a['href'], "slug": filename})
                 file.close()
         except:
