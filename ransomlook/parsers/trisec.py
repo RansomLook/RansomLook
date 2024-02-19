@@ -13,8 +13,8 @@ def main() -> List[Dict[str, str]] :
                 soup=BeautifulSoup(file,'html.parser')
                 divs_name=soup.find_all('td')
                 for div in divs_name:
-                    title = div.a.text.strip()
-                    if title in ['[*] back']:
+                    title = div.a.text.replace('[*]','').strip()
+                    if title == 'back':
                         continue
                     description = ''
                     list_div.append({"title" : title, "description" : description, "link" : div.a['href'], "slug": filename})
