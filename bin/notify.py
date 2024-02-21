@@ -3,6 +3,7 @@
 import json
 
 import smtplib
+import ssl
 from email.message import EmailMessage
 
 from typing import List, Any, Dict
@@ -34,7 +35,7 @@ def getnewpost(date: str) -> Dict[str, List[str]] :
 def main() -> None :
 
     email_config = get_config('generic','email')
-    
+    smtp_auth = get_config('generic', 'email_smtp_auth')
     newposts = getnewpost(str(date.today() - timedelta(days =1)))
     if newposts == {}:
         print('No new post')
@@ -60,9 +61,21 @@ def main() -> None :
     msg['Bcc'] = ', '.join(toaddrsbcc)
     msg.set_content(message)
     try:
-         server = smtplib.SMTP(email_config['smtp_server'],email_config['smtp_port'])
-         server.send_message(msg)
-         server.quit()
+            with smtplib.SMTP(host=email_config['smtp_server'], port=email_config['smtp_port']) as server:
+                if smtp_auth['auth']:
+                    if 'smtp_use_tls' in smtp_auth:
+                        print('please change the config name from smtp_use_tls to smtp_use_starttls')
+                    if smtp_auth.get('smtp_use_tls') is True or smtp_auth['smtp_use_starttls']:
+                        if smtp_auth['verify_certificate'] is False:
+                            ssl_context = ssl.create_default_context()
+                            ssl_context.check_hostname = False
+                            ssl_context.verify_mode = ssl.CERT_NONE
+                            server.starttls(context=ssl_context)
+                        else:
+                            server.starttls()
+                    server.login(smtp_auth['smtp_user'], smtp_auth['smtp_pass'])
+                server.send_message(msg)
+                server.quit()
     except smtplib.SMTPException as e:
         print(e)
 

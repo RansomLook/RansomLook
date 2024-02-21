@@ -9,6 +9,13 @@
         "message_head": "Hello,\n\nPlease check the new entries in RansomLook:",
         "message_foot": "Best regards,\n\nRansomlook Team"
     },
+    "email_smtp_auth": {
+        "auth": false,
+        "smtp_user":"johndoe@myorg.local",
+        "smtp_pass":"password",
+        "smtp_use_starttls": true,
+        "verify_certificate": false
+    },
     "rocketchat": {
         "enable": false,
         "server": "localhost",
