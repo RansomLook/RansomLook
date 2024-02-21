@@ -70,6 +70,7 @@
     "_notes": {
         "malpedia": "malpedia apikey",
         "email": "Email configuration",
+        "email_smtp_auth": "SSL configuration for email",
         "rocketchat": "Informatin about rocketckat",
         "twitter": "Allow to post new item to Twitter",
         "website_listen_ip": "IP Flask will listen on. Defaults to 0.0.0.0, meaning all interfaces.",
