@@ -72,7 +72,7 @@ setuptools = "^69.1.0"
 mypy = "^1.8.0"
 types-setuptools = "^69.1.0.20240217"
 types-redis = "^4.6.0.20240218"
-pylint = "^3.0.3"
+pylint = "^3.1.0"
 
 
 [build-system]
