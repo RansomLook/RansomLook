@@ -53,7 +53,7 @@ pymisp = "^2.4.185"
 gitpython = "^3.1.42"
 ldap3 = "^2.9.1"
 types-ldap3 = "^2.9.13.20240205"
-pandas = "^2.2.0"
+pandas = "^2.2.1"
 plotly = "^5.19.0"
 orca = "^1.8"
 psutil = "^5.9.8"
@@ -66,13 +66,13 @@ types-pillow = "^10.2.0.20240213"
 libtorrent = "^2.0.9"
 urllib3 = "^2.2.1"
 playwright-stealth = "^1.0.6"
-setuptools = "^69.1.0"
+setuptools = "^69.1.1"
 
 [tool.poetry.dev-dependencies]
 mypy = "^1.8.0"
-types-setuptools = "^69.1.0.20240217"
+types-setuptools = "^69.1.0.20240223"
 types-redis = "^4.6.0.20240218"
-pylint = "^3.0.3"
+pylint = "^3.1.0"
 
 
 [build-system]
