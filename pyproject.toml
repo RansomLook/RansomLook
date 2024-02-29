@@ -70,7 +70,7 @@ setuptools = "^69.1.1"
 
 [tool.poetry.dev-dependencies]
 mypy = "^1.8.0"
-types-setuptools = "^69.1.0.20240223"
+types-setuptools = "^69.1.0.20240229"
 types-redis = "^4.6.0.20240218"
 pylint = "^3.1.0"
 
