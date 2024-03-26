@@ -100,13 +100,17 @@ class Groupinfo(Resource): # type: ignore[misc]
                             group['meta']=group['meta'].replace('\n', '<br/>')
                         for location in group['locations']:
                             screenfile = '/screenshots/' + name.lower() + '-' + createfile(location['slug']) + '.png'
-                            screenpath = str(get_homedir()) + '/source' + screenfile
+                            screenpath = os.path.normpath(str(get_homedir()) + '/source' + screenfile)
+                            if not screenpath.startswith(str(get_homedir())):
+                                raise Exception("not allowed")
                             if os.path.exists(screenpath):
                                 with open(screenpath, "rb") as image_file:
                                      screenencoded = base64.b64encode(image_file.read()).decode("ascii")
                                 location.update({'screen':screenencoded})
                             source = name.lower() + '-' + striptld(location['slug']) + '.html'
-                            sourcepath = str(get_homedir()) + '/source/' + source
+                            sourcepath = os.path.normpath(str(get_homedir()) + '/source/' + source)
+                            if not sourcepath.startswith(str(get_homedir())):
+                                raise Exception("not allowed")
                             if os.path.exists(sourcepath):
                                 with open(sourcepath, "rb") as text_file:
                                      sourceencoded = base64.b64encode(text_file.read()).decode("ascii")
@@ -137,7 +141,9 @@ class GroupPost(Resource): # type: ignore[misc]
                                      screenencoded = base64.b64encode(image_file.read()).decode("ascii")
                                 post.update({'screen':screenencoded})
                         if 'link' in post and post['link'] != None :
-                            filepath = str(get_homedir()) + '/source/' + name + '/' + createfile(postname)+'.html'
+                            filepath = os.path.normpath(str(get_homedir()) + '/source/' + name + '/' + createfile(postname)+'.html')
+                            if not filepath.startswith(str(get_homedir())):
+                                raise Exception("not allowed")
                             if os.path.exists(filepath):
                                 with open(filepath, "rb") as src_file:
                                      srcencoded = base64.b64encode(src_file.read()).decode("ascii")
@@ -161,13 +167,17 @@ class Marketinfo(Resource): # type: ignore[misc]
                             group['meta']=group['meta'].replace('\n', '<br/>')
                         for location in group['locations']:
                             screenfile = '/screenshots/' + name.lower() + '-' + createfile(location['slug']) + '.png'
-                            screenpath = str(get_homedir()) + '/source' + screenfile
+                            screenpath = os.path.normpath(str(get_homedir()) + '/source' + screenfile)
+                            if not screenpath.startswith(str(get_homedir())):
+                                raise Exception("not allowed")
                             if os.path.exists(screenpath):
                                 with open(screenpath, "rb") as image_file:
                                      screenencoded = base64.b64encode(image_file.read()).decode("ascii")
                                 location.update({'screen':screenencoded})
                             source = name.lower() + '-' + striptld(location['slug']) + '.html'
-                            sourcepath = str(get_homedir()) + '/source/' + source
+                            sourcepath = os.path.normpath(os.path.join(str(get_homedir()) + '/source/' , source))
+                            if not sourcepath.startswith(str(get_homedir())):
+                                raise Exception("not allowed")
                             if os.path.exists(sourcepath):
                                 with open(sourcepath, "rb") as text_file:
                                      sourceencoded = base64.b64encode(text_file.read()).decode("ascii")
