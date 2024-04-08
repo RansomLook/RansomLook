@@ -166,13 +166,13 @@ test = ["Pillow", "numpy", "pytest"]
 
 [[package]]
 name = "bootstrap-flask"
-version = "2.3.3"
+version = "2.4.0"
 description = "Bootstrap 4 & 5 helper for your Flask projects."
 optional = false
 python-versions = "*"
 files = [
-    {file = "Bootstrap-Flask-2.3.3.tar.gz", hash = "sha256:8c40d846e12af0e66d673bcb883d8344fd5ea95244f54e5b119e680e000ccf49"},
-    {file = "Bootstrap_Flask-2.3.3-py2.py3-none-any.whl", hash = "sha256:4c3d1f1b8ee19081dfc80e03aba5cb19cd92a8d54ba0ba98cee69acffded91d0"},
+    {file = "Bootstrap-Flask-2.4.0.tar.gz", hash = "sha256:3f7aa1b8be31e182fa2eaff2580e9b66aa9fad14f1a35e5c03d486169fb6c1a1"},
+    {file = "Bootstrap_Flask-2.4.0-py3-none-any.whl", hash = "sha256:bd5084bcb1557e85db799aa9d70b153cb13a3895ea871603dbf242cd05894b90"},
 ]
 
 [package.dependencies]
@@ -1669,7 +1669,6 @@ files = [
     {file = "msgpack-1.0.8-cp39-cp39-musllinux_1_1_x86_64.whl", hash = "sha256:5fbb160554e319f7b22ecf530a80a3ff496d38e8e07ae763b9e82fadfe96f273"},
     {file = "msgpack-1.0.8-cp39-cp39-win32.whl", hash = "sha256:f9af38a89b6a5c04b7d18c492c8ccf2aee7048aff1ce8437c4683bb5a1df893d"},
     {file = "msgpack-1.0.8-cp39-cp39-win_amd64.whl", hash = "sha256:ed59dd52075f8fc91da6053b12e8c89e37aa043f8986efd89e61fae69dc1b011"},
-    {file = "msgpack-1.0.8-py3-none-any.whl", hash = "sha256:24f727df1e20b9876fa6e95f840a2a2651e34c0ad147676356f4bf5fbb0206ca"},
     {file = "msgpack-1.0.8.tar.gz", hash = "sha256:95c02b0e27e706e48d0e5426d1710ca78e0f0628d6e89d5b5a5b91a5f12274f3"},
 ]
 
@@ -3072,4 +3071,4 @@ email = ["email-validator"]
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.10,<3.11"
-content-hash = "05215934b3e546594d86db759d2ba06a4b3d082f094200d9572107d0454561f2"
+content-hash = "893a6db44080ab222ebdad61834a2f64941b09eb677492838f5a9a811a2b1ad0"
