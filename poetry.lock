@@ -1669,7 +1669,6 @@ files = [
     {file = "msgpack-1.0.8-cp39-cp39-musllinux_1_1_x86_64.whl", hash = "sha256:5fbb160554e319f7b22ecf530a80a3ff496d38e8e07ae763b9e82fadfe96f273"},
     {file = "msgpack-1.0.8-cp39-cp39-win32.whl", hash = "sha256:f9af38a89b6a5c04b7d18c492c8ccf2aee7048aff1ce8437c4683bb5a1df893d"},
     {file = "msgpack-1.0.8-cp39-cp39-win_amd64.whl", hash = "sha256:ed59dd52075f8fc91da6053b12e8c89e37aa043f8986efd89e61fae69dc1b011"},
-    {file = "msgpack-1.0.8-py3-none-any.whl", hash = "sha256:24f727df1e20b9876fa6e95f840a2a2651e34c0ad147676356f4bf5fbb0206ca"},
     {file = "msgpack-1.0.8.tar.gz", hash = "sha256:95c02b0e27e706e48d0e5426d1710ca78e0f0628d6e89d5b5a5b91a5f12274f3"},
 ]
 
@@ -2061,23 +2060,23 @@ test = ["appdirs (==1.4.4)", "covdefaults (>=2.3)", "pytest (>=7.4.3)", "pytest-
 
 [[package]]
 name = "playwright"
-version = "1.42.0"
+version = "1.43.0"
 description = "A high-level API to automate web browsers"
 optional = false
 python-versions = ">=3.8"
 files = [
-    {file = "playwright-1.42.0-py3-none-macosx_10_13_x86_64.whl", hash = "sha256:e2b293f077efeaa45253fde31cea4bc6b0ae8be6b5e65e8ce8b4aa3b9f0d55b6"},
-    {file = "playwright-1.42.0-py3-none-macosx_11_0_arm64.whl", hash = "sha256:283887f0bdd0039c3d720e32fbc73a045c24fa800599a6ad60fb199c29580534"},
-    {file = "playwright-1.42.0-py3-none-macosx_11_0_universal2.whl", hash = "sha256:4e1fc1c049a0af64626ddd50814d14a01f316bcbb4d1aa83c3416fe420add558"},
-    {file = "playwright-1.42.0-py3-none-manylinux1_x86_64.whl", hash = "sha256:313f2551a772f57c9ccca017c4dd4661f2277166f9e1d84bbf5a2e316f0f892c"},
-    {file = "playwright-1.42.0-py3-none-manylinux_2_17_aarch64.manylinux2014_aarch64.whl", hash = "sha256:b2a46a24641e5d468046cde567c98fdb8d85e32df901630b14dfb288cbd1ed4f"},
-    {file = "playwright-1.42.0-py3-none-win32.whl", hash = "sha256:dbf473496808d4c2c816902c1dee2aabc029648e56ce8514b643f5a1a6fc8e22"},
-    {file = "playwright-1.42.0-py3-none-win_amd64.whl", hash = "sha256:e092c6cfbf797bff03fbdfc53c3e6a9e29fbcf6b82f9e43113d37494aee0561b"},
+    {file = "playwright-1.43.0-py3-none-macosx_10_13_x86_64.whl", hash = "sha256:b03b12bd4da9c2cfb78dff820deac8b52892fe3c2f89a4d95d6f08c59e41deb9"},
+    {file = "playwright-1.43.0-py3-none-macosx_11_0_arm64.whl", hash = "sha256:e9ec21b141727392f630761c7f4dec46d80c98243614257cc501b64ff636d337"},
+    {file = "playwright-1.43.0-py3-none-macosx_11_0_universal2.whl", hash = "sha256:e05a8d8fb2040c630429cca07e843c8fa33059717837c8f50c01b7d1fc651ce1"},
+    {file = "playwright-1.43.0-py3-none-manylinux1_x86_64.whl", hash = "sha256:50d9a5c07c76456945a2296d63f78fdf6eb11aed3e8d39bb5ccbda760a8d6d41"},
+    {file = "playwright-1.43.0-py3-none-manylinux_2_17_aarch64.manylinux2014_aarch64.whl", hash = "sha256:87191272c40b4c282cf2c9449ca3acaf705f38ac6e2372270f1617ce16b661b8"},
+    {file = "playwright-1.43.0-py3-none-win32.whl", hash = "sha256:bd8b818904b17e2914be23e7bc2a340b203f57fe81678520b10f908485b056ea"},
+    {file = "playwright-1.43.0-py3-none-win_amd64.whl", hash = "sha256:9b7bd707eeeaebee47f656b2de90aa9bd85e9ca2c6af7a08efd73896299e4d50"},
 ]
 
 [package.dependencies]
 greenlet = "3.0.3"
-pyee = "11.0.1"
+pyee = "11.1.0"
 
 [[package]]
 name = "playwright-stealth"
@@ -2189,20 +2188,20 @@ files = [
 
 [[package]]
 name = "pyee"
-version = "11.0.1"
+version = "11.1.0"
 description = "A rough port of Node.js's EventEmitter to Python with a few tricks of its own"
 optional = false
 python-versions = ">=3.8"
 files = [
-    {file = "pyee-11.0.1-py3-none-any.whl", hash = "sha256:9bcc9647822234f42c228d88de63d0f9ffa881e87a87f9d36ddf5211f6ac977d"},
-    {file = "pyee-11.0.1.tar.gz", hash = "sha256:a642c51e3885a33ead087286e35212783a4e9b8d6514a10a5db4e57ac57b2b29"},
+    {file = "pyee-11.1.0-py3-none-any.whl", hash = "sha256:5d346a7d0f861a4b2e6c47960295bd895f816725b27d656181947346be98d7c1"},
+    {file = "pyee-11.1.0.tar.gz", hash = "sha256:b53af98f6990c810edd9b56b87791021a8f54fd13db4edd1142438d44ba2263f"},
 ]
 
 [package.dependencies]
 typing-extensions = "*"
 
 [package.extras]
-dev = ["black", "flake8", "flake8-black", "isort", "jupyter-console", "mkdocs", "mkdocs-include-markdown-plugin", "mkdocstrings[python]", "pytest", "pytest-asyncio", "pytest-trio", "toml", "tox", "trio", "trio", "trio-typing", "twine", "twisted", "validate-pyproject[all]"]
+dev = ["black", "build", "flake8", "flake8-black", "isort", "jupyter-console", "mkdocs", "mkdocs-include-markdown-plugin", "mkdocstrings[python]", "pytest", "pytest-asyncio", "pytest-trio", "sphinx", "toml", "tox", "trio", "trio", "trio-typing", "twine", "twisted", "validate-pyproject[all]"]
 
 [[package]]
 name = "pylint"
@@ -3072,4 +3071,4 @@ email = ["email-validator"]
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.10,<3.11"
-content-hash = "05215934b3e546594d86db759d2ba06a4b3d082f094200d9572107d0454561f2"
+content-hash = "c19ede590314899e117f2d6a982aa681cbd446447c466c98af45c442ad51c138"
