@@ -62,15 +62,15 @@ types-pytz = "^2024.1.0.20240203"
 pandas-stubs = "^2.2.1.240316"
 types-flask-cors = "^4.0.0.20240405"
 mastodon-py = "^1.8.1"
-types-pillow = "^10.2.0.20240406"
+types-pillow = "^10.2.0.20240415"
 libtorrent = "^2.0.9"
 urllib3 = "^2.2.1"
 playwright-stealth = "^1.0.6"
-setuptools = "^69.2.0"
+setuptools = "^69.5.1"
 
 [tool.poetry.dev-dependencies]
 mypy = "^1.9.0"
-types-setuptools = "^69.2.0.20240317"
+types-setuptools = "^69.5.0.20240415"
 types-redis = "^4.6.0.20240409"
 pylint = "^3.1.0"
 
