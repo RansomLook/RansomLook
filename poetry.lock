@@ -569,13 +569,13 @@ profile = ["gprof2dot (>=2022.7.29)"]
 
 [[package]]
 name = "exceptiongroup"
-version = "1.2.0"
+version = "1.2.1"
 description = "Backport of PEP 654 (exception groups)"
 optional = false
 python-versions = ">=3.7"
 files = [
-    {file = "exceptiongroup-1.2.0-py3-none-any.whl", hash = "sha256:4bfd3996ac73b41e9b9628b04e079f193850720ea5945fc96a08633c66912f14"},
-    {file = "exceptiongroup-1.2.0.tar.gz", hash = "sha256:91f5c769735f051a4290d52edd0858999b57e5876e9f85937691bd4c9fa3ed68"},
+    {file = "exceptiongroup-1.2.1-py3-none-any.whl", hash = "sha256:5258b9ed329c5bbdd31a309f53cbfb0b155341807f6ff7606a1e801a891b29ad"},
+    {file = "exceptiongroup-1.2.1.tar.gz", hash = "sha256:a4785e48b045528f5bfe627b6ad554ff32def154f42372786903b7abcfe1aa16"},
 ]
 
 [package.extras]
@@ -2096,13 +2096,13 @@ test = ["pytest"]
 
 [[package]]
 name = "plotly"
-version = "5.20.0"
+version = "5.21.0"
 description = "An open-source, interactive data visualization library for Python"
 optional = false
 python-versions = ">=3.8"
 files = [
-    {file = "plotly-5.20.0-py3-none-any.whl", hash = "sha256:837a9c8aa90f2c0a2f0d747b82544d014dc2a2bdde967b5bb1da25b53932d1a9"},
-    {file = "plotly-5.20.0.tar.gz", hash = "sha256:bf901c805d22032cfa534b2ff7c5aa6b0659e037f19ec1e0cca7f585918b5c89"},
+    {file = "plotly-5.21.0-py3-none-any.whl", hash = "sha256:a33f41fd5922e45b2b253f795b200d14452eb625790bb72d0a72cf1328a6abbf"},
+    {file = "plotly-5.21.0.tar.gz", hash = "sha256:69243f8c165d4be26c0df1c6f0b7b258e2dfeefe032763404ad7e7fb7d7c2073"},
 ]
 
 [package.dependencies]
@@ -2139,13 +2139,13 @@ test = ["enum34", "ipaddress", "mock", "pywin32", "wmi"]
 
 [[package]]
 name = "publicsuffixlist"
-version = "0.10.0.20240416"
+version = "0.10.0.20240420"
 description = "publicsuffixlist implement"
 optional = false
 python-versions = ">=2.6"
 files = [
-    {file = "publicsuffixlist-0.10.0.20240416-py2.py3-none-any.whl", hash = "sha256:724f44ade7f3a4a23a23e6cb21548b6d5723c5bf2309c4ecd999a4972b3aa03a"},
-    {file = "publicsuffixlist-0.10.0.20240416.tar.gz", hash = "sha256:63440ff5234940e30610a004783c0a353450b458b050e5862db906271eba4819"},
+    {file = "publicsuffixlist-0.10.0.20240420-py2.py3-none-any.whl", hash = "sha256:a1844f565c79b88ee78731c7f177dafd8d02d45cedbafb1fd6aa99c0e2c1693a"},
+    {file = "publicsuffixlist-0.10.0.20240420.tar.gz", hash = "sha256:b3cc4f91eb3fc4595e8ea7ce94c64e3cb98d2bdd9ed932cad7c5199afdff6ba2"},
 ]
 
 [package.extras]
@@ -2229,30 +2229,30 @@ testutils = ["gitpython (>3)"]
 
 [[package]]
 name = "pymisp"
-version = "2.4.188"
+version = "2.4.190"
 description = "Python API for MISP."
 optional = false
 python-versions = "<4.0,>=3.8"
 files = [
-    {file = "pymisp-2.4.188-py3-none-any.whl", hash = "sha256:454746ee717841cd1a9425ec6cffdaf99de595d8672685e0a61b7a233659480a"},
-    {file = "pymisp-2.4.188.tar.gz", hash = "sha256:c2313d059a9f4d1221243fcda64fb8ae11603c1745e92d57c4071aad04336696"},
+    {file = "pymisp-2.4.190-py3-none-any.whl", hash = "sha256:0b63b3d7c497239987ad3220eb7bbbe9249e61461278c6c0d6575a6bb8619b40"},
+    {file = "pymisp-2.4.190.tar.gz", hash = "sha256:e7374295bfd8c7d25f56867e4395a029433360d95420e39b7f78eb1d4f8b48b4"},
 ]
 
 [package.dependencies]
 deprecated = ">=1.2.14,<2.0.0"
-publicsuffixlist = ">=0.10.0.20231214,<0.11.0.0"
+publicsuffixlist = ">=0.10.0.20240403,<0.11.0.0"
 python-dateutil = ">=2.9.0.post0,<3.0.0"
 requests = ">=2.31.0,<3.0.0"
 
 [package.extras]
 brotli = ["urllib3[brotli]"]
-docs = ["Sphinx (<7.2)", "Sphinx (>=7.2,<8.0)", "recommonmark (>=0.7.1,<0.8.0)", "sphinx-autodoc-typehints (>=2.0.0,<3.0.0)"]
-email = ["RTFDE (>=0.1.1,<0.2.0)", "extract_msg (>=0.48.0,<0.49.0)", "oletools (>=0.60.1,<0.61.0)"]
+docs = ["Sphinx (>=7.3.6,<8.0.0)", "docutils (>=0.21.1,<0.22.0)", "recommonmark (>=0.7.1,<0.8.0)", "sphinx-autodoc-typehints (>=2.1.0,<3.0.0)"]
+email = ["RTFDE (>=0.1.1,<0.2.0)", "extract_msg (>=0.48.5,<0.49.0)", "oletools (>=0.60.1,<0.61.0)"]
 fileobjects = ["lief (>=0.14.1,<0.15.0)", "pydeep2 (>=0.5.1,<0.6.0)", "python-magic (>=0.4.27,<0.5.0)"]
 openioc = ["beautifulsoup4 (>=4.12.3,<5.0.0)"]
 pdfexport = ["reportlab (>=4.1.0,<5.0.0)"]
 url = ["pyfaup (>=1.2,<2.0)"]
-virustotal = ["validators (>=0.23.0,<0.24.0)"]
+virustotal = ["validators (>=0.28.0,<0.29.0)"]
 
 [[package]]
 name = "pyparsing"
@@ -3085,4 +3085,4 @@ email = ["email-validator"]
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.10,<3.11"
-content-hash = "dcb509a5d27a67b941a1e08a89dd8e49d151aa13523244da024a6907662c34f2"
+content-hash = "77cc2d6433daa00e8d9349336800f41f6395bfeb497cd75f038102b34f1c4063"
