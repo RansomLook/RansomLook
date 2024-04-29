@@ -67,7 +67,10 @@ def threadscape(queuethread, lock) -> None: # type: ignore[no-untyped-def]
             stdlog('Starting : ' + host['fqdn']+ ' --------- ' + group)
             host['available'] = bool()
             try:
-                if group in ['blackbasta', 'clop', 'metaencryptor']:
+                if group in ['apos']:
+                    browser = play.firefox.launch(
+                          args=['--unsafely-treat-insecure-origin-as-secure='+host['slug']])
+                elif group in ['blackbasta', 'clop', 'metaencryptor']:
                     browser = play.firefox.launch(proxy={"server": "socks5://127.0.0.1:9050"},
                           args=['--unsafely-treat-insecure-origin-as-secure='+host['slug']])
                 else:
@@ -191,6 +194,9 @@ def threadscreen(queuethread, lock) -> None: # type: ignore[no-untyped-def]
             host, group, title = queuethread.get()
             stdlog('Starting : ' + host['slug']+ ' --------- ' + group)
             try:
+                if group in ['apos']:
+                    browser = play.firefox.launch(
+                          args=['--unsafely-treat-insecure-origin-as-secure='+host['slug'], "--headless=new"])
                 if group in ['knight','lockbit3']:
                     browser = play.chromium.launch(proxy={"server": "socks5://127.0.0.1:9050"},
                           args=['--unsafely-treat-insecure-origin-as-secure='+host['slug'], "--headless=new"])
