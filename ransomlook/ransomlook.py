@@ -67,7 +67,7 @@ def threadscape(queuethread, lock) -> None: # type: ignore[no-untyped-def]
             stdlog('Starting : ' + host['fqdn']+ ' --------- ' + group)
             host['available'] = bool()
             try:
-                if group in ['apos']:
+                if group in ['apos','snatch']:
                     browser = play.firefox.launch(
                           args=['--unsafely-treat-insecure-origin-as-secure='+host['slug']])
                 elif group in ['blackbasta', 'clop', 'metaencryptor']:
@@ -194,7 +194,7 @@ def threadscreen(queuethread, lock) -> None: # type: ignore[no-untyped-def]
             host, group, title = queuethread.get()
             stdlog('Starting : ' + host['slug']+ ' --------- ' + group)
             try:
-                if group in ['apos']:
+                if group in ['apos','snatch']:
                     browser = play.firefox.launch(
                           args=['--unsafely-treat-insecure-origin-as-secure='+host['slug'], "--headless=new"])
                 elif group in ['knight','lockbit3']:
