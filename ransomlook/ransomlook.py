@@ -197,7 +197,7 @@ def threadscreen(queuethread, lock) -> None: # type: ignore[no-untyped-def]
                 if group in ['apos']:
                     browser = play.firefox.launch(
                           args=['--unsafely-treat-insecure-origin-as-secure='+host['slug'], "--headless=new"])
-                if group in ['knight','lockbit3']:
+                elif group in ['knight','lockbit3']:
                     browser = play.chromium.launch(proxy={"server": "socks5://127.0.0.1:9050"},
                           args=['--unsafely-treat-insecure-origin-as-secure='+host['slug'], "--headless=new"])
                 else:
