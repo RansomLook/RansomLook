@@ -24,13 +24,13 @@ def main() -> List[Dict[str, str]] :
                     title = div.find('h3').text
                     description = div.find("p").text.strip()
                     list_div.append({"title" : title, "description" : description})
+                divs_name =  soup.find('table',{"class":"data-table table nowrap"})
+                divs = divs_name.find_all('tbody')
+                for div in divs:
+                    title = div.find('div',{"class":"txt"}).text.strip()
+                    description = ''
+                    list_div.append({"title" : title, "description" : description})
                 file.close()
-                divs_name =  soup.find_all('table')
-                for div in divs_name:
-                    title = div.find('img')['src'].split('/')[-1].split('.')[0]
-                    description = div.find('p', {"class": "description"}).text.strip()
-                    link = div.find('p', {"class": "textprice"}).a['href']
-                    list_div.append({"title" : title, "description" : description, "link": link, "slug": filename})
 
         except:
             print("Failed during : " + filename)
