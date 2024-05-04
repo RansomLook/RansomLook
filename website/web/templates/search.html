@@ -95,6 +95,30 @@
         </table>
         {% endif %}
 
+        <h1>Notes</h1>
+        {% if not notes %}
+        <p> No result </p>
+        {% else %}
+        <table  id="table" class="table" style="display:table; table-layout:auto; width:100%">
+          <thead>
+            <tr>
+                <th style="width:15%"> Group </th>
+                <th>Name of Ransom note</th>
+            </tr>
+          </thead>
+          <tbody>
+          {% for entry in notes %}
+            <tr>
+                <td><a href="/group/{{entry['group_name']}}">{{entry['group_name'].title()}}</a></td>
+                <td>{{entry['name']}}</td>
+            <tr>
+            <tr><td colspan="3"> {{entry['content']}} </td></tr>
+
+          {% endfor %}
+          </tbody>
+        </table>
+        {% endif %}
+
 	<h1>Channels</h1>
         {% if not channels %}
         <p> No result </p>

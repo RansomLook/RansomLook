@@ -579,7 +579,18 @@ def search(): # type: ignore[no-untyped-def]
                             messages.append(myentry)
         messages.sort(key=lambda x: x["date"].lower(),reverse=True)
 
-        return render_template("search.html", query=query,groups=groups, markets=markets, posts=posts, leaks=leaks, channels=channels, messages=messages)
+        red = Redis(unix_socket_path=get_socket_path('cache'), db=11)
+        notes = []
+        for key in red.keys():
+                entries = json.loads(red.get(key)) # type: ignore
+                for entry in entries:
+                    if query.lower() in entry['name'].lower() or query.lower() in entry['content'].lower(): # type: ignore
+                        entry['group_name']=key.decode()
+                        notes.append(entry)
+        notes.sort(key=lambda x: x["group_name"].lower())
+
+
+        return render_template("search.html", query=query,groups=groups, markets=markets, posts=posts, leaks=leaks, channels=channels, messages=messages, notes=notes)
     return redirect(url_for("home"))
 
 @app.route("/stats/<file>")

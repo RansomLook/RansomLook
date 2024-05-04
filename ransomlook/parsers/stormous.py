@@ -24,8 +24,8 @@ def main() -> List[Dict[str, str]] :
                     title = div.find('h3').text
                     description = div.find("p").text.strip()
                     list_div.append({"title" : title, "description" : description})
-                divs_name =  soup.find('table',{"class":"data-table table nowrap"})
-                divs = divs_name.find_all('tbody')
+                divs_name =  soup.find('table',{"class":"data-table table nowrap"}) # type: ignore
+                divs = divs_name.find_all('tbody') # type: ignore
                 for div in divs:
                     title = div.find('div',{"class":"txt"}).text.strip()
                     description = ''
