@@ -1,4 +1,4 @@
-name: Run local test for ransomwatch
+name: Run local test for ransomlook
 
 # Controls when the workflow will run
 on:
@@ -24,12 +24,12 @@ jobs:
         with:
           python-version: ${{matrix.python-version}}
           
-      - name: Install and setup redis
+      - name: Install and setup Valkey
         run: |
           pushd ..
-          git clone https://github.com/antirez/redis.git
-          pushd redis
-          git checkout 7.0
+          git clone https://github.com/valkey-io/valkey
+          pushd valkey
+          git checkout 7.2
           make
           popd
           popd
