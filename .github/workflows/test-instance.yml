@@ -24,11 +24,11 @@ jobs:
         with:
           python-version: ${{matrix.python-version}}
           
-      - name: Install and setup redis
+      - name: Install and setup valkey
         run: |
           pushd ..
           git clone https://github.com/valkey-io/valkey
-          pushd redis
+          pushd valkey
           git checkout 7.2
           make
           popd
