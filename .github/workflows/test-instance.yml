@@ -1,4 +1,4 @@
-name: Run local test for ransomwatch
+name: Run local test for RansomLook
 
 # Controls when the workflow will run
 on:
@@ -27,9 +27,9 @@ jobs:
       - name: Install and setup redis
         run: |
           pushd ..
-          git clone https://github.com/antirez/redis.git
+          git clone https://github.com/valkey-io/valkey
           pushd redis
-          git checkout 7.0
+          git checkout 7.2
           make
           popd
           popd
