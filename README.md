@@ -6,7 +6,7 @@ RansomLook is tool to monitor Ransomware groups and markets and extract their vi
 
 - Based on ransomwatch https://github.com/joshhighet/ransomwatch,
   - Important changes have been done:
-    - All data are stored into redis
+    - All data are stored into valkey
     - Scraping is multithreaded
     - Scraping is done with PlayWright and screenshots are taken at the same time
     - Parsers are now using BeautilfulSoup and are independant
@@ -32,7 +32,30 @@ You need poetry installed, see the [install guide](https://python-poetry.org/doc
 
 ## Prerequisites
 
-### Redis
+### Valkey
+
+[Valkey](https://valkey.io/): Valkey is an open source (BSD) high-performance key/value datastore that supports a variety workloads such as caching, message queues, and can act as a primary database. Valkey can run as either a standalone daemon or in a cluster, with options for replication and high availability.
+
+NOTE: Valkey should be installed from the source, and the repository must be in the same directory as the one you will be cloning RansomLook into.
+
+In order to compile and test Valkey, you will need a few packages:
+
+```bash
+sudo apt-get update
+sudo apt install build-essential tcl
+```
+
+```bash
+git clone https://github.com/valkey-io/valkey
+cd valkey
+git checkout 7.2
+make
+# Optionally, you can run the tests:
+make test
+cd ..
+```
+
+### Redis (Deprecated, please use Valkey)
 
 [Redis](https://redis.io/): An open source (BSD licensed), in-memory data structure store, used as a database, cache and message broker.
 
@@ -65,16 +88,16 @@ git clone https://github.com/RansomLook/RansomLook.git
 
 ### Ready to install RansomLook ?
 
-And at this point, you should be in a directory that contains `redis` and `RansomLook`.
+And at this point, you should be in a directory that contains `valkey` and `RansomLook`.
 
-Make sure it is the case by running `ls redis RansomLook`. If you see `No such file or directory`,
+Make sure it is the case by running `ls valkey RansomLook`. If you see `No such file or directory`,
 one of them is missing and you need to fix the installation.
 
 The directory tree must look like that:
 
 ```
 .
-├── redis  => compiled redis
+├── valkey  => compiled valkey
 └── RansomLook => not installed RansomLook yet
 ```
 

@@ -3,5 +3,8 @@
 set -e
 set -x
 
-../../redis/src/redis-server ./cache.conf
-#--loadmodule ../../RedisJSON/target/release/librejson.so
+if [ -f  ../../valkey/src/valkey-server ]; then
+    ../../valkey/src/valkey-server ./cache.conf
+else
+    ../../redis/src/redis-server ./cache.conf
+fi
