@@ -171,13 +171,13 @@ def postcount() -> int :
         post_count+=len(grouppost)
     return post_count
 
-def groupcount() -> int :
-    red = redis.Redis(unix_socket_path=get_socket_path('cache'), db=0)
+def groupcount(db: int) -> int :
+    red = redis.Redis(unix_socket_path=get_socket_path('cache'), db=db)
     groups = red.keys()
     return len(groups)
 
-def hostcount() -> int :
-    red = redis.Redis(unix_socket_path=get_socket_path('cache'), db=0)
+def hostcount(db: int) -> int :
+    red = redis.Redis(unix_socket_path=get_socket_path('cache'), db=db)
     groups = red.keys()
     host_count = 0
     for entry in groups:
@@ -231,8 +231,8 @@ def parsercount() -> int :
     __all__ = [ basename(f)[:-3] for f in modules if isfile(f) and not f.endswith('__init__.py')]
     return len(__all__)
 
-def onlinecount() -> int :
-    red = redis.Redis(unix_socket_path=get_socket_path('cache'), db=0)
+def onlinecount(db: int) -> int :
+    red = redis.Redis(unix_socket_path=get_socket_path('cache'), db=db)
     groups = red.keys()
     online_count = 0
     for entry in groups:

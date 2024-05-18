@@ -159,9 +159,13 @@ def custom_strftime(fmt, t) -> str: # type: ignore
 def home(): # type: ignore[no-untyped-def]
         date = custom_strftime('%B {S}, %Y', dt.now()).lower()
         data = {}
-        data['nbgroups'] = groupcount()
-        data['nblocations'] = hostcount()
-        data['online'] = onlinecount()
+        data['nbgroups'] = groupcount(0)
+        data['nblocations'] = hostcount(0)
+        data['online'] = onlinecount(0)
+        data['nbforum'] = groupcount(3)
+        data['nbforumlocations'] = hostcount(3)
+        data['forumonline'] = onlinecount(3)
+        data['nbtelegram'] = groupcount(5)
         data['24h'] = postslast24h()
         data['monthlypost'] = mounthlypostcount()
         data['month'] = currentmonthstr() # type: ignore
