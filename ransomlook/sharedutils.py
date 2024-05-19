@@ -294,8 +294,8 @@ def siteschema(location: str) -> Dict[str, Optional[Any]] :
         'version': getonionversion(location)[0],
         'slug': location,
         'available': False,
-        'updated': None,
-        'lastscrape': '2021-05-01 00:00:00.000000'
+        'updated': str(datetime.today()),
+        'lastscrape': 'Never'
     }
     dbglog('sharedutils: ' + 'schema - ' + str(schema))
     return schema

@@ -10,6 +10,7 @@ import json
 import queue
 from threading import Thread, Lock
 from datetime import datetime
+from dateutil.relativedelta import relativedelta
 import urllib.parse
 import time
 from typing import Dict, Any, Optional
@@ -65,6 +66,15 @@ def threadscape(queuethread, lock) -> None: # type: ignore[no-untyped-def]
         while True:
             host, group, base = queuethread.get()
             stdlog('Starting : ' + host['fqdn']+ ' --------- ' + group)
+            validationDate = datetime.now() - relativedelta(months=6)
+            if host['updated'] is None:
+                print('Skipping: '+host['fqdn'])
+                queuethread.task_done()
+                continue
+            if (not datetime.strptime(host['updated'], '%Y-%m-%d %H:%M:%S.%f') > validationDate) :
+                print('Skipping '+ host['fqdn'])
+                queuethread.task_done()
+                continue
             host['available'] = bool()
             try:
                 if group in ['apos','snatch']:
