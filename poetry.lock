@@ -38,13 +38,13 @@ trio = ["trio (>=0.23)"]
 
 [[package]]
 name = "astroid"
-version = "3.2.1"
+version = "3.2.2"
 description = "An abstract syntax tree for Python with inference support."
 optional = false
 python-versions = ">=3.8.0"
 files = [
-    {file = "astroid-3.2.1-py3-none-any.whl", hash = "sha256:b452064132234819f023b94f4bd045b250ea0009f372b4377cfcd87f10806ca5"},
-    {file = "astroid-3.2.1.tar.gz", hash = "sha256:902564b36796ba1eab3ad2c7a694861fbd926f574d5dbb5fa1d86778a2ba2d91"},
+    {file = "astroid-3.2.2-py3-none-any.whl", hash = "sha256:e8a0083b4bb28fcffb6207a3bfc9e5d0a68be951dd7e336d5dcf639c682388c0"},
+    {file = "astroid-3.2.2.tar.gz", hash = "sha256:8ead48e31b92b2e217b6c9733a21afafe479d52d6e164dd25fb1a770c7c3cf94"},
 ]
 
 [package.dependencies]
@@ -2192,17 +2192,17 @@ dev = ["black", "build", "flake8", "flake8-black", "isort", "jupyter-console", "
 
 [[package]]
 name = "pylint"
-version = "3.2.0"
+version = "3.2.2"
 description = "python code static checker"
 optional = false
 python-versions = ">=3.8.0"
 files = [
-    {file = "pylint-3.2.0-py3-none-any.whl", hash = "sha256:9f20c05398520474dac03d7abb21ab93181f91d4c110e1e0b32bc0d016c34fa4"},
-    {file = "pylint-3.2.0.tar.gz", hash = "sha256:ad8baf17c8ea5502f23ae38d7c1b7ec78bd865ce34af9a0b986282e2611a8ff2"},
+    {file = "pylint-3.2.2-py3-none-any.whl", hash = "sha256:3f8788ab20bb8383e06dd2233e50f8e08949cfd9574804564803441a4946eab4"},
+    {file = "pylint-3.2.2.tar.gz", hash = "sha256:d068ca1dfd735fb92a07d33cb8f288adc0f6bc1287a139ca2425366f7cbe38f8"},
 ]
 
 [package.dependencies]
-astroid = ">=3.2.0,<=3.3.0-dev0"
+astroid = ">=3.2.2,<=3.3.0-dev0"
 colorama = {version = ">=0.4.5", markers = "sys_platform == \"win32\""}
 dill = {version = ">=0.2", markers = "python_version < \"3.11\""}
 isort = ">=4.2.5,<5.13.0 || >5.13.0,<6"
@@ -2339,13 +2339,13 @@ rpds-py = ">=0.7.0"
 
 [[package]]
 name = "requests"
-version = "2.31.0"
+version = "2.32.2"
 description = "Python HTTP for Humans."
 optional = false
-python-versions = ">=3.7"
+python-versions = ">=3.8"
 files = [
-    {file = "requests-2.31.0-py3-none-any.whl", hash = "sha256:58cd2187c01e70e6e26505bca751777aa9f2ee0b7f4300988b709f44e013003f"},
-    {file = "requests-2.31.0.tar.gz", hash = "sha256:942c5a758f98d790eaed1a29cb6eefc7ffb0d1cf7af05c3d2791656dbd6ad1e1"},
+    {file = "requests-2.32.2-py3-none-any.whl", hash = "sha256:fc06670dd0ed212426dfeb94fc1b983d917c4f9847c863f313c9dfaaffb7c23c"},
+    {file = "requests-2.32.2.tar.gz", hash = "sha256:dd951ff5ecf3e3b3aa26b40703ba77495dab41da839ae72ef3c8e5d8e2433289"},
 ]
 
 [package.dependencies]
@@ -2360,13 +2360,13 @@ use-chardet-on-py3 = ["chardet (>=3.0.2,<6)"]
 
 [[package]]
 name = "requests-file"
-version = "2.0.0"
+version = "2.1.0"
 description = "File transport adapter for Requests"
 optional = false
 python-versions = "*"
 files = [
-    {file = "requests-file-2.0.0.tar.gz", hash = "sha256:20c5931629c558fda566cacc10cfe2cd502433e628f568c34c80d96a0cc95972"},
-    {file = "requests_file-2.0.0-py2.py3-none-any.whl", hash = "sha256:3e493d390adb44aa102ebea827a48717336d5268968c370eaf19abaf5cae13bf"},
+    {file = "requests_file-2.1.0-py2.py3-none-any.whl", hash = "sha256:cf270de5a4c5874e84599fc5778303d496c10ae5e870bfa378818f35d21bda5c"},
+    {file = "requests_file-2.1.0.tar.gz", hash = "sha256:0f549a3f3b0699415ac04d167e9cb39bccfb730cb832b4d20be3d9867356e658"},
 ]
 
 [package.dependencies]
@@ -2758,13 +2758,13 @@ types-Werkzeug = "*"
 
 [[package]]
 name = "types-flask-cors"
-version = "4.0.0.20240405"
+version = "4.0.0.20240523"
 description = "Typing stubs for Flask-Cors"
 optional = false
 python-versions = ">=3.8"
 files = [
-    {file = "types-Flask-Cors-4.0.0.20240405.tar.gz", hash = "sha256:7b721df8f1e2cb8d4d0295ebeb7168e5961695bf31983858040d718af071a32b"},
-    {file = "types_Flask_Cors-4.0.0.20240405-py3-none-any.whl", hash = "sha256:3838856aff6faf96adf7b1844f357b8f74e5344f88b4ce2a158e81cbc6a82436"},
+    {file = "types-Flask-Cors-4.0.0.20240523.tar.gz", hash = "sha256:be57da07b6fd398eef2a79d4d43436fb72cfc3dd23a29a141627cd12576b8b1b"},
+    {file = "types_Flask_Cors-4.0.0.20240523-py3-none-any.whl", hash = "sha256:010c03c4f4f17ee1fb4eea6072f86c90bac03692b8ec09d2f7078bc72a6b1694"},
 ]
 
 [package.dependencies]
@@ -2822,13 +2822,13 @@ files = [
 
 [[package]]
 name = "types-pillow"
-version = "10.2.0.20240511"
+version = "10.2.0.20240520"
 description = "Typing stubs for Pillow"
 optional = false
 python-versions = ">=3.8"
 files = [
-    {file = "types-Pillow-10.2.0.20240511.tar.gz", hash = "sha256:b2fcc27b8e15ae3741941e43b4f39eba6fce6bcb152af90bbb07b387d2585783"},
-    {file = "types_Pillow-10.2.0.20240511-py3-none-any.whl", hash = "sha256:ef87a19ea0a02a89c784cbc1b99dfff6c00dd0d5796a8ac868cf7ec69c5f88ff"},
+    {file = "types-Pillow-10.2.0.20240520.tar.gz", hash = "sha256:130b979195465fa1e1676d8e81c9c7c30319e8e95b12fae945e8f0d525213107"},
+    {file = "types_Pillow-10.2.0.20240520-py3-none-any.whl", hash = "sha256:33c36494b380e2a269bb742181bea5d9b00820367822dbd3760f07210a1da23d"},
 ]
 
 [[package]]
@@ -2896,13 +2896,13 @@ types-pyOpenSSL = "*"
 
 [[package]]
 name = "types-requests"
-version = "2.31.0.20240406"
+version = "2.32.0.20240523"
 description = "Typing stubs for requests"
 optional = false
 python-versions = ">=3.8"
 files = [
-    {file = "types-requests-2.31.0.20240406.tar.gz", hash = "sha256:4428df33c5503945c74b3f42e82b181e86ec7b724620419a2966e2de604ce1a1"},
-    {file = "types_requests-2.31.0.20240406-py3-none-any.whl", hash = "sha256:6216cdac377c6b9a040ac1c0404f7284bd13199c0e1bb235f4324627e8898cf5"},
+    {file = "types-requests-2.32.0.20240523.tar.gz", hash = "sha256:26b8a6de32d9f561192b9942b41c0ab2d8010df5677ca8aa146289d11d505f57"},
+    {file = "types_requests-2.32.0.20240523-py3-none-any.whl", hash = "sha256:f19ed0e2daa74302069bbbbf9e82902854ffa780bc790742a810a9aaa52f65ec"},
 ]
 
 [package.dependencies]
@@ -2910,13 +2910,13 @@ urllib3 = ">=2"
 
 [[package]]
 name = "types-setuptools"
-version = "69.5.0.20240518"
+version = "69.5.0.20240522"
 description = "Typing stubs for setuptools"
 optional = false
 python-versions = ">=3.8"
 files = [
-    {file = "types-setuptools-69.5.0.20240518.tar.gz", hash = "sha256:2c6be895adc919fd0109414888c6ad5a972398d4eef59275416a1bcb0df6167f"},
-    {file = "types_setuptools-69.5.0.20240518-py3-none-any.whl", hash = "sha256:be23570baee0587f0c86ce970c15edc919718105c048f236dc6049327192a04d"},
+    {file = "types-setuptools-69.5.0.20240522.tar.gz", hash = "sha256:c5a97601b2d040d3b9fcd0633730f0a8c86ebef208552525c97301427f261549"},
+    {file = "types_setuptools-69.5.0.20240522-py3-none-any.whl", hash = "sha256:e27231cbc80648cfaee4921d2f1150107fdf8d33666958abf2aba0191a82688b"},
 ]
 
 [[package]]
@@ -3085,4 +3085,4 @@ email = ["email-validator"]
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.10,<3.11"
-content-hash = "da33509e48b4266d88e0231076afb1309206988ac01886e1865d064532bf1e78"
+content-hash = "91319e47a5084db677523fe0ac87a625f1a2a9dd217e392f49a1bb48ba2965c8"
