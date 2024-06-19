@@ -176,7 +176,7 @@ def twiadder(name: str, link: str) -> int:
     red = redis.Redis(unix_socket_path=get_socket_path('cache'), db=8)
     try:
         data = {
-            'name': name,
+            'name': name.strip(),
             'meta': None,
             'link': None,
             'displayname': None,

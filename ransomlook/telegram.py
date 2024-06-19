@@ -212,9 +212,9 @@ def teladder(name: str, link: str) -> int:
     red = redis.Redis(unix_socket_path=get_socket_path('cache'), db=5)
     try:
         data = {
-            'name': name,
+            'name': name.strip(),
             'meta': None,
-            'link': link
+            'link': link.strip()
         }
         red.set(name, json.dumps(data))
         return 1

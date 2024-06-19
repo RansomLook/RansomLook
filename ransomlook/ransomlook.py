@@ -174,10 +174,10 @@ def adder(name: str, location: str, db: int) -> int:
     if checkexisting(name.strip(), db):
         stdlog('ransomlook: ' + 'records for ' + name + \
             ' already exist, appending to avoid duplication')
-        return appender(name.strip(), location, db)
+        return appender(name.strip(), location.strip(), db)
     else:
         red = redis.Redis(unix_socket_path=get_socket_path('cache'), db=db)
-        newrec = creategroup(location)
+        newrec = creategroup(location.strip())
         red.set(name.strip(), json.dumps(newrec))
         stdlog('ransomlook: ' + 'record for ' + name + ' added to groups.json')
         return 0
