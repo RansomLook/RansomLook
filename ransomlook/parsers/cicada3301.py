@@ -15,7 +15,8 @@ def main() -> List[Dict[str, str]] :
                 for div in divs_name:
                     title = div.find('h2').text.strip()
                     description = div.find('p').text.strip()
-                    link = div.find('a')['href']
+                    a = div.find_all('a')
+                    link = a[1]['href']
                     list_div.append({"title" : title, "description" : description, "link" : link, "slug": filename})
                 file.close()
         except:
