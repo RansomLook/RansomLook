@@ -14,7 +14,7 @@ from flask_restx import Api, Namespace, Resource, abort, fields  # type: ignore
 from werkzeug.security import check_password_hash
 
 from ransomlook import ransomlook
-from ransomlook.default import get_socket_path, get_homedir
+from ransomlook.default import get_socket_path, get_homedir, get_config
 from ransomlook.sharedutils import createfile, striptld
 
 import tempfile
@@ -386,6 +386,30 @@ class PeriodDensityHeatmap(Resource): # type: ignore[misc]
         filename.seek(0)
         return send_file(filename, mimetype='image/gif')
 
+@api.route('/graphs/period/heatmap/<start_date>/<end_date>/<group>')
+@api.doc(description='Density heatmap for a period for a group', tags=['posts'])
+class PeriodDensityHeatmapGroup(Resource): # type: ignore[misc]
+    def get(self, start_date: str, end_date: str, group: str ): # type: ignore[no-untyped-def]
+        group_names = []
+        timestamps = []
+
+        red = Redis(unix_socket_path=get_socket_path('cache'), db=2)
+        entries = json.loads(red.get(group)) # type: ignore
+        for entry in entries:
+            if start_date <= entry['discovered'].split(' ')[0] <= end_date:
+                 group_names.append(group)
+                 timestamps.append(entry['discovered'])
+        df = pd.DataFrame({'group_name': group_names, 'timestamp': timestamps})
+        df['timestamp'] = pd.to_datetime(df['timestamp'])
+        df_sorted = df.groupby(['group_name', 'timestamp']).size().reset_index(name='count') # type: ignore
+        df_sorted = df_sorted.sort_values(by='count', ascending=False)
+        fig = px.density_heatmap(df_sorted, x='timestamp', y='group_name', z='count', title='Posts per group per day (heatmap)', width=1050, height=750)
+        fig.update_layout(font=dict(family='Roboto'))
+        filename = tempfile.TemporaryFile()
+        fig.write_image(filename)
+        filename.seek(0)
+        return send_file(filename, mimetype='image/gif')
+
 @api.route('/graphs/period/scatter/<start_date>/<end_date>')
 @api.doc(description='Distribution per days for a period', tags=['posts'])
 class PeriodScatter(Resource): # type: ignore[misc]
@@ -400,6 +424,31 @@ class PeriodScatter(Resource): # type: ignore[misc]
                     if start_date <= entry['discovered'].split(' ')[0] <= end_date:
                         group_names.append(key.decode())
                         timestamps.append(entry['discovered'])
+        df = pd.DataFrame({'group_name': group_names, 'timestamp': timestamps})
+        df['timestamp'] = pd.to_datetime(df['timestamp'])
+
+        df_sorted = df.groupby(['group_name', 'timestamp']).size().reset_index(name='count') # type: ignore
+        df_sorted = df_sorted.sort_values(by='count', ascending=False)
+        fig = px.scatter(df_sorted, x='timestamp', y='group_name', color='group_name', title='Distribution per days', color_continuous_scale='Plotly3', width=1050, height=750)
+        fig.update_layout(font=dict(family='Roboto'))
+        filename = tempfile.TemporaryFile()
+        fig.write_image(filename)
+        filename.seek(0)
+        return send_file(filename, mimetype='image/gif')
+
+@api.route('/graphs/period/scatter/<start_date>/<end_date>/<group>')
+@api.doc(description='Distribution per days for a period for a group', tags=['posts'])
+class PeriodScatterGroup(Resource): # type: ignore[misc]
+    def get(self, start_date: str, end_date: str, group: str): # type: ignore[no-untyped-def]
+        group_names = []
+        timestamps = []
+
+        red = Redis(unix_socket_path=get_socket_path('cache'), db=2)
+        entries = json.loads(red.get(group)) # type: ignore
+        for entry in entries:
+            if start_date <= entry['discovered'].split(' ')[0] <= end_date:
+                group_names.append(group)
+                timestamps.append(entry['discovered'])
         df = pd.DataFrame({'group_name': group_names, 'timestamp': timestamps})
         df['timestamp'] = pd.to_datetime(df['timestamp'])
 
@@ -461,5 +510,64 @@ class PeriodBar(Resource): # type: ignore[misc]
         fig.update_layout(font=dict(family='Roboto'))
         filename = tempfile.TemporaryFile()
         fig.write_image(filename)
+        filename.seek(0)
+        return send_file(filename, mimetype='image/gif')
+
+@api.route('/graphs/period/bar/<start_date>/<end_date>/<group>')
+@api.doc(description='Posts per group during the period for a group', tags=['posts'])
+class PeriodBarGroup(Resource): # type: ignore[misc]
+    def get(self, start_date: str, end_date: str, group: str): # type: ignore[no-untyped-def]
+        group_names = []
+        timestamps = []
+        red = Redis(unix_socket_path=get_socket_path('cache'), db=2)
+        entries = json.loads(red.get(group)) # type: ignore
+        victim_counts: Dict[str, int] = {}
+        dates = (Any)
+        counts = (Any)
+
+        post_data = json.loads(red.get(group)) # type: ignore
+        # Count the number of victims per day
+        for post in post_data:
+            if start_date <= post['discovered'].split(' ')[0] <= end_date:
+                date = post['discovered'].split(' ')[0]
+                victim_counts[date] = victim_counts.get(date, 0) + 1 
+
+        # Sort the victim counts by date
+        sorted_counts = sorted(victim_counts.items())
+
+        # Extract the dates and counts for plotting
+        dates, counts = zip(*sorted_counts)
+        # Plot the graph
+        plt.clf()
+        # Create a new figure and axes for each group with a larger figure size
+        px = 1/plt.rcParams['figure.dpi']
+        if get_config("generic","darkmode"):
+            fig,ax = plt.subplots(figsize=(1050*px, 750*px), facecolor='#272b30')
+        else:
+            fig,ax = plt.subplots(figsize=(1050*px, 750*px))
+        # plt.plot(dates, counts)
+        color = '#505d6b'
+        if get_config("generic","darkmode"):
+            color ='#ddd'
+        ax.bar(dates, counts, color = '#6ad37a')
+        ax.set_xlabel('New daily discovery when parsing', color = color)
+        ax.set_ylabel('Number of Victims', color = color)
+        ax.set_title('Number of Victims for Group: ' + group.title(), color = color)
+        ax.tick_params(axis='x', bottom=False, labelbottom=False)
+        if get_config("generic","darkmode"):
+            #ax.set_xtick
+            for pos in ['top', 'bottom', 'right', 'left']:
+                ax.spines[pos].set_edgecolor(color)
+            ax.tick_params(colors=color)
+            ax.set_facecolor("#272b30")
+
+        # Set the x-axis limits
+        #ax.set_xlim(str(dates[0]), str(dates[-1:]))
+        # Format y-axis ticks as whole numbers without a comma separator
+
+        plt.tight_layout()
+
+        filename = tempfile.TemporaryFile()
+        plt.savefig(filename)
         filename.seek(0)
         return send_file(filename, mimetype='image/gif')
