@@ -19,7 +19,7 @@ RansomLook is tool to monitor Ransomware groups and markets and extract their vi
 - Telegram monitoring
 - Dataleak monitoring
 - Monitoring Cryptocurrencies, data are from: https://ransomwhe.re
-- [MISP](https://www.misp-project.org/) integration with the support of the MISP ransomware galaxy
+- [MISP](https://www.misp-project.org/) integration with the support of the [MISP ransomware galaxy](https://www.misp-galaxy.org/ransomware/)
 - Ransomnotes, from ThreatLabs (@Threatlabz) 
 
 # Install guide
