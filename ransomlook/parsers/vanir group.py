@@ -18,7 +18,7 @@ def main() -> List[Dict[str, str]] :
                          .replace("websiteLink:", '"websiteLink":')\
                          .replace("tags:", '"tags":')
 
-                data = json.loads(myjson) # type: ignore
+                data = json.loads(myjson)
                 for entry in data:
                     title = entry['projectName'].strip()
                     description = entry['projectDescription'].strip()
