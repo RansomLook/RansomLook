@@ -12,11 +12,7 @@ def main() -> List[Dict[str, str]] :
             if '.js' in filename:
                 content = file.read()
                 matches = re.search('projects:(.*)}}},P', content, re.IGNORECASE)
-                myjson= matches.group(1).replace("projectName:", '"projectName":')\
-                         .replace("projectDescription:", '"projectDescription":')\
-                         .replace("githubLink:", '"githubLink":')\
-                         .replace("websiteLink:", '"websiteLink":')\
-                         .replace("tags:", '"tags":')
+                myjson= matches.group(1).replace("projectName:", '"projectName":').replace("projectDescription:", '"projectDescription":').replace("githubLink:", '"githubLink":').replace("websiteLink:", '"websiteLink":').replace("tags:", '"tags":') # type: ignore
 
                 data = json.loads(myjson)
                 for entry in data:
