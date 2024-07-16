@@ -80,7 +80,7 @@ def threadscape(queuethread, lock) -> None: # type: ignore[no-untyped-def]
                 if group in ['apos','snatch','handala']:
                     browser = play.firefox.launch(
                           args=['--unsafely-treat-insecure-origin-as-secure='+host['slug']])
-                elif group in ['blackbasta', 'clop', 'metaencryptor']:
+                elif group in ['blackbasta', 'clop', 'metaencryptor','meow']:
                     browser = play.firefox.launch(proxy={"server": "socks5://127.0.0.1:9050"},
                           args=['--unsafely-treat-insecure-origin-as-secure='+host['slug']])
                 else:
