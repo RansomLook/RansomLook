@@ -66,7 +66,7 @@ types-pillow = "^10.2.0.20240520"
 libtorrent = "^2.0.9"
 urllib3 = "^2.2.2"
 playwright-stealth = "^1.0.6"
-setuptools = "^70.3.0"
+setuptools = "^71.0.3"
 types-python-dateutil = "^2.9.0.20240316"
 
 [tool.poetry.dev-dependencies]
