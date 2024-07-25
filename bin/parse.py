@@ -85,7 +85,7 @@ def appender(entry: Union[Dict[str, str], str], group_name: str) -> None :
                 stdlog('post already existing')
                 print(post)
                 return
-    newpost = posttemplate(post_title, description, link, str(entry['date']) if 'date' in entry else str(datetime.today()), magnet)
+    newpost = posttemplate(post_title, description, link, str(entry['date']) if 'date' in entry else str(datetime.today()), magnet) # type: ignore
     stdlog('adding new post: ' + 'group: ' + group_name + ' title: ' + post_title)
     posts.append(newpost)
     red.set(group_name, json.dumps(posts))

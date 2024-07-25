@@ -14,6 +14,7 @@ def main() -> List[Dict[str, str]] :
                 file=open(html_doc,'r')
                 soup=BeautifulSoup(file,'html.parser')
                 if 'getallblogs' in filename:
+                    print(filename)
                     jsonpart= soup.pre.contents # type: ignore
                     data = json.loads(jsonpart[0]) # type: ignore
                     for entry in data['data']['items']:
@@ -23,6 +24,7 @@ def main() -> List[Dict[str, str]] :
                        list_div.append({"title":entry['company_name'].strip(),"description":entry["description"].strip(), "link":entry["id"], "slug": filename, "date":formatted_date})
                 file.close()
         except:
+            print("can not open " + filename)
             pass
     print(list_div)
     return list_div

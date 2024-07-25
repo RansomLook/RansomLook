@@ -65,7 +65,7 @@ def statsgroup(group: bytes) -> None :
     sorted_counts = sorted(victim_counts.items())
 
     # Extract the dates and counts for plotting
-    dates, counts = zip(*sorted_counts)
+    dates, counts = zip(*sorted_counts) # type: ignore
     # Plot the graph
     plt.clf()
     # Create a new figure and axes for each group with a larger figure size
@@ -78,7 +78,7 @@ def statsgroup(group: bytes) -> None :
     color = '#505d6b'
     if get_config("generic","darkmode"):
         color ='#ddd'
-    ax.bar(dates, counts, color = '#6ad37a')
+    ax.bar(dates, counts, color = '#6ad37a') # type: ignore
     ax.set_xlabel('New daily discovery when parsing', color = color)
     ax.set_ylabel('Number of Victims', color = color)
     ax.set_title('Number of Victims for Group: ' + group.decode().title(), color = color)
