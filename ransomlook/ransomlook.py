@@ -90,7 +90,8 @@ def threadscape(queuethread, lock) -> None: # type: ignore[no-untyped-def]
                 else:
                     browser = play.chromium.launch(proxy={"server": "socks5://127.0.0.1:9050"},
                           args=['--unsafely-treat-insecure-origin-as-secure='+host['slug'], "--headless=new"])
-                context = browser.new_context(ignore_https_errors= True )
+                context = browser.new_context(ignore_https_errors= True, java_script_enabled=True )
+
                 page = context.new_page()
                 stealth_sync(page)
                 if 'timeout' in host and host['timeout'] is not None:
