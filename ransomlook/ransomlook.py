@@ -71,10 +71,14 @@ def threadscape(queuethread, lock) -> None: # type: ignore[no-untyped-def]
                 print('Skipping: '+host['fqdn'])
                 queuethread.task_done()
                 continue
-            if (not datetime.strptime(host['updated'], '%Y-%m-%d %H:%M:%S.%f') > validationDate) :
+            try :
+              if (not datetime.strptime(host['updated'], '%Y-%m-%d %H:%M:%S.%f') > validationDate) :
                 print('Skipping '+ host['fqdn'])
                 queuethread.task_done()
                 continue
+            except Exception as exception:
+                errlog('Forcing scraping')
+                errlog(exception)
             host['available'] = bool()
             try:
                 if group in ['apos','snatch','handala']:
