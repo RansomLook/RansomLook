@@ -203,7 +203,7 @@ def screen() -> None:
         group = json.loads(redgroup.get(capture['group'].encode())) # type: ignore
         for host in group['locations']:
             if capture['slug'].removeprefix(capture['group']+'-').split('.')[0] in striptld(host['slug']):
-                capture.update({'slug2' : urllib.parse.urljoin(host['slug'], capture['link'])})
+                capture.update({'slug2' : urllib.parse.urljoin(host['slug'], str(capture['link']))})
                 if capture['slug2'] not in slugs:
                    slugs.append(capture['slug2'])
                    uuid = lacus.enqueue(url=capture['slug2'])
