@@ -72,7 +72,7 @@ playwrightcapture = "^1.25.9"
 lacuscore = "^1.10.8"
 
 [tool.poetry.dev-dependencies]
-mypy = "^1.11.0"
+mypy = "^1.11.1"
 types-setuptools = "^71.1.0.20240726"
 types-redis = "^4.6.0.20240726"
 pylint = "^3.2.6"
