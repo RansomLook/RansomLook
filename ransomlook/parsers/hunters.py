@@ -12,10 +12,13 @@ def main() -> List[Dict[str, str]] :
             soup=BeautifulSoup(file,'html.parser')
             divs_name=soup.find_all('div', {"class": "wrapper ng-star-inserted"})
             for div in divs_name:
+              try:  
                 title = div.find('div', {"class": "title"}).text.strip()
                 description = ''
                 link = div.a['href']
                 list_div.append({'title': title, 'description': description, 'link': link, 'slug': filename})
+              except:
+                pass
             file.close()
     print(list_div)
     return list_div
