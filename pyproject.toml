@@ -48,7 +48,7 @@ googletrans-py = "^4.0.0"
 types-requests = "^2.32.0.20240712"
 types-beautifulsoup4 = "^4.12.0.20240511"
 types-flask = "^1.1.6"
-types-redis = "^4.6.0.20240806"
+types-redis = "^4.6.0.20240819"
 pymisp = "^2.4.195"
 gitpython = "^3.1.43"
 ldap3 = "^2.9.1"
@@ -72,7 +72,7 @@ lacuscore = "^1.10.10"
 
 [tool.poetry.dev-dependencies]
 mypy = "^1.11.1"
-types-redis = "^4.6.0.20240806"
+types-redis = "^4.6.0.20240819"
 pylint = "^3.2.6"
 
 
