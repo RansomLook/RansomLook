@@ -67,7 +67,7 @@ libtorrent = "^2.0.9"
 urllib3 = "^2.2.2"
 playwright-stealth = "^1.0.6"
 types-python-dateutil = "^2.9.0.20240316"
-playwrightcapture = "^1.25.11"
+playwrightcapture = "^1.25.14"
 lacuscore = "^1.10.10"
 
 [tool.poetry.dev-dependencies]
