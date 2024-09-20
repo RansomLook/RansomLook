@@ -73,7 +73,7 @@ lacuscore = "^1.10.13"
 [tool.poetry.dev-dependencies]
 mypy = "^1.11.2"
 types-redis = "^4.6.0.20240903"
-pylint = "^3.2.7"
+pylint = "^3.3.0"
 
 
 [build-system]
