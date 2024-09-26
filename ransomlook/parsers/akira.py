@@ -9,15 +9,14 @@ def main() -> List[Dict[str, str]] :
         if filename.startswith(__name__.split('.')[-1]+'-'):
             html_doc='source/'+filename
             print(filename)
-            file=open(html_doc,'r')
-            soup=BeautifulSoup(file,'html.parser')
-            if 'onion-n' in filename:
-                jsonpart= soup.pre.contents # type: ignore
-                data = json.loads(jsonpart[0]) # type: ignore
+            file=open(html_doc,'r', encoding='utf-8')
+            try:
+                data = json.load(file)
                 for entry in data:
-                    title = entry['title'].replace('\n','').strip()
-                    description = entry['content'].replace('\n','').strip()
-                    list_div.append({"title" : title, "description" : description})
-            file.close()
+                    title = entry['title'].replace('\n', '').strip()
+                    description = entry['content'].replace('\n', '').strip()
+                    list_div.append({"title": title, "description": description})
+            except json.JSONDecodeError as e:
+                pass
     print(list_div)
     return list_div
