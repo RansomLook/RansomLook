@@ -10,7 +10,7 @@ def main() -> List[Dict[str, str]] :
             if filename.startswith(__name__.split('.')[-1]+'-'):
                 html_doc='source/'+filename
                 file=open(html_doc,'r')
-                soup=BeautifulSoup(file,'html.parser')
+                soup=BeautifulSoup(file,'html.parser',encoding='utf-8')
                 divs_name=soup.find_all('article')
                 for div in divs_name:
                     title = div.find('a').text.strip()
@@ -22,8 +22,8 @@ def main() -> List[Dict[str, str]] :
                     link = div.find('a')['href']
                     list_div.append({"title" : title, "description" : description, 'link': link, 'slug': filename})
                 file.close()
-        except:
-            print("Failed during : " + filename)
+        except Exception as e:
+            print("Error in parsing file: " + filename + " | " + str(e))
             pass
     print(list_div)
     return list_div
