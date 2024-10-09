@@ -24,7 +24,6 @@ def main() -> List[Dict[str, str]] :
                 divs_name=soup.find_all('div')
                 for div in divs_name:
                     try: 
-                        print(div)
                         try:
                             title = div.find('h3').text.strip()
                         except:
