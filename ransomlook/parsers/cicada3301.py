@@ -18,9 +18,10 @@ def main() -> List[Dict[str, str]] :
                     a = div.find_all('a')
                     try:
                         link = a[1]['href']
+                        list_div.append({"title" : title, "description" : description, "link" : link, "slug": filename})
                     except:
+                        list_div.append({"title" : title, "description" : description})
                         pass
-                    list_div.append({"title" : title, "description" : description, "link" : link, "slug": filename})
                 file.close()
         except:
             print("Failed during : " + filename)
