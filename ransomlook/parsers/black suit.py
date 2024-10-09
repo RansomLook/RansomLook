@@ -9,7 +9,7 @@ def main() -> List[Dict[str, str]] :
         try:
             if filename.startswith(__name__.split('.')[-1]+'-'):
                 html_doc='source/'+filename
-                file=open(html_doc,'r')
+                file=open(html_doc,'r',encoding='utf-8')
                 soup=BeautifulSoup(file,'html.parser')
                 divs_name=soup.find_all('div', {"class": "card"})
                 for div in divs_name:
