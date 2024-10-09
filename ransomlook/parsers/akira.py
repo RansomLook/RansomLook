@@ -8,8 +8,7 @@ def main() -> List[Dict[str, str]] :
     for filename in os.listdir('source'):
         if filename.startswith(__name__.split('.')[-1]+'-'):
             html_doc='source/'+filename
-            print(filename)
-            file=open(html_doc,'r')
+            file=open(html_doc,'r', encoding='utf-8')
             soup=BeautifulSoup(file,'html.parser')
             if 'onion-n' in filename:
                 jsonpart= soup.pre.contents # type: ignore
