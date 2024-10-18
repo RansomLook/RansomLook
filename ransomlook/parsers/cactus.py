@@ -9,8 +9,8 @@ def main() -> List[Dict[str, str]] :
         try:
             if filename.startswith(__name__.split('.')[-1]+'-'):
                 html_doc='source/'+filename
-                file=open(html_doc,'r')
-                soup=BeautifulSoup(file,'html.parser',encoding='utf-8')
+                file=open(html_doc,'r', encoding='utf-8')
+                soup=BeautifulSoup(file,'html.parser')
                 divs_name=soup.find_all('article')
                 for div in divs_name:
                     title = div.find('a').text.strip()
