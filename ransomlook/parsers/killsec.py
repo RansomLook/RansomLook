@@ -15,13 +15,19 @@ def main() -> List[Dict[str, str]] :
                 for div in divs_name:
                     title = div.find('div',{"class": "post-title"}).text.strip()
                     description = div.find('p',{"class" : "post-block-text"}).text.strip()
-                    link = div['href']
+                    try :
+                        link = div['href']
+                    except:
+                        link = "No link"
                     list_div.append({"title" : title, "description" : description, "link": link, "slug": filename})
                 divs_name=soup.find_all('a', {"class": "post-block leaked"})
                 for div in divs_name:
                     title = div.find('div',{"class": "post-title"}).text.strip()
                     description = div.find('p',{"class" : "post-block-text"}).text.strip()
-                    link = div['href']
+                    try :
+                        link = div['href']
+                    except:
+                        link = "No link"
                     list_div.append({"title" : title, "description" : description, "link": link, "slug": filename})
                 file.close()
         except:
