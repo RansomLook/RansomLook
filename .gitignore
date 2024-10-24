@@ -21,6 +21,7 @@ source/screenshots/twitter/*
 source/screenshots/twitter/img/*
 source/screenshots/telegram/*
 source/screenshots/telegram/img/*
+source/screeenshos/old/*
 cache/
 web/website/stats/*.png
 

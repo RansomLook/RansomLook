@@ -15,6 +15,7 @@ import urllib.parse
 import time
 from typing import Dict, Any, Optional
 from redis import Redis
+from pylacus import PyLacus
 from lacuscore import LacusCore
 import libtorrent as lt # type: ignore
 import asyncio
@@ -77,6 +78,20 @@ def scraper(base: int) -> None:
     groups=[]
     uuids=[]
     validationDate = datetime.now() - relativedelta(months=6)
+    remote_lacus_url = None
+    if get_config('generic', 'remote_lacus'):
+        remote_lacus_config = get_config('generic', 'remote_lacus')
+        if remote_lacus_config.get('enable'):
+            remote_lacus_url = remote_lacus_config.get('url')
+            lacus = PyLacus(remote_lacus_url)
+            try:
+                lacus.status()
+            except:
+                remote_lacus_url = None
+
+    if not remote_lacus_url:
+        lacus = LacusCore(redislacus,tor_proxy='socks5://127.0.0.1:9050')
+
     for key in red.keys():
         group = json.loads(red.get(key)) # type: ignore
         group['name'] = key.decode()
@@ -92,10 +107,11 @@ def scraper(base: int) -> None:
             except:
                 print('Error with : '+ host['slug'])
                 continue
-            uuid = lacus.enqueue(url=host['slug'])
+            uuid = lacus.enqueue(url=host['slug'], general_timeout_in_sec=90)
             host.update({'uuid':uuid})
             uuids.append(uuid)
-    asyncio.run(run_captures())
+    if not remote_lacus_url:
+        asyncio.run(run_captures())
     while uuids:
         for group in groups:
             for host in group['locations']:
@@ -124,11 +140,27 @@ def scraper(base: int) -> None:
                             filename = group['name'] + '-' + createfile(host['slug']) + '.png'
                             name = os.path.join(get_homedir(), 'source/screenshots', filename)
                             with open(name, 'wb') as tosave:
-                                tosave.write(base64.b64decode(result['png'])) # type: ignore
+                                if remote_lacus_url:
+                                    tosave.write((result['png']))
+                                else:
+                                    tosave.write(base64.b64decode(result['png'])) # type: ignore
                             targetImage = Image.open(name)
                             metadata = PngInfo()
                             metadata.add_text("Source", "RansomLook.io")
                             targetImage.save(name, pnginfo=metadata)
+                            if get_config('generic', 'keepall'):
+                                nowpng = datetime.now()
+                                timestamp = nowpng.strftime("%Y-%m-%d_%H-%M-%S")
+                                filename =  timestamp + '-' + createfile(host['slug']) + '.png'
+                                folder = os.path.join(get_homedir(), 'source/screenshots/old', group['name'])
+                                if not os.path.exists(folder):
+                                    os.makedirs(folder)
+                                file_path = os.path.join(folder, filename)
+                                with open(file_path, 'wb') as tosave:
+                                    if remote_lacus_url:
+                                        tosave.write((result['png']))
+                                    else:
+                                        tosave.write(base64.b64decode(result['png'])) # type: ignore
 
                         if 'html' in result:
                             filename = group['name'] + '-' + striptld(host['slug']) + '.html'
@@ -156,8 +188,10 @@ def scraper(base: int) -> None:
                         red.set(name, json.dumps(group))
                         group['name']=name
 
-        asyncio.run(run_captures())
-
+        if not remote_lacus_url:
+            asyncio.run(run_captures())
+        else:
+            time.sleep(10)
 
 def adder(name: str, location: str, db: int) -> int:
     '''
@@ -197,6 +231,20 @@ def screen() -> None:
         return
     redgroup = redis.Redis(unix_socket_path=get_socket_path('cache'), db=0)
     captures = json.loads(red.get('toscan')) # type: ignore
+    remote_lacus_url = None
+    if get_config('generic', 'remote_lacus'):
+        remote_lacus_config = get_config('generic', 'remote_lacus')
+        if remote_lacus_config.get('enable'):
+            remote_lacus_url = remote_lacus_config.get('url')
+            lacus = PyLacus(remote_lacus_url)
+            try:
+                lacus.status()
+            except:
+                remote_lacus_url = None
+
+    if not remote_lacus_url:
+        lacus = LacusCore(redislacus,tor_proxy='socks5://127.0.0.1:9050')
+
     uuids = []
     slugs = []
     for capture in captures:
@@ -210,7 +258,9 @@ def screen() -> None:
                    capture.update({'uuid':uuid})
                    uuids.append(uuid)
 
-    asyncio.run(run_captures())
+    if not remote_lacus_url:
+        asyncio.run(run_captures())
+    print(uuids)
     while uuids:
         for capture in captures:
             if 'uuid' in capture:
@@ -218,9 +268,11 @@ def screen() -> None:
                     uuids.remove(capture['uuid'])
                     del capture['uuid']
                     continue
-
                 if lacus.get_capture_status(capture['uuid']) == 1:
+                        time.sleep(1)
+                        print(capture['uuid'])
                         result = lacus.get_capture(capture['uuid'])
+                        print(result['status'])
                         uuids.remove(capture['uuid'])
                         del capture['uuid']
 
@@ -235,7 +287,10 @@ def screen() -> None:
                             namepng = os.path.join(path, filenamepng)
                             print(namepng)
                             with open(namepng, 'wb') as tosave:
-                                tosave.write(base64.b64decode(result['png'])) # type: ignore
+                                if remote_lacus_url:
+                                    tosave.write((result['png']))
+                                else:
+                                    tosave.write(base64.b64decode(result['png'])) # type: ignore
                             targetImage = Image.open(namepng)
                             metadata = PngInfo()
                             metadata.add_text("Source", "RansomLook.io")
@@ -261,7 +316,10 @@ def screen() -> None:
                                     toscreen.pop(idx)
                                     break
                             red.set('toscan', json.dumps(toscreen))
-        asyncio.run(run_captures())
+        if not remote_lacus_url:
+            asyncio.run(run_captures())
+        else:
+            time.sleep(10)
 
 def threadtorrent(queuethread, lock) -> None: # type: ignore[no-untyped-def]
     while True:
