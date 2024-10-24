@@ -90,7 +90,7 @@ def scraper(base: int) -> None:
                 remote_lacus_url = None
 
     if not remote_lacus_url:
-        lacus = LacusCore(redislacus,tor_proxy='socks5://127.0.0.1:9050')
+        lacus = LacusCore(redislacus,tor_proxy='socks5://127.0.0.1:9050') # type: ignore
 
     for key in red.keys():
         group = json.loads(red.get(key)) # type: ignore
@@ -141,7 +141,7 @@ def scraper(base: int) -> None:
                             name = os.path.join(get_homedir(), 'source/screenshots', filename)
                             with open(name, 'wb') as tosave:
                                 if remote_lacus_url:
-                                    tosave.write((result['png']))
+                                    tosave.write((result['png'])) # type: ignore
                                 else:
                                     tosave.write(base64.b64decode(result['png'])) # type: ignore
                             targetImage = Image.open(name)
@@ -158,7 +158,7 @@ def scraper(base: int) -> None:
                                 file_path = os.path.join(folder, filename)
                                 with open(file_path, 'wb') as tosave:
                                     if remote_lacus_url:
-                                        tosave.write((result['png']))
+                                        tosave.write((result['png'])) # type: ignore
                                     else:
                                         tosave.write(base64.b64decode(result['png'])) # type: ignore
 
@@ -243,7 +243,7 @@ def screen() -> None:
                 remote_lacus_url = None
 
     if not remote_lacus_url:
-        lacus = LacusCore(redislacus,tor_proxy='socks5://127.0.0.1:9050')
+        lacus = LacusCore(redislacus,tor_proxy='socks5://127.0.0.1:9050') # type: ignore
 
     uuids = []
     slugs = []
@@ -288,7 +288,7 @@ def screen() -> None:
                             print(namepng)
                             with open(namepng, 'wb') as tosave:
                                 if remote_lacus_url:
-                                    tosave.write((result['png']))
+                                    tosave.write((result['png'])) # type: ignore
                                 else:
                                     tosave.write(base64.b64decode(result['png'])) # type: ignore
                             targetImage = Image.open(namepng)
