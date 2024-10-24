@@ -72,7 +72,7 @@ lacuscore = "^1.11.2"
 pylacus = "^1.11.1"
 
 [tool.poetry.dev-dependencies]
-mypy = "^1.12.1"
+mypy = "^1.13.0"
 types-redis = "^4.6.0.20241004"
 pylint = "^3.3.1"
 
