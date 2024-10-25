@@ -16,6 +16,7 @@ import ast
 import flask_login  # type: ignore
 from werkzeug.security import check_password_hash
 from werkzeug.exceptions import HTTPException
+from werkzeug.middleware.proxy_fix import ProxyFix
 
 from flask_cors import CORS
 from flask_restx import Api  # type: ignore
@@ -47,6 +48,7 @@ from .api.rfapi import api as rf_api
 from .api.leaksapi import api as leaks_api
 
 app = Flask(__name__)
+app.wsgi_app = ProxyFix(app.wsgi_app, x_proto=1)
 app.jinja_env.filters['quote_plus'] = lambda u: quote(u)
 app.config['SECRET_KEY'] = get_secret_key()
 
