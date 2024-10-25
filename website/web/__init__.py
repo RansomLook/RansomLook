@@ -48,7 +48,7 @@ from .api.rfapi import api as rf_api
 from .api.leaksapi import api as leaks_api
 
 app = Flask(__name__)
-app.wsgi_app = ProxyFix(app.wsgi_app, x_proto=1, x_for=1)
+app.wsgi_app = ProxyFix(app.wsgi_app, x_proto=1, x_for=1) # type: ignore
 app.jinja_env.filters['quote_plus'] = lambda u: quote(u)
 app.config['SECRET_KEY'] = get_secret_key()
 app.config['PREFERRED_URL_SCHEME'] = 'https'
