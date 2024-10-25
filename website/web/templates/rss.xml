@@ -2,16 +2,19 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
 <channel>
   <title>RansomLook – Last entries</title>
-  <atom:link href="https://www.ransomlook.io/rss.xml" rel="self" type="application/atom+xml" />
-  <link>https://www.ransomlook.io</link>
-  <description>Most recents entries in Ransomlook.io</description>
+  <atom:link href="{{ request.url_root }}/rss.xml" rel="self" type="application/atom+xml" />
+  <link>{{ request.url_root }}</link>
+  <description>Most recents entries in {{ request.url_root }}</description>
   <lastBuildDate>{{ build_date.strftime("%a, %d %b %Y %T") }} +0200</lastBuildDate>
   <language>en-US</language>
   {% for post in posts %}
   <item>
   <title>{{ post["post_title"] }} By {{ post['group_name'] }}</title>
-  <link>https://ransomlook.io/group/{{ post['group_name'] }}</link>
+  <link>{{ request.url_root }}/group/{{ post['group_name']| urlencode }}</link>
   <description>{{ post["description"] }}</description>
+  {% if post["screen"] %}
+  <enclosure url="{{ request.url_root + post["screen"]| urlencode }}" type="image/png"/>
+  {% endif %}
   <pubDate>{{ post["discovered"] }} +0200</pubDate>
   <guid isPermaLink="false">{{ post["guid"] }}</guid>
   </item>
