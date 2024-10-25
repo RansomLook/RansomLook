@@ -5,7 +5,7 @@
   <atom:link href="{{ request.url_root }}rss.xml" rel="self" type="application/atom+xml" />
   <link>{{ request.url_root }}</link>
   <description>Most recents entries in {{ request.url_root }}</description>
-  <lastBuildDate>{{ build_date.strftime("%a, %d %b %Y %T") }}</lastBuildDate>
+  <lastBuildDate>{{ build_date.strftime("%a, %d %b %Y %T") }} +0200</lastBuildDate>
   <language>en-US</language>
   {% for post in posts %}
   <item>
@@ -15,7 +15,7 @@
   {% if post["screen"] %}
   <enclosure url="{{ request.url_root + post["screen"]| urlencode }}" type="image/png"/>
   {% endif %}
-  <pubDate>{{ post["discovered"] }}</pubDate>
+  <pubDate>{{ post["discovered"] }} +0200</pubDate>
   <guid isPermaLink="false">{{ post["guid"] }}</guid>
   </item>
   {% endfor %}
