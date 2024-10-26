@@ -3163,13 +3163,13 @@ test = ["pytest", "pytest-xdist", "setuptools"]
 
 [[package]]
 name = "publicsuffixlist"
-version = "1.0.2.20241023"
+version = "1.0.2.20241026"
 description = "publicsuffixlist implement"
 optional = false
 python-versions = ">=3.5"
 files = [
-    {file = "publicsuffixlist-1.0.2.20241023-py2.py3-none-any.whl", hash = "sha256:e1cf7ce5f703d0580bed94f4693cad9fb04e7cd7ddc540f36868428c96aa2cc4"},
-    {file = "publicsuffixlist-1.0.2.20241023.tar.gz", hash = "sha256:590b380c9ca0732393cc364795b8d6fae6409dae68b300c3938370812fd5af57"},
+    {file = "publicsuffixlist-1.0.2.20241026-py2.py3-none-any.whl", hash = "sha256:e2576f23f2d6017b1fb70a669101665a3bab7872bd0238f44feef071f8752b1c"},
+    {file = "publicsuffixlist-1.0.2.20241026.tar.gz", hash = "sha256:bc24c7b391c55b6d5ded6d06fd6f76ba003617d25ba84e88c261c71dbeab754b"},
 ]
 
 [package.extras]
@@ -3588,13 +3588,13 @@ files = [
 
 [[package]]
 name = "redis"
-version = "5.1.1"
+version = "5.2.0"
 description = "Python client for Redis database and key-value store"
 optional = false
 python-versions = ">=3.8"
 files = [
-    {file = "redis-5.1.1-py3-none-any.whl", hash = "sha256:f8ea06b7482a668c6475ae202ed8d9bcaa409f6e87fb77ed1043d912afd62e24"},
-    {file = "redis-5.1.1.tar.gz", hash = "sha256:f6c997521fedbae53387307c5d0bf784d9acc28d9f1d058abeac566ec4dbed72"},
+    {file = "redis-5.2.0-py3-none-any.whl", hash = "sha256:ae174f2bb3b1bf2b09d54bf3e51fbc1469cf6c10aa03e21141f51969801a7897"},
+    {file = "redis-5.2.0.tar.gz", hash = "sha256:0b1087665a771b1ff2e003aa5bdd354f15a70c9e25d5a7dbf9c722c16528a7b0"},
 ]
 
 [package.dependencies]
@@ -4325,13 +4325,13 @@ urllib3 = ">=2"
 
 [[package]]
 name = "types-setuptools"
-version = "75.2.0.20241019"
+version = "75.2.0.20241025"
 description = "Typing stubs for setuptools"
 optional = false
 python-versions = ">=3.8"
 files = [
-    {file = "types-setuptools-75.2.0.20241019.tar.gz", hash = "sha256:86ea31b5f6df2c6b8f2dc8ae3f72b213607f62549b6fa2ed5866e5299f968694"},
-    {file = "types_setuptools-75.2.0.20241019-py3-none-any.whl", hash = "sha256:2e48ff3acd4919471e80d5e3f049cce5c177e108d5d36d2d4cee3fa4d4104258"},
+    {file = "types-setuptools-75.2.0.20241025.tar.gz", hash = "sha256:2949913a518d5285ce00a3b7d88961c80a6e72ffb8f3da0a3f5650ea533bd45e"},
+    {file = "types_setuptools-75.2.0.20241025-py3-none-any.whl", hash = "sha256:6721ac0f1a620321e2ccd87a9a747c4a383dc381f78d894ce37f2455b45fcf1c"},
 ]
 
 [[package]]
@@ -4425,13 +4425,13 @@ files = [
 
 [[package]]
 name = "werkzeug"
-version = "3.0.4"
+version = "3.0.6"
 description = "The comprehensive WSGI web application library."
 optional = false
 python-versions = ">=3.8"
 files = [
-    {file = "werkzeug-3.0.4-py3-none-any.whl", hash = "sha256:02c9eb92b7d6c06f31a782811505d2157837cea66aaede3e217c7c27c039476c"},
-    {file = "werkzeug-3.0.4.tar.gz", hash = "sha256:34f2371506b250df4d4f84bfe7b0921e4762525762bbd936614909fe25cd7306"},
+    {file = "werkzeug-3.0.6-py3-none-any.whl", hash = "sha256:1bc0c2310d2fbb07b1dd1105eba2f7af72f322e1e455f2f93c993bee8c8a5f17"},
+    {file = "werkzeug-3.0.6.tar.gz", hash = "sha256:a8dd59d4de28ca70471a34cba79bed5f7ef2e036a76b3ab0835474246eb41f8d"},
 ]
 
 [package.dependencies]
@@ -4635,4 +4635,4 @@ propcache = ">=0.2.0"
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.10,<3.11"
-content-hash = "f15384c2efa66dcd0aa8ad85c9364728d764839c051f9c9db4d2104df779a03f"
+content-hash = "d3faa22a61867bb47448531841cb7bbb4e373593cd461c1861638006212810c6"
