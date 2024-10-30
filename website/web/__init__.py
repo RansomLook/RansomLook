@@ -17,6 +17,7 @@ import flask_login  # type: ignore
 from werkzeug.security import check_password_hash
 from werkzeug.exceptions import HTTPException
 from werkzeug.middleware.proxy_fix import ProxyFix
+from werkzeug.utils import secure_filename
 
 from flask_cors import CORS
 from flask_restx import Api  # type: ignore
@@ -25,19 +26,23 @@ from importlib.metadata import version
 
 import hashlib
 
+import imghdr
+
 from collections import OrderedDict
 from collections import defaultdict
 
+from ransomlook.posts import appender
+
 from ransomlook.ransomlook import adder
 from ransomlook.sharedutils import createfile
-from ransomlook.sharedutils import groupcount, hostcount, onlinecount, postslast24h, mounthlypostcount, currentmonthstr, postssince, poststhisyear, postcount, parsercount, statsgroup
+from ransomlook.sharedutils import groupcount, hostcount, onlinecount, postslast24h, mounthlypostcount, currentmonthstr, postssince, poststhisyear, postcount, parsercount, statsgroup, run_data_viz
 from ransomlook.default.config import get_homedir
 from ransomlook.default.config import get_config
 from ransomlook.default import get_socket_path
 from ransomlook.telegram import teladder
 from ransomlook.twitter import twiadder
 from .helpers import get_secret_key, sri_load, User, build_users_table, load_user_from_request
-from .forms import AddForm, LoginForm, SelectForm, EditForm, DeleteForm, AlertForm
+from .forms import AddForm, LoginForm, SelectForm, EditForm, DeleteForm, AlertForm, AddPostForm
 from .ldap import global_ldap_authentication
 
 from typing import Dict, Any, Optional
@@ -52,6 +57,7 @@ app.wsgi_app = ProxyFix(app.wsgi_app, x_proto=1, x_for=1) # type: ignore
 app.jinja_env.filters['quote_plus'] = lambda u: quote(u)
 app.config['SECRET_KEY'] = get_secret_key()
 app.config['PREFERRED_URL_SCHEME'] = 'https'
+app.config['UPLOAD_EXTENSIONS'] = ['.png', '.jpg']
 
 Bootstrap5(app)
 app.config['BOOTSTRAP_SERVE_LOCAL'] = True
@@ -65,6 +71,13 @@ pkg_version = version('ransomlook')
 
 flask_moment.Moment(app=app)
 
+def validate_image(stream): # type: ignore[no-untyped-def]
+    header = stream.read(512)
+    stream.seek(0) 
+    format = imghdr.what(None, header)
+    if not format:
+        return None
+    return '.' + (format if format != 'jpeg' else 'jpg')
 
 @app.context_processor
 def inject_global_vars() -> Dict[str, bool]:
@@ -652,7 +665,7 @@ def addgroup(): # type: ignore[no-untyped-def]
         elif int(form.category.data) == 8:
            res = twiadder(form.groupname.data, form.url.data)
         else:
-           res = adder(form.groupname.data.lower(), form.url.data, form.category.data)
+           res = adder(form.groupname.data.lower(), form.url.data, form.category.data, form.fs.data)
         if res > 1:
            flash(f'Fail to add: {form.url.data} to {form.groupname.data}.  Url already exists for this group', 'error')
            return render_template('add.html',form=form)
@@ -678,7 +691,7 @@ def edit(): # type: ignore[no-untyped-def]
 
     red = Redis(unix_socket_path=get_socket_path('cache'), db=3)
     keys = red.keys()
-    choices=[('','Please select your group')]
+    choices=[('','Please select your Market')]
     keys.sort(key=lambda x: x.lower())
     for key in keys:
         choices.append((key.decode(), key.decode()))
@@ -733,6 +746,89 @@ def editgroup(database: int, name: str):
             data['locations']='[]'
         form.links.data = data['locations']
     return render_template('editentry.html', form=form, deleteform=deleteButton)
+
+@app.route('/admin/addpost', methods=['GET', 'POST'])
+@flask_login.login_required
+def addpost(): # type: ignore[no-untyped-def]
+    formSelect = SelectForm()
+    formMarkets = SelectForm()
+    red = Redis(unix_socket_path=get_socket_path('cache'), db=0)
+    keys = red.keys()
+    choices=[('','Please select your group')]
+    keys.sort(key=lambda x: x.lower())
+    for key in keys:
+        choices.append((key.decode(), key.decode()))
+    formSelect.group.choices=choices
+
+    red = Redis(unix_socket_path=get_socket_path('cache'), db=3)
+    keys = red.keys()
+    choices=[('','Please select your Market')]
+    keys.sort(key=lambda x: x.lower())
+    for key in keys:
+        choices.append((key.decode(), key.decode()))
+    formMarkets.group.choices=choices
+
+    if formSelect.validate_on_submit():
+        return redirect('/admin/addpost/'+'0'+'/'+formSelect.group.data)
+    if formMarkets.validate_on_submit():
+        return redirect('/admin/addpost/'+'3'+'/'+formMarkets.group.data)
+    return render_template('addpost.html', form=formSelect, formMarkets=formMarkets)
+
+@app.route('/admin/addpost/<database>/<name>', methods=['GET', 'POST'])
+@flask_login.login_required # type: ignore
+def addpostentry(database: int, name: str): 
+    score = dt.now().timestamp()
+    deleteButton = DeleteForm()
+    form = AddPostForm()
+    redlogs = Redis(unix_socket_path=get_socket_path('cache'), db=1)
+
+    if form.validate_on_submit():
+        entry: Dict[str, str|None] = {}
+        entry['slug']= None
+        entry['title'] = form.title.data
+        if form.description.data:
+            entry['description']=form.description.data
+        else:
+            entry['description'] = ''
+        if form.link.data:
+            entry['link'] = form.link.data
+        if form.magnet.data:
+            entry['magnet'] = form.magnet.data
+        if form.link.data and form.magnet.data:
+            flash(f'Error to add post to : {name} - You should select Magnet or Link not both', 'error')
+            return render_template('addpostentry.html', form=form)
+        if form.date.data:
+            entry['date'] = form.date.data
+        uploaded_file = request.files['file']
+        filename = secure_filename(uploaded_file.filename)
+        if filename != '':
+            file_ext = os.path.splitext(filename)[1]
+            if file_ext not in app.config['UPLOAD_EXTENSIONS'] or \
+              file_ext != validate_image(uploaded_file.stream): # type: ignore
+                flash(f'Error to add post to : {name} - Screen should be a PNG', 'error')
+                return render_template('addpostentry.html', form=form)
+            filenamepng = createfile(form.title.data) + file_ext
+            path = os.path.join(get_homedir(), 'source/screenshots', name)
+            if not os.path.exists(path):
+                os.mkdir(path)
+            namepng = os.path.join(path, filenamepng)
+            uploaded_file.save(namepng)
+            entry['screen'] = str(os.path.join('screenshots', name, filenamepng))
+        if appender(entry, name):
+            flash(f'Error to add post to : {name} - The entry already exists', 'error')
+            return render_template('addpostentry.html', form=form)
+        else:
+            statsgroup(name.encode())
+            run_data_viz(7)
+            run_data_viz(14)
+            run_data_viz(30)
+            run_data_viz(90)
+            redlogs.zadd('logs', {f'{flask_login.current_user.id} added {form.title.data} to : {name}': score})
+            flash(f'Success to add post to : {name}', 'success')
+        return redirect(url_for('admin'))
+
+    form.groupname.label=name
+    return render_template('addpostentry.html', form=form)
 
 @app.route('/export/<database>')
 def exportdb(database: int): # type: ignore[no-untyped-def]

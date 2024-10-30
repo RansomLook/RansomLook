@@ -279,7 +279,7 @@ def countcaptchahosts() -> int :
 '''
 Ransomlook
 '''
-def siteschema(location: str) -> Dict[str, Optional[Any]] :
+def siteschema(location: str, fs: bool) -> Dict[str, Optional[Any]] :
     '''
     returns a dict with the site schema
     '''
@@ -295,6 +295,7 @@ def siteschema(location: str) -> Dict[str, Optional[Any]] :
         'slug': location,
         'available': False,
         'updated': str(datetime.today()),
+        'fs': fs,
         'lastscrape': 'Never'
     }
     dbglog('sharedutils: ' + 'schema - ' + str(schema))

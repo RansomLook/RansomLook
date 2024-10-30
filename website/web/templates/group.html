@@ -34,6 +34,7 @@
           </thead>
           <tbody>
         {% for location in group['locations'] %}
+            {% if not 'fs' in location or location['fs'] is false %}
             <tr><td> {{location['slug']}} </td>
                 {% if 'screen' in location %}
                 <td><center><a href="{{ location['screen'] }}" rel="noopener noreferrer" target="_blank">Screen</a></center></td>
@@ -41,6 +42,29 @@
                 <td> </td>
                 {% endif %}
             </tr>
+            {% endif %}
+        {% endfor %}
+          </tbody>
+        </table>
+
+        <table id="table" class="table" style="display:table; table-layout:auto; width:100%">
+          <thead>
+            <tr>
+                <th>File servers</th>
+                <th style="width:10%" ><center>Screen</center></th>
+            </tr>
+          </thead>
+          <tbody>
+        {% for location in group['locations'] %}
+            {% if 'fs' in location and location['fs'] is true %}
+            <tr><td> {{location['slug']}} </td>
+                {% if 'screen' in location %}
+                <td><center><a href="{{ location['screen'] }}" rel="noopener noreferrer" target="_blank">Screen</a></center></td>
+                {% else %}
+                <td> </td>
+                {% endif %}
+            </tr>
+            {% endif %}
         {% endfor %}
           </tbody>
         </table>

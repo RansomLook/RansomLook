@@ -38,11 +38,11 @@ from .sharedutils import format_bytes
 redislacus = Redis(unix_socket_path=get_socket_path('cache'), db=15)
 lacus = LacusCore(redislacus,tor_proxy='socks5://127.0.0.1:9050')
 
-def creategroup(location: str) -> Dict[str, object] :
+def creategroup(location: str, fs: bool) -> Dict[str, object] :
     '''
     create a new group for a new provider - added to groups.json
     '''
-    mylocation = siteschema(location)
+    mylocation = siteschema(location, fs)
     insertdata: dict[str, Optional[Any]] = {
         'captcha': bool(),
         'meta': None,
@@ -193,22 +193,22 @@ def scraper(base: int) -> None:
         else:
             time.sleep(10)
 
-def adder(name: str, location: str, db: int) -> int:
+def adder(name: str, location: str, db: int, fs: bool=False) -> int:
     '''
     handles the addition of new providers to groups.json
     '''
     if checkexisting(name.strip(), db):
         stdlog('ransomlook: ' + 'records for ' + name + \
             ' already exist, appending to avoid duplication')
-        return appender(name.strip(), location.strip(), db)
+        return appender(name.strip(), location.strip(), db, fs)
     else:
         red = redis.Redis(unix_socket_path=get_socket_path('cache'), db=db)
-        newrec = creategroup(location.strip())
+        newrec = creategroup(location.strip(), fs)
         red.set(name.strip(), json.dumps(newrec))
         stdlog('ransomlook: ' + 'record for ' + name + ' added to groups.json')
         return 0
 
-def appender(name: str, location: str, db: int) -> int:
+def appender(name: str, location: str, db: int, fs: bool) -> int:
     '''
     handles the addition of new mirrors and relays for the same site
     to an existing group within groups.json
@@ -220,7 +220,7 @@ def appender(name: str, location: str, db: int) -> int:
         if location == loc['slug']:
             errlog('cannot append to non-existing provider or the location already exists')
             return 2
-    group['locations'].append(siteschema(location))
+    group['locations'].append(siteschema(location, fs))
     red.set(name.strip(), json.dumps(group))
     return 1
 

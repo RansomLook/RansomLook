@@ -12,9 +12,9 @@ def main() -> List[Dict[str, str]] :
             soup=BeautifulSoup(file,'html.parser')
             ls = soup.find('ls')
             if ls is not None:
-                divs_name=ls.find_all('a')
+                divs_name=ls.find_all('a') # type: ignore
                 for div in divs_name:
-                  try:  
+                  try:
                     title = div.find('span').text.strip()
                     description = div.find('url').text.strip()
                     link = div['href']

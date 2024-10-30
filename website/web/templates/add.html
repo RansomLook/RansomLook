@@ -28,6 +28,9 @@
             <span style="color: red;">[{{ error }}]</span>
             {% endfor %}
         </p>
+        <p>
+            {{ form.fs.label }} : {{ form.fs() }}<br>
+        </p>
         <p>{{ form.submit() }}</p>
     </form>
     </article>
