@@ -838,7 +838,15 @@ def exportdb(database: int): # type: ignore[no-untyped-def]
     red = Redis(unix_socket_path=get_socket_path('cache'), db=database)
     dump={}
     for key in red.keys():
-        dump[key.decode()]=json.loads(red.get(key)) # type: ignore
+        if str(database) != '0' and str(database) != '3':
+            dump[key.decode()]=json.loads(red.get(key)) # type: ignore
+        else:
+            temp = json.loads(red.get(key)) # type: ignore
+            if 'locations' in temp:
+                for location in temp['locations']:
+                    if 'private' in location and location['private'] is True:
+                        temp['locations'].remove(location)
+            dump[key.decode()]=temp
     return dump
 
 @app.route('/admin/logs')

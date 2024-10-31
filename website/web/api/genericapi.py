@@ -206,7 +206,7 @@ class Exportdb(Resource): # type: ignore[misc]
         red = Redis(unix_socket_path=get_socket_path('cache'), db=database)
         dump={}
         for key in red.keys():
-            if database != '0' and database != '3':
+            if str(database) != '0' and str(database) != '3':
                 dump[key.decode()]=json.loads(red.get(key)) # type: ignore
             else:
                 temp = json.loads(red.get(key)) # type: ignore
