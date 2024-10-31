@@ -99,6 +99,9 @@ class Groupinfo(Resource): # type: ignore[misc]
                         if group['meta'] is not None:
                             group['meta']=group['meta'].replace('\n', '<br/>')
                         for location in group['locations']:
+                            if 'private' in location and location['private'] is True:
+                                group['locations'].remove(location)
+                                continue
                             screenfile = '/screenshots/' + name.lower() + '-' + createfile(location['slug']) + '.png'
                             screenpath = os.path.normpath(str(get_homedir()) + '/source' + screenfile)
                             if not screenpath.startswith(str(get_homedir())):
@@ -166,6 +169,9 @@ class Marketinfo(Resource): # type: ignore[misc]
                         if group['meta'] is not None:
                             group['meta']=group['meta'].replace('\n', '<br/>')
                         for location in group['locations']:
+                            if 'private' in location and location['private'] is True:
+                                group['locations'].remove(location)
+                                continue
                             screenfile = '/screenshots/' + name.lower() + '-' + createfile(location['slug']) + '.png'
                             screenpath = os.path.normpath(str(get_homedir()) + '/source' + screenfile)
                             if not screenpath.startswith(str(get_homedir())):
@@ -200,7 +206,15 @@ class Exportdb(Resource): # type: ignore[misc]
         red = Redis(unix_socket_path=get_socket_path('cache'), db=database)
         dump={}
         for key in red.keys():
-            dump[key.decode()]=json.loads(red.get(key)) # type: ignore
+            if database != '0' and database != '3':
+                dump[key.decode()]=json.loads(red.get(key)) # type: ignore
+            else:
+                temp = json.loads(red.get(key)) # type: ignore
+                if 'locations' in temp:
+                    for location in temp['locations']:
+                        if 'private' in location and location['private'] is True:
+                            temp['locations'].remove(location)
+                dump[key.decode()]=temp
         return dump
 
 @api.route('/posts/<year>/<month>')

@@ -47,6 +47,7 @@
             </thead>
             <tbody>
             {% for location in entry['locations'] %}
+              {% if current_user.is_authenticated or not 'private' in location or location['private'] is false %}
                 <tr>
                 <td> {{ location['title'] }}  </td>
                 {% if location['available'] is true %} <td><center> ⬆️ </center></td>
@@ -60,6 +61,7 @@
                 <td> </td>
                 {% endif %}
                 </tr>
+              {% endif %}
             {% endfor %}
            </tbody>
            </table>

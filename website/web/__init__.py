@@ -665,7 +665,7 @@ def addgroup(): # type: ignore[no-untyped-def]
         elif int(form.category.data) == 8:
            res = twiadder(form.groupname.data, form.url.data)
         else:
-           res = adder(form.groupname.data.lower(), form.url.data, form.category.data, form.fs.data)
+           res = adder(form.groupname.data.lower(), form.url.data, form.category.data, form.fs.data, form.private.data)
         if res > 1:
            flash(f'Fail to add: {form.url.data} to {form.groupname.data}.  Url already exists for this group', 'error')
            return render_template('add.html',form=form)

@@ -8,6 +8,7 @@ class AddForm(FlaskForm): # type: ignore
     groupname = StringField('Group name', validators=[DataRequired()])
     url = StringField('Url', validators=[DataRequired()])
     fs = BooleanField('File server')
+    private = BooleanField('Private DLS')
     submit = SubmitField('Add')
 
 class AlertForm(FlaskForm): # type: ignore

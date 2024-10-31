@@ -34,6 +34,7 @@
           </thead>
           <tbody>
         {% for location in group['locations'] %}
+          {% if current_user.is_authenticated or not 'private' in location or location['private'] is false %}
             {% if not 'fs' in location or location['fs'] is false %}
             <tr><td> {{location['slug']}} </td>
                 {% if 'screen' in location %}
@@ -43,6 +44,7 @@
                 {% endif %}
             </tr>
             {% endif %}
+          {% endif %}
         {% endfor %}
           </tbody>
         </table>
@@ -56,6 +58,7 @@
           </thead>
           <tbody>
         {% for location in group['locations'] %}
+          {% if current_user.is_authenticated or not 'private' in location and location['private'] is false %} 
             {% if 'fs' in location and location['fs'] is true %}
             <tr><td> {{location['slug']}} </td>
                 {% if 'screen' in location %}
@@ -65,6 +68,7 @@
                 {% endif %}
             </tr>
             {% endif %}
+          {% endif %}
         {% endfor %}
           </tbody>
         </table>
