@@ -48,30 +48,7 @@ sudo apt install build-essential tcl
 ```bash
 git clone https://github.com/valkey-io/valkey
 cd valkey
-git checkout 7.2
-make
-# Optionally, you can run the tests:
-make test
-cd ..
-```
-
-### Redis (Deprecated, please use Valkey)
-
-[Redis](https://redis.io/): An open source (BSD licensed), in-memory data structure store, used as a database, cache and message broker.
-
-NOTE: Redis should be installed from the source, and the repository must be in the same directory as the one you will be cloning RansomLook into.
-
-In order to compile and test redis, you will need a few packages:
-
-```bash
-sudo apt-get update
-sudo apt install build-essential tcl
-```
-
-```bash
-git clone https://github.com/redis/redis.git
-cd redis
-git checkout 7.0
+git checkout 8.0
 make
 # Optionally, you can run the tests:
 make test
