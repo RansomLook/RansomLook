@@ -25,6 +25,7 @@ class EditForm(FlaskForm): # type: ignore
     description = TextAreaField()
     profiles = TextAreaField()
     links = TextAreaField()
+    private = BooleanField('Private Group')
     submit = SubmitField('Save changes')
 
 class LoginForm(FlaskForm): # type: ignore

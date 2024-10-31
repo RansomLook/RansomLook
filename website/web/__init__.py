@@ -2,6 +2,7 @@ from flask import Flask, render_template, redirect, url_for, flash
 import flask_moment # type: ignore
 from flask import request, send_from_directory
 from flask_bootstrap import Bootstrap5  # type: ignore
+from flask_login import current_user # type: ignore
 from urllib.parse import quote
 
 from datetime import datetime as dt
@@ -13,7 +14,7 @@ import json
 from redis import Redis
 
 import ast
-import flask_login  # type: ignore
+import flask_login
 from werkzeug.security import check_password_hash
 from werkzeug.exceptions import HTTPException
 from werkzeug.middleware.proxy_fix import ProxyFix
@@ -250,6 +251,8 @@ def status(): # type: ignore[no-untyped-def]
         groups = []
         for key in red.keys():
                 entry= json.loads(red.get(key)) # type: ignore
+                if not current_user.is_authenticated and 'private' in entry and entry['private'] is True:
+                    continue
                 entry['name']=key.decode()
                 groups.append(entry)
         groups.sort(key=lambda x: x["name"].lower())
@@ -280,6 +283,8 @@ def alive(): # type: ignore[no-untyped-def]
         groups = []
         for key in red.keys():
                 entry= json.loads(red.get(key)) # type: ignore
+                if not current_user.is_authenticated and 'private' in entry and entry['private'] is True:
+                    continue
                 entry['name']=key.decode()
                 groups.append(entry)
         groups.sort(key=lambda x: x["name"].lower())
@@ -312,6 +317,8 @@ def groups(): # type: ignore[no-untyped-def]
         groups = []
         for key in red.keys():
                 entry= json.loads(red.get(key)) # type: ignore
+                if not current_user.is_authenticated and 'private' in entry and entry['private'] is True:
+                    continue
                 entry['name']=key.decode()
                 if key in redpost.keys():
                     posts=json.loads(redpost.get(key)) # type: ignore
@@ -336,6 +343,9 @@ def group(name: str): # type: ignore[no-untyped-def]
         for key in red.keys():
                 if key.decode().lower() == name.lower():
                         group= json.loads(red.get(key)) # type: ignore
+                        if not current_user.is_authenticated and 'private' in group and group['private'] is True:
+                            return redirect(url_for("home"))
+
                         group['name']=key.decode()
                         if group['meta'] is not None:
                             group['meta']=group['meta'].replace('\n', '<br/>')
@@ -364,6 +374,8 @@ def markets(): # type: ignore[no-untyped-def]
         groups = []
         for key in red.keys():
                 entry= json.loads(red.get(key)) # type: ignore
+                if not current_user.is_authenticated and 'private' in entry and entry['private'] is True:
+                    continue
                 entry['name']=key.decode()
                 if key in redpost.keys():
                     posts=json.loads(redpost.get(key)) # type: ignore
@@ -388,6 +400,9 @@ def market(name: str): # type: ignore[no-untyped-def]
         for key in red.keys():
                 if key.decode().lower() == name.lower():
                         group= json.loads(red.get(key)) # type: ignore
+                        if not current_user.is_authenticated and 'private' in group and group['private'] is True:
+                            return redirect(url_for("home"))
+
                         group['name']=key.decode()
                         redpost = Redis(unix_socket_path=get_socket_path('cache'), db=2)
                         if key in redpost.keys():
@@ -537,6 +552,9 @@ def search(): # type: ignore[no-untyped-def]
         groups = []
         for key in red.keys():
             group = json.loads(red.get(key)) # type: ignore
+            if not current_user.is_authenticated and 'private' in group and group['private'] is True:
+                continue
+
             if query.lower() in key.decode().lower() or group['meta'] is not None and query.lower() in group['meta'].lower(): # type: ignore
                 group['name']=key.decode().lower()
                 groups.append(group)
@@ -546,6 +564,9 @@ def search(): # type: ignore[no-untyped-def]
         markets = []
         for key in red.keys():
             group = json.loads(red.get(key)) # type: ignore
+            if not current_user.is_authenticated and 'private' in group and group['private'] is True:
+                continue
+
             if query.lower() in key.decode().lower() or group['meta'] is not None and query.lower() in group['meta'].lower(): # type: ignore
                 group['name'] = key.decode().lower()
                 markets.append(group)
@@ -722,6 +743,7 @@ def editgroup(database: int, name: str):
         data['ransomware_galaxy_value'] = form.galaxy.data
         data['profile'] = ast.literal_eval(form.profiles.data)
         data['locations'] = ast.literal_eval(form.links.data)
+        data['private'] = form.private.data
         red.set(name, json.dumps(data))
         redlogs.zadd('logs', {f'{flask_login.current_user.id} modified : {name}, {data["meta"]}, {data["profile"]}, {data["locations"]}': score})
         if name != form.groupname.data:
@@ -745,6 +767,8 @@ def editgroup(database: int, name: str):
         if data['locations']== '':
             data['locations']='[]'
         form.links.data = data['locations']
+    if 'private' in data:
+        form.private.data = data['private']
     return render_template('editentry.html', form=form, deleteform=deleteButton)
 
 @app.route('/admin/addpost', methods=['GET', 'POST'])
@@ -842,6 +866,9 @@ def exportdb(database: int): # type: ignore[no-untyped-def]
             dump[key.decode()]=json.loads(red.get(key)) # type: ignore
         else:
             temp = json.loads(red.get(key)) # type: ignore
+            if not current_user.is_authenticated and 'private' in temp and temp['private'] is True:
+                continue
+
             if 'locations' in temp:
                 for location in temp['locations']:
                     if 'private' in location and location['private'] is True:

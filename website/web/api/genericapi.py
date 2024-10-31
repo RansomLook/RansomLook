@@ -72,6 +72,9 @@ class Groups(Resource): # type: ignore[misc]
         groups = []
         red = Redis(unix_socket_path=get_socket_path('cache'), db=0)
         for key in red.keys():
+            group= json.loads(red.get(key)) # type: ignore
+            if 'private' in group and group['private'] is True:
+                  continue
             groups.append(key.decode())
         return groups
 
@@ -82,6 +85,9 @@ class Markets(Resource): # type: ignore[misc]
         groups = []
         red = Redis(unix_socket_path=get_socket_path('cache'), db=3)
         for key in red.keys():
+            group= json.loads(red.get(key)) # type: ignore
+            if 'private' in group and group['private'] is True:
+                  continue
             groups.append(key.decode())
         return groups
 
@@ -96,6 +102,9 @@ class Groupinfo(Resource): # type: ignore[misc]
         for key in red.keys():
                 if key.decode().lower() == name.lower():
                         group= json.loads(red.get(key)) # type: ignore
+                        if 'private' in group and group['private'] is True:
+                           return [[],{}]
+
                         if group['meta'] is not None:
                             group['meta']=group['meta'].replace('\n', '<br/>')
                         for location in group['locations']:
@@ -166,6 +175,8 @@ class Marketinfo(Resource): # type: ignore[misc]
         for key in red.keys():
                 if key.decode().lower() == name.lower():
                         group= json.loads(red.get(key)) # type: ignore
+                        if 'private' in group and group['private'] is True:
+                           return [[],{}]
                         if group['meta'] is not None:
                             group['meta']=group['meta'].replace('\n', '<br/>')
                         for location in group['locations']:
@@ -210,6 +221,8 @@ class Exportdb(Resource): # type: ignore[misc]
                 dump[key.decode()]=json.loads(red.get(key)) # type: ignore
             else:
                 temp = json.loads(red.get(key)) # type: ignore
+                if 'private' in temp and temp['private'] is True:
+                    continue
                 if 'locations' in temp:
                     for location in temp['locations']:
                         if 'private' in location and location['private'] is True:
