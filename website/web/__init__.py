@@ -832,10 +832,10 @@ def addpostentry(database: int, name: str):
                 flash(f'Error to add post to : {name} - Screen should be a PNG', 'error')
                 return render_template('addpostentry.html', form=form)
             filenamepng = createfile(form.title.data) + file_ext
-            path = os.path.join(get_homedir(), 'source/screenshots', name)
+            path = os.path.normpath(str(get_homedir()) +  '/source/screenshots/' + name)
             if not os.path.exists(path):
                 os.mkdir(path)
-            namepng = os.path.join(path, filenamepng)
+            namepng = os.path.normpath(path +'/' +filenamepng)
             uploaded_file.save(namepng)
             entry['screen'] = str(os.path.join('screenshots', name, filenamepng))
         if appender(entry, name):
