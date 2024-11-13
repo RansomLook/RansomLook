@@ -87,6 +87,7 @@ def scraper(base: int) -> None:
             try:
                 lacus.status()
             except:
+                print('using local lacuscore')
                 remote_lacus_url = None
 
     if not remote_lacus_url:
@@ -240,6 +241,7 @@ def screen() -> None:
             try:
                 lacus.status()
             except:
+                print('using local lacuscore')
                 remote_lacus_url = None
 
     if not remote_lacus_url:
