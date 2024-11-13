@@ -108,7 +108,11 @@ def scraper(base: int) -> None:
             except:
                 print('Error with : '+ host['slug'])
                 continue
-            uuid = lacus.enqueue(url=host['slug'], general_timeout_in_sec=90, max_retries=1)
+            if 'header' in host:
+                print(host)
+                uuid = lacus.enqueue(url=host['slug'], general_timeout_in_sec=90, max_retries=1, headers=json.loads(host['header']))
+            else:
+                uuid = lacus.enqueue(url=host['slug'], general_timeout_in_sec=90, max_retries=1)
             host.update({'uuid':uuid})
             uuids.append(uuid)
     if not remote_lacus_url:
@@ -256,7 +260,10 @@ def screen() -> None:
                 capture.update({'slug2' : urllib.parse.urljoin(host['slug'], str(capture['link']))})
                 if capture['slug2'] not in slugs:
                    slugs.append(capture['slug2'])
-                   uuid = lacus.enqueue(url=capture['slug2'], max_retries=1)
+                   if 'header' in host:
+                       uuid = lacus.enqueue(url=host['slug'], general_timeout_in_sec=90, max_retries=1, headers=json.loads(host['header']))
+                   else:
+                       uuid = lacus.enqueue(url=capture['slug2'], max_retries=1)
                    capture.update({'uuid':uuid})
                    uuids.append(uuid)
 
