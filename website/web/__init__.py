@@ -7,6 +7,7 @@ from urllib.parse import quote
 
 from datetime import datetime as dt
 from datetime import timedelta
+from dateutil import parser
 import glob
 from os.path import dirname, basename, isfile, join
 import os
@@ -822,7 +823,7 @@ def addpostentry(database: int, name: str):
             flash(f'Error to add post to : {name} - You should select Magnet or Link not both', 'error')
             return render_template('addpostentry.html', form=form)
         if form.date.data:
-            entry['date'] = form.date.data
+            entry['date'] = parser.parse(form.date.data)
         uploaded_file = request.files['file']
         filename = secure_filename(uploaded_file.filename)
         if filename != '':

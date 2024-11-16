@@ -116,7 +116,7 @@ def run_data_viz(days_filter: int) -> None:
                 timestamps.append(post['discovered'])
     df = pd.DataFrame({'group_name': group_names, 'timestamp': timestamps})
     # Convert the timestamps into a datetime format
-    df['timestamp'] = pd.to_datetime(df['timestamp'])
+    df['timestamp'] = pd.to_datetime(df['timestamp'], format='mixed')
 
     # Group and sort the data by the number of postings in each group
     df_sorted = df.groupby(['group_name', 'timestamp']).size().reset_index(name='count') # type: ignore[call-overload]
