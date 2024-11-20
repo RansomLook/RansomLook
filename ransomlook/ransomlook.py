@@ -113,7 +113,7 @@ def scraper(base: int) -> None:
                         'max_retries':1
                        }
             if 'header' in host:
-                settings['header']=host['header']
+                settings['headers']=host['header']
             if 'browser' in host:
                 settings['browser']=host['browser']
 
@@ -271,7 +271,7 @@ def screen() -> None:
                         'max_retries':1
                        }
                    if 'header' in host:
-                       settings['header']=host['header']
+                       settings['headers']=host['header']
                    if 'browser' in host:
                        settings['browser']=host['browser']
 
