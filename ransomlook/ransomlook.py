@@ -108,11 +108,16 @@ def scraper(base: int) -> None:
             except:
                 print('Error with : '+ host['slug'])
                 continue
+            settings = {'url': host['slug'],
+                        'general_timeout_in_sec':90,
+                        'max_retries':1
+                       }
             if 'header' in host:
-                print(host)
-                uuid = lacus.enqueue(url=host['slug'], general_timeout_in_sec=90, max_retries=1, headers=json.loads(host['header']))
-            else:
-                uuid = lacus.enqueue(url=host['slug'], general_timeout_in_sec=90, max_retries=1)
+                settings['header']=host['header']
+            if 'browser' in host:
+                settings['browser']=host['browser']
+
+            uuid = lacus.enqueue(settings=settings)
             host.update({'uuid':uuid})
             uuids.append(uuid)
     if not remote_lacus_url:
@@ -256,16 +261,26 @@ def screen() -> None:
     for capture in captures:
         group = json.loads(redgroup.get(capture['group'].encode())) # type: ignore
         for host in group['locations']:
+          try:
             if capture['slug'].removeprefix(capture['group']+'-').split('.')[0] in striptld(host['slug']):
                 capture.update({'slug2' : urllib.parse.urljoin(host['slug'], str(capture['link']))})
                 if capture['slug2'] not in slugs:
                    slugs.append(capture['slug2'])
+                   settings = {'url': capture['slug2'],
+                        'general_timeout_in_sec':90,
+                        'max_retries':1
+                       }
                    if 'header' in host:
-                       uuid = lacus.enqueue(url=host['slug'], general_timeout_in_sec=90, max_retries=1, headers=json.loads(host['header']))
-                   else:
-                       uuid = lacus.enqueue(url=capture['slug2'], max_retries=1)
+                       settings['header']=host['header']
+                   if 'browser' in host:
+                       settings['browser']=host['browser']
+
+                   uuid = lacus.enqueue(settings=settings)
                    capture.update({'uuid':uuid})
                    uuids.append(uuid)
+          except:
+            print(capture['group'].encode())
+            print(capture['slug'])
 
     if not remote_lacus_url:
         asyncio.run(run_captures())
