@@ -194,7 +194,10 @@ def postssince(days: int) -> int :
     for entry in groups:
         posts = json.loads(red.get(entry)) # type: ignore
         for post in posts:
-            datetime_object = datetime.strptime(post['discovered'], '%Y-%m-%d %H:%M:%S.%f')
+            try:
+                datetime_object = datetime.strptime(post['discovered'], '%Y-%m-%d %H:%M:%S.%f')
+            except:
+                datetime_object = datetime.strptime(post['discovered'], '%Y-%m-%d %H:%M:%S')
             if datetime_object > datetime.now() - timedelta(days=days):
                 post_count += 1
     return post_count
@@ -208,7 +211,10 @@ def poststhisyear() -> int :
     for entry in groups:
         posts = json.loads(red.get(entry)) # type: ignore
         for post in posts:
-            datetime_object = datetime.strptime(post['discovered'], '%Y-%m-%d %H:%M:%S.%f')
+            try:
+                datetime_object = datetime.strptime(post['discovered'], '%Y-%m-%d %H:%M:%S.%f')
+            except:
+                datetime_object = datetime.strptime(post['discovered'], '%Y-%m-%d %H:%M:%S')
             if datetime_object.year == current_year:
                 post_count += 1
     return post_count
@@ -221,9 +227,12 @@ def postslast24h() -> int :
     for entry in groups:
         posts = json.loads(red.get(entry)) # type: ignore
         for post in posts:
-            datetime_object = datetime.strptime(post['discovered'], '%Y-%m-%d %H:%M:%S.%f')
+            try :
+                datetime_object = datetime.strptime(post['discovered'], '%Y-%m-%d %H:%M:%S.%f')
+            except:
+                datetime_object = datetime.strptime(post['discovered'], '%Y-%m-%d %H:%M:%S')
             if datetime_object > datetime.now() - timedelta(hours=24):
-                post_count += 1
+               post_count += 1
     return post_count
 
 def parsercount() -> int :
@@ -260,7 +269,10 @@ def mounthlypostcount() -> int :
     for entry in groups:
         posts = json.loads(red.get(entry)) # type: ignore
         for post in posts:
-            datetime_object = datetime.strptime(post['discovered'], '%Y-%m-%d %H:%M:%S.%f')
+            try:
+                datetime_object = datetime.strptime(post['discovered'], '%Y-%m-%d %H:%M:%S.%f')
+            except:
+                datetime_object = datetime.strptime(post['discovered'], '%Y-%m-%d %H:%M:%S')
             if datetime_object > month_first_day:
                 post_count += 1
     return post_count
