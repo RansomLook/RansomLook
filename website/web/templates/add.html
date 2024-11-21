@@ -28,8 +28,15 @@
             <span style="color: red;">[{{ error }}]</span>
             {% endfor %}
         </p>
+        <p> {{ form.browser.label }}<br>
+            {{ form.browser }}<br>
+        </p>
+
         <p>
             {{ form.fs.label }} : {{ form.fs() }}<br>
+        </p>
+        <p>
+            {{ form.chat.label }} : {{ form.chat() }}<br>
         </p>
         <p>
             {{ form.private.label }} : {{ form.private() }}<br>

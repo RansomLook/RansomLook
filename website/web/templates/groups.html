@@ -22,9 +22,17 @@
 	<h1>Group profiles</h1>
         {% for entry in data %}
             {% if type == "groups" %}
+            {% if 'private' in entry and entry['private'] is true %}
+            <h3 id="{{entry['name'].title()}}"> <a style="color:purple;" href="/group/{{entry['name']}}">{{entry['name'].title()}}</a></h3>
+            {% else %}
             <h3 id="{{entry['name'].title()}}"> <a href="/group/{{entry['name']}}">{{entry['name'].title()}}</a></h3>
+            {% endif %}
+            {% else %}
+            {% if 'private' in entry and entry['private'] is true %}
+            <h3 id="{{entry['name'].title()}}"> <a style="color:purple;" href="/market/{{entry['name']}}">{{entry['name'].title()}}</a></h3>
             {% else %}
             <h3 id="{{entry['name'].title()}}"> <a href="/market/{{entry['name']}}">{{entry['name'].title()}}</a></h3>
+            {% endif %}
             {% endif %}
             {% if entry['meta'] is not none %}  
             <h4>Description</h4>
@@ -54,7 +62,11 @@
                 {% else %} <td><center> ⬇️ </center></td>
                 {% endif %}
                 <td><center> {{ location['lastscrape'].split(' ')[0] }} </center></td>
+                {% if 'private' in location and location['private'] is true %}
+                <td style="color: red;"> {{location['slug']}} </td>
+                {% else %}
                 <td> {{location['slug']}} </td>
+                {% endif %}
                 {% if 'screen' in location %}
                 <td><a href="{{ location['screen'] }}" rel="noopener noreferrer" target="_blank"">Screen</a></td>
                 {% else %}
@@ -66,32 +78,6 @@
            </tbody>
            </table>
            </div>
-            {% if entry['posts'] %}
-            <h4>Posts</h4>
-            <div class="table-responsive">
-            <table id="table" class="table" style="display:table; table-layout:auto; width:100%">
-            <thead>
-                <tr>
-                    <th>Title</th>
-                    <th style="width:10%">Date</th>
-                    <th style="width:10%">Screen</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for post in entry['posts'] %}
-                    <tr><td> {{post['post_title']}} </td>
-                        <td><center> {{post['discovered'].split(' ')[0]}} </center></td>
-                        {% if 'screen' in post and post['screen'] is not none %}
-                            <td><a href="{{ post['screen'] }}" rel="noopener noreferrer" target="_blank"">Screen</a></td>
-                        {% else %}
-                            <td> </td>
-                        {% endif %}
-                    </tr>
-                {% endfor %}
-            </tbody>
-            </table>
-            </div>
-            {% endif %}
         {% endfor %}
     </article>
 {% endblock %}

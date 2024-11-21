@@ -313,7 +313,6 @@ def alive(): # type: ignore[no-untyped-def]
 @app.route("/groups")
 def groups(): # type: ignore[no-untyped-def]
         red = Redis(unix_socket_path=get_socket_path('cache'), db=0)
-        redpost = Redis(unix_socket_path=get_socket_path('cache'), db=2)
 
         groups = []
         for key in red.keys():
@@ -321,12 +320,6 @@ def groups(): # type: ignore[no-untyped-def]
                 if not current_user.is_authenticated and 'private' in entry and entry['private'] is True:
                     continue
                 entry['name']=key.decode()
-                if key in redpost.keys():
-                    posts=json.loads(redpost.get(key)) # type: ignore
-                    sorted_posts = sorted(posts, key=lambda x: x['discovered'], reverse=True)
-                    entry['posts']= sorted_posts
-                else:
-                    entry['posts']={}
                 groups.append(entry)
         groups.sort(key=lambda x: x["name"].lower())
         for group in groups:
@@ -370,7 +363,6 @@ def group(name: str): # type: ignore[no-untyped-def]
 @app.route("/markets")
 def markets(): # type: ignore[no-untyped-def]
         red = Redis(unix_socket_path=get_socket_path('cache'), db=3)
-        redpost = Redis(unix_socket_path=get_socket_path('cache'), db=2)
 
         groups = []
         for key in red.keys():
@@ -378,12 +370,6 @@ def markets(): # type: ignore[no-untyped-def]
                 if not current_user.is_authenticated and 'private' in entry and entry['private'] is True:
                     continue
                 entry['name']=key.decode()
-                if key in redpost.keys():
-                    posts=json.loads(redpost.get(key)) # type: ignore
-                    sorted_posts = sorted(posts, key=lambda x: x['discovered'], reverse=True)
-                    entry['posts']= sorted_posts
-                else:
-                    entry['posts']={}
                 groups.append(entry)
         groups.sort(key=lambda x: x["name"].lower())
         for group in groups:
@@ -687,7 +673,7 @@ def addgroup(): # type: ignore[no-untyped-def]
         elif int(form.category.data) == 8:
            res = twiadder(form.groupname.data, form.url.data)
         else:
-           res = adder(form.groupname.data.lower(), form.url.data, form.category.data, form.fs.data, form.private.data)
+           res = adder(form.groupname.data.lower(), form.url.data, form.category.data, form.fs.data, form.private.data, form.chat.data, form.browser.data)
         if res > 1:
            flash(f'Fail to add: {form.url.data} to {form.groupname.data}.  Url already exists for this group', 'error')
            return render_template('add.html',form=form)

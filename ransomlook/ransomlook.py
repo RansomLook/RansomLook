@@ -16,6 +16,7 @@ import time
 from typing import Dict, Any, Optional
 from redis import Redis
 from pylacus import PyLacus
+from pylacus import CaptureSettings
 from lacuscore import LacusCore
 import libtorrent as lt # type: ignore
 import asyncio
@@ -38,11 +39,11 @@ from .sharedutils import format_bytes
 redislacus = Redis(unix_socket_path=get_socket_path('cache'), db=15)
 lacus = LacusCore(redislacus,tor_proxy='socks5://127.0.0.1:9050')
 
-def creategroup(location: str, fs: bool, private: bool) -> Dict[str, object] :
+def creategroup(location: str, fs: bool, private: bool, chat: bool, browser: str|None) -> Dict[str, object] :
     '''
     create a new group for a new provider - added to groups.json
     '''
-    mylocation = siteschema(location, fs, private)
+    mylocation = siteschema(location, fs, private, chat, browser)
     insertdata: dict[str, Optional[Any]] = {
         'captcha': bool(),
         'meta': None,
@@ -108,16 +109,16 @@ def scraper(base: int) -> None:
             except:
                 print('Error with : '+ host['slug'])
                 continue
-            settings = {'url': host['slug'],
+            settings: CaptureSettings = {'url': host['slug'],
                         'general_timeout_in_sec':90,
                         'max_retries':1
                        }
             if 'header' in host:
                 settings['headers']=host['header']
-            if 'browser' in host:
+            if 'browser' in host and host['browser'] is not None:
                 settings['browser']=host['browser']
 
-            uuid = lacus.enqueue(settings=settings)
+            uuid = lacus.enqueue(settings = settings)
             host.update({'uuid':uuid})
             uuids.append(uuid)
     if not remote_lacus_url:
@@ -203,22 +204,22 @@ def scraper(base: int) -> None:
         else:
             time.sleep(10)
 
-def adder(name: str, location: str, db: int, fs: bool=False, private: bool=False) -> int:
+def adder(name: str, location: str, db: int, fs: bool=False, private: bool=False, chat: bool=False, browser: str|None=None) -> int:
     '''
     handles the addition of new providers to groups.json
     '''
     if checkexisting(name.strip(), db):
         stdlog('ransomlook: ' + 'records for ' + name + \
             ' already exist, appending to avoid duplication')
-        return appender(name.strip(), location.strip(), db, fs, private)
+        return appender(name.strip(), location.strip(), db, fs, private, chat, browser)
     else:
         red = redis.Redis(unix_socket_path=get_socket_path('cache'), db=db)
-        newrec = creategroup(location.strip(), fs, private)
+        newrec = creategroup(location.strip(), fs, private, chat, browser)
         red.set(name.strip(), json.dumps(newrec))
         stdlog('ransomlook: ' + 'record for ' + name + ' added to groups.json')
         return 0
 
-def appender(name: str, location: str, db: int, fs: bool, private: bool) -> int:
+def appender(name: str, location: str, db: int, fs: bool, private: bool, chat: bool, browser: str|None) -> int:
     '''
     handles the addition of new mirrors and relays for the same site
     to an existing group within groups.json
@@ -230,7 +231,7 @@ def appender(name: str, location: str, db: int, fs: bool, private: bool) -> int:
         if location == loc['slug']:
             errlog('cannot append to non-existing provider or the location already exists')
             return 2
-    group['locations'].append(siteschema(location, fs, private))
+    group['locations'].append(siteschema(location, fs, private, chat, browser))
     red.set(name.strip(), json.dumps(group))
     return 1
 
@@ -266,13 +267,13 @@ def screen() -> None:
                 capture.update({'slug2' : urllib.parse.urljoin(host['slug'], str(capture['link']))})
                 if capture['slug2'] not in slugs:
                    slugs.append(capture['slug2'])
-                   settings = {'url': capture['slug2'],
+                   settings: CaptureSettings = {'url': capture['slug2'],
                         'general_timeout_in_sec':90,
                         'max_retries':1
                        }
                    if 'header' in host:
                        settings['headers']=host['header']
-                   if 'browser' in host:
+                   if 'browser' in host and host['browser'] is not None:
                        settings['browser']=host['browser']
 
                    uuid = lacus.enqueue(settings=settings)

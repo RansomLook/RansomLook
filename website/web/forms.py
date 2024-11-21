@@ -7,7 +7,9 @@ class AddForm(FlaskForm): # type: ignore
     category = SelectField('Database', choices=[('','Select a database'),(0, 'Group'),(3,'Market'),(5,'Telegram'),(8,'Twitter')],  default='', validators=[DataRequired()])
     groupname = StringField('Group name', validators=[DataRequired()])
     url = StringField('Url', validators=[DataRequired()])
+    browser = SelectField('Browser', choices=[('','Select a browser'),('chrome', 'chrome'),('firefix','firefox'),('webkit','webkit')],  default='')
     fs = BooleanField('File server')
+    chat = BooleanField('Chat')
     private = BooleanField('Private DLS')
     submit = SubmitField('Add')
 
