@@ -291,7 +291,7 @@ class DensityHeatmap(Resource): # type: ignore[misc]
                         group_names.append(key.decode())
                         timestamps.append(entry['discovered'])
         df = pd.DataFrame({'group_name': group_names, 'timestamp': timestamps})
-        df['timestamp'] = pd.to_datetime(df['timestamp'])
+        df['timestamp'] = pd.to_datetime(df['timestamp'],format='mixed')
 
         df_sorted = df.groupby(['group_name', 'timestamp']).size().reset_index(name='count') # type: ignore
         df_sorted = df_sorted.sort_values(by='count', ascending=False)
@@ -321,7 +321,7 @@ class Scatter(Resource): # type: ignore[misc]
                         group_names.append(key.decode())
                         timestamps.append(entry['discovered'])
         df = pd.DataFrame({'group_name': group_names, 'timestamp': timestamps})
-        df['timestamp'] = pd.to_datetime(df['timestamp'])
+        df['timestamp'] = pd.to_datetime(df['timestamp'],format='mixed')
 
         df_sorted = df.groupby(['group_name', 'timestamp']).size().reset_index(name='count') # type: ignore
         df_sorted = df_sorted.sort_values(by='count', ascending=False)
@@ -351,7 +351,7 @@ class Pie(Resource): # type: ignore[misc]
                         group_names.append(key.decode())
                         timestamps.append(entry['discovered'])
         df = pd.DataFrame({'group_name': group_names, 'timestamp': timestamps})
-        df['timestamp'] = pd.to_datetime(df['timestamp'])
+        df['timestamp'] = pd.to_datetime(df['timestamp'],format='mixed')
 
         df_sorted = df.groupby(['group_name', 'timestamp']).size().reset_index(name='count') # type: ignore
         df_sorted = df_sorted.sort_values(by='count', ascending=False)
@@ -382,7 +382,7 @@ class Bar(Resource): # type: ignore[misc]
                         group_names.append(key.decode())
                         timestamps.append(entry['discovered'])
         df = pd.DataFrame({'group_name': group_names, 'timestamp': timestamps})
-        df['timestamp'] = pd.to_datetime(df['timestamp'])
+        df['timestamp'] = pd.to_datetime(df['timestamp'],format='mixed')
 
         df_sorted = df.groupby(['group_name', 'timestamp']).size().reset_index(name='count') # type: ignore[call-overload]
         df_sorted = df_sorted.sort_values(by='count', ascending=False)
@@ -409,7 +409,7 @@ class PeriodDensityHeatmap(Resource): # type: ignore[misc]
                         group_names.append(key.decode())
                         timestamps.append(entry['discovered'])
         df = pd.DataFrame({'group_name': group_names, 'timestamp': timestamps})
-        df['timestamp'] = pd.to_datetime(df['timestamp'])
+        df['timestamp'] = pd.to_datetime(df['timestamp'],format='mixed')
 
         df_sorted = df.groupby(['group_name', 'timestamp']).size().reset_index(name='count') # type: ignore
         df_sorted = df_sorted.sort_values(by='count', ascending=False)
@@ -434,7 +434,7 @@ class PeriodDensityHeatmapGroup(Resource): # type: ignore[misc]
                  group_names.append(group)
                  timestamps.append(entry['discovered'])
         df = pd.DataFrame({'group_name': group_names, 'timestamp': timestamps})
-        df['timestamp'] = pd.to_datetime(df['timestamp'])
+        df['timestamp'] = pd.to_datetime(df['timestamp'],format='mixed')
         df_sorted = df.groupby(['group_name', 'timestamp']).size().reset_index(name='count') # type: ignore
         df_sorted = df_sorted.sort_values(by='count', ascending=False)
         fig = px.density_heatmap(df_sorted, x='timestamp', y='group_name', z='count', title='Posts per group per day (heatmap)', width=1050, height=750)
@@ -464,7 +464,7 @@ class PeriodDensityHeatmapGroups(Resource): # type: ignore[misc]
                     group_names.append(group)
                     timestamps.append(entry['discovered'])
         df = pd.DataFrame({'group_name': group_names, 'timestamp': timestamps})
-        df['timestamp'] = pd.to_datetime(df['timestamp'])
+        df['timestamp'] = pd.to_datetime(df['timestamp'],format='mixed')
         df_sorted = df.groupby(['group_name', 'timestamp']).size().reset_index(name='count') # type: ignore
         df_sorted = df_sorted.sort_values(by='count', ascending=False)
         fig = px.density_heatmap(df_sorted, x='timestamp', y='group_name', z='count', title='Posts per group per day (heatmap)', width=1050, height=750)
@@ -490,7 +490,7 @@ class PeriodScatter(Resource): # type: ignore[misc]
                         group_names.append(key.decode())
                         timestamps.append(entry['discovered'])
         df = pd.DataFrame({'group_name': group_names, 'timestamp': timestamps})
-        df['timestamp'] = pd.to_datetime(df['timestamp'])
+        df['timestamp'] = pd.to_datetime(df['timestamp'],format='mixed')
 
         df_sorted = df.groupby(['group_name', 'timestamp']).size().reset_index(name='count') # type: ignore
         df_sorted = df_sorted.sort_values(by='count', ascending=False)
@@ -515,7 +515,7 @@ class PeriodScatterGroup(Resource): # type: ignore[misc]
                 group_names.append(group)
                 timestamps.append(entry['discovered'])
         df = pd.DataFrame({'group_name': group_names, 'timestamp': timestamps})
-        df['timestamp'] = pd.to_datetime(df['timestamp'])
+        df['timestamp'] = pd.to_datetime(df['timestamp'],format='mixed')
 
         df_sorted = df.groupby(['group_name', 'timestamp']).size().reset_index(name='count') # type: ignore
         df_sorted = df_sorted.sort_values(by='count', ascending=False)
@@ -548,7 +548,7 @@ class PeriodScatterGroups(Resource): # type: ignore[misc]
                     group_names.append(group)
                     timestamps.append(entry['discovered'])
         df = pd.DataFrame({'group_name': group_names, 'timestamp': timestamps})
-        df['timestamp'] = pd.to_datetime(df['timestamp'])
+        df['timestamp'] = pd.to_datetime(df['timestamp'],format='mixed')
 
         df_sorted = df.groupby(['group_name', 'timestamp']).size().reset_index(name='count') # type: ignore
         df_sorted = df_sorted.sort_values(by='count', ascending=False)
@@ -574,7 +574,7 @@ class PeriodPie(Resource): # type: ignore[misc]
                         group_names.append(key.decode())
                         timestamps.append(entry['discovered'])
         df = pd.DataFrame({'group_name': group_names, 'timestamp': timestamps})
-        df['timestamp'] = pd.to_datetime(df['timestamp'])
+        df['timestamp'] = pd.to_datetime(df['timestamp'],format='mixed')
 
         df_sorted = df.groupby(['group_name', 'timestamp']).size().reset_index(name='count') # type: ignore
         df_sorted = df_sorted.sort_values(by='count', ascending=False)
@@ -600,7 +600,7 @@ class PeriodBar(Resource): # type: ignore[misc]
                         group_names.append(key.decode())
                         timestamps.append(entry['discovered'])
         df = pd.DataFrame({'group_name': group_names, 'timestamp': timestamps})
-        df['timestamp'] = pd.to_datetime(df['timestamp'])
+        df['timestamp'] = pd.to_datetime(df['timestamp'],format='mixed')
 
         df_sorted = df.groupby(['group_name', 'timestamp']).size().reset_index(name='count') # type: ignore
         df_sorted = df_sorted.sort_values(by='count', ascending=False)
