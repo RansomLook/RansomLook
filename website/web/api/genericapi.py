@@ -58,7 +58,11 @@ class LastPost(Resource): # type: ignore[misc]
         for key in red.keys():
                 entries = json.loads(red.get(key)) # type: ignore
                 for entry in entries:
-                    if datetime.strptime(entry['discovered'], '%Y-%m-%d %H:%M:%S.%f') > actualdate:
+                    try:
+                        datetime_object = datetime.strptime(entry['discovered'], '%Y-%m-%d %H:%M:%S.%f')
+                    except:
+                        datetime_object = datetime.strptime(entry['discovered'], '%Y-%m-%d %H:%M:%S')
+                    if datetime_object > actualdate:
                         entry['group_name']=key.decode()
                         posts.append(entry)
         sorted_posts = sorted(posts, key=lambda x: x['discovered'], reverse=True)

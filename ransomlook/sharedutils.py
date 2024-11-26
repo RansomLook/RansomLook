@@ -186,6 +186,39 @@ def hostcount(db: int) -> int :
             host_count += 1
     return host_count
 
+def hostcountdls(db: int) -> int :
+    red = redis.Redis(unix_socket_path=get_socket_path('cache'), db=db)
+    groups = red.keys()
+    host_count = 0
+    for entry in groups:
+        group = json.loads(red.get(entry)) # type: ignore
+        for host in group['locations']:
+            if (not 'chat' in host or host['chat'] is False) and (not 'fs' in host or host['fs'] is False):
+                host_count += 1
+    return host_count
+
+def hostcountfs(db: int) -> int :
+    red = redis.Redis(unix_socket_path=get_socket_path('cache'), db=db)
+    groups = red.keys()
+    host_count = 0
+    for entry in groups:
+        group = json.loads(red.get(entry)) # type: ignore
+        for host in group['locations']:
+            if 'fs' in host and host['fs'] is True:
+                host_count += 1
+    return host_count
+
+def hostcountchat(db: int) -> int :
+    red = redis.Redis(unix_socket_path=get_socket_path('cache'), db=db)
+    groups = red.keys()
+    host_count = 0
+    for entry in groups:
+        group = json.loads(red.get(entry)) # type: ignore
+        for host in group['locations']:
+            if 'chat' in host and host['chat'] is True:
+                host_count += 1
+    return host_count
+
 def postssince(days: int) -> int :
     '''returns the number of posts within the last x days'''
     post_count = 0

@@ -37,7 +37,7 @@ from ransomlook.posts import appender
 
 from ransomlook.ransomlook import adder
 from ransomlook.sharedutils import createfile
-from ransomlook.sharedutils import groupcount, hostcount, onlinecount, postslast24h, mounthlypostcount, currentmonthstr, postssince, poststhisyear, postcount, parsercount, statsgroup, run_data_viz
+from ransomlook.sharedutils import groupcount, hostcount, hostcountdls, hostcountfs, hostcountchat, onlinecount, postslast24h, mounthlypostcount, currentmonthstr, postssince, poststhisyear, postcount, parsercount, statsgroup, run_data_viz
 from ransomlook.default.config import get_homedir
 from ransomlook.default.config import get_config
 from ransomlook.default import get_socket_path
@@ -179,6 +179,9 @@ def home(): # type: ignore[no-untyped-def]
         data = {}
         data['nbgroups'] = groupcount(0)
         data['nblocations'] = hostcount(0)
+        data['nbdls'] = hostcountdls(0)
+        data['nbfs'] = hostcountfs(0)
+        data['nbchat'] = hostcountchat(0)
         data['online'] = onlinecount(0)
         data['nbforum'] = groupcount(3)
         data['nbforumlocations'] = hostcount(3)
