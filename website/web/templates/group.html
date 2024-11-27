@@ -62,7 +62,7 @@
           </thead>
           <tbody>
         {% for location in group['locations'] %}
-          {% if current_user.is_authenticated or not 'private' in location and location['private'] is false %} 
+          {% if current_user.is_authenticated or not 'private' in location or location['private'] is false %} 
             {% if 'fs' in location and location['fs'] is true %}
             {% if location['private'] is true %}
             <tr><td style="color: red;"> {{location['slug']}} </td>
@@ -90,8 +90,8 @@
           </thead>
           <tbody>
         {% for location in group['locations'] %}
-          {% if current_user.is_authenticated or not 'private' in location and location['private'] is false %} 
-            {% if 'fs' in location and location['chat'] is true %}
+          {% if current_user.is_authenticated or not 'private' in location or location['private'] is false %} 
+            {% if 'chat' in location and location['chat'] is true %}
             {% if location['private'] is true %}
             <tr><td style="color: red;"> {{location['slug']}} </td>
             {% else %}
