@@ -77,7 +77,7 @@ def scraper(base: int) -> None:
     '''main scraping function'''
     red = redis.Redis(unix_socket_path=get_socket_path('cache'), db=base)
     groups=[]
-    uuids=[]
+    running_capture = {}
     validationDate = datetime.now() - relativedelta(months=6)
     remote_lacus_url = None
     if get_config('generic', 'remote_lacus'):
@@ -119,85 +119,79 @@ def scraper(base: int) -> None:
                 settings['browser']=host['browser']
 
             uuid = lacus.enqueue(settings = settings)
-            host.update({'uuid':uuid})
-            uuids.append(uuid)
+            running_capture[uuid]={'group':group['name'],'slug':host['slug']}
     if not remote_lacus_url:
         asyncio.run(run_captures())
-    while uuids:
-        for group in groups:
-            for host in group['locations']:
-                if 'uuid' in host:
-                    if lacus.get_capture_status(host['uuid']) == -1:
-                        uuids.remove(uuid)
-                        name=group['name']
-                        del host['uuid']
-                        del group['name']
-                        host.update({'available':False})
-                        red.set(name, json.dumps(group))
-                        group['name']=name
-                    if lacus.get_capture_status(host['uuid']) == 1:
-                        result = lacus.get_capture(host['uuid'])
-                        uuids.remove(host['uuid'])
-                        del host['uuid']
-                        if result['status']=='error': # type: ignore
-                            host.update({'available':False})
-                            name=group['name']
-                            del group['name']
-                            red.set(name, json.dumps(group))
-                            group['name']=name
-                            red.set(group['name'], json.dumps(host))
-                            continue
-                        if 'png' in result:
-                            filename = group['name'] + '-' + createfile(host['slug']) + '.png'
-                            name = os.path.join(get_homedir(), 'source/screenshots', filename)
-                            with open(name, 'wb') as tosave:
-                                if remote_lacus_url:
-                                    tosave.write((result['png'])) # type: ignore
-                                else:
-                                    tosave.write(base64.b64decode(result['png'])) # type: ignore
-                            targetImage = Image.open(name)
-                            metadata = PngInfo()
-                            metadata.add_text("Source", "RansomLook.io")
-                            targetImage.save(name, pnginfo=metadata)
-                            if get_config('generic', 'keepall'):
-                                nowpng = datetime.now()
-                                timestamp = nowpng.strftime("%Y-%m-%d_%H-%M-%S")
-                                filename =  timestamp + '-' + createfile(host['slug']) + '.png'
-                                folder = os.path.join(get_homedir(), 'source/screenshots/old', group['name'])
-                                if not os.path.exists(folder):
-                                    os.makedirs(folder)
-                                file_path = os.path.join(folder, filename)
-                                with open(file_path, 'wb') as tosave:
-                                    if remote_lacus_url:
-                                        tosave.write((result['png'])) # type: ignore
-                                    else:
-                                        tosave.write(base64.b64decode(result['png'])) # type: ignore
-
-                        if 'html' in result:
-                            filename = group['name'] + '-' + striptld(host['slug']) + '.html'
-                            name = os.path.join(os.getcwd(), 'source', filename)
-                            with open(name, 'w') as tosave:
-                                tosave.write(result['html']) # type: ignore
-                        if 'har' in result:
-                            out = False
-                            for entry in result['har']['log']['entries']: # type: ignore
-                                if entry['response']['status'] == -1:
-                                    host.update({'available':False})
-                                    name= group['name']
-                                    del group['name']
-                                    red.set(name, json.dumps(group))
-                                    group['name']=name
-                                    out = True
-                            if not out:
-                                host.update({'available':True, 'title':result['har']['log']['pages'][0]['title'], # type: ignore
-                                     'lastscrape':result['har']['log']['pages'][0]['startedDateTime'].replace('T',' ').replace('Z',''), # type: ignore
-                                     'updated':result['har']['log']['pages'][0]['startedDateTime'].replace('T',' ').replace('Z','')}) # type: ignore
+    while running_capture:
+        for key in list(running_capture): # type: ignore
+            if lacus.get_capture_status(str(key)) == -1:
+                group = json.loads(red.get(running_capture[str(key)]['group'])) # type: ignore
+                for location in group['locations']:
+                    if location['slug']==running_capture[str(key)]['slug']:
+                        location.update({'available':False})
+                        red.set(running_capture[str(key)]['group'], json.dumps(group))
+                        break
+                running_capture.pop(str(key))
+                continue
+            if lacus.get_capture_status(str(key)) == 1:
+                result = lacus.get_capture(str(key))
+                name = str(running_capture[str(key)]['group'])
+                group = json.loads(red.get(name)) # type: ignore
+                for location in group['locations']:
+                    if location['slug']==running_capture[str(key)]['slug']:
+                        host=location
+                        continue
+                if result['status']=='error': # type: ignore
+                    host.update({'available':False})
+                    running_capture.pop(str(key))
+                    red.set(name, json.dumps(group))
+                    continue
+                if 'png' in result:
+                    filename = name + '-' + createfile(host['slug']) + '.png'
+                    namefile = os.path.join(get_homedir(), 'source/screenshots', filename)
+                    with open(namefile, 'wb') as tosave:
+                        if remote_lacus_url:
+                            tosave.write((result['png'])) # type: ignore
                         else:
+                            tosave.write(base64.b64decode(result['png'])) # type: ignore
+                    targetImage = Image.open(namefile)
+                    metadata = PngInfo()
+                    metadata.add_text("Source", "RansomLook.io")
+                    targetImage.save(namefile, pnginfo=metadata)
+                    if get_config('generic', 'keepall'):
+                        nowpng = datetime.now()
+                        timestamp = nowpng.strftime("%Y-%m-%d_%H-%M-%S")
+                        filename =  timestamp + '-' + createfile(host['slug']) + '.png'
+                        folder = os.path.join(get_homedir(), 'source/screenshots/old', group['name'])
+                        if not os.path.exists(folder):
+                            os.makedirs(folder)
+                        file_path = os.path.join(folder, filename)
+                        with open(file_path, 'wb') as tosave:
+                            if remote_lacus_url:
+                                tosave.write((result['png'])) # type: ignore
+                            else:
+                                tosave.write(base64.b64decode(result['png'])) # type: ignore
+
+                if 'html' in result:
+                    filename = name + '-' + striptld(host['slug']) + '.html'
+                    namefile = os.path.join(os.getcwd(), 'source', filename)
+                    with open(namefile, 'w') as tosave:
+                        tosave.write(result['html']) # type: ignore
+                if 'har' in result:
+                    out = False
+                    for entry in result['har']['log']['entries']: # type: ignore
+                        if entry['response']['status'] == -1:
                             host.update({'available':False})
-                        name= group['name']
-                        del group['name']
-                        red.set(name, json.dumps(group))
-                        group['name']=name
+                            red.set(name, json.dumps(group))
+                            out = True
+                    if not out:
+                        host.update({'available':True, 'title':result['har']['log']['pages'][0]['title'], # type: ignore
+                             'lastscrape':result['har']['log']['pages'][0]['startedDateTime'].replace('T',' ').replace('Z',''), # type: ignore
+                             'updated':result['har']['log']['pages'][0]['startedDateTime'].replace('T',' ').replace('Z','')}) # type: ignore
+                else:
+                    host.update({'available':False})
+                red.set(name, json.dumps(group))
+                running_capture.pop(str(key))
 
         if not remote_lacus_url:
             asyncio.run(run_captures())
