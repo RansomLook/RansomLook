@@ -162,7 +162,7 @@ def scraper(base: int) -> None:
                         nowpng = datetime.now()
                         timestamp = nowpng.strftime("%Y-%m-%d_%H-%M-%S")
                         filename =  timestamp + '-' + createfile(host['slug']) + '.png'
-                        folder = os.path.join(get_homedir(), 'source/screenshots/old', group['name'])
+                        folder = os.path.join(get_homedir(), 'source/screenshots/old', name)
                         if not os.path.exists(folder):
                             os.makedirs(folder)
                         file_path = os.path.join(folder, filename)
