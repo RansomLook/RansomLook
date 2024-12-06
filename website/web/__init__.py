@@ -32,6 +32,7 @@ import imghdr
 
 from collections import OrderedDict
 from collections import defaultdict
+from collections import namedtuple
 
 from ransomlook.posts import appender
 
@@ -44,7 +45,7 @@ from ransomlook.default import get_socket_path
 from ransomlook.telegram import teladder
 from ransomlook.twitter import twiadder
 from .helpers import get_secret_key, sri_load, User, build_users_table, load_user_from_request
-from .forms import AddForm, LoginForm, SelectForm, EditForm, DeleteForm, AlertForm, AddPostForm
+from .forms import AddForm, LoginForm, SelectForm, EditForm, DeleteForm, AlertForm, AddPostForm, EditPostForm, EditPostsForm
 from .ldap import global_ldap_authentication
 
 from typing import Dict, Any, Optional
@@ -792,7 +793,6 @@ def addpost(): # type: ignore[no-untyped-def]
 @flask_login.login_required # type: ignore
 def addpostentry(database: int, name: str): 
     score = dt.now().timestamp()
-    deleteButton = DeleteForm()
     form = AddPostForm()
     redlogs = Redis(unix_socket_path=get_socket_path('cache'), db=1)
 
@@ -843,6 +843,85 @@ def addpostentry(database: int, name: str):
 
     form.groupname.label=name
     return render_template('addpostentry.html', form=form)
+
+@app.route('/admin/editpost', methods=['GET', 'POST'])
+@flask_login.login_required
+def editpost(): # type: ignore[no-untyped-def]
+    formSelect = SelectForm()
+    formMarkets = SelectForm()
+    red = Redis(unix_socket_path=get_socket_path('cache'), db=0)
+    keys = red.keys()
+    choices=[('','Please select your group')]
+    keys.sort(key=lambda x: x.lower())
+    for key in keys:
+        choices.append((key.decode(), key.decode()))
+    formSelect.group.choices=choices
+
+    red = Redis(unix_socket_path=get_socket_path('cache'), db=3)
+    keys = red.keys()
+    choices=[('','Please select your Market')]
+    keys.sort(key=lambda x: x.lower())
+    for key in keys:
+        choices.append((key.decode(), key.decode()))
+    formMarkets.group.choices=choices
+
+    if formSelect.validate_on_submit():
+        return redirect('/admin/editpost/'+formSelect.group.data)
+    if formMarkets.validate_on_submit():
+        return redirect('/admin/editpost/'+formMarkets.group.data)
+    return render_template('edit.html', form=formSelect, formMarkets=formMarkets)
+
+@app.route('/admin/editpost/<name>', methods=['GET', 'POST'])
+@flask_login.login_required # type: ignore
+def editpostentry(name: str): # type: ignore[no-untyped-def]
+    red = Redis(unix_socket_path=get_socket_path('cache'), db=2)
+    try:
+        posts = json.loads(red.get(name))
+    except:
+        return redirect('/admin/editpost')
+    post = namedtuple('posts', ['post_title', 'discovered', 'description', 'link', 'magnet', 'screen'])
+    postlist=[]
+    for entry in posts:
+       postlist.append(post(entry['post_title'], entry['discovered'], entry['description'], entry['link'], entry['magnet'], entry['screen'] if 'screen' in entry else ''))
+    data = {'postslist': postlist}
+    form = EditPostsForm(data=data, files=request.files)
+
+    if form.validate_on_submit():
+        posts=[]
+        for field in form.postslist:
+            if field.delete.data is True:
+                continue
+            post = {
+        'post_title': field.post_title.data.strip(),
+        'discovered': field.discovered.data.strip(),
+        'description': field.description.data.strip() if field.description else '',
+        'link': field.link.data.strip() if field.link.data else '',
+        'magnet': field.magnet.data.strip() if field.magnet.data else ''
+            }
+            if field.file.data != None:
+                print(field.file.data.filename)
+                filename = field.file.data.filename
+                file_ext = os.path.splitext(filename)[1]
+                if file_ext not in app.config['UPLOAD_EXTENSIONS'] or \
+                  file_ext != validate_image(field.file.data): # type: ignore
+                    flash(f'Error to add post to : {name} - Screen should be a PNG', 'error')
+                    return render_template('editpost.html', form=form)
+                filenamepng = createfile(post['post_title']) + file_ext
+                path = os.path.normpath(str(get_homedir()) +  '/source/screenshots/' + name)
+                if not os.path.exists(path):
+                    os.mkdir(path)
+                namepng = os.path.normpath(path +'/' +filenamepng)
+                field.file.data.save(namepng)
+                post['screen'] = str(os.path.join('screenshots', name, filenamepng))
+            else:
+                if field.screen.data :
+                    post['screen'] =  field.screen.data.strip() if field.screen.data else ''
+            posts.append(post)
+        red.set(name, json.dumps(posts))
+        flash(f'Success to add post to : {name}', 'success')
+        return redirect(url_for('admin'))
+
+    return render_template('editpost.html', form=form)
 
 @app.route('/export/<database>')
 def exportdb(database: int): # type: ignore[no-untyped-def]

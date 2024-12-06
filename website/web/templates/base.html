@@ -70,6 +70,7 @@
               <li {% if request.path == '/admin/add' %} class="active" {% endif %}><a href="{{ url_for('addgroup') }}" title="Add ">Add</a></li>
               <li {% if request.path == '/admin/edit' %} class="active" {% endif %}><a href="{{ url_for('edit') }}" title="Edit ">Edit</a></li>
               <li {% if request.path == '/admin/addpost' %} class="active" {% endif %}><a href="{{ url_for('addpost') }}" title="Add post ">Add post</a></li>
+              <li {% if request.path == '/admin/editpost' %} class="active" {% endif %}><a href="{{ url_for('editpost') }}" title="Edit post ">Edit post</a></li>
               <li {% if request.path == '/admin/alerting' %} class="active" {% endif %}><a href="{{ url_for('alerting') }}" title="Alerting ">Alerting</a></li>
               <li {% if request.path == '/admin/logs' %} class="active" {% endif %}><a href="{{ url_for('logs') }}" title="Logs ">Logs</a></li>
               </ul>

@@ -1,5 +1,5 @@
 from flask_wtf import FlaskForm # type: ignore
-from wtforms import StringField, PasswordField, BooleanField, SubmitField, SelectField, TextAreaField # type: ignore
+from wtforms import StringField, PasswordField, BooleanField, SubmitField, SelectField, TextAreaField, FieldList, Form, FormField # type: ignore
 from flask_wtf.file import FileField # type: ignore
 from wtforms.validators import DataRequired # type: ignore
 
@@ -49,3 +49,16 @@ class AddPostForm(FlaskForm): # type: ignore
     file = FileField('File')
     submit = SubmitField('Add post')
 
+class EditPostForm(Form): # type: ignore
+    post_title = StringField(validators=[DataRequired()])
+    description = TextAreaField()
+    discovered = StringField(validators=[DataRequired()])
+    link = StringField()
+    magnet = StringField()
+    screen = StringField()
+    file = FileField('File')
+    delete = BooleanField('Delete')
+
+class EditPostsForm(FlaskForm): # type: ignore
+    postslist = FieldList(FormField(EditPostForm), min_entries=0)
+    submit = SubmitField('Save changes')
