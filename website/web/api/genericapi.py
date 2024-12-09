@@ -297,7 +297,7 @@ class DensityHeatmap(Resource): # type: ignore[misc]
         df = pd.DataFrame({'group_name': group_names, 'timestamp': timestamps})
         df['timestamp'] = pd.to_datetime(df['timestamp'],format='mixed')
 
-        df_sorted = df.groupby(['group_name', 'timestamp']).size().reset_index(name='count') # type: ignore
+        df_sorted = df.groupby(['group_name', 'timestamp']).size().reset_index(name='count')
         df_sorted = df_sorted.sort_values(by='count', ascending=False)
         fig = px.density_heatmap(df_sorted, x='timestamp', y='group_name', z='count', title='Posts per group per day (heatmap)', width=1050, height=750)
         fig.update_layout(font=dict(family='Roboto'))
@@ -327,7 +327,7 @@ class Scatter(Resource): # type: ignore[misc]
         df = pd.DataFrame({'group_name': group_names, 'timestamp': timestamps})
         df['timestamp'] = pd.to_datetime(df['timestamp'],format='mixed')
 
-        df_sorted = df.groupby(['group_name', 'timestamp']).size().reset_index(name='count') # type: ignore
+        df_sorted = df.groupby(['group_name', 'timestamp']).size().reset_index(name='count')
         df_sorted = df_sorted.sort_values(by='count', ascending=False)
         fig = px.scatter(df_sorted, x='timestamp', y='group_name', color='group_name', title='Distribution per days', color_continuous_scale='Plotly3', width=1050, height=750)
         fig.update_layout(font=dict(family='Roboto'))
@@ -357,9 +357,9 @@ class Pie(Resource): # type: ignore[misc]
         df = pd.DataFrame({'group_name': group_names, 'timestamp': timestamps})
         df['timestamp'] = pd.to_datetime(df['timestamp'],format='mixed')
 
-        df_sorted = df.groupby(['group_name', 'timestamp']).size().reset_index(name='count') # type: ignore
+        df_sorted = df.groupby(['group_name', 'timestamp']).size().reset_index(name='count')
         df_sorted = df_sorted.sort_values(by='count', ascending=False)
-        df_sorted = df.groupby('group_name').size().reset_index(name='count').sort_values(by='count', ascending=True) # type: ignore[call-overload]
+        df_sorted = df.groupby('group_name').size().reset_index(name='count').sort_values(by='count', ascending=True)
         fig = px.pie(df_sorted, values='count', names='group_name', title='Percentage of total post during the period', width=1050, height=750)
         fig.update_layout(font=dict(family='Roboto'))
         filename = tempfile.TemporaryFile()
@@ -388,9 +388,9 @@ class Bar(Resource): # type: ignore[misc]
         df = pd.DataFrame({'group_name': group_names, 'timestamp': timestamps})
         df['timestamp'] = pd.to_datetime(df['timestamp'],format='mixed')
 
-        df_sorted = df.groupby(['group_name', 'timestamp']).size().reset_index(name='count') # type: ignore[call-overload]
+        df_sorted = df.groupby(['group_name', 'timestamp']).size().reset_index(name='count')
         df_sorted = df_sorted.sort_values(by='count', ascending=False)
-        df_sorted = df.groupby('group_name').size().reset_index(name='count').sort_values(by='count', ascending=True) # type: ignore[call-overload]
+        df_sorted = df.groupby('group_name').size().reset_index(name='count').sort_values(by='count', ascending=True)
         fig = px.bar(df_sorted, x='group_name', y='count', color='count', title='Posts per group during the month', color_continuous_scale='Portland',width=1050, height=750)
         fig.update_layout(font=dict(family='Roboto'))
         filename = tempfile.TemporaryFile()
@@ -415,7 +415,7 @@ class PeriodDensityHeatmap(Resource): # type: ignore[misc]
         df = pd.DataFrame({'group_name': group_names, 'timestamp': timestamps})
         df['timestamp'] = pd.to_datetime(df['timestamp'],format='mixed')
 
-        df_sorted = df.groupby(['group_name', 'timestamp']).size().reset_index(name='count') # type: ignore
+        df_sorted = df.groupby(['group_name', 'timestamp']).size().reset_index(name='count')
         df_sorted = df_sorted.sort_values(by='count', ascending=False)
         fig = px.density_heatmap(df_sorted, x='timestamp', y='group_name', z='count', title='Posts per group per day (heatmap)', width=1050, height=750)
         fig.update_layout(font=dict(family='Roboto'))
@@ -439,7 +439,7 @@ class PeriodDensityHeatmapGroup(Resource): # type: ignore[misc]
                  timestamps.append(entry['discovered'])
         df = pd.DataFrame({'group_name': group_names, 'timestamp': timestamps})
         df['timestamp'] = pd.to_datetime(df['timestamp'],format='mixed')
-        df_sorted = df.groupby(['group_name', 'timestamp']).size().reset_index(name='count') # type: ignore
+        df_sorted = df.groupby(['group_name', 'timestamp']).size().reset_index(name='count')
         df_sorted = df_sorted.sort_values(by='count', ascending=False)
         fig = px.density_heatmap(df_sorted, x='timestamp', y='group_name', z='count', title='Posts per group per day (heatmap)', width=1050, height=750)
         fig.update_layout(font=dict(family='Roboto'))
@@ -469,7 +469,7 @@ class PeriodDensityHeatmapGroups(Resource): # type: ignore[misc]
                     timestamps.append(entry['discovered'])
         df = pd.DataFrame({'group_name': group_names, 'timestamp': timestamps})
         df['timestamp'] = pd.to_datetime(df['timestamp'],format='mixed')
-        df_sorted = df.groupby(['group_name', 'timestamp']).size().reset_index(name='count') # type: ignore
+        df_sorted = df.groupby(['group_name', 'timestamp']).size().reset_index(name='count')
         df_sorted = df_sorted.sort_values(by='count', ascending=False)
         fig = px.density_heatmap(df_sorted, x='timestamp', y='group_name', z='count', title='Posts per group per day (heatmap)', width=1050, height=750)
         fig.update_layout(font=dict(family='Roboto'))
@@ -496,7 +496,7 @@ class PeriodScatter(Resource): # type: ignore[misc]
         df = pd.DataFrame({'group_name': group_names, 'timestamp': timestamps})
         df['timestamp'] = pd.to_datetime(df['timestamp'],format='mixed')
 
-        df_sorted = df.groupby(['group_name', 'timestamp']).size().reset_index(name='count') # type: ignore
+        df_sorted = df.groupby(['group_name', 'timestamp']).size().reset_index(name='count')
         df_sorted = df_sorted.sort_values(by='count', ascending=False)
         fig = px.scatter(df_sorted, x='timestamp', y='group_name', color='group_name', title='Distribution per days', color_continuous_scale='Plotly3', width=1050, height=750)
         fig.update_layout(font=dict(family='Roboto'))
@@ -521,7 +521,7 @@ class PeriodScatterGroup(Resource): # type: ignore[misc]
         df = pd.DataFrame({'group_name': group_names, 'timestamp': timestamps})
         df['timestamp'] = pd.to_datetime(df['timestamp'],format='mixed')
 
-        df_sorted = df.groupby(['group_name', 'timestamp']).size().reset_index(name='count') # type: ignore
+        df_sorted = df.groupby(['group_name', 'timestamp']).size().reset_index(name='count')
         df_sorted = df_sorted.sort_values(by='count', ascending=False)
         fig = px.scatter(df_sorted, x='timestamp', y='group_name', color='group_name', title='Distribution per days', color_continuous_scale='Plotly3', width=1050, height=750)
         fig.update_layout(font=dict(family='Roboto'))
@@ -554,7 +554,7 @@ class PeriodScatterGroups(Resource): # type: ignore[misc]
         df = pd.DataFrame({'group_name': group_names, 'timestamp': timestamps})
         df['timestamp'] = pd.to_datetime(df['timestamp'],format='mixed')
 
-        df_sorted = df.groupby(['group_name', 'timestamp']).size().reset_index(name='count') # type: ignore
+        df_sorted = df.groupby(['group_name', 'timestamp']).size().reset_index(name='count')
         df_sorted = df_sorted.sort_values(by='count', ascending=False)
         fig = px.scatter(df_sorted, x='timestamp', y='group_name', color='group_name', title='Distribution per days', color_continuous_scale='Plotly3', width=1050, height=750)
         fig.update_layout(font=dict(family='Roboto'))
@@ -580,9 +580,9 @@ class PeriodPie(Resource): # type: ignore[misc]
         df = pd.DataFrame({'group_name': group_names, 'timestamp': timestamps})
         df['timestamp'] = pd.to_datetime(df['timestamp'],format='mixed')
 
-        df_sorted = df.groupby(['group_name', 'timestamp']).size().reset_index(name='count') # type: ignore
+        df_sorted = df.groupby(['group_name', 'timestamp']).size().reset_index(name='count')
         df_sorted = df_sorted.sort_values(by='count', ascending=False)
-        df_sorted = df.groupby('group_name').size().reset_index(name='count').sort_values(by='count', ascending=True) # type: ignore[call-overload]
+        df_sorted = df.groupby('group_name').size().reset_index(name='count').sort_values(by='count', ascending=True)
         fig = px.pie(df_sorted, values='count', names='group_name', title='Percentage of total post during the period', width=1050, height=750)
         fig.update_layout(font=dict(family='Roboto'))
         filename = tempfile.TemporaryFile()
@@ -606,9 +606,9 @@ class PeriodBar(Resource): # type: ignore[misc]
         df = pd.DataFrame({'group_name': group_names, 'timestamp': timestamps})
         df['timestamp'] = pd.to_datetime(df['timestamp'],format='mixed')
 
-        df_sorted = df.groupby(['group_name', 'timestamp']).size().reset_index(name='count') # type: ignore
+        df_sorted = df.groupby(['group_name', 'timestamp']).size().reset_index(name='count')
         df_sorted = df_sorted.sort_values(by='count', ascending=False)
-        df_sorted = df.groupby('group_name').size().reset_index(name='count').sort_values(by='count', ascending=True) # type: ignore
+        df_sorted = df.groupby('group_name').size().reset_index(name='count').sort_values(by='count', ascending=True)
         fig = px.bar(df_sorted, x='group_name', y='count', color='count', title='Posts per group during the month', color_continuous_scale='Portland',width=1050, height=750)
         fig.update_layout(font=dict(family='Roboto'))
         filename = tempfile.TemporaryFile()

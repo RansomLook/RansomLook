@@ -119,7 +119,7 @@ def run_data_viz(days_filter: int) -> None:
     df['timestamp'] = pd.to_datetime(df['timestamp'], format='mixed')
 
     # Group and sort the data by the number of postings in each group
-    df_sorted = df.groupby(['group_name', 'timestamp']).size().reset_index(name='count') # type: ignore[call-overload]
+    df_sorted = df.groupby(['group_name', 'timestamp']).size().reset_index(name='count')
     df_sorted = df_sorted.sort_values(by='count', ascending=False)
 
     # Use Plotly's Heatmap plot to create the density heatmap
@@ -139,7 +139,7 @@ def run_data_viz(days_filter: int) -> None:
     #fig4.show()
 
     # Group and sort the data by the number of postings in each group
-    df_sorted = df.groupby('group_name').size().reset_index(name='count').sort_values(by='count', ascending=True) # type: ignore[call-overload]
+    df_sorted = df.groupby('group_name').size().reset_index(name='count').sort_values(by='count', ascending=True)
 
     # Use Plotly's Pie plot to create the pie chart
     fig3 = px.pie(df_sorted, values='count', names='group_name', title='Posting Frequency by Group', width=1050, height=750)

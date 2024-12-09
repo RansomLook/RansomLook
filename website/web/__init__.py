@@ -873,25 +873,24 @@ def editpost(): # type: ignore[no-untyped-def]
 
 @app.route('/admin/editpost/<name>', methods=['GET', 'POST'])
 @flask_login.login_required # type: ignore
-def editpostentry(name: str): # type: ignore[no-untyped-def]
+def editpostentry(name: str):
     red = Redis(unix_socket_path=get_socket_path('cache'), db=2)
     try:
-        posts = json.loads(red.get(name))
+        posts = json.loads(red.get(name)) # type: ignore
     except:
         return redirect('/admin/editpost')
-    post = namedtuple('posts', ['post_title', 'discovered', 'description', 'link', 'magnet', 'screen'])
+    postdata = namedtuple('posts', ['post_title', 'discovered', 'description', 'link', 'magnet', 'screen']) # type: ignore
     postlist=[]
     for entry in posts:
-       postlist.append(post(entry['post_title'], entry['discovered'], entry['description'], entry['link'], entry['magnet'], entry['screen'] if 'screen' in entry else ''))
+       postlist.append(postdata(entry['post_title'], entry['discovered'], entry['description'], entry['link'], entry['magnet'], entry['screen'] if 'screen' in entry else ''))
     data = {'postslist': postlist}
     form = EditPostsForm(data=data, files=request.files)
-
     if form.validate_on_submit():
         posts=[]
         for field in form.postslist:
             if field.delete.data is True:
                 continue
-            post = {
+            post = { 
         'post_title': field.post_title.data.strip(),
         'discovered': field.discovered.data.strip(),
         'description': field.description.data.strip() if field.description else '',

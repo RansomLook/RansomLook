@@ -12,14 +12,14 @@ def main() -> List[Dict[str, str]] :
                 file=open(html_doc,'r')
                 soup=BeautifulSoup(file,'html.parser')
                 div_name=soup.find('div', {"id": "breach"})
-                divs_name=div_name.find_all('a', {"class":"product-card"})
+                divs_name=div_name.find_all('a', {"class":"product-card"}) # type: ignore
                 for div in divs_name:
                     title = div.find('h2').text.strip()
                     description = ''
                     link = div['href']
                     list_div.append({'title':title, 'description': description, "link": link, "slug": filename})
                 div_name=soup.find('div', {"id": "ransom"})
-                divs_name=div_name.find_all('a', {"class":"product-card"})
+                divs_name=div_name.find_all('a', {"class":"product-card"}) # type: ignore
                 for div in divs_name:
                     title = div.find('h2').text.strip()
                     description = ''
