@@ -41,6 +41,7 @@ class LinkForm(Form): # type: ignore
 class EditForm(FlaskForm): # type: ignore
     groupname = StringField(validators=[DataRequired()])
     captcha = BooleanField('Captcha')
+    raas = BooleanField('RaaS')
     galaxy = StringField()
     description = TextAreaField()
     profiles = TextAreaField()

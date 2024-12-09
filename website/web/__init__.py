@@ -733,6 +733,7 @@ def editgroup(database: int, name: str):
             'captcha' : datagroup['captcha'] if 'captcha' in datagroup else False,
             'profiles' : datagroup['profile'],
             'private' : datagroup['private'] if 'private' in datagroup else False,
+            'raas' : datagroup['raas'] if 'raas' in datagroup else False,
             'links' : locationlist
            }
 
@@ -753,6 +754,7 @@ def editgroup(database: int, name: str):
         data['profile'] = ast.literal_eval(form.profiles.data)
         data['private'] = form.private.data
         data['captcha'] = form.captcha.data
+        data['raas'] = form.raas.data
         newlocations = []
         for entry in form.links:
             if entry.delete.data is True:

@@ -4,8 +4,14 @@
     <article id="main" class="markdown-section">
 	<h1>{{group['name'].title()}}</h1>
         {% if group['name'].lower() in parser %}
-        <p><em>parsing : <code>enabled</code></em></p>
+        <p><em>Parsing : <code>Enabled</code></em></p>
         {% endif %} 
+        {% if 'raas' in group and group['raas'] is true %}
+        <p><em>Known to be a RaaS</em></p>
+        {% endif %}
+        {% if 'captcha' in group and group['captcha'] is true %}
+        <p><em>Known to use a Captcha to block crawling.</em></p>
+        {% endif %}
         {% if group['meta'] is not none %}
         <h4>Description</h4>
         <p>{{group['meta']|safe}}</p>
