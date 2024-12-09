@@ -21,9 +21,11 @@
         </p>Profiles</p>
         <p>{{ form.profiles(style="width:100%; height: 150px;", size=5) }}</p>
         </p>Links</p>
-        <p>{{ form.links(style="width:100%; height: 150px;") }}</p>
-        </p>Is a private group ?</p>
-        <p>{{ form.private() }}</p>
+        {% for nested in form.links %}
+            {{ nested }}
+        {% endfor %}
+        </p>Captcha protected ? {{ form.captcha() }}</p>
+        </p>Is a private group ? {{ form.private() }}</p>
         <p>{{ form.submit }}</p>
     </form>
     <form action"" method="post" novalidate>

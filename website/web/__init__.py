@@ -720,21 +720,61 @@ def edit(): # type: ignore[no-untyped-def]
 def editgroup(database: int, name: str): 
     score = dt.now().timestamp()
     deleteButton = DeleteForm()
-    form = EditForm()
+
     red = Redis(unix_socket_path=get_socket_path('cache'), db=database)
+    datagroup = json.loads(red.get(name)) # type: ignore
+    locations = namedtuple('locations',['slug', 'fqdn', 'timeout', 'delay', 'fs', 'chat', 'browser', 'private', 'version', 'available', 'title', 'updated', 'lastscrape', 'header'])
+    locationlist = []
+    for entry in datagroup['locations']:
+        locationlist.append(locations(entry['slug'], entry['fqdn'], entry['timeout'] if 'timeout' in entry else '', entry['delay'] if 'delay' in entry else '', entry['fs'] if 'fs' in entry else False, entry['chat'] if 'chat' in entry else False, entry['browser'] if 'browser' in entry else '', entry['private'] if 'private' in entry else False, entry['version'], entry['available'], entry['title'], entry['updated'], entry['lastscrape'], entry['header'] if 'header' in entry else '' ))
+    data = {'groupname': name,
+            'description' : datagroup['meta'],
+            'ransomware_galaxy_value': datagroup['ransomware_galaxy_value'] if 'ransomware_galaxy_value' in datagroup else '',
+            'captcha' : datagroup['captcha'] if 'captcha' in datagroup else False,
+            'profiles' : datagroup['profile'],
+            'private' : datagroup['private'] if 'private' in datagroup else False,
+            'links' : locationlist
+           }
+
+    form = EditForm(data=data)
+    form.groupname.label=name
+
     redlogs = Redis(unix_socket_path=get_socket_path('cache'), db=1)
     if deleteButton.validate_on_submit():
         red.delete(name)
         redlogs.zadd('logs', {f'{flask_login.current_user.id} deleted : {name}': score})
         flash(f'Success to delete : {name}', 'success')
         return redirect(url_for('admin'))
+    print(form.groupname.data)
     if form.validate_on_submit():
         data = json.loads(red.get(name)) # type: ignore
         data['meta']=form.description.data
+        data['captcha']=form.captcha.data
         data['ransomware_galaxy_value'] = form.galaxy.data
         data['profile'] = ast.literal_eval(form.profiles.data)
-        data['locations'] = ast.literal_eval(form.links.data)
         data['private'] = form.private.data
+        data['captcha'] = form.captcha.data
+        newlocations = []
+        for entry in form.links:
+            if entry.delete.data is True:
+                continue
+            location = {'slug' : entry.slug.data,
+                        'fqdn' : entry.fqdn.data,
+                        'timeout': entry.timeout.data,
+                        'delay': entry.delay.data,
+                        'fs': entry.fs.data,
+                        'chat': entry.chat.data,
+                        'browser': entry.browser.data,
+                        'private': entry.private.data,
+                        'version': entry.version.data,
+                        'available': entry.available.data,
+                        'title': entry.title.data,
+                        'updated': entry.updated.data,
+                        'lastscrape': entry.lastscrape.data,
+                        'header': entry.header.data
+                       }
+            newlocations.append(location)
+        data['locations'] = newlocations
         red.set(name, json.dumps(data))
         redlogs.zadd('logs', {f'{flask_login.current_user.id} modified : {name}, {data["meta"]}, {data["profile"]}, {data["locations"]}': score})
         if name != form.groupname.data:
@@ -742,25 +782,8 @@ def editgroup(database: int, name: str):
             redlogs.zadd('logs', {f'{flask_login.current_user.id} renamed : {name} to {form.groupname.data}': score})
         flash(f'Success to edit : {form.groupname.data}', 'success')
         return redirect(url_for('admin'))
-    form.groupname.label=name
-    form.groupname.data=name
-    data = json.loads(red.get(name)) # type: ignore
-    if form.description.data == None:
-        form.description.data = data['meta']
-    if form.galaxy.data == None:
-        if 'ransomware_galaxy_value' in data:
-            form.galaxy.data = data['ransomware_galaxy_value']
-        else :
-            form.galaxy.data = ''
-    if form.profiles.data == None:
-        form.profiles.data = data['profile']
-    if form.links.data == None:
-        if data['locations']== '':
-            data['locations']='[]'
-        form.links.data = data['locations']
-    if 'private' in data:
-        form.private.data = data['private']
-    return render_template('editentry.html', form=form, deleteform=deleteButton)
+
+    return render_template('editentry.html', form=form , deleteform=deleteButton) 
 
 @app.route('/admin/addpost', methods=['GET', 'POST'])
 @flask_login.login_required

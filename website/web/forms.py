@@ -1,7 +1,7 @@
 from flask_wtf import FlaskForm # type: ignore
-from wtforms import StringField, PasswordField, BooleanField, SubmitField, SelectField, TextAreaField, FieldList, Form, FormField # type: ignore
+from wtforms import StringField, PasswordField, BooleanField, SubmitField, SelectField, TextAreaField, FieldList, Form, FormField, IntegerField # type: ignore
 from flask_wtf.file import FileField # type: ignore
-from wtforms.validators import DataRequired # type: ignore
+from wtforms.validators import DataRequired, Optional, ReadOnly # type: ignore
 
 class AddForm(FlaskForm): # type: ignore
     category = SelectField('Database', choices=[('','Select a database'),(0, 'Group'),(3,'Market'),(5,'Telegram'),(8,'Twitter')],  default='', validators=[DataRequired()])
@@ -21,12 +21,30 @@ class DeleteForm(FlaskForm): # type: ignore
     delete = BooleanField('Check to delete', validators=[DataRequired()])
     submit = SubmitField('Delete this group')
 
+class LinkForm(Form): # type: ignore
+    slug = StringField(validators=[DataRequired()], render_kw={'size': 96})
+    fqdn = StringField(validators=[DataRequired()])
+    timeout= IntegerField(validators=[Optional()])
+    delay = IntegerField(validators=[Optional()])
+    fs = BooleanField('File Server')
+    chat = BooleanField('Chat')
+    browser = SelectField('Browser', choices=[('','Select a browser'),('chrome', 'chrome'),('firefix','firefox'),('webkit','webkit')],  default='')
+    header = StringField()
+    version = IntegerField(validators=[Optional()])
+    available = BooleanField()
+    updated = StringField()
+    lastscrape = StringField()
+    title = StringField()
+    private = BooleanField('Private Link')
+    delete = BooleanField('Check to delete')
+
 class EditForm(FlaskForm): # type: ignore
     groupname = StringField(validators=[DataRequired()])
+    captcha = BooleanField('Captcha')
     galaxy = StringField()
     description = TextAreaField()
     profiles = TextAreaField()
-    links = TextAreaField()
+    links = FieldList(FormField(LinkForm), min_entries=0)
     private = BooleanField('Private Group')
     submit = SubmitField('Save changes')
 
