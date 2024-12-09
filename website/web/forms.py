@@ -23,13 +23,13 @@ class DeleteForm(FlaskForm): # type: ignore
 
 class LinkForm(Form): # type: ignore
     slug = StringField(validators=[DataRequired()], render_kw={'size': 96})
-    fqdn = StringField(validators=[DataRequired()])
+    fqdn = StringField(validators=[DataRequired()], render_kw={'size': 96})
     timeout= IntegerField(validators=[Optional()])
     delay = IntegerField(validators=[Optional()])
     fs = BooleanField('File Server')
     chat = BooleanField('Chat')
     browser = SelectField('Browser', choices=[('','Select a browser'),('chrome', 'chrome'),('firefix','firefox'),('webkit','webkit')],  default='')
-    header = StringField()
+    header = StringField(render_kw={'size': 96})
     version = IntegerField(validators=[Optional()])
     available = BooleanField()
     updated = StringField()

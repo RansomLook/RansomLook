@@ -745,7 +745,6 @@ def editgroup(database: int, name: str):
         redlogs.zadd('logs', {f'{flask_login.current_user.id} deleted : {name}': score})
         flash(f'Success to delete : {name}', 'success')
         return redirect(url_for('admin'))
-    print(form.groupname.data)
     if form.validate_on_submit():
         data = json.loads(red.get(name)) # type: ignore
         data['meta']=form.description.data
@@ -921,7 +920,6 @@ def editpostentry(name: str):
         'magnet': field.magnet.data.strip() if field.magnet.data else ''
             }
             if field.file.data != None:
-                print(field.file.data.filename)
                 filename = field.file.data.filename
                 file_ext = os.path.splitext(filename)[1]
                 if file_ext not in app.config['UPLOAD_EXTENSIONS'] or \
