@@ -904,7 +904,7 @@ def editpostentry(name: str):
     postdata = namedtuple('posts', ['post_title', 'discovered', 'description', 'link', 'magnet', 'screen']) # type: ignore
     postlist=[]
     for entry in posts:
-       postlist.append(postdata(entry['post_title'], entry['discovered'], entry['description'], entry['link'], entry['magnet'], entry['screen'] if 'screen' in entry else ''))
+       postlist.append(postdata(entry['post_title'], entry['discovered'], entry['description'], entry['link'] if 'link' in entry else: '', entry['magnet'] if 'magnet' in entry else '', entry['screen'] if 'screen' in entry else ''))
     data = {'postslist': postlist}
     form = EditPostsForm(data=data, files=request.files)
     if form.validate_on_submit():
