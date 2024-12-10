@@ -2,7 +2,7 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
 <channel>
   <title>RansomLook – Last entries</title>
-  <atom:link href="{{ request.url_root }}/rss.xml" rel="self" type="application/atom+xml" />
+  <atom:link href="{{ request.url_root }}rss.xml" rel="self" type="application/atom+xml" />
   <link>{{ request.url_root }}</link>
   <description>Most recents entries in {{ request.url_root }}</description>
   <lastBuildDate>{{ build_date }}</lastBuildDate>
