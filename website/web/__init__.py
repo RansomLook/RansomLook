@@ -5,6 +5,7 @@ from flask_bootstrap import Bootstrap5  # type: ignore
 from flask_login import current_user # type: ignore
 from urllib.parse import quote
 
+import datetime
 from datetime import datetime as dt
 from datetime import timedelta
 from dateutil import parser
@@ -224,23 +225,52 @@ def recent(): # type: ignore[no-untyped-def]
         return render_template("recent.html", data=recentposts)
 
 @app.route("/rss.xml")
-def feeds(): # type: ignore[no-untyped-def]
-        posts = []
-        red = Redis(unix_socket_path=get_socket_path('cache'), db=2)
-        for key in red.keys():
-                entries = json.loads(red.get(key)) # type: ignore
-                for entry in entries:
-                    entry['group_name']=key.decode()
-                    posts.append(entry)
-        sorted_posts = sorted(posts, key=lambda x: x['discovered'], reverse=True)
-        recentposts = []
-        for post in sorted_posts:
-                post['discovered'] = dt.strptime(post['discovered'].split('.')[0], "%Y-%m-%d %H:%M:%S").strftime("%a, %d %b %Y %T")
-                post['guid'] = hashlib.sha256(post['post_title'].encode()+post['group_name'].encode()).hexdigest()
-                recentposts.append(post)
-                if len(recentposts) == 50:
-                        break
-        return render_template("rss.xml", posts=recentposts, build_date=dt.now()), {'Content-Type': 'application/xml'}
+def feeds():  # type: ignore[no-untyped-def]
+    posts = []
+    red = Redis(unix_socket_path=get_socket_path('cache'), db=2)
+
+    # Iterate over Redis keys and parse entries
+    for key in red.keys():
+        entries = json.loads(red.get(key))  # type: ignore
+        for entry in entries:
+            entry['group_name'] = key.decode()
+            posts.append(entry)
+
+    # Sort posts by 'discovered' field
+    sorted_posts = sorted(posts, key=lambda x: x['discovered'], reverse=True)
+
+    recentposts = []
+    for post in sorted_posts:
+        # Convert 'discovered' to UTC datetime and format as RFC 2822
+        if 'discovered' in post:
+            discovered_time = dt.strptime(
+                post['discovered'].split('.')[0], "%Y-%m-%d %H:%M:%S"
+            )
+            discovered_utc = discovered_time.replace(tzinfo=datetime.timezone.utc)
+            post['discovered'] = discovered_utc.strftime("%a, %d %b %Y %T GMT")
+        else:
+            # Fallback to current UTC time if 'discovered' is missing
+            post['discovered'] = dt.now(
+                datetime.timezone.utc
+            ).strftime("%a, %d %b %Y %T GMT")
+
+        # Generate GUID for the post
+        post['guid'] = hashlib.sha256(
+            (post['post_title'] + post['group_name']).encode()
+        ).hexdigest()
+
+        recentposts.append(post)
+
+        # Limit the number of recent posts
+        if len(recentposts) == 50:
+            break
+
+    # Render the RSS feed
+    return render_template(
+        "rss.xml",
+        posts=recentposts,
+        build_date=datetime.datetime.now(datetime.timezone.utc).strftime("%a, %d %b %Y %T GMT")
+    ), {'Content-Type': 'application/xml'}
 
 @app.route("/stats")
 def stats(): # type: ignore[no-untyped-def]
