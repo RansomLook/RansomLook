@@ -21,15 +21,29 @@ def main() -> List[Dict[str, str]] :
                         pass
                 divs_name=soup.find_all('div', {"class": "item-details"})
                 for div in divs_name:
-                    title = div.find('h3').text
-                    description = div.find("p").text.strip()
-                    list_div.append({"title" : title, "description" : description})
+                    try:
+                        title = div.find('h3').text
+                        description = div.find("p").text.strip()
+                        list_div.append({"title" : title, "description" : description})
+                    except:
+                        pass
                 divs_name =  soup.find('table',{"class":"data-table table nowrap"}) # type: ignore
-                divs = divs_name.find_all('tbody') # type: ignore
-                for div in divs:
-                    title = div.find('div',{"class":"txt"}).text.strip()
-                    description = ''
-                    list_div.append({"title" : title, "description" : description})
+                try:
+                    divs = divs_name.find_all('tbody') # type: ignore
+                    for div in divs:
+                        title = div.find('div',{"class":"txt"}).text.strip()
+                        description = ''
+                        list_div.append({"title" : title, "description" : description})
+                except:
+                    pass
+                divs_name=soup.find_all('div', {"class": "post-card"})
+                for div in divs_name:
+                    try:
+                        title = div.find('h4').text.strip()
+                        description = div.find('p', {"class": "subtitle"}).text.strip()
+                        list_div.append({'title': title, 'description': description})
+                    except:
+                        pass
                 file.close()
 
         except:
