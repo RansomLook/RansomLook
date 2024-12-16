@@ -49,7 +49,7 @@ def creategroup(location: str, fs: bool, private: bool, chat: bool, browser: str
         'meta': None,
         'locations': [
             mylocation
-        ],
+        ] if location != '' else [],
         'profile': [],
         'ransomware_galaxy_value': ''
     }
@@ -205,7 +205,9 @@ def adder(name: str, location: str, db: int, fs: bool=False, private: bool=False
     if checkexisting(name.strip(), db):
         stdlog('ransomlook: ' + 'records for ' + name + \
             ' already exist, appending to avoid duplication')
-        return appender(name.strip(), location.strip(), db, fs, private, chat, browser)
+        if location.strip() != "":
+            return appender(name.strip(), location.strip(), db, fs, private, chat, browser)
+        return 0
     else:
         red = redis.Redis(unix_socket_path=get_socket_path('cache'), db=db)
         newrec = creategroup(location.strip(), fs, private, chat, browser)

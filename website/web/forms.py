@@ -6,7 +6,7 @@ from wtforms.validators import DataRequired, Optional, ReadOnly # type: ignore
 class AddForm(FlaskForm): # type: ignore
     category = SelectField('Database', choices=[('','Select a database'),(0, 'Group'),(3,'Market'),(5,'Telegram'),(8,'Twitter')],  default='', validators=[DataRequired()])
     groupname = StringField('Group name', validators=[DataRequired()])
-    url = StringField('Url', validators=[DataRequired()])
+    url = StringField('Url', validators=[Optional()])
     browser = SelectField('Browser', choices=[('','Select a browser'),('chrome', 'chrome'),('firefix','firefox'),('webkit','webkit')],  default='')
     fs = BooleanField('File server')
     chat = BooleanField('Chat')

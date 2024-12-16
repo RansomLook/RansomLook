@@ -703,8 +703,14 @@ def addgroup(): # type: ignore[no-untyped-def]
     form = AddForm()
     if form.validate_on_submit():
         if int(form.category.data) == 5:
+           if form.url.data == None:
+               flash(f'Fail to add: {form.url.data} to {form.groupname.data}.  Missing URL', 'error')
+               return render_template('add.html',form=form)
            res = teladder(form.groupname.data, form.url.data)
         elif int(form.category.data) == 8:
+           if form.url.data == None:
+               flash(f'Fail to add: {form.url.data} to {form.groupname.data}.  Missing URL', 'error')
+               return render_template('add.html',form=form)
            res = twiadder(form.groupname.data, form.url.data)
         else:
            res = adder(form.groupname.data.lower(), form.url.data, form.category.data, form.fs.data, form.private.data, form.chat.data, form.browser.data)
