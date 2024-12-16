@@ -30,7 +30,104 @@
           </tbody>
         </table>
         {% endif %}
-
+        {% if 'jabber' in group and group['jabber'].split()[0] %}
+        <table id="table" class="table" style="display:table; table-layout:auto; width:100%">
+          <thead>
+            <tr>
+                <th> Jabber </th>
+            </tr>
+          </thead>
+          <tbody>
+          {% for jabber in group['jabber'].split() %}
+          <tr><td>{{jabber}}</td></tr>
+          {% endfor %}
+          </tbody>
+        </table>
+        {% endif %}
+        {% if 'mail' in group and group['mail'].split()[0] %}
+        <table id="table" class="table" style="display:table; table-layout:auto; width:100%">
+          <thead>
+            <tr>
+                <th> Mail </th>
+            </tr>
+          </thead>
+          <tbody>
+          {% for mail in group['mail'].split() %}
+          <tr><td>{{mail}}</td></tr>
+          {% endfor %}
+          </tbody>
+        </table>
+        {% endif %}
+        {% if 'matrix' in group and group['matrix'].split()[0] %}
+        <table id="table" class="table" style="display:table; table-layout:auto; width:100%">
+          <thead>
+            <tr>
+                <th> Matrix </th>
+            </tr>
+          </thead>
+          <tbody>
+          {% for matrix in group['matrix'].split() %}
+          <tr><td>{{matrix}}</td></tr>
+          {% endfor %}
+          </tbody>
+        </table>
+        {% endif %}
+        {% if 'session' in group and group['session'].split()[0] %}
+        <table id="table" class="table" style="display:table; table-layout:auto; width:100%">
+          <thead>
+            <tr>
+                <th> Session </th>
+            </tr>
+          </thead>
+          <tbody>
+          {% for session in group['session'].split() %}
+          <tr><td>{{session}}</td></tr>
+          {% endfor %}
+          </tbody>
+        </table>
+        {% endif %}
+        {% if 'telegram' in group and group['telegram'].split()[0] %}
+        <table id="table" class="table" style="display:table; table-layout:auto; width:100%">
+          <thead>
+            <tr>
+                <th> Telegram </th>
+            </tr>
+          </thead>
+          <tbody>
+          {% for telegram in group['telegram'].split() %}
+          <tr><td>{{telegram}}</td></tr>
+          {% endfor %}
+          </tbody>
+        </table>
+        {% endif %}
+        {% if 'tox' in group and group['tox'].split()[0] %}
+        <table id="table" class="table" style="display:table; table-layout:auto; width:100%">
+          <thead>
+            <tr>
+                <th> Tox </th>
+            </tr>
+          </thead>
+          <tbody>
+          {% for tox in group['tox'].split() %}
+          <tr><td>{{tox}}</td></tr>
+          {% endfor %}
+          </tbody>
+        </table>
+        {% endif %}
+        {% if 'other' in group and group['other'].split()[0] %}
+        <table id="table" class="table" style="display:table; table-layout:auto; width:100%">
+          <thead>
+            <tr>
+                <th> Other </th>
+            </tr>
+          </thead>
+          <tbody>
+          {% for other in group['other'].split() %}
+          <tr><td>{{other}}</td></tr>
+          {% endfor %}
+          </tbody>
+        </table>
+        {% endif %}
         <table id="table" class="table" style="display:table; table-layout:auto; width:100%">
           <thead>
             <tr>

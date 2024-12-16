@@ -768,6 +768,13 @@ def editgroup(database: int, name: str):
             'ransomware_galaxy_value': datagroup['ransomware_galaxy_value'] if 'ransomware_galaxy_value' in datagroup else '',
             'captcha' : datagroup['captcha'] if 'captcha' in datagroup else False,
             'profiles' : datagroup['profile'],
+            'jabber' : datagroup['jabber'] if 'jabber' in datagroup else '',
+            'mail' : datagroup['mail'] if 'mail' in datagroup else '',
+            'matrix' : datagroup['matrix'] if 'matrix' in datagroup else '',
+            'session' : datagroup['session'] if 'session' in datagroup else '',
+            'telegram' : datagroup['telegram'] if 'telegram' in datagroup else '',
+            'tox' : datagroup['tox'] if 'tox' in datagroup else '',
+            'other' : datagroup['other'] if 'other' in datagroup else '',
             'private' : datagroup['private'] if 'private' in datagroup else False,
             'raas' : datagroup['raas'] if 'raas' in datagroup else False,
             'links' : locationlist
@@ -788,6 +795,13 @@ def editgroup(database: int, name: str):
         data['captcha']=form.captcha.data
         data['ransomware_galaxy_value'] = form.galaxy.data
         data['profile'] = ast.literal_eval(form.profiles.data)
+        data['jabber'] = form.jabber.data.strip()
+        data['mail'] = form.mail.data.strip()
+        data['matrix'] = form.matrix.data.strip()
+        data['session'] = form.session.data.strip()
+        data['telegram'] = form.telegram.data.strip()
+        data['tox'] = form.tox.data.strip()
+        data['other'] = form.other.data.strip()
         data['private'] = form.private.data
         data['captcha'] = form.captcha.data
         data['raas'] = form.raas.data

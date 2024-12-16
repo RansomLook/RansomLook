@@ -21,6 +21,20 @@
         <p>{{ form.description(style="width:100%; height: 150px;") }}</p>
         </p>Profiles</p>
         <p>{{ form.profiles(style="width:100%; height: 150px;", size=5) }}</p>
+        </p>Jabber (One per line)</p>
+        <p>{{ form.jabber(style="width:100%; height: 75px;", size=5) }}</p>
+        </p>Mail (One per line)</p>
+        <p>{{ form.mail(style="width:100%; height: 75px;", size=5) }}</p>
+        </p>Matrix (One per line)</p>
+        <p>{{ form.matrix(style="width:100%; height: 75px;", size=5) }}</p>
+        </p>Session (One per line)</p>
+        <p>{{ form.session(style="width:100%; height: 75px;", size=5) }}</p>
+        </p>Telegram (One per line)</p>
+        <p>{{ form.telegram(style="width:100%; height: 75px;", size=5) }}</p>
+        </p>Tox (One per line)</p>
+        <p>{{ form.tox(style="width:100%; height: 75px;", size=5) }}</p>
+        </p>Other (One per line)</p>
+        <p>{{ form.other(style="width:100%; height: 75px;", size=5) }}</p>
         </p>Links</p>
         {% for nested in form.links %}
             {{ nested }}
