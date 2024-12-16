@@ -6,7 +6,7 @@
 
     <article id="main" class="markdown-section">
         <h1>Edit {{ form.groupname.label }}</h1>
-    <form action="" method="post" novalidate>
+    <form action="" method="post" enctype="multipart/form-data" novalidate="">
         {{ form.hidden_tag() }}
         <p>
             {{ form.groupname }}<br>

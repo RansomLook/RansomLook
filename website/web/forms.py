@@ -36,6 +36,8 @@ class LinkForm(Form): # type: ignore
     lastscrape = StringField()
     title = StringField()
     private = BooleanField('Private Link')
+    file = FileField('File')
+    fixedfile = BooleanField('Don\'t update screen')
     delete = BooleanField('Check to delete')
 
 class EditForm(FlaskForm): # type: ignore

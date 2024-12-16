@@ -146,7 +146,7 @@ def scraper(base: int) -> None:
                     running_capture.pop(str(key))
                     red.set(name, json.dumps(group))
                     continue
-                if 'png' in result:
+                if 'png' in result and not ('fixedfile' in host and host['fixedfile'] is True):
                     filename = name + '-' + createfile(host['slug']) + '.png'
                     namefile = os.path.join(get_homedir(), 'source/screenshots', filename)
                     with open(namefile, 'wb') as tosave:

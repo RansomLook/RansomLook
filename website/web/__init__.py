@@ -56,6 +56,9 @@ from .api.telegramapi import api as telegram_api
 from .api.rfapi import api as rf_api
 from .api.leaksapi import api as leaks_api
 
+from PIL import Image
+from PIL.PngImagePlugin import PngInfo
+
 app = Flask(__name__)
 app.wsgi_app = ProxyFix(app.wsgi_app, x_proto=1, x_for=1) # type: ignore
 app.jinja_env.filters['quote_plus'] = lambda u: quote(u)
@@ -759,10 +762,10 @@ def editgroup(database: int, name: str):
 
     red = Redis(unix_socket_path=get_socket_path('cache'), db=database)
     datagroup = json.loads(red.get(name)) # type: ignore
-    locations = namedtuple('locations',['slug', 'fqdn', 'timeout', 'delay', 'fs', 'chat', 'browser', 'private', 'version', 'available', 'title', 'updated', 'lastscrape', 'header'])
+    locations = namedtuple('locations',['slug', 'fqdn', 'timeout', 'delay', 'fs', 'chat', 'browser', 'private', 'version', 'available', 'title', 'updated', 'lastscrape', 'header', 'fixedfile'])
     locationlist = []
     for entry in datagroup['locations']:
-        locationlist.append(locations(entry['slug'], entry['fqdn'], entry['timeout'] if 'timeout' in entry else '', entry['delay'] if 'delay' in entry else '', entry['fs'] if 'fs' in entry else False, entry['chat'] if 'chat' in entry else False, entry['browser'] if 'browser' in entry else '', entry['private'] if 'private' in entry else False, entry['version'], entry['available'], entry['title'], entry['updated'], entry['lastscrape'], entry['header'] if 'header' in entry else '' ))
+        locationlist.append(locations(entry['slug'], entry['fqdn'], entry['timeout'] if 'timeout' in entry else '', entry['delay'] if 'delay' in entry else '', entry['fs'] if 'fs' in entry else False, entry['chat'] if 'chat' in entry else False, entry['browser'] if 'browser' in entry else '', entry['private'] if 'private' in entry else False, entry['version'], entry['available'], entry['title'], entry['updated'], entry['lastscrape'], entry['header'] if 'header' in entry else '' , entry['fixedfile'] if 'fixedfile' in entry else False))
     data = {'groupname': name,
             'description' : datagroup['meta'],
             'ransomware_galaxy_value': datagroup['ransomware_galaxy_value'] if 'ransomware_galaxy_value' in datagroup else '',
@@ -780,7 +783,7 @@ def editgroup(database: int, name: str):
             'links' : locationlist
            }
 
-    form = EditForm(data=data)
+    form = EditForm(data=data, files=request.files)
     form.groupname.label=name
 
     redlogs = Redis(unix_socket_path=get_socket_path('cache'), db=1)
@@ -822,9 +825,25 @@ def editgroup(database: int, name: str):
                         'title': entry.title.data,
                         'updated': entry.updated.data,
                         'lastscrape': entry.lastscrape.data,
-                        'header': entry.header.data
+                        'header': entry.header.data,
+                        'fixedfile': entry.fixedfile.data
                        }
             newlocations.append(location)
+            if entry.file.data != None:
+                filename = entry.file.data.filename
+                file_ext = os.path.splitext(filename)[1]
+                if file_ext not in app.config['UPLOAD_EXTENSIONS'] or \
+                  file_ext != validate_image(entry.file.data): # type: ignore
+                    flash(f'Error to add post to : {name} - Screen should be a PNG', 'error')
+                    return render_template('editentry.html', form=form, deleteform=deleteButton)
+                filename = name + '-' + createfile(entry.slug.data) + '.png'
+                namefile = os.path.join(get_homedir(), 'source/screenshots', filename)
+                entry.file.data.save(namefile)
+                targetImage = Image.open(namefile)
+                metadata = PngInfo()
+                metadata.add_text("Source", "RansomLook.io")
+                targetImage.save(namefile, pnginfo=metadata)
+
         data['locations'] = newlocations
         red.set(name, json.dumps(data))
         redlogs.zadd('logs', {f'{flask_login.current_user.id} modified : {name}, {data["meta"]}, {data["profile"]}, {data["locations"]}': score})
