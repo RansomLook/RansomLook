@@ -904,11 +904,11 @@ def logo(): # type: ignore[no-untyped-def]
     return render_template('logo.html', form=formSelect, formMarkets=formMarkets)
 
 @app.route('/admin/logo/<database>/<name>', methods=['GET', 'POST'])
-@flask_login.login_required
-def editlogo(database: int, name: str): # type: ignore[no-untyped-def]
+@flask_login.login_required # type: ignore
+def editlogo(database: int, name: str):
     if not (int(database) == 3 or int(database) == 0):
         return render_template('admin.html')
-    logo =  namedtuple('logo',['link']) # type: ignore
+    logo =  namedtuple('logo',['link'])
     logos = []
     logofolder = os.path.normpath(str(get_homedir()) + '/source/logo/'+dbvalue[int(database)]+'/'+name)
     if  os.path.exists(logofolder):
