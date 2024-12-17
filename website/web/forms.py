@@ -58,6 +58,15 @@ class EditForm(FlaskForm): # type: ignore
     private = BooleanField('Private Group')
     submit = SubmitField('Save changes')
 
+class LogoForm(Form): # type: ignore
+    link = StringField()
+    delete = BooleanField('Check to delete')
+
+class EditLogo(FlaskForm): # type: ignore
+    logos = FieldList(FormField(LogoForm), min_entries=0)
+    file = FileField('File')
+    submit = SubmitField('Save changes')
+
 class LoginForm(FlaskForm): # type: ignore
     username = StringField('Username', validators=[DataRequired()])
     password = PasswordField('Password', validators=[DataRequired()])

@@ -11,6 +11,7 @@ from datetime import timedelta
 from dateutil import parser
 import glob
 from os.path import dirname, basename, isfile, join
+from os import listdir
 import os
 import json
 from redis import Redis
@@ -46,7 +47,7 @@ from ransomlook.default import get_socket_path
 from ransomlook.telegram import teladder
 from ransomlook.twitter import twiadder
 from .helpers import get_secret_key, sri_load, User, build_users_table, load_user_from_request
-from .forms import AddForm, LoginForm, SelectForm, EditForm, DeleteForm, AlertForm, AddPostForm, EditPostForm, EditPostsForm
+from .forms import AddForm, LoginForm, SelectForm, EditForm, DeleteForm, AlertForm, AddPostForm, EditPostForm, EditPostsForm, EditLogo
 from .ldap import global_ldap_authentication
 
 from typing import Dict, Any, Optional
@@ -58,6 +59,8 @@ from .api.leaksapi import api as leaks_api
 
 from PIL import Image
 from PIL.PngImagePlugin import PngInfo
+
+dbvalue ={0:'group', 1:'market'}
 
 app = Flask(__name__)
 app.wsgi_app = ProxyFix(app.wsgi_app, x_proto=1, x_for=1) # type: ignore
@@ -376,6 +379,12 @@ def group(name: str): # type: ignore[no-untyped-def]
                         group= json.loads(red.get(key)) # type: ignore
                         if not current_user.is_authenticated and 'private' in group and group['private'] is True:
                             return redirect(url_for("home"))
+                        logofolder = os.path.normpath(str(get_homedir()) + '/source/logo/group/'+name)
+                        logo=[]
+                        if  os.path.exists(logofolder):
+                            listlogo = [f for f in listdir(logofolder) if isfile(join(logofolder, f))]
+                            for f in listlogo:
+                                logo.append("/logo/group/"+name+"/" +f)
 
                         group['name']=key.decode()
                         if group['meta'] is not None:
@@ -393,7 +402,7 @@ def group(name: str): # type: ignore[no-untyped-def]
                         modules = glob.glob(join(dirname(str(get_homedir())+'/ransomlook/parsers/'), "*.py"))
                         parserlist = [ basename(f)[:-3].split('.')[0] for f in modules if isfile(f) and not f.endswith('__init__.py')]
 
-                        return render_template("group.html", group = group, posts=sorted_posts, parser=parserlist)
+                        return render_template("group.html", group = group, posts=sorted_posts, parser=parserlist, logo=logo)
 
         return redirect(url_for("home"))
 
@@ -426,7 +435,12 @@ def market(name: str): # type: ignore[no-untyped-def]
                         group= json.loads(red.get(key)) # type: ignore
                         if not current_user.is_authenticated and 'private' in group and group['private'] is True:
                             return redirect(url_for("home"))
-
+                        logofolder = os.path.normpath(str(get_homedir()) + '/source/logo/market/'+name)
+                        logo=[]
+                        if  os.path.exists(logofolder):
+                            listlogo = [f for f in listdir(logofolder) if isfile(join(logofolder, f))]
+                            for f in listlogo:
+                                logo.append("/logo/market/"+name+"/" +f)
                         group['name']=key.decode()
                         redpost = Redis(unix_socket_path=get_socket_path('cache'), db=2)
                         if key in redpost.keys():
@@ -434,7 +448,7 @@ def market(name: str): # type: ignore[no-untyped-def]
                             sorted_posts = sorted(posts, key=lambda x: x['discovered'], reverse=True)
                         else:
                             sorted_posts = []
-                        return render_template("group.html", group = group, posts=sorted_posts)
+                        return render_template("group.html", group = group, posts=sorted_posts, logo=logo)
         return redirect(url_for("home"))
 
 @app.route("/leaks")
@@ -691,6 +705,13 @@ def screenshotstwitter(file: str): # type: ignore[no-untyped-def]
 def screenshotstwitterimg(file: str): # type: ignore[no-untyped-def]
     return send_from_directory( str(get_homedir())+ '/source/screenshots/twitter/img', file, mimetype='image/gif')
 
+@app.route("/logo/<database>/<group>/<file>")
+def logofile(database: str, group: str, file: str): # type: ignore[no-untyped-def]
+    fullpath = os.path.normpath(os.path.join(str(get_homedir())+ '/source/logo/',database, group))
+    if not fullpath.startswith(str(get_homedir())):
+        raise Exception("not allowed")
+    return send_from_directory( fullpath, file, mimetype='image/gif')
+
 # Admin Zone
 
 @app.route('/admin/')
@@ -854,6 +875,67 @@ def editgroup(database: int, name: str):
         return redirect(url_for('admin'))
 
     return render_template('editentry.html', form=form , deleteform=deleteButton) 
+
+@app.route('/admin/logo', methods=['GET', 'POST'])
+@flask_login.login_required
+def logo(): # type: ignore[no-untyped-def]
+    formSelect = SelectForm()
+    formMarkets = SelectForm()
+    red = Redis(unix_socket_path=get_socket_path('cache'), db=0)
+    keys = red.keys()
+    choices=[('','Please select your group')]
+    keys.sort(key=lambda x: x.lower())
+    for key in keys:
+        choices.append((key.decode(), key.decode()))
+    formSelect.group.choices=choices
+
+    red = Redis(unix_socket_path=get_socket_path('cache'), db=3)
+    keys = red.keys()
+    choices=[('','Please select your Market')]
+    keys.sort(key=lambda x: x.lower())
+    for key in keys:
+        choices.append((key.decode(), key.decode()))
+    formMarkets.group.choices=choices
+
+    if formSelect.validate_on_submit():
+        return redirect('/admin/logo/0'+'/'+formSelect.group.data)
+    if formMarkets.validate_on_submit():
+        return redirect('/admin/logo/3'+'/'+formMarkets.group.data)
+    return render_template('logo.html', form=formSelect, formMarkets=formMarkets)
+
+@app.route('/admin/logo/<database>/<name>', methods=['GET', 'POST'])
+@flask_login.login_required
+def editlogo(database: int, name: str): # type: ignore[no-untyped-def]
+    if not (int(database) == 3 or int(database) == 0):
+        return render_template('admin.html')
+    logo =  namedtuple('logo',['link']) # type: ignore
+    logos = []
+    logofolder = os.path.normpath(str(get_homedir()) + '/source/logo/'+dbvalue[int(database)]+'/'+name)
+    if  os.path.exists(logofolder):
+        listlogo = [f for f in listdir(logofolder) if isfile(join(logofolder, f))]
+        for f in listlogo:
+            logos.append(logo("/logo/"+dbvalue[int(database)]+"/"+name+"/" +f))
+    data = {'logos':logos}
+    form = EditLogo(data=data, files=request.files)
+    if form.validate_on_submit():
+        for currentlogo in form.logos:
+            if currentlogo.delete.data is True:
+                os.remove(logofolder+'/'+currentlogo.link.data)
+        if form.file.data is not None:
+            filename = form.file.data.filename
+            file_ext = os.path.splitext(filename)[1]
+            if file_ext not in app.config['UPLOAD_EXTENSIONS'] or \
+                file_ext != validate_image(form.file.data): # type: ignore
+                flash(f'Error to add post to : {name} - Screen should be a PNG', 'error')
+                return render_template('editlogo.html', form=form)
+            filename = createfile(os.path.splitext(filename)[0])+ file_ext
+            if not os.path.exists(logofolder):
+                os.mkdir(logofolder)
+            logoname = os.path.normpath(logofolder+'/'+filename)
+            form.file.data.save(logoname)
+            return redirect('/admin')
+    return render_template('editlogo.html', form=form)
+
 
 @app.route('/admin/addpost', methods=['GET', 'POST'])
 @flask_login.login_required

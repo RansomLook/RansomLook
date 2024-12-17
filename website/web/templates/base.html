@@ -67,12 +67,23 @@
           {% if current_user.is_authenticated %}
           <ul><li>Admin Zone </li>
               <ul>
+              <li class="active"><b>Group & Monitoring</b></li>
+              <ul>
               <li {% if request.path == '/admin/add' %} class="active" {% endif %}><a href="{{ url_for('addgroup') }}" title="Add ">Add</a></li>
               <li {% if request.path == '/admin/edit' %} class="active" {% endif %}><a href="{{ url_for('edit') }}" title="Edit ">Edit</a></li>
+              <li {% if request.path == '/admin/logo' %} class="active" {% endif %}><a href="{{ url_for('logo') }}" title="Logo ">Logo</a></li>
+              </ul>
+              <li class="active"><b>Post actions</b></li>
+              <ul>
               <li {% if request.path == '/admin/addpost' %} class="active" {% endif %}><a href="{{ url_for('addpost') }}" title="Add post ">Add post</a></li>
               <li {% if request.path == '/admin/editpost' %} class="active" {% endif %}><a href="{{ url_for('editpost') }}" title="Edit post ">Edit post</a></li>
+              </ul>
+              <li class="active"><b>Other</b></li>
+              <ul>
               <li {% if request.path == '/admin/alerting' %} class="active" {% endif %}><a href="{{ url_for('alerting') }}" title="Alerting ">Alerting</a></li>
               <li {% if request.path == '/admin/logs' %} class="active" {% endif %}><a href="{{ url_for('logs') }}" title="Logs ">Logs</a></li>
+              <li><a href="{{ url_for('logout') }}" title="Logout ">Logout</a></li>
+              </ul>
               </ul>
           </ul>
           {% endif %}          

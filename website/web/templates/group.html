@@ -3,6 +3,10 @@
 {% block content %}
     <article id="main" class="markdown-section">
 	<h1>{{group['name'].title()}}</h1>
+        <p>{% for item in logo %}
+            <img src="{{item}}" style="max-height:150px;max-width:150px;height:auto;width:auto;" >
+        {% endfor %}
+        </p>
         {% if group['name'].lower() in parser %}
         <p><em>Parsing : <code>Enabled</code></em></p>
         {% endif %} 
