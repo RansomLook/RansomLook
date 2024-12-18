@@ -177,17 +177,10 @@ def scraper(base: int) -> None:
                     namefile = os.path.join(os.getcwd(), 'source', filename)
                     with open(namefile, 'w') as tosave:
                         tosave.write(result['html']) # type: ignore
-                if 'har' in result:
-                    out = False
-                    for entry in result['har']['log']['entries']: # type: ignore
-                        if entry['response']['status'] == -1:
-                            host.update({'available':False})
-                            red.set(name, json.dumps(group))
-                            out = True
-                    if not out:
-                        host.update({'available':True, 'title':result['har']['log']['pages'][0]['title'], # type: ignore
+                    host.update({'available':True, 'title':result['har']['log']['pages'][0]['title'], # type: ignore
                              'lastscrape':result['har']['log']['pages'][0]['startedDateTime'].replace('T',' ').replace('Z',''), # type: ignore
                              'updated':result['har']['log']['pages'][0]['startedDateTime'].replace('T',' ').replace('Z','')}) # type: ignore
+
                 else:
                     host.update({'available':False})
                 red.set(name, json.dumps(group))
