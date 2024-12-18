@@ -82,7 +82,7 @@ if get_config('generic','darkmode'):
 app.debug = False
 
 class CustomRequest(Request):
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args, **kwargs): # type: ignore[no-untyped-def]
         super(CustomRequest, self).__init__(*args, **kwargs)
         self.max_form_parts = 200000
 
@@ -699,7 +699,7 @@ def search(): # type: ignore[no-untyped-def]
         return render_template("search.html", query=query,groups=groups, markets=markets, posts=posts, leaks=leaks, channels=channels, messages=messages, notes=notes)
     return redirect(url_for("home"))
 
-def get_mime_type(file_path):
+def get_mime_type(file_path): # type: ignore[no-untyped-def]
     # Guess the MIME type based on the file extension
     mime_type, _ = mimetypes.guess_type(file_path)
     return mime_type if mime_type else 'application/octet-stream'  # Fallback MIME type
@@ -742,7 +742,7 @@ def logofile(database: str, group: str, file: str): # type: ignore[no-untyped-de
     fullpath = os.path.normpath(os.path.join(str(get_homedir())+ '/source/logo/',database, group))
     if not fullpath.startswith(str(get_homedir())):
         raise Exception("not allowed")
-    mime_type = get_mime_type(os.path.join(fullpath, file))
+    mime_type = get_mime_type(os.path.join(fullpath, file)) # type: ignore
     return send_from_directory( fullpath, file, mimetype=mime_type)
 
 # Admin Zone
