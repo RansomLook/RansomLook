@@ -23,6 +23,9 @@ class Website(AbstractManager):
         port = get_config('generic', 'website_listen_port')
         return Popen(['gunicorn', '-w', '10',
                       '--graceful-timeout', '2', '--timeout', '300',
+                      '--limit-request-line', '500000',
+                      '--limit-request-field_size', '500000',
+                      '--limit-request-fields', '200000',
                       '-b', f'{ip}:{port}',
                       'web:app'],
                      cwd=website_dir)

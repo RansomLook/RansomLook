@@ -4,6 +4,7 @@ from flask import request, send_from_directory
 from flask_bootstrap import Bootstrap5  # type: ignore
 from flask_login import current_user # type: ignore
 from urllib.parse import quote
+from flask import Request
 
 import datetime
 from datetime import datetime as dt
@@ -22,6 +23,7 @@ from werkzeug.security import check_password_hash
 from werkzeug.exceptions import HTTPException
 from werkzeug.middleware.proxy_fix import ProxyFix
 from werkzeug.utils import secure_filename
+from werkzeug.wsgi import LimitedStream
 
 from flask_cors import CORS
 from flask_restx import Api  # type: ignore
@@ -60,6 +62,8 @@ from .api.leaksapi import api as leaks_api
 from PIL import Image
 from PIL.PngImagePlugin import PngInfo
 
+import mimetypes
+
 dbvalue ={0:'group', 1:'market'}
 
 app = Flask(__name__)
@@ -67,8 +71,8 @@ app.wsgi_app = ProxyFix(app.wsgi_app, x_proto=1, x_for=1) # type: ignore
 app.jinja_env.filters['quote_plus'] = lambda u: quote(u)
 app.config['SECRET_KEY'] = get_secret_key()
 app.config['PREFERRED_URL_SCHEME'] = 'https'
-app.config['UPLOAD_EXTENSIONS'] = ['.png', '.jpg']
-
+app.config['UPLOAD_EXTENSIONS'] = ['.png', '.jpg', '.svg']
+app.config['MAX_CONTENT_LENGTH'] = 20 * 1024 * 1024
 Bootstrap5(app)
 app.config['BOOTSTRAP_SERVE_LOCAL'] = True
 app.config['SESSION_COOKIE_NAME'] = 'RansomLook'
@@ -77,17 +81,40 @@ if get_config('generic','darkmode'):
     app.config['BOOTSTRAP_BOOTSWATCH_THEME'] = 'slate'
 app.debug = False
 
+class CustomRequest(Request):
+    def __init__(self, *args, **kwargs):
+        super(CustomRequest, self).__init__(*args, **kwargs)
+        self.max_form_parts = 200000
+
+app.request_class = CustomRequest
+
 pkg_version = version('ransomlook')
 
 flask_moment.Moment(app=app)
 
-def validate_image(stream): # type: ignore[no-untyped-def]
-    header = stream.read(512)
-    stream.seek(0) 
+
+def validate_image(stream):  # type: ignore[no-untyped-def]
+    allowed_formats = {'jpg', 'png', 'svg'}  # Allowed formats
+    header = stream.read(512)  # Read the initial bytes of the file
+    stream.seek(0)
+
+    # Check for SVG based on its XML header or <svg> tag
+    if header.lstrip().startswith(b'<?xml') or b'<svg' in header[:100].lower():
+        return '.svg'
+
+    # Check for other formats using imghdr
     format = imghdr.what(None, header)
-    if not format:
-        return None
-    return '.' + (format if format != 'jpeg' else 'jpg')
+    print(format)  # Debugging purposes
+
+    if format == 'jpeg':  # Treat jpeg as jpg
+        format = 'jpg'
+
+    # Return the format if it's allowed
+    if format in allowed_formats:
+        return '.' + format
+
+    # If format is not recognized or not allowed
+    return None
 
 @app.context_processor
 def inject_global_vars() -> Dict[str, bool]:
@@ -672,6 +699,11 @@ def search(): # type: ignore[no-untyped-def]
         return render_template("search.html", query=query,groups=groups, markets=markets, posts=posts, leaks=leaks, channels=channels, messages=messages, notes=notes)
     return redirect(url_for("home"))
 
+def get_mime_type(file_path):
+    # Guess the MIME type based on the file extension
+    mime_type, _ = mimetypes.guess_type(file_path)
+    return mime_type if mime_type else 'application/octet-stream'  # Fallback MIME type
+
 @app.route("/stats/<file>")
 def screenshotsstats(file: str): # type: ignore[no-untyped-def]
     return send_from_directory( str(get_homedir())+ '/source/screenshots/stats', file, mimetype='image/gif')
@@ -710,7 +742,8 @@ def logofile(database: str, group: str, file: str): # type: ignore[no-untyped-de
     fullpath = os.path.normpath(os.path.join(str(get_homedir())+ '/source/logo/',database, group))
     if not fullpath.startswith(str(get_homedir())):
         raise Exception("not allowed")
-    return send_from_directory( fullpath, file, mimetype='image/gif')
+    mime_type = get_mime_type(os.path.join(fullpath, file))
+    return send_from_directory( fullpath, file, mimetype=mime_type)
 
 # Admin Zone
 
