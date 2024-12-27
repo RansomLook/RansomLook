@@ -10,6 +10,7 @@ class AddForm(FlaskForm): # type: ignore
     browser = SelectField('Browser', choices=[('','Select a browser'),('chrome', 'chrome'),('firefix','firefox'),('webkit','webkit')],  default='')
     fs = BooleanField('File server')
     chat = BooleanField('Chat')
+    admin = BooleanField('Admin')
     private = BooleanField('Private DLS')
     submit = SubmitField('Add')
 
@@ -28,6 +29,7 @@ class LinkForm(Form): # type: ignore
     delay = IntegerField(validators=[Optional()])
     fs = BooleanField('File Server')
     chat = BooleanField('Chat')
+    admin = BooleanField('Admin')
     browser = SelectField('Browser', choices=[('','Select a browser'),('chrome', 'chrome'),('firefix','firefox'),('webkit','webkit')],  default='')
     header = StringField(render_kw={'size': 96})
     version = IntegerField(validators=[Optional()])

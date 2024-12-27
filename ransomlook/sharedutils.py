@@ -193,7 +193,7 @@ def hostcountdls(db: int) -> int :
     for entry in groups:
         group = json.loads(red.get(entry)) # type: ignore
         for host in group['locations']:
-            if (not 'chat' in host or host['chat'] is False) and (not 'fs' in host or host['fs'] is False):
+            if (not 'chat' in host or host['chat'] is False) and (not 'fs' in host or host['fs'] is False) and (not 'admin' in host or host['admin'] is False):
                 host_count += 1
     return host_count
 
@@ -216,6 +216,17 @@ def hostcountchat(db: int) -> int :
         group = json.loads(red.get(entry)) # type: ignore
         for host in group['locations']:
             if 'chat' in host and host['chat'] is True:
+                host_count += 1
+    return host_count
+
+def hostcountadmin(db: int) -> int :
+    red = redis.Redis(unix_socket_path=get_socket_path('cache'), db=db)
+    groups = red.keys()
+    host_count = 0
+    for entry in groups:
+        group = json.loads(red.get(entry)) # type: ignore
+        for host in group['locations']:
+            if 'admin' in host and host['admin'] is True:
                 host_count += 1
     return host_count
 
@@ -324,7 +335,7 @@ def countcaptchahosts() -> int :
 '''
 Ransomlook
 '''
-def siteschema(location: str, fs: bool, private: bool, chat: bool, browser: str|None) -> Dict[str, Optional[Any]] :
+def siteschema(location: str, fs: bool, private: bool, chat: bool, admin: bool, browser: str|None) -> Dict[str, Optional[Any]] :
     '''
     returns a dict with the site schema
     '''
@@ -342,6 +353,7 @@ def siteschema(location: str, fs: bool, private: bool, chat: bool, browser: str|
         'updated': str(datetime.today()),
         'fs': fs,
         'chat': chat,
+        'admin': admin,
         'browser': browser,
         'private': private,
         'lastscrape': 'Never'

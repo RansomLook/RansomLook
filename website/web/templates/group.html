@@ -142,7 +142,7 @@
           <tbody>
         {% for location in group['locations'] %}
           {% if current_user.is_authenticated or not 'private' in location or location['private'] is false %}
-            {% if (not 'fs' in location or location['fs'] is false) and (not 'chat' in location or location['chat'] is false) %}
+            {% if (not 'fs' in location or location['fs'] is false) and (not 'chat' in location or location['chat'] is false) and (not 'admin' in location or location['admin'] is false) %}
             {% if location['private'] is true %}
             <tr><td style="color: red;"> {{location['slug']}} </td>
             {% else %}
@@ -199,6 +199,34 @@
         {% for location in group['locations'] %}
           {% if current_user.is_authenticated or not 'private' in location or location['private'] is false %} 
             {% if 'chat' in location and location['chat'] is true %}
+            {% if location['private'] is true %}
+            <tr><td style="color: red;"> {{location['slug']}} </td>
+            {% else %}
+            <tr><td> {{location['slug']}} </td>
+            {% endif %}
+                {% if 'screen' in location %}
+                <td><center><a href="{{ location['screen'] }}" rel="noopener noreferrer" target="_blank">Screen</a></center></td>
+                {% else %}
+                <td> </td>
+                {% endif %}
+            </tr>
+            {% endif %}
+           {% endif %}
+        {% endfor %}
+          </tbody>
+        </table>
+
+        <table id="table" class="table" style="display:table; table-layout:auto; width:100%">
+          <thead>
+            <tr>
+                <th>Admin servers</th>
+                <th style="width:10%" ><center>Screen</center></th>
+            </tr>
+          </thead>
+          <tbody>
+        {% for location in group['locations'] %}
+          {% if current_user.is_authenticated or not 'private' in location or location['private'] is false %} 
+            {% if 'admin' in location and location['admin'] is true %}
             {% if location['private'] is true %}
             <tr><td style="color: red;"> {{location['slug']}} </td>
             {% else %}

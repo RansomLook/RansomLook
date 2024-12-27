@@ -42,7 +42,7 @@ from ransomlook.posts import appender
 
 from ransomlook.ransomlook import adder
 from ransomlook.sharedutils import createfile
-from ransomlook.sharedutils import groupcount, hostcount, hostcountdls, hostcountfs, hostcountchat, onlinecount, postslast24h, mounthlypostcount, currentmonthstr, postssince, poststhisyear, postcount, parsercount, statsgroup, run_data_viz
+from ransomlook.sharedutils import groupcount, hostcount, hostcountdls, hostcountfs, hostcountchat, hostcountadmin, onlinecount, postslast24h, mounthlypostcount, currentmonthstr, postssince, poststhisyear, postcount, parsercount, statsgroup, run_data_viz
 from ransomlook.default.config import get_homedir
 from ransomlook.default.config import get_config
 from ransomlook.default import get_socket_path
@@ -72,7 +72,7 @@ app.jinja_env.filters['quote_plus'] = lambda u: quote(u)
 app.config['SECRET_KEY'] = get_secret_key()
 app.config['PREFERRED_URL_SCHEME'] = 'https'
 app.config['UPLOAD_EXTENSIONS'] = ['.png', '.jpg', '.svg']
-app.config['MAX_CONTENT_LENGTH'] = 20 * 1024 * 1024
+app.config['MAX_CONTENT_LENGTH'] = 50 * 1024 * 1024
 Bootstrap5(app)
 app.config['BOOTSTRAP_SERVE_LOCAL'] = True
 app.config['SESSION_COOKIE_NAME'] = 'RansomLook'
@@ -217,6 +217,7 @@ def home(): # type: ignore[no-untyped-def]
         data['nbdls'] = hostcountdls(0)
         data['nbfs'] = hostcountfs(0)
         data['nbchat'] = hostcountchat(0)
+        data['nbadmin'] = hostcountadmin(0)
         data['online'] = onlinecount(0)
         data['nbforum'] = groupcount(3)
         data['nbforumlocations'] = hostcount(3)
@@ -770,7 +771,7 @@ def addgroup(): # type: ignore[no-untyped-def]
                return render_template('add.html',form=form)
            res = twiadder(form.groupname.data, form.url.data)
         else:
-           res = adder(form.groupname.data.lower(), form.url.data, form.category.data, form.fs.data, form.private.data, form.chat.data, form.browser.data)
+           res = adder(form.groupname.data.lower(), form.url.data, form.category.data, form.fs.data, form.private.data, form.chat.data, form.admin.data, form.browser.data)
         if res > 1:
            flash(f'Fail to add: {form.url.data} to {form.groupname.data}.  Url already exists for this group', 'error')
            return render_template('add.html',form=form)
@@ -816,10 +817,10 @@ def editgroup(database: int, name: str):
 
     red = Redis(unix_socket_path=get_socket_path('cache'), db=database)
     datagroup = json.loads(red.get(name)) # type: ignore
-    locations = namedtuple('locations',['slug', 'fqdn', 'timeout', 'delay', 'fs', 'chat', 'browser', 'private', 'version', 'available', 'title', 'updated', 'lastscrape', 'header', 'fixedfile'])
+    locations = namedtuple('locations',['slug', 'fqdn', 'timeout', 'delay', 'fs', 'chat', 'admin', 'browser', 'private', 'version', 'available', 'title', 'updated', 'lastscrape', 'header', 'fixedfile'])
     locationlist = []
     for entry in datagroup['locations']:
-        locationlist.append(locations(entry['slug'], entry['fqdn'], entry['timeout'] if 'timeout' in entry else '', entry['delay'] if 'delay' in entry else '', entry['fs'] if 'fs' in entry else False, entry['chat'] if 'chat' in entry else False, entry['browser'] if 'browser' in entry else '', entry['private'] if 'private' in entry else False, entry['version'], entry['available'], entry['title'], entry['updated'], entry['lastscrape'], entry['header'] if 'header' in entry else '' , entry['fixedfile'] if 'fixedfile' in entry else False))
+        locationlist.append(locations(entry['slug'], entry['fqdn'], entry['timeout'] if 'timeout' in entry else '', entry['delay'] if 'delay' in entry else '', entry['fs'] if 'fs' in entry else False, entry['chat'] if 'chat' in entry else False, entry['admin'] if 'admin' in entry else False, entry['browser'] if 'browser' in entry else '', entry['private'] if 'private' in entry else False, entry['version'], entry['available'], entry['title'], entry['updated'], entry['lastscrape'], entry['header'] if 'header' in entry else '' , entry['fixedfile'] if 'fixedfile' in entry else False))
     data = {'groupname': name,
             'description' : datagroup['meta'],
             'ransomware_galaxy_value': datagroup['ransomware_galaxy_value'] if 'ransomware_galaxy_value' in datagroup else '',
@@ -872,6 +873,7 @@ def editgroup(database: int, name: str):
                         'delay': entry.delay.data,
                         'fs': entry.fs.data,
                         'chat': entry.chat.data,
+                        'admin': entry.admin.data,
                         'browser': entry.browser.data,
                         'private': entry.private.data,
                         'version': entry.version.data,

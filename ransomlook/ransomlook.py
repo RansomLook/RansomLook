@@ -39,11 +39,11 @@ from .sharedutils import format_bytes
 redislacus = Redis(unix_socket_path=get_socket_path('cache'), db=15)
 lacus = LacusCore(redislacus,tor_proxy='socks5://127.0.0.1:9050')
 
-def creategroup(location: str, fs: bool, private: bool, chat: bool, browser: str|None) -> Dict[str, object] :
+def creategroup(location: str, fs: bool, private: bool, chat: bool, admin: bool, browser: str|None) -> Dict[str, object] :
     '''
     create a new group for a new provider - added to groups.json
     '''
-    mylocation = siteschema(location, fs, private, chat, browser)
+    mylocation = siteschema(location, fs, private, chat, admin, browser)
     insertdata: dict[str, Optional[Any]] = {
         'captcha': bool(),
         'meta': None,
@@ -191,7 +191,7 @@ def scraper(base: int) -> None:
         else:
             time.sleep(10)
 
-def adder(name: str, location: str, db: int, fs: bool=False, private: bool=False, chat: bool=False, browser: str|None=None) -> int:
+def adder(name: str, location: str, db: int, fs: bool=False, private: bool=False, chat: bool=False, admin: bool=False, browser: str|None=None) -> int:
     '''
     handles the addition of new providers to groups.json
     '''
@@ -199,16 +199,16 @@ def adder(name: str, location: str, db: int, fs: bool=False, private: bool=False
         stdlog('ransomlook: ' + 'records for ' + name + \
             ' already exist, appending to avoid duplication')
         if location.strip() != "":
-            return appender(name.strip(), location.strip(), db, fs, private, chat, browser)
+            return appender(name.strip(), location.strip(), db, fs, private, chat, admin, browser)
         return 0
     else:
         red = redis.Redis(unix_socket_path=get_socket_path('cache'), db=db)
-        newrec = creategroup(location.strip(), fs, private, chat, browser)
+        newrec = creategroup(location.strip(), fs, private, chat, admin, browser)
         red.set(name.strip(), json.dumps(newrec))
         stdlog('ransomlook: ' + 'record for ' + name + ' added to groups.json')
         return 0
 
-def appender(name: str, location: str, db: int, fs: bool, private: bool, chat: bool, browser: str|None) -> int:
+def appender(name: str, location: str, db: int, fs: bool, private: bool, chat: bool, admin: bool, browser: str|None) -> int:
     '''
     handles the addition of new mirrors and relays for the same site
     to an existing group within groups.json
@@ -220,7 +220,7 @@ def appender(name: str, location: str, db: int, fs: bool, private: bool, chat: b
         if location == loc['slug']:
             errlog('cannot append to non-existing provider or the location already exists')
             return 2
-    group['locations'].append(siteschema(location, fs, private, chat, browser))
+    group['locations'].append(siteschema(location, fs, private, chat, admin, browser))
     red.set(name.strip(), json.dumps(group))
     return 1
 
