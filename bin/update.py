@@ -112,7 +112,7 @@ def main() -> None:
             run_command('sudo service ransomlook restart')
             print('done.')
         except subprocess.CalledProcessError:
-            print('Restarting Ransomlool with poetry...')
+            print('Restarting Ransomlook with poetry...')
             run_command('poetry run stop', expect_fail=True)
             run_command('poetry run start', capture_output=False)
             print('Ransomlook started.')
