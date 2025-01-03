@@ -63,13 +63,13 @@ def parser() -> None :
            profile['displayname'] = name.div.div.div.text # type: ignore
            description = soup.find('div', {'data-testid':'UserDescription'})
            if description != None:
-               profile['meta'] = description.text # type: ignore
+               profile['meta'] = description.text
            location = soup.find('span',{'data-testid':'UserLocation'})
            if location != None:
-               profile['location'] = location.text # type: ignore
+               profile['location'] = location.text
            website = soup.find('a',{'data-testid':'UserUrl'})
            if website != None:
-               profile['link'] = website.text # type: ignore
+               profile['link'] = website.text
            join_date =soup.find('span',{'data-testid':'UserJoinDate'}).text # type: ignore
            profile['joindate'] = join_date
            profile['following'] = soup.find('span', text = "Following").parent.span.text # type: ignore

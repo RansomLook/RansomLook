@@ -14,10 +14,10 @@ def main() -> List[Dict[str, str]] :
                 divs_name=soup.find_all('div', {"class": "post"})
                 for div in divs_name:
                     title = div.find('h2').text.strip()
-                    descriptions = div.find_all('p')
-                    description = ''
-                    for p in descriptions:
-                        description += p.text
+                    try:
+                        description = div.find('div', {"style": "white-space: pre-line;"}).text.strip()
+                    except:
+                        description = ''
                     list_div.append({'title':title, 'description': description.strip()})
                 file.close()
         except:
