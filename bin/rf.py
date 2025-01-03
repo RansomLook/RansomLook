@@ -1,5 +1,5 @@
 import json
-import redis
+import valkey
 import requests
 
 from ransomlook.default.config import get_config, get_socket_path
@@ -7,8 +7,8 @@ from ransomlook.rocket import rocketnotifyrf
 
 def main() -> None :
 
-    red = redis.Redis(unix_socket_path=get_socket_path('cache'), db=10)
-    keys = red.keys()
+    valkey_handle = valkey.Valkey(unix_socket_path=get_socket_path('cache'), db=10)
+    keys = valkey_handle.keys()
 
     rocketconfig = get_config('generic','rocketchat')
 
@@ -30,7 +30,7 @@ def main() -> None :
                 next = True
                 continue
         if next == False :
-            red.set(entry['name'], json.dumps(entry))
+            valkey_handle.set(entry['name'], json.dumps(entry))
             if rocketconfig['enable'] == True:
                 rocketnotifyrf(rocketconfig, entry)
 

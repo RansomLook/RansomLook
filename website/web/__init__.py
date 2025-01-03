@@ -15,7 +15,7 @@ from os.path import dirname, basename, isfile, join
 from os import listdir
 import os
 import json
-from redis import Redis
+from valkey import Valkey
 
 import ast
 import flask_login
@@ -234,19 +234,19 @@ def home(): # type: ignore[no-untyped-def]
         alertposts= defaultdict(list)
         alert=get_config('generic','alertondashboard')
         if alert is True:
-            red = Redis(unix_socket_path=get_socket_path('cache'), db=12)
-            groups = red.keys()
+            valkey_handle = Valkey(unix_socket_path=get_socket_path('cache'), db=12)
+            groups = valkey_handle.keys()
             for entry in groups:
-                post = json.loads(red.get(entry)) # type: ignore
+                post = json.loads(valkey_handle.get(entry)) # type: ignore
                 alertposts[post['type']].append(post)
         return render_template("index.html", date=date, data=data,alert=alert, posts=alertposts)
 
 @app.route("/recent")
 def recent(): # type: ignore[no-untyped-def]
         posts = []
-        red = Redis(unix_socket_path=get_socket_path('cache'), db=2)
-        for key in red.keys():
-                entries = json.loads(red.get(key)) # type: ignore
+        valkey_handle = Valkey(unix_socket_path=get_socket_path('cache'), db=2)
+        for key in valkey_handle.keys():
+                entries = json.loads(valkey_handle.get(key)) # type: ignore
                 for entry in entries:
                     entry['group_name']=key.decode()
                     posts.append(entry)
@@ -261,11 +261,11 @@ def recent(): # type: ignore[no-untyped-def]
 @app.route("/rss.xml")
 def feeds():  # type: ignore[no-untyped-def]
     posts = []
-    red = Redis(unix_socket_path=get_socket_path('cache'), db=2)
+    valkey_handle = Valkey(unix_socket_path=get_socket_path('cache'), db=2)
 
-    # Iterate over Redis keys and parse entries
-    for key in red.keys():
-        entries = json.loads(red.get(key))  # type: ignore
+    # Iterate over Valkey keys and parse entries
+    for key in valkey_handle.keys():
+        entries = json.loads(valkey_handle.get(key))  # type: ignore
         for entry in entries:
             entry['group_name'] = key.decode()
             posts.append(entry)
@@ -316,10 +316,10 @@ def about(): # type: ignore[no-untyped-def]
 
 @app.route("/status")
 def status(): # type: ignore[no-untyped-def]
-        red = Redis(unix_socket_path=get_socket_path('cache'), db=0)
+        valkey_handle = Valkey(unix_socket_path=get_socket_path('cache'), db=0)
         groups = []
-        for key in red.keys():
-                entry= json.loads(red.get(key)) # type: ignore
+        for key in valkey_handle.keys():
+                entry= json.loads(valkey_handle.get(key)) # type: ignore
                 if not current_user.is_authenticated and 'private' in entry and entry['private'] is True:
                     continue
                 entry['name']=key.decode()
@@ -330,10 +330,10 @@ def status(): # type: ignore[no-untyped-def]
                 screenfile = '/screenshots/' + group['name'] + '-' + createfile(location['slug']) + '.png'
                 if os.path.exists(str(get_homedir()) + '/source' + screenfile):
                     location['screen']=screenfile
-        red = Redis(unix_socket_path=get_socket_path('cache'), db=3)
+        valkey_handle = Valkey(unix_socket_path=get_socket_path('cache'), db=3)
         markets = []
-        for key in red.keys():
-                entry= json.loads(red.get(key)) # type: ignore
+        for key in valkey_handle.keys():
+                entry= json.loads(valkey_handle.get(key)) # type: ignore
                 entry['name']=key.decode()
                 markets.append(entry)
         markets.sort(key=lambda x: x["name"].lower())
@@ -348,10 +348,10 @@ def status(): # type: ignore[no-untyped-def]
 @app.route("/alive")
 
 def alive(): # type: ignore[no-untyped-def]
-        red = Redis(unix_socket_path=get_socket_path('cache'), db=0)
+        valkey_handle = Valkey(unix_socket_path=get_socket_path('cache'), db=0)
         groups = []
-        for key in red.keys():
-                entry= json.loads(red.get(key)) # type: ignore
+        for key in valkey_handle.keys():
+                entry= json.loads(valkey_handle.get(key)) # type: ignore
                 if not current_user.is_authenticated and 'private' in entry and entry['private'] is True:
                     continue
                 entry['name']=key.decode()
@@ -362,10 +362,10 @@ def alive(): # type: ignore[no-untyped-def]
                 screenfile = '/screenshots/' + group['name'] + '-' + createfile(location['slug']) + '.png'
                 if os.path.exists(str(get_homedir()) + '/source' + screenfile):
                     location['screen']=screenfile
-        red = Redis(unix_socket_path=get_socket_path('cache'), db=3)
+        valkey_handle = Valkey(unix_socket_path=get_socket_path('cache'), db=3)
         markets = []
-        for key in red.keys():
-                entry= json.loads(red.get(key)) # type: ignore
+        for key in valkey_handle.keys():
+                entry= json.loads(valkey_handle.get(key)) # type: ignore
                 entry['name']=key.decode()
                 markets.append(entry)
         markets.sort(key=lambda x: x["name"].lower())
@@ -380,11 +380,11 @@ def alive(): # type: ignore[no-untyped-def]
 
 @app.route("/groups")
 def groups(): # type: ignore[no-untyped-def]
-        red = Redis(unix_socket_path=get_socket_path('cache'), db=0)
+        valkey_handle = Valkey(unix_socket_path=get_socket_path('cache'), db=0)
 
         groups = []
-        for key in red.keys():
-                entry= json.loads(red.get(key)) # type: ignore
+        for key in valkey_handle.keys():
+                entry= json.loads(valkey_handle.get(key)) # type: ignore
                 if not current_user.is_authenticated and 'private' in entry and entry['private'] is True:
                     continue
                 entry['name']=key.decode()
@@ -401,10 +401,10 @@ def groups(): # type: ignore[no-untyped-def]
 
 @app.route("/group/<name>")
 def group(name: str): # type: ignore[no-untyped-def]
-        red = Redis(unix_socket_path=get_socket_path('cache'), db=0)
-        for key in red.keys():
+        valkey_handle = Valkey(unix_socket_path=get_socket_path('cache'), db=0)
+        for key in valkey_handle.keys():
                 if key.decode().lower() == name.lower():
-                        group= json.loads(red.get(key)) # type: ignore
+                        group= json.loads(valkey_handle.get(key)) # type: ignore
                         if not current_user.is_authenticated and 'private' in group and group['private'] is True:
                             return redirect(url_for("home"))
                         logofolder = os.path.normpath(str(get_homedir()) + '/source/logo/group/'+name)
@@ -421,9 +421,9 @@ def group(name: str): # type: ignore[no-untyped-def]
                             screenfile = '/screenshots/' + group['name'] + '-' + createfile(location['slug']) + '.png'
                             if os.path.exists(str(get_homedir()) + '/source' + screenfile):
                                 location['screen']=screenfile
-                        redpost = Redis(unix_socket_path=get_socket_path('cache'), db=2)
-                        if key in redpost.keys():
-                            posts=json.loads(redpost.get(key)) # type: ignore
+                        valkey_post_handle = Valkey(unix_socket_path=get_socket_path('cache'), db=2)
+                        if key in valkey_post_handle.keys():
+                            posts=json.loads(valkey_post_handle.get(key)) # type: ignore
                             sorted_posts = sorted(posts, key=lambda x: x['discovered'], reverse=True)
                         else:
                             sorted_posts = []
@@ -436,11 +436,11 @@ def group(name: str): # type: ignore[no-untyped-def]
 
 @app.route("/markets")
 def markets(): # type: ignore[no-untyped-def]
-        red = Redis(unix_socket_path=get_socket_path('cache'), db=3)
+        valkey_handle = Valkey(unix_socket_path=get_socket_path('cache'), db=3)
 
         groups = []
-        for key in red.keys():
-                entry= json.loads(red.get(key)) # type: ignore
+        for key in valkey_handle.keys():
+                entry= json.loads(valkey_handle.get(key)) # type: ignore
                 if not current_user.is_authenticated and 'private' in entry and entry['private'] is True:
                     continue
                 entry['name']=key.decode()
@@ -457,10 +457,10 @@ def markets(): # type: ignore[no-untyped-def]
 
 @app.route("/market/<name>")
 def market(name: str): # type: ignore[no-untyped-def]
-        red = Redis(unix_socket_path=get_socket_path('cache'), db=3)
-        for key in red.keys():
+        valkey_handle = Valkey(unix_socket_path=get_socket_path('cache'), db=3)
+        for key in valkey_handle.keys():
                 if key.decode().lower() == name.lower():
-                        group= json.loads(red.get(key)) # type: ignore
+                        group= json.loads(valkey_handle.get(key)) # type: ignore
                         if not current_user.is_authenticated and 'private' in group and group['private'] is True:
                             return redirect(url_for("home"))
                         logofolder = os.path.normpath(str(get_homedir()) + '/source/logo/market/'+name)
@@ -470,9 +470,9 @@ def market(name: str): # type: ignore[no-untyped-def]
                             for f in listlogo:
                                 logo.append("/logo/market/"+name+"/" +f)
                         group['name']=key.decode()
-                        redpost = Redis(unix_socket_path=get_socket_path('cache'), db=2)
-                        if key in redpost.keys():
-                            posts=json.loads(redpost.get(key)) # type: ignore
+                        valkey_post_handle = Valkey(unix_socket_path=get_socket_path('cache'), db=2)
+                        if key in valkey_post_handle.keys():
+                            posts=json.loads(valkey_post_handle.get(key)) # type: ignore
                             sorted_posts = sorted(posts, key=lambda x: x['discovered'], reverse=True)
                         else:
                             sorted_posts = []
@@ -481,11 +481,11 @@ def market(name: str): # type: ignore[no-untyped-def]
 
 @app.route("/leaks")
 def leaks(): # type: ignore[no-untyped-def]
-        red = Redis(unix_socket_path=get_socket_path('cache'), db=4)
+        valkey_handle = Valkey(unix_socket_path=get_socket_path('cache'), db=4)
 
         leaks = []
-        for key in red.keys():
-                entry= json.loads(red.get(key)) # type: ignore
+        for key in valkey_handle.keys():
+                entry= json.loads(valkey_handle.get(key)) # type: ignore
                 entry['id']=key
                 leaks.append(entry)
         leaks.sort(key=lambda x: x["name"].lower())
@@ -493,10 +493,10 @@ def leaks(): # type: ignore[no-untyped-def]
 
 @app.route("/leak/<name>")
 def leak(name: str): # type: ignore[no-untyped-def]
-        red = Redis(unix_socket_path=get_socket_path('cache'), db=4) 
-        for key in red.keys(): 
+        valkey_handle = Valkey(unix_socket_path=get_socket_path('cache'), db=4) 
+        for key in valkey_handle.keys(): 
                 if key.decode().lower() == name.lower():
-                        group= json.loads(red.get(key)) # type: ignore
+                        group= json.loads(valkey_handle.get(key)) # type: ignore
                         if 'meta' in group and group['meta'] is not None:
                             group['meta']=group['meta'].replace('\n', '<br/>')
                         return render_template("leak.html", group = group)
@@ -505,10 +505,10 @@ def leak(name: str): # type: ignore[no-untyped-def]
 
 @app.route("/notes")
 def notes(): # type: ignore[no-untyped-def]
-        red = Redis(unix_socket_path=get_socket_path('cache'), db=11)
+        valkey_handle = Valkey(unix_socket_path=get_socket_path('cache'), db=11)
         data = []
         keys = []
-        for key in red.keys():
+        for key in valkey_handle.keys():
             keys.append(key.decode())
         keys.sort()
         for i in range(0,len(keys),3):
@@ -517,28 +517,28 @@ def notes(): # type: ignore[no-untyped-def]
 
 @app.route("/notes/<name>")
 def notesdetails(name: str): # type: ignore[no-untyped-def]
-        red = Redis(unix_socket_path=get_socket_path('cache'), db=11)
+        valkey_handle = Valkey(unix_socket_path=get_socket_path('cache'), db=11)
         data = []
-        data = json.loads(red.get(name.lower())) # type: ignore
+        data = json.loads(valkey_handle.get(name.lower())) # type: ignore
         return render_template("notesdetails.html", data=data)
 
 
 @app.route("/RF")
 def rf(): # type: ignore[no-untyped-def]
-        red = Redis(unix_socket_path=get_socket_path('cache'), db=10)
+        valkey_handle = Valkey(unix_socket_path=get_socket_path('cache'), db=10)
         leaks = []
-        for key in red.keys():
-                entry= json.loads(red.get(key)) # type: ignore
+        for key in valkey_handle.keys():
+                entry= json.loads(valkey_handle.get(key)) # type: ignore
                 leaks.append(entry)
         leaks.sort(key=lambda x: x["name"].lower())
         return render_template("RF.html", data=leaks)
 
 @app.route("/RF/<name>")
 def rfdetails(name: str): # type: ignore[no-untyped-def]
-        red = Redis(unix_socket_path=get_socket_path('cache'), db=10)
-        for key in red.keys():
+        valkey_handle = Valkey(unix_socket_path=get_socket_path('cache'), db=10)
+        for key in valkey_handle.keys():
                 if key.decode().lower() == name.lower():
-                        group= json.loads(red.get(key)) # type: ignore
+                        group= json.loads(valkey_handle.get(key)) # type: ignore
                         return render_template("RFdetails.html", group = group)
 
         return redirect(url_for("home"))
@@ -546,11 +546,11 @@ def rfdetails(name: str): # type: ignore[no-untyped-def]
 
 @app.route("/telegrams")
 def telegrams(): # type: ignore[no-untyped-def]
-        red = Redis(unix_socket_path=get_socket_path('cache'), db=5)
+        valkey_handle = Valkey(unix_socket_path=get_socket_path('cache'), db=5)
 
         telegram = []
-        for key in red.keys():
-                entry= json.loads(red.get(key)) # type: ignore
+        for key in valkey_handle.keys():
+                entry= json.loads(valkey_handle.get(key)) # type: ignore
                 screenfile = '/screenshots/telegram/' + entry['name'] + '.png'
                 if os.path.exists(str(get_homedir()) + '/source' + screenfile):
                     entry['screen']=screenfile
@@ -560,10 +560,10 @@ def telegrams(): # type: ignore[no-untyped-def]
 
 @app.route("/telegram/<name>")
 def telegram(name: str): # type: ignore[no-untyped-def]
-        red = Redis(unix_socket_path=get_socket_path('cache'), db=6)
-        for key in red.keys():
+        valkey_handle = Valkey(unix_socket_path=get_socket_path('cache'), db=6)
+        for key in valkey_handle.keys():
                 if key.decode() == name:
-                        posts= json.loads(red.get(key)) # type: ignore
+                        posts= json.loads(valkey_handle.get(key)) # type: ignore
                         for post in posts:
                             if isinstance(posts[post], str):
                                posttmp = {}
@@ -576,10 +576,10 @@ def telegram(name: str): # type: ignore[no-untyped-def]
 
 @app.route("/twitters")
 def twitters(): # type: ignore[no-untyped-def]
-        red = Redis(unix_socket_path=get_socket_path('cache'), db=8)
+        valkey_handle = Valkey(unix_socket_path=get_socket_path('cache'), db=8)
         twitter = []
-        for key in red.keys():
-                entry= json.loads(red.get(key)) # type: ignore
+        for key in valkey_handle.keys():
+                entry= json.loads(valkey_handle.get(key)) # type: ignore
                 screenfile = '/screenshots/twitter/' + entry['name'] + '.png'
                 if os.path.exists(str(get_homedir()) + '/source' + screenfile):
                     entry['screen']=screenfile
@@ -589,12 +589,12 @@ def twitters(): # type: ignore[no-untyped-def]
 
 @app.route("/twitter/<name>")
 def twitter(name: str): # type: ignore[no-untyped-def]
-        redprofile = Redis(unix_socket_path=get_socket_path('cache'), db=8)
-        red = Redis(unix_socket_path=get_socket_path('cache'), db=9)
-        profile = redprofile.get(name)
+        valkey_profile_handle = Valkey(unix_socket_path=get_socket_path('cache'), db=8)
+        valkey_handle = Valkey(unix_socket_path=get_socket_path('cache'), db=9)
+        profile = valkey_profile_handle.get(name)
         if profile is None:
             return redirect(url_for("home"))
-        posts = red.get(name)
+        posts = valkey_handle.get(name)
         sorted_posts : Dict[Any, Any]= {}
         if posts is not None:
             posts = json.loads(posts)
@@ -603,10 +603,10 @@ def twitter(name: str): # type: ignore[no-untyped-def]
 
 @app.route("/crypto")
 def crypto(): # type: ignore[no-untyped-def]
-        red = Redis(unix_socket_path=get_socket_path('cache'), db=7)
+        valkey_handle = Valkey(unix_socket_path=get_socket_path('cache'), db=7)
         groups = {}
-        for key in red.keys():
-                groups[key.decode()]=json.loads(red.get(key)) # type: ignore
+        for key in valkey_handle.keys():
+                groups[key.decode()]=json.loads(valkey_handle.get(key)) # type: ignore
         crypto = OrderedDict(sorted(groups.items()))
         return render_template("crypto.html", data=crypto)
 
@@ -614,10 +614,10 @@ def crypto(): # type: ignore[no-untyped-def]
 def search(): # type: ignore[no-untyped-def]
     if request.method == 'POST':
         query = request.form.get('search')
-        red = Redis(unix_socket_path=get_socket_path('cache'), db=0)
+        valkey_handle = Valkey(unix_socket_path=get_socket_path('cache'), db=0)
         groups = []
-        for key in red.keys():
-            group = json.loads(red.get(key)) # type: ignore
+        for key in valkey_handle.keys():
+            group = json.loads(valkey_handle.get(key)) # type: ignore
             if not current_user.is_authenticated and 'private' in group and group['private'] is True:
                 continue
 
@@ -626,10 +626,10 @@ def search(): # type: ignore[no-untyped-def]
                 groups.append(group)
         groups.sort(key=lambda x: x["name"].lower())
 
-        red = Redis(unix_socket_path=get_socket_path('cache'), db=3)
+        valkey_handle = Valkey(unix_socket_path=get_socket_path('cache'), db=3)
         markets = []
-        for key in red.keys():
-            group = json.loads(red.get(key)) # type: ignore
+        for key in valkey_handle.keys():
+            group = json.loads(valkey_handle.get(key)) # type: ignore
             if not current_user.is_authenticated and 'private' in group and group['private'] is True:
                 continue
 
@@ -638,37 +638,37 @@ def search(): # type: ignore[no-untyped-def]
                 markets.append(group)
         markets.sort(key=lambda x: x["name"].lower())
 
-        red = Redis(unix_socket_path=get_socket_path('cache'), db=4)
+        valkey_handle = Valkey(unix_socket_path=get_socket_path('cache'), db=4)
         leaks = []
-        for key in red.keys():
-            group = json.loads(red.get(key)) # type: ignore
+        for key in valkey_handle.keys():
+            group = json.loads(valkey_handle.get(key)) # type: ignore
             if query.lower() in group['name']: # type: ignore
                 group['key'] = key.decode().lower()
                 leaks.append(group)
         leaks.sort(key=lambda x: x["name"].lower())
 
-        red = Redis(unix_socket_path=get_socket_path('cache'), db=2)
+        valkey_handle = Valkey(unix_socket_path=get_socket_path('cache'), db=2)
         posts = []
-        for key in red.keys():
-                entries = json.loads(red.get(key)) # type: ignore
+        for key in valkey_handle.keys():
+                entries = json.loads(valkey_handle.get(key)) # type: ignore
                 for entry in entries:
                     if query.lower() in entry['post_title'].lower() or 'description' in entry and entry['description'] is not None and query.lower() in entry['description'].lower(): # type: ignore
                         entry['group_name']=key.decode()
                         posts.append(entry)
         posts.sort(key=lambda x: x["group_name"].lower())
 
-        red = Redis(unix_socket_path=get_socket_path('cache'), db=5)
+        valkey_handle = Valkey(unix_socket_path=get_socket_path('cache'), db=5)
         channels = []
-        for key in red.keys():
-            group = json.loads(red.get(key)) # type: ignore
+        for key in valkey_handle.keys():
+            group = json.loads(valkey_handle.get(key)) # type: ignore
             if query.lower() in key.decode().lower() or group['meta'] is not None and query.lower() in group['meta'].lower(): # type: ignore
                 channels.append(group)
         channels.sort(key=lambda x: x["name"].lower())
 
-        red = Redis(unix_socket_path=get_socket_path('cache'), db=6)
+        valkey_handle = Valkey(unix_socket_path=get_socket_path('cache'), db=6)
         messages = []
-        for key in red.keys():
-                entries = json.loads(red.get(key)) # type: ignore
+        for key in valkey_handle.keys():
+                entries = json.loads(valkey_handle.get(key)) # type: ignore
                 for entry in entries:
                     if isinstance(entries[entry], str):
                         if query.lower() in entries[entry].lower() : # type: ignore
@@ -686,10 +686,10 @@ def search(): # type: ignore[no-untyped-def]
                             messages.append(myentry)
         messages.sort(key=lambda x: x["date"].lower(),reverse=True)
 
-        red = Redis(unix_socket_path=get_socket_path('cache'), db=11)
+        valkey_handle = Valkey(unix_socket_path=get_socket_path('cache'), db=11)
         notes = []
-        for key in red.keys():
-                entries = json.loads(red.get(key)) # type: ignore
+        for key in valkey_handle.keys():
+                entries = json.loads(valkey_handle.get(key)) # type: ignore
                 for entry in entries:
                     if query.lower() in entry['name'].lower() or query.lower() in entry['content'].lower(): # type: ignore
                         entry['group_name']=key.decode()
@@ -777,8 +777,8 @@ def addgroup(): # type: ignore[no-untyped-def]
            return render_template('add.html',form=form)
         else:
            flash(f'Success to add: {form.url.data} to {form.groupname.data}', 'success')
-           redlogs = Redis(unix_socket_path=get_socket_path('cache'), db=1)
-           redlogs.zadd("logs", {f"{flask_login.current_user.id} add : {form.groupname.data}, {form.url.data}": score})
+           valkey_logs_handle = Valkey(unix_socket_path=get_socket_path('cache'), db=1)
+           valkey_logs_handle.zadd("logs", {f"{flask_login.current_user.id} add : {form.groupname.data}, {form.url.data}": score})
            return redirect(url_for('admin'))
     return render_template('add.html',form=form)
 
@@ -787,16 +787,16 @@ def addgroup(): # type: ignore[no-untyped-def]
 def edit(): # type: ignore[no-untyped-def]
     formSelect = SelectForm()
     formMarkets = SelectForm()
-    red = Redis(unix_socket_path=get_socket_path('cache'), db=0)
-    keys = red.keys()
+    valkey_handle = Valkey(unix_socket_path=get_socket_path('cache'), db=0)
+    keys = valkey_handle.keys()
     choices=[('','Please select your group')]
     keys.sort(key=lambda x: x.lower())
     for key in keys:
         choices.append((key.decode(), key.decode()))
     formSelect.group.choices=choices
 
-    red = Redis(unix_socket_path=get_socket_path('cache'), db=3)
-    keys = red.keys()
+    valkey_handle = Valkey(unix_socket_path=get_socket_path('cache'), db=3)
+    keys = valkey_handle.keys()
     choices=[('','Please select your Market')]
     keys.sort(key=lambda x: x.lower())
     for key in keys:
@@ -815,8 +815,8 @@ def editgroup(database: int, name: str):
     score = dt.now().timestamp()
     deleteButton = DeleteForm()
 
-    red = Redis(unix_socket_path=get_socket_path('cache'), db=database)
-    datagroup = json.loads(red.get(name)) # type: ignore
+    valkey_handle = Valkey(unix_socket_path=get_socket_path('cache'), db=database)
+    datagroup = json.loads(valkey_handle.get(name)) # type: ignore
     locations = namedtuple('locations',['slug', 'fqdn', 'timeout', 'delay', 'fs', 'chat', 'admin', 'browser', 'private', 'version', 'available', 'title', 'updated', 'lastscrape', 'header', 'fixedfile'])
     locationlist = []
     for entry in datagroup['locations']:
@@ -841,14 +841,14 @@ def editgroup(database: int, name: str):
     form = EditForm(data=data, files=request.files)
     form.groupname.label=name
 
-    redlogs = Redis(unix_socket_path=get_socket_path('cache'), db=1)
+    valkey_logs_handle = Valkey(unix_socket_path=get_socket_path('cache'), db=1)
     if deleteButton.validate_on_submit():
-        red.delete(name)
-        redlogs.zadd('logs', {f'{flask_login.current_user.id} deleted : {name}': score})
+        valkey_handle.delete(name)
+        valkey_logs_handle.zadd('logs', {f'{flask_login.current_user.id} deleted : {name}': score})
         flash(f'Success to delete : {name}', 'success')
         return redirect(url_for('admin'))
     if form.validate_on_submit():
-        data = json.loads(red.get(name)) # type: ignore
+        data = json.loads(valkey_handle.get(name)) # type: ignore
         data['meta']=form.description.data
         data['captcha']=form.captcha.data
         data['ransomware_galaxy_value'] = form.galaxy.data
@@ -901,11 +901,11 @@ def editgroup(database: int, name: str):
                 targetImage.save(namefile, pnginfo=metadata)
 
         data['locations'] = newlocations
-        red.set(name, json.dumps(data))
-        redlogs.zadd('logs', {f'{flask_login.current_user.id} modified : {name}, {data["meta"]}, {data["profile"]}, {data["locations"]}': score})
+        valkey_handle.set(name, json.dumps(data))
+        valkey_logs_handle.zadd('logs', {f'{flask_login.current_user.id} modified : {name}, {data["meta"]}, {data["profile"]}, {data["locations"]}': score})
         if name != form.groupname.data:
-            red.rename(name, form.groupname.data.lower()) # type: ignore[no-untyped-call]
-            redlogs.zadd('logs', {f'{flask_login.current_user.id} renamed : {name} to {form.groupname.data}': score})
+            valkey_handle.rename(name, form.groupname.data.lower()) # type: ignore[no-untyped-call]
+            valkey_logs_handle.zadd('logs', {f'{flask_login.current_user.id} renamed : {name} to {form.groupname.data}': score})
         flash(f'Success to edit : {form.groupname.data}', 'success')
         return redirect(url_for('admin'))
 
@@ -916,16 +916,16 @@ def editgroup(database: int, name: str):
 def logo(): # type: ignore[no-untyped-def]
     formSelect = SelectForm()
     formMarkets = SelectForm()
-    red = Redis(unix_socket_path=get_socket_path('cache'), db=0)
-    keys = red.keys()
+    valkey_handle = Valkey(unix_socket_path=get_socket_path('cache'), db=0)
+    keys = valkey_handle.keys()
     choices=[('','Please select your group')]
     keys.sort(key=lambda x: x.lower())
     for key in keys:
         choices.append((key.decode(), key.decode()))
     formSelect.group.choices=choices
 
-    red = Redis(unix_socket_path=get_socket_path('cache'), db=3)
-    keys = red.keys()
+    valkey_handle = Valkey(unix_socket_path=get_socket_path('cache'), db=3)
+    keys = valkey_handle.keys()
     choices=[('','Please select your Market')]
     keys.sort(key=lambda x: x.lower())
     for key in keys:
@@ -977,16 +977,16 @@ def editlogo(database: int, name: str):
 def addpost(): # type: ignore[no-untyped-def]
     formSelect = SelectForm()
     formMarkets = SelectForm()
-    red = Redis(unix_socket_path=get_socket_path('cache'), db=0)
-    keys = red.keys()
+    valkey_handle = Valkey(unix_socket_path=get_socket_path('cache'), db=0)
+    keys = valkey_handle.keys()
     choices=[('','Please select your group')]
     keys.sort(key=lambda x: x.lower())
     for key in keys:
         choices.append((key.decode(), key.decode()))
     formSelect.group.choices=choices
 
-    red = Redis(unix_socket_path=get_socket_path('cache'), db=3)
-    keys = red.keys()
+    valkey_handle = Valkey(unix_socket_path=get_socket_path('cache'), db=3)
+    keys = valkey_handle.keys()
     choices=[('','Please select your Market')]
     keys.sort(key=lambda x: x.lower())
     for key in keys:
@@ -1004,7 +1004,7 @@ def addpost(): # type: ignore[no-untyped-def]
 def addpostentry(database: int, name: str): 
     score = dt.now().timestamp()
     form = AddPostForm()
-    redlogs = Redis(unix_socket_path=get_socket_path('cache'), db=1)
+    valkey_logs_handle = Valkey(unix_socket_path=get_socket_path('cache'), db=1)
 
     if form.validate_on_submit():
         entry: Dict[str, str|None] = {}
@@ -1047,7 +1047,7 @@ def addpostentry(database: int, name: str):
             run_data_viz(14)
             run_data_viz(30)
             run_data_viz(90)
-            redlogs.zadd('logs', {f'{flask_login.current_user.id} added {form.title.data} to : {name}': score})
+            valkey_logs_handle.zadd('logs', {f'{flask_login.current_user.id} added {form.title.data} to : {name}': score})
             flash(f'Success to add post to : {name}', 'success')
         return redirect(url_for('admin'))
 
@@ -1059,16 +1059,16 @@ def addpostentry(database: int, name: str):
 def editpost(): # type: ignore[no-untyped-def]
     formSelect = SelectForm()
     formMarkets = SelectForm()
-    red = Redis(unix_socket_path=get_socket_path('cache'), db=0)
-    keys = red.keys()
+    valkey_handle = Valkey(unix_socket_path=get_socket_path('cache'), db=0)
+    keys = valkey_handle.keys()
     choices=[('','Please select your group')]
     keys.sort(key=lambda x: x.lower())
     for key in keys:
         choices.append((key.decode(), key.decode()))
     formSelect.group.choices=choices
 
-    red = Redis(unix_socket_path=get_socket_path('cache'), db=3)
-    keys = red.keys()
+    valkey_handle = Valkey(unix_socket_path=get_socket_path('cache'), db=3)
+    keys = valkey_handle.keys()
     choices=[('','Please select your Market')]
     keys.sort(key=lambda x: x.lower())
     for key in keys:
@@ -1084,9 +1084,9 @@ def editpost(): # type: ignore[no-untyped-def]
 @app.route('/admin/editpost/<name>', methods=['GET', 'POST'])
 @flask_login.login_required # type: ignore
 def editpostentry(name: str):
-    red = Redis(unix_socket_path=get_socket_path('cache'), db=2)
+    valkey_handle = Valkey(unix_socket_path=get_socket_path('cache'), db=2)
     try:
-        posts = json.loads(red.get(name)) # type: ignore
+        posts = json.loads(valkey_handle.get(name)) # type: ignore
     except:
         return redirect('/admin/editpost')
     postdata = namedtuple('posts', ['post_title', 'discovered', 'description', 'link', 'magnet', 'screen']) # type: ignore
@@ -1125,7 +1125,7 @@ def editpostentry(name: str):
                 if field.screen.data :
                     post['screen'] =  field.screen.data.strip() if field.screen.data else ''
             posts.append(post)
-        red.set(name, json.dumps(posts))
+        valkey_handle.set(name, json.dumps(posts))
         flash(f'Success to add post to : {name}', 'success')
         return redirect(url_for('admin'))
 
@@ -1136,13 +1136,13 @@ def exportdb(database: int): # type: ignore[no-untyped-def]
     if str(database) not in ['0','2','3','4','5','6','7']:
         flash(f'You are not allowed to dump this DataBase', 'error')
         return redirect(url_for('home'))
-    red = Redis(unix_socket_path=get_socket_path('cache'), db=database)
+    valkey_handle = Valkey(unix_socket_path=get_socket_path('cache'), db=database)
     dump={}
-    for key in red.keys():
+    for key in valkey_handle.keys():
         if str(database) != '0' and str(database) != '3':
-            dump[key.decode()]=json.loads(red.get(key)) # type: ignore
+            dump[key.decode()]=json.loads(valkey_handle.get(key)) # type: ignore
         else:
-            temp = json.loads(red.get(key)) # type: ignore
+            temp = json.loads(valkey_handle.get(key)) # type: ignore
             if not current_user.is_authenticated and 'private' in temp and temp['private'] is True:
                 continue
 
@@ -1156,8 +1156,8 @@ def exportdb(database: int): # type: ignore[no-untyped-def]
 @app.route('/admin/logs')
 @flask_login.login_required
 def logs(): # type: ignore[no-untyped-def]
-    red = Redis(unix_socket_path=get_socket_path('cache'), db=1)
-    logs = red.zrange('logs', 0, -1, desc=True, withscores=True)
+    valkey_handle = Valkey(unix_socket_path=get_socket_path('cache'), db=1)
+    logs = valkey_handle.zrange('logs', 0, -1, desc=True, withscores=True)
     log = []
     for i,s in enumerate(logs):
        log.append((s[0].decode(), dt.fromtimestamp(s[1]).strftime('%Y-%m-%d')))
@@ -1167,16 +1167,16 @@ def logs(): # type: ignore[no-untyped-def]
 @flask_login.login_required
 def alerting(): # type: ignore[no-untyped-def]
     form = AlertForm()
-    red = Redis(unix_socket_path=get_socket_path('cache'), db=1)
-    keywordsred = red.get('keywords')
+    valkey_handle = Valkey(unix_socket_path=get_socket_path('cache'), db=1)
+    valkey_kewords_handle = valkey_handle.get('keywords')
     keywords= None
-    if keywordsred is not None:
-        keywords = keywordsred.decode()
+    if valkey_kewords_handle is not None:
+        keywords = valkey_kewords_handle.decode()
     if form.validate_on_submit():
         keywordstmp = str(form.keywords.data).splitlines()
         keywordslist = list(dict.fromkeys(keywordstmp))
         keywords = '\n'.join(keywordslist)
-        red.set('keywords',str(keywords))
+        valkey_handle.set('keywords',str(keywords))
         flash(f'Success to update keywords', 'success')
     form.keywords.data=keywords
     return render_template('alerts.html', form=form)

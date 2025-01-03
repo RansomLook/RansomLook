@@ -11,7 +11,7 @@ from datetime import timedelta
 
 import collections
 
-import redis
+import valkey
 
 from ransomlook.default.config import get_config, get_socket_path
 
@@ -38,6 +38,7 @@ def appender(entry, group_name: str) -> None: # type: ignore
     '''
     append a new post to posts.json
     '''
+    magnet = None
     if type(entry) is str :
        post_title = entry
        description = ''
@@ -51,8 +52,6 @@ def appender(entry, group_name: str) -> None: # type: ignore
            link = None
        if 'magnet' in entry:
            magnet = entry['magnet']
-       else:
-           magnet = None
     if len(post_title) == 0:
         errlog('post_title is empty')
         return
@@ -61,22 +60,22 @@ def appender(entry, group_name: str) -> None: # type: ignore
         post_title = post_title[:90]
  
     if link != None and link != '':
-        screenred = redis.Redis(unix_socket_path=get_socket_path('cache'), db=1)
-        if 'toscan'.encode() not in screenred.keys():
+        screen_valk_handle = valkey.Valkey(unix_socket_path=get_socket_path('cache'), db=1)
+        if 'toscan'.encode() not in screen_valk_handle.keys():
            toscan=[]
         else: 
-           toscan = json.loads(screenred.get('toscan')) # type: ignore
+           toscan = json.loads(screen_valk_handle.get('toscan')) # type: ignore
         toscan.append({'group': group_name, 'title': entry['title'], 'slug': entry['slug'], 'link': entry['link']})
-        screenred.set('toscan', json.dumps(toscan))
+        screen_valk_handle.set('toscan', json.dumps(toscan))
     # preparing to torrent
     if magnet != None and magnet != '':
-        torrentred = redis.Redis(unix_socket_path=get_socket_path('cache'), db=1)
-        if 'totorrent'.encode() not in torrentred.keys():
+        torrent_valk_handle = valkey.Valkey(unix_socket_path=get_socket_path('cache'), db=1)
+        if 'totorrent'.encode() not in torrent_valk_handle.keys():
            totorrent=[]
         else: 
-           totorrent = json.loads(torrentred.get('totorrent')) # type: ignore
+           totorrent = json.loads(torrent_valk_handle.get('totorrent')) # type: ignore
         totorrent.append({'group': group_name, 'title': entry['title'], 'magnet': entry['magnet']})
-        torrentred.set('totorrent', json.dumps(totorrent))
+        torrent_valk_handle.set('totorrent', json.dumps(totorrent))
 
 def main() -> None:
     if len(sys.argv) != 2:

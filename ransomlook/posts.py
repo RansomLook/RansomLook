@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 import json
-import redis
+import valkey
 import uuid
 
 from datetime import datetime
@@ -72,12 +72,12 @@ def appender(entry: Union[Dict[str, str|None], str], group_name: str) -> int :
     # limit length of post_title to 90 chars
     if len(post_title) > 90:
         post_title = post_title[:90]
-    red = redis.Redis(unix_socket_path=get_socket_path('cache'), db=2)
-    keys = red.keys()
+    valkey_handle = valkey.Valkey(unix_socket_path=get_socket_path('cache'), db=2)
+    keys = valkey_handle.keys()
     posts=[]
 
-    if group_name.encode() in red.keys():
-        posts = json.loads(red.get(group_name)) # type: ignore
+    if group_name.encode() in valkey_handle.keys():
+        posts = json.loads(valkey_handle.get(group_name)) # type: ignore
         for post in posts:
             if post['post_title'] == post_title:
                 stdlog('post already existing')
@@ -86,28 +86,28 @@ def appender(entry: Union[Dict[str, str|None], str], group_name: str) -> int :
     newpost = posttemplate(post_title, description, link, str(entry['date']) if 'date' in entry else str(datetime.today()), magnet, screen) # type: ignore
     stdlog('adding new post: ' + 'group: ' + group_name + ' title: ' + post_title)
     posts.append(newpost)
-    red.set(group_name, json.dumps(posts))
+    valkey_handle.set(group_name, json.dumps(posts))
     # preparing to screen
     if link != None and link != '' and not screen:
-        screenred = redis.Redis(unix_socket_path=get_socket_path('cache'), db=1)
-        if 'toscan'.encode() not in screenred.keys():
+        screen_valkey_handle = valkey.Valkey(unix_socket_path=get_socket_path('cache'), db=1)
+        if 'toscan'.encode() not in screen_valkey_handle.keys():
            toscan=[]
         else:
-           toscan = json.loads(screenred.get('toscan')) # type: ignore
+           toscan = json.loads(screen_valkey_handle.get('toscan')) # type: ignore
         toscan.append({'group': group_name, 'title': entry['title'], 'slug': entry['slug'], 'link': entry['link']}) # type: ignore
-        screenred.set('toscan', json.dumps(toscan))
+        screen_valkey_handle.set('toscan', json.dumps(toscan))
     # preparing to torrent
     if magnet != None and magnet != '':
-        torrentred = redis.Redis(unix_socket_path=get_socket_path('cache'), db=1)
-        if 'totorrent'.encode() not in torrentred.keys():
+        torrent_valkey_handle = valkey.Valkey(unix_socket_path=get_socket_path('cache'), db=1)
+        if 'totorrent'.encode() not in torrent_valkey_handle.keys():
            totorrent=[]
         else: 
-           totorrent = json.loads(torrentred.get('totorrent')) # type: ignore
+           totorrent = json.loads(torrent_valkey_handle.get('totorrent')) # type: ignore
         totorrent.append({'group': group_name, 'title': entry['title'], 'magnet': entry['magnet']}) # type: ignore
-        torrentred.set('totorrent', json.dumps(totorrent))
+        torrent_valkey_handle.set('totorrent', json.dumps(totorrent))
     # Notification zone
-    red = redis.Redis(unix_socket_path=get_socket_path('cache'), db=1)
-    keywords = red.get('keywords')
+    valkey_handle = valkey.Valkey(unix_socket_path=get_socket_path('cache'), db=1)
+    keywords = valkey_handle.get('keywords')
     matching = []
     if keywords is not None:
         listkeywords = keywords.decode().splitlines()
@@ -117,7 +117,7 @@ def appender(entry: Union[Dict[str, str|None], str], group_name: str) -> int :
                  matching.append(keyword)
         if matching:
             alertingnotify(emailconfig, group_name, post_title, description, matching)
-            alertdb = redis.Redis(unix_socket_path=get_socket_path('cache'), db=12)
+            alertdb = valkey.Valkey(unix_socket_path=get_socket_path('cache'), db=12)
             uuidkey = str(uuid.uuid4())
             value = {'type': 'group', 'group_name': group_name, 'post_title': post_title, 'description': description, 'matching': matching}
             alertdb.set(uuidkey,json.dumps(value))
@@ -133,10 +133,10 @@ def appender(entry: Union[Dict[str, str|None], str], group_name: str) -> int :
         blueskynotify(blueskyconfig, group_name, post_title, siteurl)
     if mispconfig['enable'] == True:
         try:
-            groupred = redis.Redis(unix_socket_path=get_socket_path('cache'), db=0)
-            for key in groupred.keys():
+            group_valkey_handle = valkey.Valkey(unix_socket_path=get_socket_path('cache'), db=0)
+            for key in group_valkey_handle.keys():
                 if key.decode() == group_name:
-                       groupinfo = json.loads(groupred.get(key)) # type: ignore
+                       groupinfo = json.loads(group_valkey_handle.get(key)) # type: ignore
             galaxyname = groupinfo['ransomware_galaxy_value']
         except:
             galaxyname = None

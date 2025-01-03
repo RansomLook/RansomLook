@@ -2,8 +2,8 @@
 
 from subprocess import Popen, run
 
-from redis import Redis
-from redis.exceptions import ConnectionError
+from valkey import Valkey
+from valkey.exceptions import ConnectionError
 
 from ransomlook.default import get_homedir, get_socket_path
 
@@ -13,8 +13,8 @@ def main() -> None:
     p = Popen(['shutdown'])
     p.wait()
     try:
-        r = Redis(unix_socket_path=get_socket_path('cache'), db=1)
-        r.delete('shutdown')
+        valkey_handle = Valkey(unix_socket_path=get_socket_path('cache'), db=1)
+        valkey_handle.delete('shutdown')
         print('Shutting down databases...')
         p_backend = run(['run_backend', '--stop'])
         p_backend.check_returncode()

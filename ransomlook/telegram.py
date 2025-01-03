@@ -18,7 +18,7 @@ from playwright_stealth import stealth_sync # type: ignore
 from .default.config import get_config, get_homedir, get_socket_path
 
 import uuid
-import redis
+import valkey
 
 import smtplib
 import ssl
@@ -126,10 +126,10 @@ def threadscape(queuethread, lock): # type: ignore
 
 def scraper() -> None:
     '''main scraping function'''
-    red = redis.Redis(unix_socket_path=get_socket_path('cache'), db=5)
+    valkey_handle = valkey.Valkey(unix_socket_path=get_socket_path('cache'), db=5)
     groups=[]
-    for key in red.keys():
-        group = json.loads(red.get(key)) # type: ignore
+    for key in valkey_handle.keys():
+        group = json.loads(valkey_handle.get(key)) # type: ignore
         groups.append(group)
     lock = Lock()
     queuethread = queue.Queue() # type: ignore
@@ -137,7 +137,7 @@ def scraper() -> None:
         thread1 = Thread(target=threadscape, args=(queuethread,lock), daemon=True)
         thread1.start()
 
-    for key in red.keys():
+    for key in valkey_handle.keys():
         stdlog('ransomloook: ' + 'working on ' + key.decode())
         queuethread.put(key.decode())
     queuethread.join()
@@ -146,29 +146,29 @@ def scraper() -> None:
 
 def parser() -> None:
     '''parsing telegram'''
-    red = redis.Redis(unix_socket_path=get_socket_path('cache'), db=5)
-    redmessage = redis.Redis(unix_socket_path=get_socket_path('cache'), db=6)
-    redmatch = redis.Redis(unix_socket_path=get_socket_path('cache'), db=1)
+    valkey_handle = valkey.Valkey(unix_socket_path=get_socket_path('cache'), db=5)
+    valkey_message_handle = valkey.Valkey(unix_socket_path=get_socket_path('cache'), db=6)
+    valkey_match_handle = valkey.Valkey(unix_socket_path=get_socket_path('cache'), db=1)
     emailconfig = get_config('generic', 'email')
 
-    keywords = redmatch.get('keywords')
+    keywords = valkey_match_handle.get('keywords')
     listkeywords = []
     if keywords is not None:
         listkeywords = keywords.decode().splitlines()
 
-    for key in red.keys():
+    for key in valkey_handle.keys():
         try:
            html_doc='source/telegram/'+ key.decode() + '.html'
            file=open(html_doc,'r')
            soup = BeautifulSoup(file,'html.parser')
            titletag = soup.find('title')
            title = titletag.string # type: ignore
-           data = json.loads(red.get(key)) # type: ignore
+           data = json.loads(valkey_handle.get(key)) # type: ignore
            data['meta']=title
-           red.set(key, json.dumps(data))
+           valkey_handle.set(key, json.dumps(data))
            tgpost =  soup.find_all('div', {'class' : 'tgme_widget_message'})
-           if key in redmessage.keys():
-               posts = json.loads(redmessage.get(key)) # type: ignore
+           if key in valkey_message_handle.keys():
+               posts = json.loads(valkey_message_handle.get(key)) # type: ignore
            else:
                posts={}
            for content in tgpost:
@@ -196,27 +196,27 @@ def parser() -> None:
                               matching.append(keyword)
                       if matching :
                           alertingnotify(emailconfig, key, message, matching, timestamp)
-                          alertdb = redis.Redis(unix_socket_path=get_socket_path('cache'), db=12)
+                          alertdb = valkey.Valkey(unix_socket_path=get_socket_path('cache'), db=12)
                           uuidkey = str(uuid.uuid4())
                           value = {'type': 'telegram', 'group_name': key.decode(), 'description': message, 'matching': matching}
                           alertdb.set(uuidkey,json.dumps(value))
                           alertdb.expire(uuidkey, 60 * 60 * 24)
                except Exception as e:
                    print('error with the channel:'+key.decode())
-           redmessage.set(key,json.dumps(posts))
+           valkey_message_handle.set(key,json.dumps(posts))
         except:
            print('error with :'+key.decode())
            continue
 
 def teladder(name: str, link: str) -> int:
-    red = redis.Redis(unix_socket_path=get_socket_path('cache'), db=5)
+    valkey_handle = valkey.Valkey(unix_socket_path=get_socket_path('cache'), db=5)
     try:
         data = {
             'name': name.strip(),
             'meta': None,
             'link': link.strip()
         }
-        red.set(name, json.dumps(data))
+        valkey_handle.set(name, json.dumps(data))
         return 1
     except:
         return 0

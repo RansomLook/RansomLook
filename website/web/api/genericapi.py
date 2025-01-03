@@ -4,7 +4,7 @@ import base64
 import hashlib
 import json
 from typing import Any, Dict, Optional, List
-from redis import Redis
+from valkey import Valkey
 
 import flask_login  # type: ignore
 from flask import request
@@ -34,9 +34,9 @@ api = Namespace('GenericAPI', description='Generic Ransomlook API', path='/api')
 class RecentPost(Resource): # type: ignore[misc]
     def get(self, number: int=100) -> List[str]:
         posts = []
-        red = Redis(unix_socket_path=get_socket_path('cache'), db=2)
-        for key in red.keys():
-                entries = json.loads(red.get(key)) # type: ignore
+        valkey_handle = Valkey(unix_socket_path=get_socket_path('cache'), db=2)
+        for key in valkey_handle.keys():
+                entries = json.loads(valkey_handle.get(key)) # type: ignore
                 for entry in entries:
                     entry['group_name']=key.decode()
                     posts.append(entry)
@@ -54,9 +54,9 @@ class LastPost(Resource): # type: ignore[misc]
     def get(self, number: int=1) -> List[Dict[str, Any]]:
         posts = []
         actualdate = datetime.now() + timedelta(days = -number)
-        red = Redis(unix_socket_path=get_socket_path('cache'), db=2)
-        for key in red.keys():
-                entries = json.loads(red.get(key)) # type: ignore
+        valkey_handle = Valkey(unix_socket_path=get_socket_path('cache'), db=2)
+        for key in valkey_handle.keys():
+                entries = json.loads(valkey_handle.get(key)) # type: ignore
                 for entry in entries:
                     try:
                         datetime_object = datetime.strptime(entry['discovered'], '%Y-%m-%d %H:%M:%S.%f')
@@ -74,9 +74,9 @@ class LastPost(Resource): # type: ignore[misc]
 class Groups(Resource): # type: ignore[misc]
     def get(self) -> List[str]:
         groups = []
-        red = Redis(unix_socket_path=get_socket_path('cache'), db=0)
-        for key in red.keys():
-            group= json.loads(red.get(key)) # type: ignore
+        valkey_handle = Valkey(unix_socket_path=get_socket_path('cache'), db=0)
+        for key in valkey_handle.keys():
+            group= json.loads(valkey_handle.get(key)) # type: ignore
             if 'private' in group and group['private'] is True:
                   continue
             groups.append(key.decode())
@@ -87,9 +87,9 @@ class Groups(Resource): # type: ignore[misc]
 class Markets(Resource): # type: ignore[misc]
     def get(self) -> List[str]:
         groups = []
-        red = Redis(unix_socket_path=get_socket_path('cache'), db=3)
-        for key in red.keys():
-            group= json.loads(red.get(key)) # type: ignore
+        valkey_handle = Valkey(unix_socket_path=get_socket_path('cache'), db=3)
+        for key in valkey_handle.keys():
+            group= json.loads(valkey_handle.get(key)) # type: ignore
             if 'private' in group and group['private'] is True:
                   continue
             groups.append(key.decode())
@@ -100,12 +100,12 @@ class Markets(Resource): # type: ignore[misc]
 @api.doc(param={'name':'Name of the group'})
 class Groupinfo(Resource): # type: ignore[misc]
    def get(self, name: str) -> List[Any]:
-        red = Redis(unix_socket_path=get_socket_path('cache'), db=0)
+        valkey_handle = Valkey(unix_socket_path=get_socket_path('cache'), db=0)
         group = {}
         sorted_posts:list[Dict[str, Any]] = []
-        for key in red.keys():
+        for key in valkey_handle.keys():
                 if key.decode().lower() == name.lower():
-                        group= json.loads(red.get(key)) # type: ignore
+                        group= json.loads(valkey_handle.get(key)) # type: ignore
                         if 'private' in group and group['private'] is True:
                            return [[],{}]
 
@@ -131,9 +131,9 @@ class Groupinfo(Resource): # type: ignore[misc]
                                 with open(sourcepath, "rb") as text_file:
                                      sourceencoded = base64.b64encode(text_file.read()).decode("ascii")
                                 location.update({'source':sourceencoded})
-                        redpost = Redis(unix_socket_path=get_socket_path('cache'), db=2)
-                        if key in redpost.keys():
-                            posts=json.loads(redpost.get(key)) # type: ignore
+                        valkey_post_handle = Valkey(unix_socket_path=get_socket_path('cache'), db=2)
+                        if key in valkey_post_handle.keys():
+                            posts=json.loads(valkey_post_handle.get(key)) # type: ignore
                             sorted_posts = sorted(posts, key=lambda x: x['discovered'], reverse=True)
                         else:
                             sorted_posts = []
@@ -144,10 +144,10 @@ class Groupinfo(Resource): # type: ignore[misc]
 @api.doc(param={'name':'Name of the group or market', 'postname':'Post title'})
 class GroupPost(Resource): # type: ignore[misc]
    def get(self, name: str, postname: str) -> Dict[str, Any]:
-        red = Redis(unix_socket_path=get_socket_path('cache'), db=2)
-        for key in red.keys():
+        valkey_handle = Valkey(unix_socket_path=get_socket_path('cache'), db=2)
+        for key in valkey_handle.keys():
             if key.decode().lower() == name.lower():
-                posts = json.loads(red.get(key)) # type: ignore
+                posts = json.loads(valkey_handle.get(key)) # type: ignore
                 for post in posts:
                     if post['post_title'] == postname:
                         if 'screen' in post and post['screen'] != None :
@@ -173,12 +173,12 @@ class GroupPost(Resource): # type: ignore[misc]
 @api.doc(param={'name':'Name of the market'})
 class Marketinfo(Resource): # type: ignore[misc]
    def get(self, name: str) -> List[Any]:
-        red = Redis(unix_socket_path=get_socket_path('cache'), db=3)
+        valkey_handle = Valkey(unix_socket_path=get_socket_path('cache'), db=3)
         group = {}
         sorted_posts: List[Dict[str, Any]]  = []
-        for key in red.keys():
+        for key in valkey_handle.keys():
                 if key.decode().lower() == name.lower():
-                        group= json.loads(red.get(key)) # type: ignore
+                        group= json.loads(valkey_handle.get(key)) # type: ignore
                         if 'private' in group and group['private'] is True:
                            return [[],{}]
                         if group['meta'] is not None:
@@ -203,9 +203,9 @@ class Marketinfo(Resource): # type: ignore[misc]
                                 with open(sourcepath, "rb") as text_file:
                                      sourceencoded = base64.b64encode(text_file.read()).decode("ascii")
                                 location.update({'source':sourceencoded})
-                        redpost = Redis(unix_socket_path=get_socket_path('cache'), db=2)
-                        if key in redpost.keys():
-                            posts=json.loads(redpost.get(key)) # type: ignore
+                        valkey_post_handle = Valkey(unix_socket_path=get_socket_path('cache'), db=2)
+                        if key in valkey_post_handle.keys():
+                            posts=json.loads(valkey_post_handle.get(key)) # type: ignore
                             sorted_posts = sorted(posts, key=lambda x: x['discovered'], reverse=True)
                         else:
                             sorted_posts = []
@@ -218,13 +218,13 @@ class Exportdb(Resource): # type: ignore[misc]
     def get(self, database: int) -> Any:
         if str(database) not in ['0','2','3','4','5','6']:
             return(['You are not allowed to dump this DataBase'])
-        red = Redis(unix_socket_path=get_socket_path('cache'), db=database)
+        valkey_handle = Valkey(unix_socket_path=get_socket_path('cache'), db=database)
         dump={}
-        for key in red.keys():
+        for key in valkey_handle.keys():
             if str(database) != '0' and str(database) != '3':
-                dump[key.decode()]=json.loads(red.get(key)) # type: ignore
+                dump[key.decode()]=json.loads(valkey_handle.get(key)) # type: ignore
             else:
-                temp = json.loads(red.get(key)) # type: ignore
+                temp = json.loads(valkey_handle.get(key)) # type: ignore
                 if 'private' in temp and temp['private'] is True:
                     continue
                 if 'locations' in temp:
@@ -244,9 +244,9 @@ class PostPerMonth(Resource): # type: ignore[misc]
             date = str(year)+'-'+str(month)
         else:
             date = str(year)+'-'
-        red = Redis(unix_socket_path=get_socket_path('cache'), db=2)
-        for key in red.keys():
-                entries = json.loads(red.get(key)) # type: ignore
+        valkey_handle = Valkey(unix_socket_path=get_socket_path('cache'), db=2)
+        for key in valkey_handle.keys():
+                entries = json.loads(valkey_handle.get(key)) # type: ignore
                 for entry in entries:
                     if entry['discovered'].startswith(date):
                         entry['group_name']=key.decode()
@@ -259,9 +259,9 @@ class PostPerMonth(Resource): # type: ignore[misc]
 class PostPerPeriod(Resource): # type: ignore[misc]
     def get(self, start_date: str, end_date: str) -> List[Dict[str, Any]]:
         posts = []
-        red = Redis(unix_socket_path=get_socket_path('cache'), db=2)
-        for key in red.keys():
-                entries = json.loads(red.get(key)) # type: ignore
+        valkey_handle = Valkey(unix_socket_path=get_socket_path('cache'), db=2)
+        for key in valkey_handle.keys():
+                entries = json.loads(valkey_handle.get(key)) # type: ignore
                 for entry in entries:
                     if start_date <= entry['discovered'].split(' ')[0] <= end_date:
                         entry['group_name']=key.decode()
@@ -287,9 +287,9 @@ class DensityHeatmap(Resource): # type: ignore[misc]
             date = str(year)+'-'+str(month)
         else :
             date = str(year)+'-'
-        red = Redis(unix_socket_path=get_socket_path('cache'), db=2)
-        for key in red.keys():
-                entries = json.loads(red.get(key)) # type: ignore
+        valkey_handle = Valkey(unix_socket_path=get_socket_path('cache'), db=2)
+        for key in valkey_handle.keys():
+                entries = json.loads(valkey_handle.get(key)) # type: ignore
                 for entry in entries:
                     if entry['discovered'].startswith(date):
                         group_names.append(key.decode())
@@ -317,9 +317,9 @@ class Scatter(Resource): # type: ignore[misc]
             date = str(year)+'-'+str(month)
         else:
             date = str(year)+'-'
-        red = Redis(unix_socket_path=get_socket_path('cache'), db=2)
-        for key in red.keys():
-                entries = json.loads(red.get(key)) # type: ignore
+        valkey_handle = Valkey(unix_socket_path=get_socket_path('cache'), db=2)
+        for key in valkey_handle.keys():
+                entries = json.loads(valkey_handle.get(key)) # type: ignore
                 for entry in entries:
                     if entry['discovered'].startswith(date):
                         group_names.append(key.decode())
@@ -347,9 +347,9 @@ class Pie(Resource): # type: ignore[misc]
             date = str(year)+'-'+str(month)
         else:
             date = str(year)+'-'
-        red = Redis(unix_socket_path=get_socket_path('cache'), db=2)
-        for key in red.keys():
-                entries = json.loads(red.get(key)) # type: ignore
+        valkey_handle = Valkey(unix_socket_path=get_socket_path('cache'), db=2)
+        for key in valkey_handle.keys():
+                entries = json.loads(valkey_handle.get(key)) # type: ignore
                 for entry in entries:
                     if entry['discovered'].startswith(date):
                         group_names.append(key.decode())
@@ -378,9 +378,9 @@ class Bar(Resource): # type: ignore[misc]
             date = str(year)+'-'+str(month)
         else:
             date = str(year)+'-'
-        red = Redis(unix_socket_path=get_socket_path('cache'), db=2)
-        for key in red.keys():
-                entries = json.loads(red.get(key)) # type: ignore
+        valkey_handle = Valkey(unix_socket_path=get_socket_path('cache'), db=2)
+        for key in valkey_handle.keys():
+                entries = json.loads(valkey_handle.get(key)) # type: ignore
                 for entry in entries:
                     if entry['discovered'].startswith(date):
                         group_names.append(key.decode())
@@ -405,9 +405,9 @@ class PeriodDensityHeatmap(Resource): # type: ignore[misc]
         group_names = []
         timestamps = []
 
-        red = Redis(unix_socket_path=get_socket_path('cache'), db=2)
-        for key in red.keys():
-                entries = json.loads(red.get(key)) # type: ignore
+        valkey_handle = Valkey(unix_socket_path=get_socket_path('cache'), db=2)
+        for key in valkey_handle.keys():
+                entries = json.loads(valkey_handle.get(key)) # type: ignore
                 for entry in entries:
                     if start_date <= entry['discovered'].split(' ')[0] <= end_date:
                         group_names.append(key.decode())
@@ -431,8 +431,8 @@ class PeriodDensityHeatmapGroup(Resource): # type: ignore[misc]
         group_names = []
         timestamps = []
 
-        red = Redis(unix_socket_path=get_socket_path('cache'), db=2)
-        entries = json.loads(red.get(group)) # type: ignore
+        valkey_handle = Valkey(unix_socket_path=get_socket_path('cache'), db=2)
+        entries = json.loads(valkey_handle.get(group)) # type: ignore
         for entry in entries:
             if start_date <= entry['discovered'].split(' ')[0] <= end_date:
                  group_names.append(group)
@@ -460,9 +460,9 @@ class PeriodDensityHeatmapGroups(Resource): # type: ignore[misc]
         group_names = []
         timestamps = []
 
-        red = Redis(unix_socket_path=get_socket_path('cache'), db=2)
+        valkey_handle = Valkey(unix_socket_path=get_socket_path('cache'), db=2)
         for group in groups:
-            entries = json.loads(red.get(group.lower())) # type: ignore
+            entries = json.loads(valkey_handle.get(group.lower())) # type: ignore
             for entry in entries:
                 if start_date <= entry['discovered'].split(' ')[0] <= end_date:
                     group_names.append(group)
@@ -486,9 +486,9 @@ class PeriodScatter(Resource): # type: ignore[misc]
         group_names = []
         timestamps = []
 
-        red = Redis(unix_socket_path=get_socket_path('cache'), db=2)
-        for key in red.keys():
-                entries = json.loads(red.get(key)) # type: ignore
+        valkey_handle = Valkey(unix_socket_path=get_socket_path('cache'), db=2)
+        for key in valkey_handle.keys():
+                entries = json.loads(valkey_handle.get(key)) # type: ignore
                 for entry in entries:
                     if start_date <= entry['discovered'].split(' ')[0] <= end_date:
                         group_names.append(key.decode())
@@ -512,8 +512,8 @@ class PeriodScatterGroup(Resource): # type: ignore[misc]
         group_names = []
         timestamps = []
 
-        red = Redis(unix_socket_path=get_socket_path('cache'), db=2)
-        entries = json.loads(red.get(group)) # type: ignore
+        valkey_handle = Valkey(unix_socket_path=get_socket_path('cache'), db=2)
+        entries = json.loads(valkey_handle.get(group)) # type: ignore
         for entry in entries:
             if start_date <= entry['discovered'].split(' ')[0] <= end_date:
                 group_names.append(group)
@@ -544,9 +544,9 @@ class PeriodScatterGroups(Resource): # type: ignore[misc]
         end_date = req['end_date']
         group_names = []
         timestamps = []
-        red = Redis(unix_socket_path=get_socket_path('cache'), db=2)
+        valkey_handle = Valkey(unix_socket_path=get_socket_path('cache'), db=2)
         for group in groups:
-            entries = json.loads(red.get(group.lower())) # type: ignore
+            entries = json.loads(valkey_handle.get(group.lower())) # type: ignore
             for entry in entries:
                 if start_date <= entry['discovered'].split(' ')[0] <= end_date:
                     group_names.append(group)
@@ -570,9 +570,9 @@ class PeriodPie(Resource): # type: ignore[misc]
     def get(self, start_date: str, end_date: str): # type: ignore[no-untyped-def]
         group_names = []
         timestamps = []
-        red = Redis(unix_socket_path=get_socket_path('cache'), db=2)
-        for key in red.keys():
-                entries = json.loads(red.get(key)) # type: ignore
+        valkey_handle = Valkey(unix_socket_path=get_socket_path('cache'), db=2)
+        for key in valkey_handle.keys():
+                entries = json.loads(valkey_handle.get(key)) # type: ignore
                 for entry in entries:
                     if start_date <= entry['discovered'].split(' ')[0] <= end_date:
                         group_names.append(key.decode())
@@ -596,9 +596,9 @@ class PeriodBar(Resource): # type: ignore[misc]
     def get(self, start_date: str, end_date: str): # type: ignore[no-untyped-def]
         group_names = []
         timestamps = []
-        red = Redis(unix_socket_path=get_socket_path('cache'), db=2)
-        for key in red.keys():
-                entries = json.loads(red.get(key)) # type: ignore
+        valkey_handle = Valkey(unix_socket_path=get_socket_path('cache'), db=2)
+        for key in valkey_handle.keys():
+                entries = json.loads(valkey_handle.get(key)) # type: ignore
                 for entry in entries:
                     if start_date <= entry['discovered'].split(' ')[0] <= end_date:
                         group_names.append(key.decode())
@@ -620,13 +620,13 @@ class PeriodBar(Resource): # type: ignore[misc]
 @api.doc(description='Posts per group during the period for a group', tags=['posts'])
 class PeriodBarGroup(Resource): # type: ignore[misc]
     def get(self, start_date: str, end_date: str, group: str): # type: ignore[no-untyped-def]
-        red = Redis(unix_socket_path=get_socket_path('cache'), db=2)
-        entries = json.loads(red.get(group)) # type: ignore
+        valkey_handle = Valkey(unix_socket_path=get_socket_path('cache'), db=2)
+        entries = json.loads(valkey_handle.get(group)) # type: ignore
         victim_counts: Dict[str, int] = {}
         dates = (Any)
         counts = (Any)
 
-        post_data = json.loads(red.get(group)) # type: ignore
+        post_data = json.loads(valkey_handle.get(group)) # type: ignore
         # Count the number of victims per day
         for post in post_data:
             if start_date <= post['discovered'].split(' ')[0] <= end_date:

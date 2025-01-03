@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 import json
-from redis import Redis
+from valkey import Valkey
 
 from flask_restx import Namespace, Resource # type: ignore
 
@@ -17,11 +17,11 @@ api = Namespace('LeaksAPI', description='Leaks Ransomlook API', path='/api/leaks
 class Leaks(Resource): # type: ignore[misc]
     def get(self) -> List[Dict[str, Any]]:
         leaks = []
-        red = Redis(unix_socket_path=get_socket_path('cache'), db=4)
-        for key in red.keys():
+        valkey_handle = Valkey(unix_socket_path=get_socket_path('cache'), db=4)
+        for key in valkey_handle.keys():
             leak = {}
             leak['id'] = int(key.decode())
-            leak['name'] = json.loads(red.get(key))['name'] # type: ignore
+            leak['name'] = json.loads(valkey_handle.get(key))['name'] # type: ignore
             leaks.append(leak)
         return sorted(leaks, key=lambda x: x['id'])
 
@@ -30,5 +30,5 @@ class Leaks(Resource): # type: ignore[misc]
 @api.doc(param={'id':'Id of the leak'})
 class LeaksDetails(Resource): # type: ignore[misc]
     def get(self, id: str) -> Dict[str, Any]:
-        red = Redis(unix_socket_path=get_socket_path('cache'), db=4)
-        return json.loads(red.get(id)) # type: ignore
+        valkey_handle = Valkey(unix_socket_path=get_socket_path('cache'), db=4)
+        return json.loads(valkey_handle.get(id)) # type: ignore

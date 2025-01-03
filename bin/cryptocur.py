@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-import redis
+import valkey
 import requests
 from collections import defaultdict
 import json
@@ -19,9 +19,9 @@ def main() -> None:
     for account in crypto["result"]:
         cryptolist[account['family']].append(account)
 
-    red = redis.Redis(unix_socket_path=get_socket_path('cache'), db=7)
+    valkey_handle = valkey.Valkey(unix_socket_path=get_socket_path('cache'), db=7)
     for key in cryptolist:
-        red.set(key, json.dumps(cryptolist[key]))
+        valkey_handle.set(key, json.dumps(cryptolist[key]))
 
 if __name__ == '__main__':
     main()

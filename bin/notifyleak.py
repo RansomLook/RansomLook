@@ -11,7 +11,7 @@ from typing import List, Any, Dict
 from datetime import date
 from datetime import timedelta
 
-import redis
+import valkey
 
 from collections import defaultdict
 
@@ -22,10 +22,10 @@ def getnewbreach(date: str) -> List[Dict[str, str]] :
     '''
     check if a post already exists in posts.json
     '''
-    red = redis.Redis(unix_socket_path=get_socket_path('cache'), db=4)
+    valkey_handle = valkey.Valkey(unix_socket_path=get_socket_path('cache'), db=4)
     notify = []
-    for breaches in red.keys():
-        breach = json.loads(red.get(breaches)) # type: ignore
+    for breaches in valkey_handle.keys():
+        breach = json.loads(valkey_handle.get(breaches)) # type: ignore
         if breach['indexed'].split()[0] == date :
             notify.append(breach)
     return notify

@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-import redis
+import valkey
 import os
 from ransomlook.default import get_socket_path, get_config
 
@@ -14,8 +14,8 @@ import json
 url = 'https://leak-lookup.com/breaches/stats'
 source = 'https://leak-lookup.com/breaches'
 
-red = redis.Redis(unix_socket_path=get_socket_path('cache'), db=4)
-keys = red.keys()
+valkey_handle = valkey.Valkey(unix_socket_path=get_socket_path('cache'), db=4)
+keys = valkey_handle.keys()
 res = requests.get(source)
 soup=BeautifulSoup(res.text,'html.parser')
 divs_name=soup.find('table', {"id": "datatables-indexed-breaches"})
@@ -39,7 +39,7 @@ for tr in trs:
   datas['columns']=columns
   datas['meta']=''
   datas['location']=[]
-  red.set(data,json.dumps(datas))
+  valkey_handle.set(data,json.dumps(datas))
   if rocketconfig['enable'] == True:
     rocketnotifyleak(rocketconfig, datas)
   if twitterconfig['enable'] == True:

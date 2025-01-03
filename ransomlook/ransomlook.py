@@ -14,7 +14,7 @@ from dateutil.relativedelta import relativedelta
 import urllib.parse
 import time
 from typing import Dict, Any, Optional
-from redis import Redis
+from valkey import Valkey
 from pylacus import PyLacus
 from pylacus import CaptureSettings
 from lacuscore import LacusCore
@@ -24,7 +24,7 @@ import base64
 
 from .default.config import get_config, get_homedir, get_socket_path
 
-import redis
+import valkey
 from PIL import Image
 from PIL.PngImagePlugin import PngInfo
 
@@ -36,8 +36,8 @@ from .sharedutils import format_bytes
 
 # pylint: disable=W0703
 
-redislacus = Redis(unix_socket_path=get_socket_path('cache'), db=15)
-lacus = LacusCore(redislacus,tor_proxy='socks5://127.0.0.1:9050')
+valkeylacus = Valkey(unix_socket_path=get_socket_path('cache'), db=15)
+lacus = LacusCore(valkeylacus,tor_proxy='socks5://127.0.0.1:9050')
 
 def creategroup(location: str, fs: bool, private: bool, chat: bool, admin: bool, browser: str|None) -> Dict[str, object] :
     '''
@@ -59,8 +59,8 @@ def checkexisting(provider: str, db: int) -> bool:
     '''
     check if group already exists within groups.json
     '''
-    red = redis.Redis(unix_socket_path=get_socket_path('cache'), db=db)
-    if provider.encode() in red.keys():
+    valkey_handle = valkey.Valkey(unix_socket_path=get_socket_path('cache'), db=db)
+    if provider.encode() in valkey_handle.keys():
         return True
     return False
 
@@ -75,7 +75,7 @@ async def run_captures() -> None:
 
 def scraper(base: int) -> None:
     '''main scraping function'''
-    red = redis.Redis(unix_socket_path=get_socket_path('cache'), db=base)
+    valkey_handle = valkey.Valkey(unix_socket_path=get_socket_path('cache'), db=base)
     groups=[]
     running_capture = {}
     validationDate = datetime.now() - relativedelta(months=6)
@@ -92,10 +92,10 @@ def scraper(base: int) -> None:
                 remote_lacus_url = None
 
     if not remote_lacus_url:
-        lacus = LacusCore(redislacus,tor_proxy='socks5://127.0.0.1:9050') # type: ignore
+        lacus = LacusCore(valkeylacus,tor_proxy='socks5://127.0.0.1:9050') # type: ignore
 
-    for key in red.keys():
-        group = json.loads(red.get(key)) # type: ignore
+    for key in valkey_handle.keys():
+        group = json.loads(valkey_handle.get(key)) # type: ignore
         group['name'] = key.decode()
         groups.append(group)
     for group in groups:
@@ -125,18 +125,18 @@ def scraper(base: int) -> None:
     while running_capture:
         for key in list(running_capture): # type: ignore
             if lacus.get_capture_status(str(key)) == -1:
-                group = json.loads(red.get(running_capture[str(key)]['group'])) # type: ignore
+                group = json.loads(valkey_handle.get(running_capture[str(key)]['group'])) # type: ignore
                 for location in group['locations']:
                     if location['slug']==running_capture[str(key)]['slug']:
                         location.update({'available':False})
-                        red.set(running_capture[str(key)]['group'], json.dumps(group))
+                        valkey_handle.set(running_capture[str(key)]['group'], json.dumps(group))
                         break
                 running_capture.pop(str(key))
                 continue
             if lacus.get_capture_status(str(key)) == 1:
                 result = lacus.get_capture(str(key))
                 name = str(running_capture[str(key)]['group'])
-                group = json.loads(red.get(name)) # type: ignore
+                group = json.loads(valkey_handle.get(name)) # type: ignore
                 for location in group['locations']:
                     if location['slug']==running_capture[str(key)]['slug']:
                         host=location
@@ -144,7 +144,7 @@ def scraper(base: int) -> None:
                 if result['status']=='error': # type: ignore
                     host.update({'available':False})
                     running_capture.pop(str(key))
-                    red.set(name, json.dumps(group))
+                    valkey_handle.set(name, json.dumps(group))
                     continue
                 if 'png' in result and not ('fixedfile' in host and host['fixedfile'] is True):
                     filename = name + '-' + createfile(host['slug']) + '.png'
@@ -183,7 +183,7 @@ def scraper(base: int) -> None:
 
                 else:
                     host.update({'available':False})
-                red.set(name, json.dumps(group))
+                valkey_handle.set(name, json.dumps(group))
                 running_capture.pop(str(key))
 
         if not remote_lacus_url:
@@ -202,9 +202,9 @@ def adder(name: str, location: str, db: int, fs: bool=False, private: bool=False
             return appender(name.strip(), location.strip(), db, fs, private, chat, admin, browser)
         return 0
     else:
-        red = redis.Redis(unix_socket_path=get_socket_path('cache'), db=db)
+        valkey_handle = valkey.Valkey(unix_socket_path=get_socket_path('cache'), db=db)
         newrec = creategroup(location.strip(), fs, private, chat, admin, browser)
-        red.set(name.strip(), json.dumps(newrec))
+        valkey_handle.set(name.strip(), json.dumps(newrec))
         stdlog('ransomlook: ' + 'record for ' + name + ' added to groups.json')
         return 0
 
@@ -213,24 +213,24 @@ def appender(name: str, location: str, db: int, fs: bool, private: bool, chat: b
     handles the addition of new mirrors and relays for the same site
     to an existing group within groups.json
     '''
-    red = redis.Redis(unix_socket_path=get_socket_path('cache'), db=db)
-    group = json.loads(red.get(name.strip())) # type: ignore
+    valkey_handle = valkey.Valkey(unix_socket_path=get_socket_path('cache'), db=db)
+    group = json.loads(valkey_handle.get(name.strip())) # type: ignore
     success = bool()
     for loc in group['locations']:
         if location == loc['slug']:
             errlog('cannot append to non-existing provider or the location already exists')
             return 2
     group['locations'].append(siteschema(location, fs, private, chat, admin, browser))
-    red.set(name.strip(), json.dumps(group))
+    valkey_handle.set(name.strip(), json.dumps(group))
     return 1
 
 def screen() -> None:
-    red = redis.Redis(unix_socket_path=get_socket_path('cache'), db=1)
-    if 'toscan'.encode() not in red.keys():
+    valkey_handle = valkey.Valkey(unix_socket_path=get_socket_path('cache'), db=1)
+    if 'toscan'.encode() not in valkey_handle.keys():
         stdlog('No screen to do !')
         return
-    redgroup = redis.Redis(unix_socket_path=get_socket_path('cache'), db=0)
-    captures = json.loads(red.get('toscan')) # type: ignore
+    valkey_group_handle = valkey.Valkey(unix_socket_path=get_socket_path('cache'), db=0)
+    captures = json.loads(valkey_handle.get('toscan')) # type: ignore
     remote_lacus_url = None
     if get_config('generic', 'remote_lacus'):
         remote_lacus_config = get_config('generic', 'remote_lacus')
@@ -244,12 +244,12 @@ def screen() -> None:
                 remote_lacus_url = None
 
     if not remote_lacus_url:
-        lacus = LacusCore(redislacus,tor_proxy='socks5://127.0.0.1:9050') # type: ignore
+        lacus = LacusCore(valkeylacus,tor_proxy='socks5://127.0.0.1:9050') # type: ignore
 
     uuids = []
     slugs = []
     for capture in captures:
-        group = json.loads(redgroup.get(capture['group'].encode())) # type: ignore
+        group = json.loads(valkey_group_handle.get(capture['group'].encode())) # type: ignore
         for host in group['locations']:
           try:
             if capture['slug'].removeprefix(capture['group']+'-').split('.')[0] in striptld(host['slug']):
@@ -291,7 +291,7 @@ def screen() -> None:
                         del capture['uuid']
 
                         if result['status']=='error' or 'error' in result: # type: ignore
-                            red.set('toscan', json.dumps(captures))
+                            valkey_handle.set('toscan', json.dumps(captures))
                             continue
                         if 'png' in result and 'html' in result:
                             filenamepng = createfile(capture['title']) + '.png'
@@ -317,19 +317,19 @@ def screen() -> None:
                             name = os.path.join(path, filename)
                             with open(name, 'w') as tosave:
                                 tosave.write(result['html']) # type: ignore
-                            redpost = redis.Redis(unix_socket_path=get_socket_path('cache'), db=2)
-                            updated = json.loads(redpost.get(capture['group'])) # type: ignore
+                            valkey_post_handle = valkey.Valkey(unix_socket_path=get_socket_path('cache'), db=2)
+                            updated = json.loads(valkey_post_handle.get(capture['group'])) # type: ignore
                             for post in updated:
                                 if post['post_title'] == capture['title']:
                                     post['screen'] = str(os.path.join('screenshots', capture['group'], filenamepng))
                                     post.update(post)
-                            redpost.set(capture['group'], json.dumps(updated))
-                            toscreen = json.loads(red.get('toscan')) # type: ignore
+                            valkey_post_handle.set(capture['group'], json.dumps(updated))
+                            toscreen = json.loads(valkey_handle.get('toscan')) # type: ignore
                             for idx, item in enumerate(toscreen):
                                 if item['group'] == capture['group'] and item['title'] == capture['title']:
                                     toscreen.pop(idx)
                                     break
-                            red.set('toscan', json.dumps(toscreen))
+                            valkey_handle.set('toscan', json.dumps(toscreen))
         if not remote_lacus_url:
             asyncio.run(run_captures())
         else:
@@ -376,27 +376,27 @@ def threadtorrent(queuethread, lock) -> None: # type: ignore[no-untyped-def]
         f.write(lt.bencode(lt.create_torrent(tinf).generate()))
         f.close()
 
-        red = redis.Redis(unix_socket_path=get_socket_path('cache'), db=2)
-        updated = json.loads(red.get(torrent['group'])) # type: ignore
+        valkey_handle = valkey.Valkey(unix_socket_path=get_socket_path('cache'), db=2)
+        updated = json.loads(valkey_handle.get(torrent['group'])) # type: ignore
         for post in updated:
             if post['post_title'] == torrent['title']:
                 post['screen'] = str(os.path.join('screenshots', torrent['group'], filename))
                 post.update(post)
-        red.set(torrent['group'], json.dumps(updated))
-        red = redis.Redis(unix_socket_path=get_socket_path('cache'), db=1)
-        totorrent = json.loads(red.get('totorrent')) # type: ignore
+        valkey_handle.set(torrent['group'], json.dumps(updated))
+        valkey_handle = valkey.Valkey(unix_socket_path=get_socket_path('cache'), db=1)
+        totorrent = json.loads(valkey_handle.get('totorrent')) # type: ignore
         for idx, item in enumerate(totorrent):
             if item['group'] == torrent['group'] and item['title'] == torrent['title']:
                 totorrent.pop(idx)
                 break
-        red.set('totorrent', json.dumps(totorrent))
+        valkey_handle.set('totorrent', json.dumps(totorrent))
         print('Done with: ' + torrent['title'])
         sess.remove_torrent(torr)
         queuethread.task_done()
 
 def gettorrentinfo() -> None :
-    red = redis.Redis(unix_socket_path=get_socket_path('cache'), db=1)
-    if 'totorrent'.encode() not in red.keys():
+    valkey_handle = valkey.Valkey(unix_socket_path=get_socket_path('cache'), db=1)
+    if 'totorrent'.encode() not in valkey_handle.keys():
         stdlog('No torrent to get !')
         return
     sess = lt.session()
@@ -406,7 +406,7 @@ def gettorrentinfo() -> None :
         t = Thread(target=threadtorrent, args=(queuethread,lock), daemon=True)
         t.start()
 
-    torrents = json.loads(red.get('totorrent')) # type: ignore
+    torrents = json.loads(valkey_handle.get('totorrent')) # type: ignore
     for torrent in torrents:
         data = [sess,torrent]
         queuethread.put(data)

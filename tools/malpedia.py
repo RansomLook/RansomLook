@@ -1,13 +1,13 @@
 #!/usr/bin/env python3
 import json
-import redis
+import valkey
 import requests
 
 from ransomlook.default import get_socket_path, get_config
 
 
 
-red = redis.Redis(unix_socket_path=get_socket_path('cache'), db=0)
+valkey_handle = valkey.Valkey(unix_socket_path=get_socket_path('cache'), db=0)
 
 malpedia = get_config('generic','malpedia')
 if malpedia == "":
@@ -21,7 +21,7 @@ if response.status_code != 200:
 
 families = json.loads(response.text)
 
-keys = red.keys()
+keys = valkey_handle.keys()
 for family in families:
     names = []
     names.append(families[family]['common_name'])
@@ -33,7 +33,7 @@ for family in families:
                print(alter)
            for url in families[family]['urls']:
                print(url)
-           group = json.loads(red.get(key)) # type: ignore
+           group = json.loads(valkey_handle.get(key)) # type: ignore
            group['meta'] = families[family]['description']
            group['profile'].extend(families[family]['urls'])
-           red.set(key,json.dumps(group))
+           valkey_handle.set(key,json.dumps(group))

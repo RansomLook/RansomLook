@@ -8,7 +8,7 @@ from ransomlook.default import get_config, get_homedir
 def main() -> None:
     # Just fail if the env isn't set.
     get_homedir()
-    print('Start backend (redis)...')
+    print('Start backend (valkey)...')
     p = run(['run_backend', '--start'])
     p.check_returncode()
     print('done.')

@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-import redis
+import valkey
 import os
 from ransomlook.default import get_socket_path, get_config
 
@@ -15,12 +15,12 @@ writer = csv.writer(f)
 writer.writerow(header)
 
 
-red = redis.Redis(unix_socket_path=get_socket_path('cache'), db=2)
+valkey_handle = valkey.Valkey(unix_socket_path=get_socket_path('cache'), db=2)
 
 postnum: Dict[bytes, Dict[str, int]] = {}
-for key in red.keys():
+for key in valkey_handle.keys():
     postnum[key]={}
-    posts =json.loads(red.get(key)) # type: ignore
+    posts =json.loads(valkey_handle.get(key)) # type: ignore
     for post in posts:
         if post['discovered'][:7] not in postnum[key]:
             postnum[key][post['discovered'][:7]]=1

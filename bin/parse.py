@@ -10,7 +10,7 @@ from datetime import timedelta
 
 import collections
 
-import redis
+import valkey
 
 from ransomlook.default.config import get_config, get_socket_path
 
@@ -33,8 +33,8 @@ def main() -> None:
             print("Error with : " + parser)
             print(e)
             pass
-    red = redis.Redis(unix_socket_path=get_socket_path('cache'), db=2)
-    for key in red.keys():
+    valkey_handle = valkey.Valkey(unix_socket_path=get_socket_path('cache'), db=2)
+    for key in valkey_handle.keys():
         statsgroup(key)
     run_data_viz(7)
     run_data_viz(14)

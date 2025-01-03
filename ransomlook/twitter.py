@@ -22,7 +22,7 @@ from bs4 import BeautifulSoup
 
 import requests, shutil
 
-import redis
+import valkey
 
 def twitternotify(config: Dict[str, str], group: str, title:str) -> None :
     '''
@@ -51,14 +51,14 @@ def twitternotifyleak(config: Dict[str, str], name: str) -> None :
         errlog('Can not tweet :(')
 
 def parser() -> None :
-    red = redis.Redis(unix_socket_path=get_socket_path('cache'), db=8)
-    redmessage = redis.Redis(unix_socket_path=get_socket_path('cache'), db=9)
-    for key in red.keys():
+    valkey_handle = valkey.Valkey(unix_socket_path=get_socket_path('cache'), db=8)
+    valkey_message_handle = valkey.Valkey(unix_socket_path=get_socket_path('cache'), db=9)
+    for key in valkey_handle.keys():
         #try:
            html_doc='source/twitter/'+ key.decode() + '.html'
            file=open(html_doc,'r')
            soup = BeautifulSoup(file,'html.parser')
-           profile = json.loads(red.get(key)) # type: ignore
+           profile = json.loads(valkey_handle.get(key)) # type: ignore
            name =  soup.find('div',{'data-testid':'UserName'}) 
            profile['displayname'] = name.div.div.div.text # type: ignore
            description = soup.find('div', {'data-testid':'UserDescription'})
@@ -74,10 +74,10 @@ def parser() -> None :
            profile['joindate'] = join_date
            profile['following'] = soup.find('span', text = "Following").parent.span.text # type: ignore
            profile['followers'] = soup.find('span', text = "Followers").parent.span.text # type: ignore
-           red.set(key,json.dumps(profile))
+           valkey_handle.set(key,json.dumps(profile))
            tweets = soup.find_all('article',{'data-testid':'tweet'})
-           if key in redmessage.keys():
-               posts = json.loads(redmessage.get(key)) # type: ignore
+           if key in valkey_message_handle.keys():
+               posts = json.loads(valkey_message_handle.get(key)) # type: ignore
            else:
                posts={}
            for tweet  in tweets:
@@ -111,7 +111,7 @@ def parser() -> None :
                except Exception as e:
                   errlog('Malformated message :( - ' + key.decode() )
                   errlog(e)
-           redmessage.set(key,json.dumps(posts))
+           valkey_message_handle.set(key,json.dumps(posts))
 
 def threadscape(queuethread, lock): # type: ignore
     '''
@@ -157,14 +157,14 @@ def threadscape(queuethread, lock): # type: ignore
 
 def scraper() -> None:
     '''main scraping function'''
-    red = redis.Redis(unix_socket_path=get_socket_path('cache'), db=8)
+    valkey_handle = valkey.Valkey(unix_socket_path=get_socket_path('cache'), db=8)
     lock = Lock()
     queuethread = queue.Queue() # type: ignore
     for _ in range(get_config('generic','thread')):
         thread1 = Thread(target=threadscape, args=(queuethread,lock), daemon=True)
         thread1.start()
 
-    for key in red.keys():
+    for key in valkey_handle.keys():
         stdlog('ransomloook: ' + 'working on ' + key.decode())
         queuethread.put(key.decode())
     queuethread.join()
@@ -173,7 +173,7 @@ def scraper() -> None:
 
 
 def twiadder(name: str, link: str) -> int:
-    red = redis.Redis(unix_socket_path=get_socket_path('cache'), db=8)
+    valkey_handle = valkey.Valkey(unix_socket_path=get_socket_path('cache'), db=8)
     try:
         data = {
             'name': name.strip(),
@@ -185,7 +185,7 @@ def twiadder(name: str, link: str) -> int:
             'followers': None,
             'following': None
         }
-        red.set(name, json.dumps(data))
+        valkey_handle.set(name, json.dumps(data))
         return 1
     except:
         return 0

@@ -2,7 +2,7 @@
 
 import json
 from typing import Any, Dict, Optional
-from redis import Redis
+from valkey import Valkey
 
 from flask import send_from_directory
 
@@ -22,8 +22,8 @@ api = Namespace('TelegramAPI', description='Telegram Ransomlook API', path='/api
 class Channels(Resource): # type: ignore[misc]
     def get(self): # type: ignore
         groups = []
-        red = Redis(unix_socket_path=get_socket_path('cache'), db=5)
-        for key in red.keys():
+        valkey_handle = Valkey(unix_socket_path=get_socket_path('cache'), db=5)
+        for key in valkey_handle.keys():
             groups.append(key.decode())
         return groups
 
@@ -32,17 +32,17 @@ class Channels(Resource): # type: ignore[misc]
 @api.doc(param={'name':'Name of the group'})
 class Channnelinfo(Resource): # type: ignore[misc]
     def get(self, name: str) -> List[Any]:
-        red = Redis(unix_socket_path=get_socket_path('cache'), db=5)
+        valkey_handle = Valkey(unix_socket_path=get_socket_path('cache'), db=5)
         group = {}
         sorted_posts:Dict[str, Any] = {}
-        for key in red.keys():
+        for key in valkey_handle.keys():
                 if key.decode().lower() == name.lower():
-                        group= json.loads(red.get(key)) # type: ignore
+                        group= json.loads(valkey_handle.get(key)) # type: ignore
                         if group['meta'] is not None:
                             group['meta']=group['meta'].replace('\n', '<br/>')
-                        redpost = Redis(unix_socket_path=get_socket_path('cache'), db=6)
-                        if key in redpost.keys():
-                            posts=json.loads(redpost.get(key)) # type: ignore
+                        valkey_post_handle = Valkey(unix_socket_path=get_socket_path('cache'), db=6)
+                        if key in valkey_post_handle.keys():
+                            posts=json.loads(valkey_post_handle.get(key)) # type: ignore
                             sorted_posts = OrderedDict(sorted(posts.items(), key=lambda t: t[0], reverse=True))
                         else:
                             sorted_posts = {}

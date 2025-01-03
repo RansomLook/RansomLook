@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 import json
-from redis import Redis
+from valkey import Valkey
 
 from flask_restx import Namespace, Resource # type: ignore
 
@@ -19,8 +19,8 @@ api = Namespace('RecordedFutureAPI', description='RecordedFuture Ransomlook API'
 class RFLeaks(Resource): # type: ignore[misc]
     def get(self) -> List[str]:
         leaks = []
-        red = Redis(unix_socket_path=get_socket_path('cache'), db=10)
-        for key in red.keys():
+        valkey_handle = Valkey(unix_socket_path=get_socket_path('cache'), db=10)
+        for key in valkey_handle.keys():
             leaks.append(key.decode())
         return leaks
 
@@ -29,9 +29,9 @@ class RFLeaks(Resource): # type: ignore[misc]
 @api.doc(param={'name':'Name of the leak'})
 class RFLeakinfo(Resource): # type: ignore[misc]
     def get(self, name: str): # type: ignore[no-untyped-def]
-        red = Redis(unix_socket_path=get_socket_path('cache'), db=10)
+        valkey_handle = Valkey(unix_socket_path=get_socket_path('cache'), db=10)
         leak = None
-        leak = red.get(name.encode())
+        leak = valkey_handle.get(name.encode())
         if leak :
             return json.loads(leak)
         return {}

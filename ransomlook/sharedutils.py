@@ -8,7 +8,7 @@ from datetime import timedelta
 import glob
 from os.path import dirname, basename, isfile, join
 import sys
-import redis
+import valkey
 
 import matplotlib.pyplot as plt
 import plotly.express as px # type: ignore
@@ -54,8 +54,8 @@ def statsgroup(group: bytes) -> None :
     dates = (Any)
     counts = (Any)
 
-    red = redis.Redis(unix_socket_path=get_socket_path('cache'), db=2)
-    post_data = json.loads(red.get(group)) # type: ignore
+    valkey_handle = valkey.Valkey(unix_socket_path=get_socket_path('cache'), db=2)
+    post_data = json.loads(valkey_handle.get(group)) # type: ignore
     # Count the number of victims per day
     for post in post_data:
         date = post['discovered'].split(' ')[0]
@@ -103,12 +103,12 @@ def statsgroup(group: bytes) -> None :
 def run_data_viz(days_filter: int) -> None:
     now = datetime.now()
 
-    red = redis.Redis(unix_socket_path=get_socket_path('cache'), db=2)
+    valkey_handle = valkey.Valkey(unix_socket_path=get_socket_path('cache'), db=2)
 
     group_names = []
     timestamps = []
-    for key in red.keys():
-        posts = json.loads(red.get(key)) # type: ignore
+    for key in valkey_handle.keys():
+        posts = json.loads(valkey_handle.get(key)) # type: ignore
         for post in posts:
             postdate = datetime.fromisoformat(post['discovered'])
             if (now - postdate).days < days_filter:
@@ -165,66 +165,66 @@ markdown
 '''
 def postcount() -> int :
     post_count = 0
-    red = redis.Redis(unix_socket_path=get_socket_path('cache'), db=2)
-    for group in red.keys():
-        grouppost = json.loads(red.get(group)) # type: ignore
+    valkey_handle = valkey.Valkey(unix_socket_path=get_socket_path('cache'), db=2)
+    for group in valkey_handle.keys():
+        grouppost = json.loads(valkey_handle.get(group)) # type: ignore
         post_count+=len(grouppost)
     return post_count
 
 def groupcount(db: int) -> int :
-    red = redis.Redis(unix_socket_path=get_socket_path('cache'), db=db)
-    groups = red.keys()
+    valkey_handle = valkey.Valkey(unix_socket_path=get_socket_path('cache'), db=db)
+    groups = valkey_handle.keys()
     return len(groups)
 
 def hostcount(db: int) -> int :
-    red = redis.Redis(unix_socket_path=get_socket_path('cache'), db=db)
-    groups = red.keys()
+    valkey_handle = valkey.Valkey(unix_socket_path=get_socket_path('cache'), db=db)
+    groups = valkey_handle.keys()
     host_count = 0
     for entry in groups:
-        group = json.loads(red.get(entry)) # type: ignore
+        group = json.loads(valkey_handle.get(entry)) # type: ignore
         for host in group['locations']:
             host_count += 1
     return host_count
 
 def hostcountdls(db: int) -> int :
-    red = redis.Redis(unix_socket_path=get_socket_path('cache'), db=db)
-    groups = red.keys()
+    valkey_handle = valkey.Valkey(unix_socket_path=get_socket_path('cache'), db=db)
+    groups = valkey_handle.keys()
     host_count = 0
     for entry in groups:
-        group = json.loads(red.get(entry)) # type: ignore
+        group = json.loads(valkey_handle.get(entry)) # type: ignore
         for host in group['locations']:
             if (not 'chat' in host or host['chat'] is False) and (not 'fs' in host or host['fs'] is False) and (not 'admin' in host or host['admin'] is False):
                 host_count += 1
     return host_count
 
 def hostcountfs(db: int) -> int :
-    red = redis.Redis(unix_socket_path=get_socket_path('cache'), db=db)
-    groups = red.keys()
+    valkey_handle = valkey.Valkey(unix_socket_path=get_socket_path('cache'), db=db)
+    groups = valkey_handle.keys()
     host_count = 0
     for entry in groups:
-        group = json.loads(red.get(entry)) # type: ignore
+        group = json.loads(valkey_handle.get(entry)) # type: ignore
         for host in group['locations']:
             if 'fs' in host and host['fs'] is True:
                 host_count += 1
     return host_count
 
 def hostcountchat(db: int) -> int :
-    red = redis.Redis(unix_socket_path=get_socket_path('cache'), db=db)
-    groups = red.keys()
+    valkey_handle = valkey.Valkey(unix_socket_path=get_socket_path('cache'), db=db)
+    groups = valkey_handle.keys()
     host_count = 0
     for entry in groups:
-        group = json.loads(red.get(entry)) # type: ignore
+        group = json.loads(valkey_handle.get(entry)) # type: ignore
         for host in group['locations']:
             if 'chat' in host and host['chat'] is True:
                 host_count += 1
     return host_count
 
 def hostcountadmin(db: int) -> int :
-    red = redis.Redis(unix_socket_path=get_socket_path('cache'), db=db)
-    groups = red.keys()
+    valkey_handle = valkey.Valkey(unix_socket_path=get_socket_path('cache'), db=db)
+    groups = valkey_handle.keys()
     host_count = 0
     for entry in groups:
-        group = json.loads(red.get(entry)) # type: ignore
+        group = json.loads(valkey_handle.get(entry)) # type: ignore
         for host in group['locations']:
             if 'admin' in host and host['admin'] is True:
                 host_count += 1
@@ -233,10 +233,10 @@ def hostcountadmin(db: int) -> int :
 def postssince(days: int) -> int :
     '''returns the number of posts within the last x days'''
     post_count = 0
-    red = redis.Redis(unix_socket_path=get_socket_path('cache'), db=2)
-    groups = red.keys()
+    valkey_handle = valkey.Valkey(unix_socket_path=get_socket_path('cache'), db=2)
+    groups = valkey_handle.keys()
     for entry in groups:
-        posts = json.loads(red.get(entry)) # type: ignore
+        posts = json.loads(valkey_handle.get(entry)) # type: ignore
         for post in posts:
             try:
                 datetime_object = datetime.strptime(post['discovered'], '%Y-%m-%d %H:%M:%S.%f')
@@ -250,10 +250,10 @@ def poststhisyear() -> int :
     '''returns the number of posts within the current year'''
     current_year = datetime.now().year
     post_count = 0
-    red = redis.Redis(unix_socket_path=get_socket_path('cache'), db=2)
-    groups = red.keys()
+    valkey_handle = valkey.Valkey(unix_socket_path=get_socket_path('cache'), db=2)
+    groups = valkey_handle.keys()
     for entry in groups:
-        posts = json.loads(red.get(entry)) # type: ignore
+        posts = json.loads(valkey_handle.get(entry)) # type: ignore
         for post in posts:
             try:
                 datetime_object = datetime.strptime(post['discovered'], '%Y-%m-%d %H:%M:%S.%f')
@@ -266,10 +266,10 @@ def poststhisyear() -> int :
 def postslast24h() -> int :
     '''returns the number of posts within the last 24 hours'''
     post_count = 0
-    red = redis.Redis(unix_socket_path=get_socket_path('cache'), db=2)
-    groups = red.keys()
+    valkey_handle = valkey.Valkey(unix_socket_path=get_socket_path('cache'), db=2)
+    groups = valkey_handle.keys()
     for entry in groups:
-        posts = json.loads(red.get(entry)) # type: ignore
+        posts = json.loads(valkey_handle.get(entry)) # type: ignore
         for post in posts:
             try :
                 datetime_object = datetime.strptime(post['discovered'], '%Y-%m-%d %H:%M:%S.%f')
@@ -285,11 +285,11 @@ def parsercount() -> int :
     return len(__all__)
 
 def onlinecount(db: int) -> int :
-    red = redis.Redis(unix_socket_path=get_socket_path('cache'), db=db)
-    groups = red.keys()
+    valkey_handle = valkey.Valkey(unix_socket_path=get_socket_path('cache'), db=db)
+    groups = valkey_handle.keys()
     online_count = 0
     for entry in groups:
-        group = json.loads(red.get(entry)) # type: ignore
+        group = json.loads(valkey_handle.get(entry)) # type: ignore
         for host in group['locations']:
             if host['available'] is True:
                 online_count += 1
@@ -306,12 +306,12 @@ def mounthlypostcount() -> int :
     returns the number of posts within the current month
     '''
     post_count = 0
-    red = redis.Redis(unix_socket_path=get_socket_path('cache'), db=2)
-    groups = red.keys()
+    valkey_handle = valkey.Valkey(unix_socket_path=get_socket_path('cache'), db=2)
+    groups = valkey_handle.keys()
     date_today = datetime.now()
     month_first_day = date_today.replace(day=1, hour=0, minute=0, second=0, microsecond=0)
     for entry in groups:
-        posts = json.loads(red.get(entry)) # type: ignore
+        posts = json.loads(valkey_handle.get(entry)) # type: ignore
         for post in posts:
             try:
                 datetime_object = datetime.strptime(post['discovered'], '%Y-%m-%d %H:%M:%S.%f')
@@ -323,11 +323,11 @@ def mounthlypostcount() -> int :
 
 def countcaptchahosts() -> int :
     '''returns a count on the number of groups that have captchas'''
-    red = redis.Redis(unix_socket_path=get_socket_path('cache'), db=0)
-    groups = red.keys()
+    valkey_handle = valkey.Valkey(unix_socket_path=get_socket_path('cache'), db=0)
+    groups = valkey_handle.keys()
     captcha_count = 0
     for entry in groups:
-        group = json.loads(red.get(entry)) # type: ignore
+        group = json.loads(valkey_handle.get(entry)) # type: ignore
         if group['captcha'] is True:
             captcha_count += 1
     return captcha_count

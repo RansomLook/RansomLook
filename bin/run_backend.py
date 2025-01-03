@@ -7,8 +7,8 @@ from pathlib import Path
 from subprocess import Popen
 from typing import Optional, Dict
 
-from redis import Redis
-from redis.exceptions import ConnectionError
+from valkey import Valkey
+from valkey.exceptions import ConnectionError
 
 from ransomlook.default import get_homedir, get_socket_path
 
@@ -19,8 +19,8 @@ def check_running(name: str) -> bool:
     if not os.path.exists(socket_path):
         return False
     try:
-        r = Redis(unix_socket_path=socket_path)
-        return True if r.ping() else False
+        valkey_handle = Valkey(unix_socket_path=socket_path)
+        return True if valkey_handle.ping() else False
     except ConnectionError:
         return False
 
@@ -35,9 +35,9 @@ def launch_cache(storage_directory: Optional[Path]=None) -> None:
 def shutdown_cache(storage_directory: Optional[Path]=None) -> None:
     if not storage_directory:
         storage_directory = get_homedir()
-    r = Redis(unix_socket_path=get_socket_path('cache'))
-    r.shutdown(save=True)
-    print('Redis cache database shutdown.')
+    valkey_handle = Valkey(unix_socket_path=get_socket_path('cache'))
+    valkey_handle.shutdown(save=True)
+    print('Valkey cache database shutdown.')
 
 
 def launch_all() -> None:
