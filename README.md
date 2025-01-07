@@ -28,7 +28,10 @@ Note that is is *strongly* recommended to use Ubuntu 22.04.
 
 ## System dependencies
 
-You need poetry installed, see the [install guide](https://python-poetry.org/docs/).
+You need poetry 1.8.4 installed.
+```bash
+curl -sSL https://install.python-poetry.org | python3 - --version 1.8.4
+``` 
 
 ## Prerequisites
 
