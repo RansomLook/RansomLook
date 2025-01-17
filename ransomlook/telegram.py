@@ -18,7 +18,7 @@ from playwright_stealth import stealth_sync # type: ignore
 from .default.config import get_config, get_homedir, get_socket_path
 
 import uuid
-import valkey
+import valkey # type: ignore
 
 import smtplib
 import ssl
@@ -129,7 +129,7 @@ def scraper() -> None:
     valkey_handle = valkey.Valkey(unix_socket_path=get_socket_path('cache'), db=5)
     groups=[]
     for key in valkey_handle.keys():
-        group = json.loads(valkey_handle.get(key)) # type: ignore
+        group = json.loads(valkey_handle.get(key)) 
         groups.append(group)
     lock = Lock()
     queuethread = queue.Queue() # type: ignore
@@ -163,12 +163,12 @@ def parser() -> None:
            soup = BeautifulSoup(file,'html.parser')
            titletag = soup.find('title')
            title = titletag.string # type: ignore
-           data = json.loads(valkey_handle.get(key)) # type: ignore
+           data = json.loads(valkey_handle.get(key)) 
            data['meta']=title
            valkey_handle.set(key, json.dumps(data))
            tgpost =  soup.find_all('div', {'class' : 'tgme_widget_message'})
            if key in valkey_message_handle.keys():
-               posts = json.loads(valkey_message_handle.get(key)) # type: ignore
+               posts = json.loads(valkey_message_handle.get(key)) 
            else:
                posts={}
            for content in tgpost:

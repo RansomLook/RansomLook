@@ -15,7 +15,7 @@ from os.path import dirname, basename, isfile, join
 from os import listdir
 import os
 import json
-from valkey import Valkey
+from valkey import Valkey # type: ignore
 
 import ast
 import flask_login
@@ -237,7 +237,7 @@ def home(): # type: ignore[no-untyped-def]
             valkey_handle = Valkey(unix_socket_path=get_socket_path('cache'), db=12)
             groups = valkey_handle.keys()
             for entry in groups:
-                post = json.loads(valkey_handle.get(entry)) # type: ignore
+                post = json.loads(valkey_handle.get(entry)) 
                 alertposts[post['type']].append(post)
         return render_template("index.html", date=date, data=data,alert=alert, posts=alertposts)
 
@@ -246,7 +246,7 @@ def recent(): # type: ignore[no-untyped-def]
         posts = []
         valkey_handle = Valkey(unix_socket_path=get_socket_path('cache'), db=2)
         for key in valkey_handle.keys():
-                entries = json.loads(valkey_handle.get(key)) # type: ignore
+                entries = json.loads(valkey_handle.get(key)) 
                 for entry in entries:
                     entry['group_name']=key.decode()
                     posts.append(entry)
@@ -265,7 +265,7 @@ def feeds():  # type: ignore[no-untyped-def]
 
     # Iterate over Valkey keys and parse entries
     for key in valkey_handle.keys():
-        entries = json.loads(valkey_handle.get(key))  # type: ignore
+        entries = json.loads(valkey_handle.get(key))  
         for entry in entries:
             entry['group_name'] = key.decode()
             posts.append(entry)
@@ -319,7 +319,7 @@ def status(): # type: ignore[no-untyped-def]
         valkey_handle = Valkey(unix_socket_path=get_socket_path('cache'), db=0)
         groups = []
         for key in valkey_handle.keys():
-                entry= json.loads(valkey_handle.get(key)) # type: ignore
+                entry= json.loads(valkey_handle.get(key)) 
                 if not current_user.is_authenticated and 'private' in entry and entry['private'] is True:
                     continue
                 entry['name']=key.decode()
@@ -333,7 +333,7 @@ def status(): # type: ignore[no-untyped-def]
         valkey_handle = Valkey(unix_socket_path=get_socket_path('cache'), db=3)
         markets = []
         for key in valkey_handle.keys():
-                entry= json.loads(valkey_handle.get(key)) # type: ignore
+                entry= json.loads(valkey_handle.get(key)) 
                 entry['name']=key.decode()
                 markets.append(entry)
         markets.sort(key=lambda x: x["name"].lower())
@@ -351,7 +351,7 @@ def alive(): # type: ignore[no-untyped-def]
         valkey_handle = Valkey(unix_socket_path=get_socket_path('cache'), db=0)
         groups = []
         for key in valkey_handle.keys():
-                entry= json.loads(valkey_handle.get(key)) # type: ignore
+                entry= json.loads(valkey_handle.get(key)) 
                 if not current_user.is_authenticated and 'private' in entry and entry['private'] is True:
                     continue
                 entry['name']=key.decode()
@@ -365,7 +365,7 @@ def alive(): # type: ignore[no-untyped-def]
         valkey_handle = Valkey(unix_socket_path=get_socket_path('cache'), db=3)
         markets = []
         for key in valkey_handle.keys():
-                entry= json.loads(valkey_handle.get(key)) # type: ignore
+                entry= json.loads(valkey_handle.get(key)) 
                 entry['name']=key.decode()
                 markets.append(entry)
         markets.sort(key=lambda x: x["name"].lower())
@@ -384,7 +384,7 @@ def groups(): # type: ignore[no-untyped-def]
 
         groups = []
         for key in valkey_handle.keys():
-                entry= json.loads(valkey_handle.get(key)) # type: ignore
+                entry= json.loads(valkey_handle.get(key)) 
                 if not current_user.is_authenticated and 'private' in entry and entry['private'] is True:
                     continue
                 entry['name']=key.decode()
@@ -404,7 +404,7 @@ def group(name: str): # type: ignore[no-untyped-def]
         valkey_handle = Valkey(unix_socket_path=get_socket_path('cache'), db=0)
         for key in valkey_handle.keys():
                 if key.decode().lower() == name.lower():
-                        group= json.loads(valkey_handle.get(key)) # type: ignore
+                        group= json.loads(valkey_handle.get(key)) 
                         if not current_user.is_authenticated and 'private' in group and group['private'] is True:
                             return redirect(url_for("home"))
                         logofolder = os.path.normpath(str(get_homedir()) + '/source/logo/group/'+name)
@@ -423,7 +423,7 @@ def group(name: str): # type: ignore[no-untyped-def]
                                 location['screen']=screenfile
                         valkey_post_handle = Valkey(unix_socket_path=get_socket_path('cache'), db=2)
                         if key in valkey_post_handle.keys():
-                            posts=json.loads(valkey_post_handle.get(key)) # type: ignore
+                            posts=json.loads(valkey_post_handle.get(key)) 
                             sorted_posts = sorted(posts, key=lambda x: x['discovered'], reverse=True)
                         else:
                             sorted_posts = []
@@ -440,7 +440,7 @@ def markets(): # type: ignore[no-untyped-def]
 
         groups = []
         for key in valkey_handle.keys():
-                entry= json.loads(valkey_handle.get(key)) # type: ignore
+                entry= json.loads(valkey_handle.get(key)) 
                 if not current_user.is_authenticated and 'private' in entry and entry['private'] is True:
                     continue
                 entry['name']=key.decode()
@@ -460,7 +460,7 @@ def market(name: str): # type: ignore[no-untyped-def]
         valkey_handle = Valkey(unix_socket_path=get_socket_path('cache'), db=3)
         for key in valkey_handle.keys():
                 if key.decode().lower() == name.lower():
-                        group= json.loads(valkey_handle.get(key)) # type: ignore
+                        group= json.loads(valkey_handle.get(key)) 
                         if not current_user.is_authenticated and 'private' in group and group['private'] is True:
                             return redirect(url_for("home"))
                         logofolder = os.path.normpath(str(get_homedir()) + '/source/logo/market/'+name)
@@ -472,7 +472,7 @@ def market(name: str): # type: ignore[no-untyped-def]
                         group['name']=key.decode()
                         valkey_post_handle = Valkey(unix_socket_path=get_socket_path('cache'), db=2)
                         if key in valkey_post_handle.keys():
-                            posts=json.loads(valkey_post_handle.get(key)) # type: ignore
+                            posts=json.loads(valkey_post_handle.get(key)) 
                             sorted_posts = sorted(posts, key=lambda x: x['discovered'], reverse=True)
                         else:
                             sorted_posts = []
@@ -485,7 +485,7 @@ def leaks(): # type: ignore[no-untyped-def]
 
         leaks = []
         for key in valkey_handle.keys():
-                entry= json.loads(valkey_handle.get(key)) # type: ignore
+                entry= json.loads(valkey_handle.get(key)) 
                 entry['id']=key
                 leaks.append(entry)
         leaks.sort(key=lambda x: x["name"].lower())
@@ -496,7 +496,7 @@ def leak(name: str): # type: ignore[no-untyped-def]
         valkey_handle = Valkey(unix_socket_path=get_socket_path('cache'), db=4) 
         for key in valkey_handle.keys(): 
                 if key.decode().lower() == name.lower():
-                        group= json.loads(valkey_handle.get(key)) # type: ignore
+                        group= json.loads(valkey_handle.get(key)) 
                         if 'meta' in group and group['meta'] is not None:
                             group['meta']=group['meta'].replace('\n', '<br/>')
                         return render_template("leak.html", group = group)
@@ -519,7 +519,7 @@ def notes(): # type: ignore[no-untyped-def]
 def notesdetails(name: str): # type: ignore[no-untyped-def]
         valkey_handle = Valkey(unix_socket_path=get_socket_path('cache'), db=11)
         data = []
-        data = json.loads(valkey_handle.get(name.lower())) # type: ignore
+        data = json.loads(valkey_handle.get(name.lower())) 
         return render_template("notesdetails.html", data=data)
 
 
@@ -528,7 +528,7 @@ def rf(): # type: ignore[no-untyped-def]
         valkey_handle = Valkey(unix_socket_path=get_socket_path('cache'), db=10)
         leaks = []
         for key in valkey_handle.keys():
-                entry= json.loads(valkey_handle.get(key)) # type: ignore
+                entry= json.loads(valkey_handle.get(key)) 
                 leaks.append(entry)
         leaks.sort(key=lambda x: x["name"].lower())
         return render_template("RF.html", data=leaks)
@@ -538,7 +538,7 @@ def rfdetails(name: str): # type: ignore[no-untyped-def]
         valkey_handle = Valkey(unix_socket_path=get_socket_path('cache'), db=10)
         for key in valkey_handle.keys():
                 if key.decode().lower() == name.lower():
-                        group= json.loads(valkey_handle.get(key)) # type: ignore
+                        group= json.loads(valkey_handle.get(key)) 
                         return render_template("RFdetails.html", group = group)
 
         return redirect(url_for("home"))
@@ -550,7 +550,7 @@ def telegrams(): # type: ignore[no-untyped-def]
 
         telegram = []
         for key in valkey_handle.keys():
-                entry= json.loads(valkey_handle.get(key)) # type: ignore
+                entry= json.loads(valkey_handle.get(key)) 
                 screenfile = '/screenshots/telegram/' + entry['name'] + '.png'
                 if os.path.exists(str(get_homedir()) + '/source' + screenfile):
                     entry['screen']=screenfile
@@ -563,7 +563,7 @@ def telegram(name: str): # type: ignore[no-untyped-def]
         valkey_handle = Valkey(unix_socket_path=get_socket_path('cache'), db=6)
         for key in valkey_handle.keys():
                 if key.decode() == name:
-                        posts= json.loads(valkey_handle.get(key)) # type: ignore
+                        posts= json.loads(valkey_handle.get(key)) 
                         for post in posts:
                             if isinstance(posts[post], str):
                                posttmp = {}
@@ -579,7 +579,7 @@ def twitters(): # type: ignore[no-untyped-def]
         valkey_handle = Valkey(unix_socket_path=get_socket_path('cache'), db=8)
         twitter = []
         for key in valkey_handle.keys():
-                entry= json.loads(valkey_handle.get(key)) # type: ignore
+                entry= json.loads(valkey_handle.get(key)) 
                 screenfile = '/screenshots/twitter/' + entry['name'] + '.png'
                 if os.path.exists(str(get_homedir()) + '/source' + screenfile):
                     entry['screen']=screenfile
@@ -606,7 +606,7 @@ def crypto(): # type: ignore[no-untyped-def]
         valkey_handle = Valkey(unix_socket_path=get_socket_path('cache'), db=7)
         groups = {}
         for key in valkey_handle.keys():
-                groups[key.decode()]=json.loads(valkey_handle.get(key)) # type: ignore
+                groups[key.decode()]=json.loads(valkey_handle.get(key)) 
         crypto = OrderedDict(sorted(groups.items()))
         return render_template("crypto.html", data=crypto)
 
@@ -617,7 +617,7 @@ def search(): # type: ignore[no-untyped-def]
         valkey_handle = Valkey(unix_socket_path=get_socket_path('cache'), db=0)
         groups = []
         for key in valkey_handle.keys():
-            group = json.loads(valkey_handle.get(key)) # type: ignore
+            group = json.loads(valkey_handle.get(key)) 
             if not current_user.is_authenticated and 'private' in group and group['private'] is True:
                 continue
 
@@ -629,7 +629,7 @@ def search(): # type: ignore[no-untyped-def]
         valkey_handle = Valkey(unix_socket_path=get_socket_path('cache'), db=3)
         markets = []
         for key in valkey_handle.keys():
-            group = json.loads(valkey_handle.get(key)) # type: ignore
+            group = json.loads(valkey_handle.get(key)) 
             if not current_user.is_authenticated and 'private' in group and group['private'] is True:
                 continue
 
@@ -641,8 +641,8 @@ def search(): # type: ignore[no-untyped-def]
         valkey_handle = Valkey(unix_socket_path=get_socket_path('cache'), db=4)
         leaks = []
         for key in valkey_handle.keys():
-            group = json.loads(valkey_handle.get(key)) # type: ignore
-            if query.lower() in group['name']: # type: ignore
+            group = json.loads(valkey_handle.get(key)) 
+            if query.lower() in group['name']: 
                 group['key'] = key.decode().lower()
                 leaks.append(group)
         leaks.sort(key=lambda x: x["name"].lower())
@@ -650,9 +650,9 @@ def search(): # type: ignore[no-untyped-def]
         valkey_handle = Valkey(unix_socket_path=get_socket_path('cache'), db=2)
         posts = []
         for key in valkey_handle.keys():
-                entries = json.loads(valkey_handle.get(key)) # type: ignore
+                entries = json.loads(valkey_handle.get(key)) 
                 for entry in entries:
-                    if query.lower() in entry['post_title'].lower() or 'description' in entry and entry['description'] is not None and query.lower() in entry['description'].lower(): # type: ignore
+                    if query.lower() in entry['post_title'].lower() or 'description' in entry and entry['description'] is not None and query.lower() in entry['description'].lower(): 
                         entry['group_name']=key.decode()
                         posts.append(entry)
         posts.sort(key=lambda x: x["group_name"].lower())
@@ -660,25 +660,25 @@ def search(): # type: ignore[no-untyped-def]
         valkey_handle = Valkey(unix_socket_path=get_socket_path('cache'), db=5)
         channels = []
         for key in valkey_handle.keys():
-            group = json.loads(valkey_handle.get(key)) # type: ignore
-            if query.lower() in key.decode().lower() or group['meta'] is not None and query.lower() in group['meta'].lower(): # type: ignore
+            group = json.loads(valkey_handle.get(key)) 
+            if query.lower() in key.decode().lower() or group['meta'] is not None and query.lower() in group['meta'].lower(): 
                 channels.append(group)
         channels.sort(key=lambda x: x["name"].lower())
 
         valkey_handle = Valkey(unix_socket_path=get_socket_path('cache'), db=6)
         messages = []
         for key in valkey_handle.keys():
-                entries = json.loads(valkey_handle.get(key)) # type: ignore
+                entries = json.loads(valkey_handle.get(key)) 
                 for entry in entries:
                     if isinstance(entries[entry], str):
-                        if query.lower() in entries[entry].lower() : # type: ignore
+                        if query.lower() in entries[entry].lower() : 
                             myentry={}
                             myentry["group_name"] = key.decode()
                             myentry["message"] = entries[entry]
                             myentry["date"] = entry
                             messages.append(myentry)
                     else:
-                        if entries[entry]['message'] is not None and query.lower() in entries[entry]['message'].lower() : # type: ignore
+                        if entries[entry]['message'] is not None and query.lower() in entries[entry]['message'].lower() : 
                             myentry={}
                             myentry["group_name"] = key.decode()
                             myentry["message"] = entries[entry]['message']
@@ -689,9 +689,9 @@ def search(): # type: ignore[no-untyped-def]
         valkey_handle = Valkey(unix_socket_path=get_socket_path('cache'), db=11)
         notes = []
         for key in valkey_handle.keys():
-                entries = json.loads(valkey_handle.get(key)) # type: ignore
+                entries = json.loads(valkey_handle.get(key)) 
                 for entry in entries:
-                    if query.lower() in entry['name'].lower() or query.lower() in entry['content'].lower(): # type: ignore
+                    if query.lower() in entry['name'].lower() or query.lower() in entry['content'].lower(): 
                         entry['group_name']=key.decode()
                         notes.append(entry)
         notes.sort(key=lambda x: x["group_name"].lower())
@@ -816,7 +816,7 @@ def editgroup(database: int, name: str):
     deleteButton = DeleteForm()
 
     valkey_handle = Valkey(unix_socket_path=get_socket_path('cache'), db=database)
-    datagroup = json.loads(valkey_handle.get(name)) # type: ignore
+    datagroup = json.loads(valkey_handle.get(name)) 
     locations = namedtuple('locations',['slug', 'fqdn', 'timeout', 'delay', 'fs', 'chat', 'admin', 'browser', 'private', 'version', 'available', 'title', 'updated', 'lastscrape', 'header', 'fixedfile'])
     locationlist = []
     for entry in datagroup['locations']:
@@ -848,7 +848,7 @@ def editgroup(database: int, name: str):
         flash(f'Success to delete : {name}', 'success')
         return redirect(url_for('admin'))
     if form.validate_on_submit():
-        data = json.loads(valkey_handle.get(name)) # type: ignore
+        data = json.loads(valkey_handle.get(name)) 
         data['meta']=form.description.data
         data['captcha']=form.captcha.data
         data['ransomware_galaxy_value'] = form.galaxy.data
@@ -904,7 +904,7 @@ def editgroup(database: int, name: str):
         valkey_handle.set(name, json.dumps(data))
         valkey_logs_handle.zadd('logs', {f'{flask_login.current_user.id} modified : {name}, {data["meta"]}, {data["profile"]}, {data["locations"]}': score})
         if name != form.groupname.data:
-            valkey_handle.rename(name, form.groupname.data.lower()) # type: ignore[no-untyped-call]
+            valkey_handle.rename(name, form.groupname.data.lower())
             valkey_logs_handle.zadd('logs', {f'{flask_login.current_user.id} renamed : {name} to {form.groupname.data}': score})
         flash(f'Success to edit : {form.groupname.data}', 'success')
         return redirect(url_for('admin'))
@@ -1086,10 +1086,10 @@ def editpost(): # type: ignore[no-untyped-def]
 def editpostentry(name: str):
     valkey_handle = Valkey(unix_socket_path=get_socket_path('cache'), db=2)
     try:
-        posts = json.loads(valkey_handle.get(name)) # type: ignore
+        posts = json.loads(valkey_handle.get(name)) 
     except:
         return redirect('/admin/editpost')
-    postdata = namedtuple('posts', ['post_title', 'discovered', 'description', 'link', 'magnet', 'screen']) # type: ignore
+    postdata = namedtuple('posts', ['post_title', 'discovered', 'description', 'link', 'magnet', 'screen'])
     postlist=[]
     for entry in posts:
        postlist.append(postdata(entry['post_title'], entry['discovered'], entry['description'] if 'description' in entry else '', entry['link'] if 'link' in entry else '', entry['magnet'] if 'magnet' in entry else '', entry['screen'] if 'screen' in entry else ''))
@@ -1140,9 +1140,9 @@ def exportdb(database: int): # type: ignore[no-untyped-def]
     dump={}
     for key in valkey_handle.keys():
         if str(database) != '0' and str(database) != '3':
-            dump[key.decode()]=json.loads(valkey_handle.get(key)) # type: ignore
+            dump[key.decode()]=json.loads(valkey_handle.get(key))
         else:
-            temp = json.loads(valkey_handle.get(key)) # type: ignore
+            temp = json.loads(valkey_handle.get(key)) 
             if not current_user.is_authenticated and 'private' in temp and temp['private'] is True:
                 continue
 

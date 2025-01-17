@@ -22,7 +22,7 @@ from bs4 import BeautifulSoup
 
 import requests, shutil
 
-import valkey
+import valkey # type: ignore
 
 def twitternotify(config: Dict[str, str], group: str, title:str) -> None :
     '''
@@ -58,26 +58,26 @@ def parser() -> None :
            html_doc='source/twitter/'+ key.decode() + '.html'
            file=open(html_doc,'r')
            soup = BeautifulSoup(file,'html.parser')
-           profile = json.loads(valkey_handle.get(key)) # type: ignore
+           profile = json.loads(valkey_handle.get(key)) 
            name =  soup.find('div',{'data-testid':'UserName'}) 
            profile['displayname'] = name.div.div.div.text # type: ignore
            description = soup.find('div', {'data-testid':'UserDescription'})
            if description != None:
-               profile['meta'] = description.text # type: ignore
+               profile['meta'] = description.text 
            location = soup.find('span',{'data-testid':'UserLocation'})
            if location != None:
-               profile['location'] = location.text # type: ignore
+               profile['location'] = location.text 
            website = soup.find('a',{'data-testid':'UserUrl'})
            if website != None:
-               profile['link'] = website.text # type: ignore
+               profile['link'] = website.text 
            join_date =soup.find('span',{'data-testid':'UserJoinDate'}).text # type: ignore
            profile['joindate'] = join_date
-           profile['following'] = soup.find('span', text = "Following").parent.span.text # type: ignore
-           profile['followers'] = soup.find('span', text = "Followers").parent.span.text # type: ignore
+           profile['following'] = soup.find('span', text = "Following").parent.span.text 
+           profile['followers'] = soup.find('span', text = "Followers").parent.span.text 
            valkey_handle.set(key,json.dumps(profile))
            tweets = soup.find_all('article',{'data-testid':'tweet'})
            if key in valkey_message_handle.keys():
-               posts = json.loads(valkey_message_handle.get(key)) # type: ignore
+               posts = json.loads(valkey_message_handle.get(key)) 
            else:
                posts={}
            for tweet  in tweets:

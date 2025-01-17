@@ -10,8 +10,8 @@ from datetime import datetime, timedelta
 from subprocess import Popen
 from typing import List, Optional, Tuple
 
-from valkey import Valkey
-from valkey.exceptions import ConnectionError as ValkeyConnectionError
+from valkey import Valkey # type: ignore
+from valkey.exceptions import ConnectionError as ValkeyConnectionError # type: ignore
 
 from .config import get_socket_path
 

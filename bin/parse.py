@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-#from ransomlook import ransomlook
 import importlib
 from os.path import dirname, basename, isfile, join
 import glob
@@ -10,7 +9,7 @@ from datetime import timedelta
 
 import collections
 
-import valkey
+import valkey # type: ignore
 
 from ransomlook.default.config import get_config, get_socket_path
 

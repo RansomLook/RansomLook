@@ -1,5 +1,5 @@
 import json
-import valkey
+import valkey # type: ignore
 import requests
 
 from ransomlook.default.config import get_config, get_socket_path

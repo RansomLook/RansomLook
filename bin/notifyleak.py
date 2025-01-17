@@ -11,7 +11,7 @@ from typing import List, Any, Dict
 from datetime import date
 from datetime import timedelta
 
-import valkey
+import valkey # type: ignore
 
 from collections import defaultdict
 
@@ -25,7 +25,7 @@ def getnewbreach(date: str) -> List[Dict[str, str]] :
     valkey_handle = valkey.Valkey(unix_socket_path=get_socket_path('cache'), db=4)
     notify = []
     for breaches in valkey_handle.keys():
-        breach = json.loads(valkey_handle.get(breaches)) # type: ignore
+        breach = json.loads(valkey_handle.get(breaches)) 
         if breach['indexed'].split()[0] == date :
             notify.append(breach)
     return notify

@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 import json
-from valkey import Valkey
+from valkey import Valkey # type: ignore
 
 from flask_restx import Namespace, Resource # type: ignore
 
@@ -21,7 +21,7 @@ class Leaks(Resource): # type: ignore[misc]
         for key in valkey_handle.keys():
             leak = {}
             leak['id'] = int(key.decode())
-            leak['name'] = json.loads(valkey_handle.get(key))['name'] # type: ignore
+            leak['name'] = json.loads(valkey_handle.get(key))['name'] 
             leaks.append(leak)
         return sorted(leaks, key=lambda x: x['id'])
 
@@ -31,4 +31,4 @@ class Leaks(Resource): # type: ignore[misc]
 class LeaksDetails(Resource): # type: ignore[misc]
     def get(self, id: str) -> Dict[str, Any]:
         valkey_handle = Valkey(unix_socket_path=get_socket_path('cache'), db=4)
-        return json.loads(valkey_handle.get(id)) # type: ignore
+        return json.loads(valkey_handle.get(id)) 

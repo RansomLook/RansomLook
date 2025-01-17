@@ -2,7 +2,7 @@
 
 import json
 from typing import Any, Dict, Optional
-from valkey import Valkey
+from valkey import Valkey # type: ignore
 
 from flask import send_from_directory
 
@@ -37,12 +37,12 @@ class Channnelinfo(Resource): # type: ignore[misc]
         sorted_posts:Dict[str, Any] = {}
         for key in valkey_handle.keys():
                 if key.decode().lower() == name.lower():
-                        group= json.loads(valkey_handle.get(key)) # type: ignore
+                        group= json.loads(valkey_handle.get(key)) 
                         if group['meta'] is not None:
                             group['meta']=group['meta'].replace('\n', '<br/>')
                         valkey_post_handle = Valkey(unix_socket_path=get_socket_path('cache'), db=6)
                         if key in valkey_post_handle.keys():
-                            posts=json.loads(valkey_post_handle.get(key)) # type: ignore
+                            posts=json.loads(valkey_post_handle.get(key)) 
                             sorted_posts = OrderedDict(sorted(posts.items(), key=lambda t: t[0], reverse=True))
                         else:
                             sorted_posts = {}

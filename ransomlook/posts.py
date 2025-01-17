@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 import json
-import valkey
+import valkey #type: ignore
 import uuid
 
 from datetime import datetime
@@ -77,13 +77,13 @@ def appender(entry: Union[Dict[str, str|None], str], group_name: str) -> int :
     posts=[]
 
     if group_name.encode() in valkey_handle.keys():
-        posts = json.loads(valkey_handle.get(group_name)) # type: ignore
+        posts = json.loads(valkey_handle.get(group_name)) 
         for post in posts:
             if post['post_title'] == post_title:
                 stdlog('post already existing')
                 print(post)
                 return 1
-    newpost = posttemplate(post_title, description, link, str(entry['date']) if 'date' in entry else str(datetime.today()), magnet, screen) # type: ignore
+    newpost = posttemplate(post_title, description, link, str(entry['date']) if 'date' in entry else str(datetime.today()), magnet, screen) 
     stdlog('adding new post: ' + 'group: ' + group_name + ' title: ' + post_title)
     posts.append(newpost)
     valkey_handle.set(group_name, json.dumps(posts))
@@ -93,8 +93,8 @@ def appender(entry: Union[Dict[str, str|None], str], group_name: str) -> int :
         if 'toscan'.encode() not in screen_valkey_handle.keys():
            toscan=[]
         else:
-           toscan = json.loads(screen_valkey_handle.get('toscan')) # type: ignore
-        toscan.append({'group': group_name, 'title': entry['title'], 'slug': entry['slug'], 'link': entry['link']}) # type: ignore
+           toscan = json.loads(screen_valkey_handle.get('toscan')) 
+        toscan.append({'group': group_name, 'title': entry['title'], 'slug': entry['slug'], 'link': entry['link']}) 
         screen_valkey_handle.set('toscan', json.dumps(toscan))
     # preparing to torrent
     if magnet != None and magnet != '':
@@ -102,8 +102,8 @@ def appender(entry: Union[Dict[str, str|None], str], group_name: str) -> int :
         if 'totorrent'.encode() not in torrent_valkey_handle.keys():
            totorrent=[]
         else: 
-           totorrent = json.loads(torrent_valkey_handle.get('totorrent')) # type: ignore
-        totorrent.append({'group': group_name, 'title': entry['title'], 'magnet': entry['magnet']}) # type: ignore
+           totorrent = json.loads(torrent_valkey_handle.get('totorrent')) 
+        totorrent.append({'group': group_name, 'title': entry['title'], 'magnet': entry['magnet']}) 
         torrent_valkey_handle.set('totorrent', json.dumps(totorrent))
     # Notification zone
     valkey_handle = valkey.Valkey(unix_socket_path=get_socket_path('cache'), db=1)
@@ -136,7 +136,7 @@ def appender(entry: Union[Dict[str, str|None], str], group_name: str) -> int :
             group_valkey_handle = valkey.Valkey(unix_socket_path=get_socket_path('cache'), db=0)
             for key in group_valkey_handle.keys():
                 if key.decode() == group_name:
-                       groupinfo = json.loads(group_valkey_handle.get(key)) # type: ignore
+                       groupinfo = json.loads(group_valkey_handle.get(key)) 
             galaxyname = groupinfo['ransomware_galaxy_value']
         except:
             galaxyname = None

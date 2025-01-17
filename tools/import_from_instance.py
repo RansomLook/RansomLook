@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 import json
-import valkey
+import valkey # type: ignore
 from ransomlook.default import get_socket_path
 import requests
 

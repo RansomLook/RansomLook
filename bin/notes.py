@@ -1,5 +1,5 @@
 import json
-import valkey
+import valkey # type: ignore
 import tempfile
 import os
 from git import Repo

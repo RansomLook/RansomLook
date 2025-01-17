@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 import json
-import valkey
+import valkey # type: ignore
 from ransomlook.default import get_socket_path
 
 valkey_handle = valkey.Valkey(unix_socket_path=get_socket_path('cache'), db=0)

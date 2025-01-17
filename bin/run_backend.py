@@ -7,8 +7,8 @@ from pathlib import Path
 from subprocess import Popen
 from typing import Optional, Dict
 
-from valkey import Valkey
-from valkey.exceptions import ConnectionError
+from valkey import Valkey # type: ignore
+from valkey.exceptions import ConnectionError # type: ignore
 
 from ransomlook.default import get_homedir, get_socket_path
 

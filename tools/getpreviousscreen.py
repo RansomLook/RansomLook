@@ -11,7 +11,7 @@ from datetime import timedelta
 
 import collections
 
-import valkey
+import valkey # type: ignore
 
 from ransomlook.default.config import get_config, get_socket_path
 
@@ -64,7 +64,7 @@ def appender(entry, group_name: str) -> None: # type: ignore
         if 'toscan'.encode() not in screen_valk_handle.keys():
            toscan=[]
         else: 
-           toscan = json.loads(screen_valk_handle.get('toscan')) # type: ignore
+           toscan = json.loads(screen_valk_handle.get('toscan')) 
         toscan.append({'group': group_name, 'title': entry['title'], 'slug': entry['slug'], 'link': entry['link']})
         screen_valk_handle.set('toscan', json.dumps(toscan))
     # preparing to torrent
@@ -73,7 +73,7 @@ def appender(entry, group_name: str) -> None: # type: ignore
         if 'totorrent'.encode() not in torrent_valk_handle.keys():
            totorrent=[]
         else: 
-           totorrent = json.loads(torrent_valk_handle.get('totorrent')) # type: ignore
+           totorrent = json.loads(torrent_valk_handle.get('totorrent')) 
         totorrent.append({'group': group_name, 'title': entry['title'], 'magnet': entry['magnet']})
         torrent_valk_handle.set('totorrent', json.dumps(totorrent))
 

@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-import valkey
+import valkey # type: ignore
 import requests
 from collections import defaultdict
 import json

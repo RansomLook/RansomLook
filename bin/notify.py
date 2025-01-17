@@ -11,7 +11,7 @@ from typing import List, Any, Dict
 from datetime import date
 from datetime import timedelta
 
-import valkey
+import valkey # type: ignore
 
 from collections import defaultdict
 
@@ -25,7 +25,7 @@ def getnewpost(date: str) -> Dict[str, List[str]] :
     valkey_handle = valkey.Valkey(unix_socket_path=get_socket_path('cache'), db=2)
     notify = defaultdict(list)
     for group in valkey_handle.keys():
-        posts = json.loads(valkey_handle.get(group)) # type: ignore
+        posts = json.loads(valkey_handle.get(group))
         for post in posts:
             if post['discovered'].split()[0] == date :
                 notify[group.decode()].append(post['post_title'])

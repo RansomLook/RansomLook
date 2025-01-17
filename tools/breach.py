@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-import valkey
+import valkey # type: ignore
 import os
 from ransomlook.default import get_socket_path, get_config
 

@@ -14,7 +14,6 @@ from dateutil.relativedelta import relativedelta
 import urllib.parse
 import time
 from typing import Dict, Any, Optional
-from valkey import Valkey
 from pylacus import PyLacus
 from pylacus import CaptureSettings
 from lacuscore import LacusCore
@@ -24,7 +23,7 @@ import base64
 
 from .default.config import get_config, get_homedir, get_socket_path
 
-import valkey
+import valkey #type: ignore
 from PIL import Image
 from PIL.PngImagePlugin import PngInfo
 
@@ -36,7 +35,7 @@ from .sharedutils import format_bytes
 
 # pylint: disable=W0703
 
-valkeylacus = Valkey(unix_socket_path=get_socket_path('cache'), db=15)
+valkeylacus = valkey.Valkey(unix_socket_path=get_socket_path('cache'), db=15)
 lacus = LacusCore(valkeylacus,tor_proxy='socks5://127.0.0.1:9050')
 
 def creategroup(location: str, fs: bool, private: bool, chat: bool, admin: bool, browser: str|None) -> Dict[str, object] :
@@ -92,10 +91,10 @@ def scraper(base: int) -> None:
                 remote_lacus_url = None
 
     if not remote_lacus_url:
-        lacus = LacusCore(valkeylacus,tor_proxy='socks5://127.0.0.1:9050') # type: ignore
+        lacus = LacusCore(valkeylacus,tor_proxy='socks5://127.0.0.1:9050') 
 
     for key in valkey_handle.keys():
-        group = json.loads(valkey_handle.get(key)) # type: ignore
+        group = json.loads(valkey_handle.get(key)) 
         group['name'] = key.decode()
         groups.append(group)
     for group in groups:
@@ -125,7 +124,7 @@ def scraper(base: int) -> None:
     while running_capture:
         for key in list(running_capture): # type: ignore
             if lacus.get_capture_status(str(key)) == -1:
-                group = json.loads(valkey_handle.get(running_capture[str(key)]['group'])) # type: ignore
+                group = json.loads(valkey_handle.get(running_capture[str(key)]['group'])) 
                 for location in group['locations']:
                     if location['slug']==running_capture[str(key)]['slug']:
                         location.update({'available':False})
@@ -136,7 +135,7 @@ def scraper(base: int) -> None:
             if lacus.get_capture_status(str(key)) == 1:
                 result = lacus.get_capture(str(key))
                 name = str(running_capture[str(key)]['group'])
-                group = json.loads(valkey_handle.get(name)) # type: ignore
+                group = json.loads(valkey_handle.get(name)) 
                 for location in group['locations']:
                     if location['slug']==running_capture[str(key)]['slug']:
                         host=location
@@ -214,7 +213,7 @@ def appender(name: str, location: str, db: int, fs: bool, private: bool, chat: b
     to an existing group within groups.json
     '''
     valkey_handle = valkey.Valkey(unix_socket_path=get_socket_path('cache'), db=db)
-    group = json.loads(valkey_handle.get(name.strip())) # type: ignore
+    group = json.loads(valkey_handle.get(name.strip())) 
     success = bool()
     for loc in group['locations']:
         if location == loc['slug']:
@@ -230,7 +229,7 @@ def screen() -> None:
         stdlog('No screen to do !')
         return
     valkey_group_handle = valkey.Valkey(unix_socket_path=get_socket_path('cache'), db=0)
-    captures = json.loads(valkey_handle.get('toscan')) # type: ignore
+    captures = json.loads(valkey_handle.get('toscan')) 
     remote_lacus_url = None
     if get_config('generic', 'remote_lacus'):
         remote_lacus_config = get_config('generic', 'remote_lacus')
@@ -244,12 +243,12 @@ def screen() -> None:
                 remote_lacus_url = None
 
     if not remote_lacus_url:
-        lacus = LacusCore(valkeylacus,tor_proxy='socks5://127.0.0.1:9050') # type: ignore
+        lacus = LacusCore(valkeylacus,tor_proxy='socks5://127.0.0.1:9050') 
 
     uuids = []
     slugs = []
     for capture in captures:
-        group = json.loads(valkey_group_handle.get(capture['group'].encode())) # type: ignore
+        group = json.loads(valkey_group_handle.get(capture['group'].encode())) 
         for host in group['locations']:
           try:
             if capture['slug'].removeprefix(capture['group']+'-').split('.')[0] in striptld(host['slug']):
@@ -290,7 +289,7 @@ def screen() -> None:
                         uuids.remove(capture['uuid'])
                         del capture['uuid']
 
-                        if result['status']=='error' or 'error' in result: # type: ignore
+                        if result['status']=='error' or 'error' in result: 
                             valkey_handle.set('toscan', json.dumps(captures))
                             continue
                         if 'png' in result and 'html' in result:
@@ -318,13 +317,13 @@ def screen() -> None:
                             with open(name, 'w') as tosave:
                                 tosave.write(result['html']) # type: ignore
                             valkey_post_handle = valkey.Valkey(unix_socket_path=get_socket_path('cache'), db=2)
-                            updated = json.loads(valkey_post_handle.get(capture['group'])) # type: ignore
+                            updated = json.loads(valkey_post_handle.get(capture['group'])) 
                             for post in updated:
                                 if post['post_title'] == capture['title']:
                                     post['screen'] = str(os.path.join('screenshots', capture['group'], filenamepng))
                                     post.update(post)
                             valkey_post_handle.set(capture['group'], json.dumps(updated))
-                            toscreen = json.loads(valkey_handle.get('toscan')) # type: ignore
+                            toscreen = json.loads(valkey_handle.get('toscan')) 
                             for idx, item in enumerate(toscreen):
                                 if item['group'] == capture['group'] and item['title'] == capture['title']:
                                     toscreen.pop(idx)
@@ -377,14 +376,14 @@ def threadtorrent(queuethread, lock) -> None: # type: ignore[no-untyped-def]
         f.close()
 
         valkey_handle = valkey.Valkey(unix_socket_path=get_socket_path('cache'), db=2)
-        updated = json.loads(valkey_handle.get(torrent['group'])) # type: ignore
+        updated = json.loads(valkey_handle.get(torrent['group'])) 
         for post in updated:
             if post['post_title'] == torrent['title']:
                 post['screen'] = str(os.path.join('screenshots', torrent['group'], filename))
                 post.update(post)
         valkey_handle.set(torrent['group'], json.dumps(updated))
         valkey_handle = valkey.Valkey(unix_socket_path=get_socket_path('cache'), db=1)
-        totorrent = json.loads(valkey_handle.get('totorrent')) # type: ignore
+        totorrent = json.loads(valkey_handle.get('totorrent')) 
         for idx, item in enumerate(totorrent):
             if item['group'] == torrent['group'] and item['title'] == torrent['title']:
                 totorrent.pop(idx)
@@ -406,7 +405,7 @@ def gettorrentinfo() -> None :
         t = Thread(target=threadtorrent, args=(queuethread,lock), daemon=True)
         t.start()
 
-    torrents = json.loads(valkey_handle.get('totorrent')) # type: ignore
+    torrents = json.loads(valkey_handle.get('totorrent')) 
     for torrent in torrents:
         data = [sess,torrent]
         queuethread.put(data)

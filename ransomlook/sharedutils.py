@@ -8,7 +8,7 @@ from datetime import timedelta
 import glob
 from os.path import dirname, basename, isfile, join
 import sys
-import valkey
+import valkey # type: ignore
 
 import matplotlib.pyplot as plt
 import plotly.express as px # type: ignore
@@ -55,7 +55,7 @@ def statsgroup(group: bytes) -> None :
     counts = (Any)
 
     valkey_handle = valkey.Valkey(unix_socket_path=get_socket_path('cache'), db=2)
-    post_data = json.loads(valkey_handle.get(group)) # type: ignore
+    post_data = json.loads(valkey_handle.get(group)) 
     # Count the number of victims per day
     for post in post_data:
         date = post['discovered'].split(' ')[0]
@@ -108,7 +108,7 @@ def run_data_viz(days_filter: int) -> None:
     group_names = []
     timestamps = []
     for key in valkey_handle.keys():
-        posts = json.loads(valkey_handle.get(key)) # type: ignore
+        posts = json.loads(valkey_handle.get(key)) 
         for post in posts:
             postdate = datetime.fromisoformat(post['discovered'])
             if (now - postdate).days < days_filter:
@@ -167,7 +167,7 @@ def postcount() -> int :
     post_count = 0
     valkey_handle = valkey.Valkey(unix_socket_path=get_socket_path('cache'), db=2)
     for group in valkey_handle.keys():
-        grouppost = json.loads(valkey_handle.get(group)) # type: ignore
+        grouppost = json.loads(valkey_handle.get(group)) 
         post_count+=len(grouppost)
     return post_count
 
@@ -181,7 +181,7 @@ def hostcount(db: int) -> int :
     groups = valkey_handle.keys()
     host_count = 0
     for entry in groups:
-        group = json.loads(valkey_handle.get(entry)) # type: ignore
+        group = json.loads(valkey_handle.get(entry)) 
         for host in group['locations']:
             host_count += 1
     return host_count
@@ -191,7 +191,7 @@ def hostcountdls(db: int) -> int :
     groups = valkey_handle.keys()
     host_count = 0
     for entry in groups:
-        group = json.loads(valkey_handle.get(entry)) # type: ignore
+        group = json.loads(valkey_handle.get(entry)) 
         for host in group['locations']:
             if (not 'chat' in host or host['chat'] is False) and (not 'fs' in host or host['fs'] is False) and (not 'admin' in host or host['admin'] is False):
                 host_count += 1
@@ -202,7 +202,7 @@ def hostcountfs(db: int) -> int :
     groups = valkey_handle.keys()
     host_count = 0
     for entry in groups:
-        group = json.loads(valkey_handle.get(entry)) # type: ignore
+        group = json.loads(valkey_handle.get(entry)) 
         for host in group['locations']:
             if 'fs' in host and host['fs'] is True:
                 host_count += 1
@@ -213,7 +213,7 @@ def hostcountchat(db: int) -> int :
     groups = valkey_handle.keys()
     host_count = 0
     for entry in groups:
-        group = json.loads(valkey_handle.get(entry)) # type: ignore
+        group = json.loads(valkey_handle.get(entry)) 
         for host in group['locations']:
             if 'chat' in host and host['chat'] is True:
                 host_count += 1
@@ -224,7 +224,7 @@ def hostcountadmin(db: int) -> int :
     groups = valkey_handle.keys()
     host_count = 0
     for entry in groups:
-        group = json.loads(valkey_handle.get(entry)) # type: ignore
+        group = json.loads(valkey_handle.get(entry)) 
         for host in group['locations']:
             if 'admin' in host and host['admin'] is True:
                 host_count += 1
@@ -236,7 +236,7 @@ def postssince(days: int) -> int :
     valkey_handle = valkey.Valkey(unix_socket_path=get_socket_path('cache'), db=2)
     groups = valkey_handle.keys()
     for entry in groups:
-        posts = json.loads(valkey_handle.get(entry)) # type: ignore
+        posts = json.loads(valkey_handle.get(entry)) 
         for post in posts:
             try:
                 datetime_object = datetime.strptime(post['discovered'], '%Y-%m-%d %H:%M:%S.%f')
@@ -253,7 +253,7 @@ def poststhisyear() -> int :
     valkey_handle = valkey.Valkey(unix_socket_path=get_socket_path('cache'), db=2)
     groups = valkey_handle.keys()
     for entry in groups:
-        posts = json.loads(valkey_handle.get(entry)) # type: ignore
+        posts = json.loads(valkey_handle.get(entry)) 
         for post in posts:
             try:
                 datetime_object = datetime.strptime(post['discovered'], '%Y-%m-%d %H:%M:%S.%f')
@@ -269,7 +269,7 @@ def postslast24h() -> int :
     valkey_handle = valkey.Valkey(unix_socket_path=get_socket_path('cache'), db=2)
     groups = valkey_handle.keys()
     for entry in groups:
-        posts = json.loads(valkey_handle.get(entry)) # type: ignore
+        posts = json.loads(valkey_handle.get(entry)) 
         for post in posts:
             try :
                 datetime_object = datetime.strptime(post['discovered'], '%Y-%m-%d %H:%M:%S.%f')
@@ -289,7 +289,7 @@ def onlinecount(db: int) -> int :
     groups = valkey_handle.keys()
     online_count = 0
     for entry in groups:
-        group = json.loads(valkey_handle.get(entry)) # type: ignore
+        group = json.loads(valkey_handle.get(entry)) 
         for host in group['locations']:
             if host['available'] is True:
                 online_count += 1
@@ -311,7 +311,7 @@ def mounthlypostcount() -> int :
     date_today = datetime.now()
     month_first_day = date_today.replace(day=1, hour=0, minute=0, second=0, microsecond=0)
     for entry in groups:
-        posts = json.loads(valkey_handle.get(entry)) # type: ignore
+        posts = json.loads(valkey_handle.get(entry)) 
         for post in posts:
             try:
                 datetime_object = datetime.strptime(post['discovered'], '%Y-%m-%d %H:%M:%S.%f')
@@ -327,7 +327,7 @@ def countcaptchahosts() -> int :
     groups = valkey_handle.keys()
     captcha_count = 0
     for entry in groups:
-        group = json.loads(valkey_handle.get(entry)) # type: ignore
+        group = json.loads(valkey_handle.get(entry)) 
         if group['captcha'] is True:
             captcha_count += 1
     return captcha_count

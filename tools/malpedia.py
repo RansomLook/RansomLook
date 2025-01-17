@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 import json
-import valkey
+import valkey # type: ignore
 import requests
 
 from ransomlook.default import get_socket_path, get_config
@@ -33,7 +33,7 @@ for family in families:
                print(alter)
            for url in families[family]['urls']:
                print(url)
-           group = json.loads(valkey_handle.get(key)) # type: ignore
+           group = json.loads(valkey_handle.get(key))
            group['meta'] = families[family]['description']
            group['profile'].extend(families[family]['urls'])
            valkey_handle.set(key,json.dumps(group))

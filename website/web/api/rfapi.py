@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 import json
-from valkey import Valkey
+from valkey import Valkey #type: ignore
 
 from flask_restx import Namespace, Resource # type: ignore
 
