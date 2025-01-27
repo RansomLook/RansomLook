@@ -12,9 +12,10 @@ def main() -> List[Dict[str, str]] :
             soup=BeautifulSoup(file,'html.parser')
             divs_name=soup.find_all('div', {"class": "col-lg-4 col-sm-6 mb-4"})
             for div in divs_name:
-                itemize= div.find_all('h5')
-                for item in itemize :
-                    list_div.append(item.text.strip())
+                title = div.find('h5').text.strip()
+                description = div.find('p').text.strip()
+                link = div.a['href']
+                list_div.append({'title' : title, 'description': description, 'link': link, 'slug': filename})
             file.close()
-    list_div = list(dict.fromkeys(list_div))
+    print(list_div)
     return list_div
