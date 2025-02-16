@@ -206,11 +206,13 @@ It's recommanded to create a cron job to scrape and parse all groups every 2 hou
 
 # License
 
-Copyright (C) 2022-2024 [Fafner \[\_KeyZee\_\]](https://github.com/FafnerKeyZee)
+Copyright (C) 2022-2025 [Fafner \[\_KeyZee\_\]](https://github.com/FafnerKeyZee)
 
-Copyright (C) 2022-2024 [Alexandre Dulaunoy](https://github.com/adulau/)
+Copyright (C) 2022-2025 [Alexandre Dulaunoy](https://github.com/adulau/)
 
-Copyright (C) 2022-2024 [CERT-AG](https://cert-ag.com/) - CERT AG
+Copyright (C) 2023-2025 Tammy Harper
+
+Copyright (C) 2022-2025 [CERT-AG](https://cert-ag.com/) - CERT AG
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU Affero General Public License as published

@@ -128,12 +128,13 @@ def scraper(base: int) -> None:
                 group = json.loads(red.get(running_capture[str(key)]['group'])) # type: ignore
                 for location in group['locations']:
                     if location['slug']==running_capture[str(key)]['slug']:
+                        print(location['slug'])
                         location.update({'available':False})
                         red.set(running_capture[str(key)]['group'], json.dumps(group))
                         break
                 running_capture.pop(str(key))
                 continue
-            if lacus.get_capture_status(str(key)) == 1:
+            if lacus.get_capture_status(str(key)) == 1 :
                 result = lacus.get_capture(str(key))
                 name = str(running_capture[str(key)]['group'])
                 group = json.loads(red.get(name)) # type: ignore
@@ -141,11 +142,12 @@ def scraper(base: int) -> None:
                     if location['slug']==running_capture[str(key)]['slug']:
                         host=location
                         continue
-                if result['status']=='error': # type: ignore
-                    host.update({'available':False})
-                    running_capture.pop(str(key))
-                    red.set(name, json.dumps(group))
-                    continue
+                print(name)
+                #if result['status']=='error': # type: ignore
+                #    host.update({'available':False})
+                #    running_capture.pop(str(key))
+                #    red.set(name, json.dumps(group))
+                #    continue
                 if 'png' in result and not ('fixedfile' in host and host['fixedfile'] is True):
                     filename = name + '-' + createfile(host['slug']) + '.png'
                     namefile = os.path.join(get_homedir(), 'source/screenshots', filename)
@@ -171,7 +173,6 @@ def scraper(base: int) -> None:
                                 tosave.write((result['png'])) # type: ignore
                             else:
                                 tosave.write(base64.b64decode(result['png'])) # type: ignore
-
                 if 'html' in result:
                     filename = name + '-' + striptld(host['slug']) + '.html'
                     namefile = os.path.join(os.getcwd(), 'source', filename)
@@ -180,7 +181,21 @@ def scraper(base: int) -> None:
                     host.update({'available':True, 'title':result['har']['log']['pages'][0]['title'], # type: ignore
                              'lastscrape':result['har']['log']['pages'][0]['startedDateTime'].replace('T',' ').replace('Z',''), # type: ignore
                              'updated':result['har']['log']['pages'][0]['startedDateTime'].replace('T',' ').replace('Z','')}) # type: ignore
-
+                elif 'har' in result and 'log' in result['har'] and 'entries' in result['har']['log'] :
+                    print('using har')
+                    print(result['har']['log']['entries'][0]['response']['content']['text'])
+                    try:
+                        html = result['har']['log']['entries'][0]['response']['content']['text']
+                        print(html)
+                        filename = name + '-' + striptld(host['slug']) + '.html'
+                        namefile = os.path.join(os.getcwd(), 'source', filename)
+                        with open(namefile, 'w') as tosave:
+                            tosave.write(html) # type: ignore
+                        host.update({'available':True, 'title':result['har']['log']['pages'][0]['title'], # type: ignore
+                             'lastscrape':result['har']['log']['pages'][0]['startedDateTime'].replace('T',' ').replace('Z',''), # type: ignore
+                             'updated':result['har']['log']['pages'][0]['startedDateTime'].replace('T',' ').replace('Z','')}) # type: ignore
+                    except:
+                        host.update({'available':False})
                 else:
                     host.update({'available':False})
                 red.set(name, json.dumps(group))
@@ -264,7 +279,6 @@ def screen() -> None:
                        settings['headers']=host['header']
                    if 'browser' in host and host['browser'] is not None:
                        settings['browser']=host['browser']
-
                    uuid = lacus.enqueue(settings=settings)
                    capture.update({'uuid':uuid})
                    uuids.append(uuid)
