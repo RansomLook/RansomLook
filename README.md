@@ -210,7 +210,7 @@ Copyright (C) 2022-2025 [Fafner \[\_KeyZee\_\]](https://github.com/FafnerKeyZee)
 
 Copyright (C) 2022-2025 [Alexandre Dulaunoy](https://github.com/adulau/)
 
-Copyright (C) 2023-2025 Tammy Harper
+Copyright (C) 2023-2025 [Tammy Harper](https://www.linkedin.com/in/tammyharper11)
 
 Copyright (C) 2022-2025 [CERT-AG](https://cert-ag.com/) - CERT AG
 
