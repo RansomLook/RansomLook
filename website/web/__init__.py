@@ -188,8 +188,8 @@ def login(): # type: ignore[no-untyped-def]
 
 
 @app.route('/logout')
-@flask_login.login_required # type: ignore[no-untyped-def]
-def logout():
+@flask_login.login_required
+def logout(): # type: ignore
     flask_login.logout_user()
     flash('Successfully logged out.', 'success')
     return redirect(url_for('home'))
@@ -811,7 +811,7 @@ def edit(): # type: ignore[no-untyped-def]
 
 @app.route('/admin/edit/<database>/<name>', methods=['GET', 'POST'])
 @flask_login.login_required # type: ignore
-def editgroup(database: int, name: str): 
+def editgroup(database: int, name: str): # type: ignore 
     score = dt.now().timestamp()
     deleteButton = DeleteForm()
 
@@ -940,7 +940,7 @@ def logo(): # type: ignore[no-untyped-def]
 
 @app.route('/admin/logo/<database>/<name>', methods=['GET', 'POST'])
 @flask_login.login_required # type: ignore
-def editlogo(database: int, name: str):
+def editlogo(database: int, name: str): # type: ignore
     if not (int(database) == 3 or int(database) == 0):
         return render_template('admin.html')
     logo =  namedtuple('logo',['link'])
@@ -1001,7 +1001,7 @@ def addpost(): # type: ignore[no-untyped-def]
 
 @app.route('/admin/addpost/<database>/<name>', methods=['GET', 'POST'])
 @flask_login.login_required # type: ignore
-def addpostentry(database: int, name: str): 
+def addpostentry(database: int, name: str): # type: ignore
     score = dt.now().timestamp()
     form = AddPostForm()
     redlogs = Redis(unix_socket_path=get_socket_path('cache'), db=1)
@@ -1083,7 +1083,7 @@ def editpost(): # type: ignore[no-untyped-def]
 
 @app.route('/admin/editpost/<name>', methods=['GET', 'POST'])
 @flask_login.login_required # type: ignore
-def editpostentry(name: str):
+def editpostentry(name: str): # type: ignore
     red = Redis(unix_socket_path=get_socket_path('cache'), db=2)
     try:
         posts = json.loads(red.get(name)) # type: ignore
