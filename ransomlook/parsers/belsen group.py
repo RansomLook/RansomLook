@@ -12,8 +12,8 @@ def main() -> List[Dict[str, str]] :
                 file=open(html_doc,'r')
                 soup=BeautifulSoup(file,'html.parser')
                 divs_name=soup.find('table',{"class": "table table-striped custom-table"})
-                tbody = divs_name.find('tbody')
-                trs = tbody.find_all('tr')
+                tbody = divs_name.find('tbody') # type: ignore
+                trs = tbody.find_all('tr') # type: ignore
                 for div in trs:
                     try:
                         td = div.find_all('td')
