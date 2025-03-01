@@ -945,8 +945,11 @@ def editlogo(database: int, name: str): # type: ignore
         return render_template('admin.html')
     logo =  namedtuple('logo',['link'])
     logos = []
-    logofolder = os.path.normpath(str(get_homedir()) + '/source/logo/'+dbvalue[int(database)]+'/'+name)
-    if  os.path.exists(logofolder):
+    base_path = os.path.normpath(str(get_homedir()) + '/source/logo/' + dbvalue[int(database)])
+    logofolder = os.path.normpath(os.path.join(base_path, name))
+    if not logofolder.startswith(base_path):
+        raise Exception("Invalid path")
+    if os.path.exists(logofolder):
         listlogo = [f for f in listdir(logofolder) if isfile(join(logofolder, f))]
         for f in listlogo:
             logos.append(logo("/logo/"+dbvalue[int(database)]+"/"+name+"/" +f))
