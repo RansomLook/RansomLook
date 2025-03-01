@@ -407,9 +407,12 @@ def group(name: str): # type: ignore[no-untyped-def]
                         group= json.loads(red.get(key)) # type: ignore
                         if not current_user.is_authenticated and 'private' in group and group['private'] is True:
                             return redirect(url_for("home"))
-                        logofolder = os.path.normpath(str(get_homedir()) + '/source/logo/group/'+name)
+                        base_path = os.path.normpath(str(get_homedir()) + '/source/logo/group/')
+                        logofolder = os.path.normpath(os.path.join(base_path, name))
                         logo=[]
-                        if  os.path.exists(logofolder):
+                        if not logofolder.startswith(base_path):
+                            raise Exception("Invalid path")
+                        if os.path.exists(logofolder):
                             listlogo = [f for f in listdir(logofolder) if isfile(join(logofolder, f))]
                             for f in listlogo:
                                 logo.append("/logo/group/"+name+"/" +f)
