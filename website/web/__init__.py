@@ -1121,7 +1121,11 @@ def editpostentry(name: str): # type: ignore
                     flash(f'Error to add post to : {name} - Screen should be a PNG', 'error')
                     return render_template('editpost.html', form=form)
                 filenamepng = createfile(post['post_title']) + file_ext
-                path = os.path.normpath(str(get_homedir()) +  '/source/screenshots/' + name)
+                base_path = os.path.normpath(str(get_homedir()) + '/source/screenshots')
+                path = os.path.normpath(os.path.join(base_path, name))
+                if not path.startswith(base_path):
+                    flash(f'Invalid path: {name}', 'error')
+                    return render_template('editpost.html', form=form)
                 if not os.path.exists(path):
                     os.mkdir(path)
                 namepng = os.path.normpath(path +'/' +filenamepng)
