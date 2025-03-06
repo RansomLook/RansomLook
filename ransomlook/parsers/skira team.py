@@ -10,12 +10,14 @@ def main() -> List[Dict[str, str]] :
             html_doc='source/'+filename
             file=open(html_doc,'r')
             soup=BeautifulSoup(file,'html.parser')
-            divs_name=soup.find_all('div', {"class": "incident-info"})
+            divs_name=soup.find_all('a')
             for div in divs_name:
-                data = div.find_all('dd')
-                title = data[0].text.strip()
-                description = data[1].text.strip()
-                list_div.append({'title' : title, 'description': description})
+                title = div.text.strip()
+                if title in ['To HOMEPAGE','https://getsession.org/']:
+                   continue
+                description = ""
+                link = div['href']
+                list_div.append({'title' : title, 'description': description, 'link': link, 'slug': filename})
             file.close()
     print(list_div)
     return list_div
