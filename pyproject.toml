@@ -71,7 +71,7 @@ playwrightcapture = "^1.28.0"
 lacuscore = "^1.13.0"
 pylacus = "^1.13.0"
 
-[tool.poetry.dev-dependencies]
+[tool.poetry.group.dev.dependencies]
 mypy = "^1.15.0"
 types-redis = "^4.6.0.20241004"
 pylint = "^3.3.4"
