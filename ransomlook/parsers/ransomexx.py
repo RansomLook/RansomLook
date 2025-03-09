@@ -18,6 +18,16 @@ def main() -> List[Dict[str, str]] :
                     link = div.find('a', {"rel": "bookmark"})['href']
                     list_div.append({'title':title, 'description': description, 'link': link, 'slug': filename})
                 file.close()
+                maincontent = soup.find('maincontent')
+                divs_name=maincontent.find_all('li') # type: ignore
+                for div in divs_name:
+                    print(div)
+                    title = div.find('h4').text.strip()
+                    description = div.find('p').text.strip()
+                    link = div.find('a')['href']
+                    list_div.append({'title':title, 'description': description, 'link': link, 'slug': filename})
+                file.close()
+
         except:
             print("Failed during : " + filename)
             pass
