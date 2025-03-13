@@ -15,7 +15,8 @@ def main() -> List[Dict[str, str]] :
                 title = div.find('div',{"class": "name"}).text.strip()
                 description = ""
                 try:
-                    link = div.find('button')['onclick']
+                    link = div.find('button')['onclick'].split('"')[1]
+                    print(link)
                     list_div.append({'title' : title, 'description': description, 'link': link, 'slug': filename})
 
                 except:
