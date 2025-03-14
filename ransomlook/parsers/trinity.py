@@ -20,6 +20,13 @@ def main() -> List[Dict[str, str]] :
                     description = para[1].text.strip()
                     link = div.find('a')["href"]
                     list_div.append({"title": title, "description": description, "link": link, "slug": filename})
+                divs_name = soup.find_all('div',{"class":"card-body"})
+                for div in divs_name:
+                    title= div.find('h5').text.strip()
+                    description = div.find('p',{"class": "card-text"}).text.strip()
+                    link = div.find('a')["href"]
+                    list_div.append({"title": title, "description": description, "link": link, "slug": filename})
+
                 file.close()
             except:
                 pass
