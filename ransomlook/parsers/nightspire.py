@@ -16,7 +16,6 @@ def main() -> List[Dict[str, str]] :
                 description = ""
                 try:
                     link = div.find('button')['onclick'].split('"')[1]
-                    print(link)
                     list_div.append({'title' : title, 'description': description, 'link': link, 'slug': filename})
 
                 except:
