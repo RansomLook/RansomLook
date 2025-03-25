@@ -263,6 +263,9 @@ def screen() -> None:
         for host in group['locations']:
           try:
             if capture['slug'].removeprefix(capture['group']+'-').split('.')[0] in striptld(host['slug']):
+                if host['private'] is true:
+                    continue
+
                 capture.update({'slug2' : urllib.parse.urljoin(host['slug'], str(capture['link']))})
                 if capture['slug2'] not in slugs:
                    slugs.append(capture['slug2'])
@@ -300,7 +303,8 @@ def screen() -> None:
                         del capture['uuid']
 
                         if result['status']=='error' or 'error' in result: # type: ignore
-                            red.set('toscan', json.dumps(captures))
+                            #red.set('toscan', json.dumps(captures))
+                            print("We failed need to fix it")
                             continue
                         if 'png' in result and 'html' in result:
                             filenamepng = createfile(capture['title']) + '.png'
@@ -308,7 +312,6 @@ def screen() -> None:
                             if not os.path.exists(path):
                                 os.mkdir(path)
                             namepng = os.path.join(path, filenamepng)
-                            print(namepng)
                             with open(namepng, 'wb') as tosave:
                                 if remote_lacus_url:
                                     tosave.write((result['png'])) # type: ignore
