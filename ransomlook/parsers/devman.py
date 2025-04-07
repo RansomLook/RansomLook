@@ -16,7 +16,7 @@ def main() -> List[Dict[str, str]] :
                     tds =  div.find_all('td')
                     if tds == []:
                         continue
-                    title = tds[1].text.strip()
+                    title = tds[0].text.strip()
                     description = ""
                     list_div.append({"title" : title, "description" : description})
 
