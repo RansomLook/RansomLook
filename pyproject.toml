@@ -67,7 +67,7 @@ libtorrent = "^2.0.11"
 urllib3 = "^2.3.0"
 playwright-stealth = "^1.0.6"
 types-python-dateutil = "^2.9.0.20241206"
-playwrightcapture = "^1.28.5"
+playwrightcapture = "^1.28.6"
 lacuscore = "^1.13.9"
 pylacus = "^1.13.2"
 
