@@ -21,7 +21,6 @@ def main() -> List[Dict[str, str]] :
                 divs = soup.find_all('div',{"class": "custom-container2"})
                 for div in divs:
                     title = div.find('strong').text.strip()
-                    print(title)
                     description = div.find_all('p')
                     description = description[2].text.strip()
                     link = div.find('a')['href']
