@@ -71,7 +71,7 @@ app.wsgi_app = ProxyFix(app.wsgi_app, x_proto=1, x_for=1) # type: ignore
 app.jinja_env.filters['quote_plus'] = lambda u: quote(u)
 app.config['SECRET_KEY'] = get_secret_key()
 app.config['PREFERRED_URL_SCHEME'] = 'https'
-app.config['UPLOAD_EXTENSIONS'] = ['.png', '.jpg', '.svg']
+app.config['UPLOAD_EXTENSIONS'] = ['.png', '.jpg', '.svg', '.gif']
 app.config['MAX_CONTENT_LENGTH'] = 50 * 1024 * 1024
 Bootstrap5(app)
 app.config['BOOTSTRAP_SERVE_LOCAL'] = True
@@ -94,7 +94,7 @@ flask_moment.Moment(app=app)
 
 
 def validate_image(stream):  # type: ignore[no-untyped-def]
-    allowed_formats = {'jpg', 'png', 'svg'}  # Allowed formats
+    allowed_formats = {'jpg', 'png', 'svg','gif'}  # Allowed formats
     header = stream.read(512)  # Read the initial bytes of the file
     stream.seek(0)
 
