@@ -68,7 +68,7 @@ urllib3 = "^2.4.0"
 playwright-stealth = "^1.0.6"
 types-python-dateutil = "^2.9.0.20241206"
 playwrightcapture = "^1.29.2"
-lacuscore = "^1.14.1"
+lacuscore = "^1.14.3"
 pylacus = "^1.14.0"
 
 [tool.poetry.group.dev.dependencies]
