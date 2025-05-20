@@ -64,10 +64,10 @@ def checkexisting(provider: str, db: int) -> bool:
         return True
     return False
 
-async def run_captures() -> None: 
+async def run_captures() -> None:
     max_captures_to_consume = get_config('generic','thread')
     captures = set()
-    for capture_task in lacus.consume_queue(max_captures_to_consume):
+    async for capture_task in lacus.consume_queue(max_captures_to_consume):
         captures.add(capture_task)  # adds the task to the set
         capture_task.add_done_callback(captures.discard)  # remove the task from the set when done
 
