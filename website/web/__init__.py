@@ -834,6 +834,7 @@ def editgroup(database: int, name: str): # type: ignore
             'profiles' : datagroup['profile'],
             'jabber' : datagroup['jabber'] if 'jabber' in datagroup else '',
             'mail' : datagroup['mail'] if 'mail' in datagroup else '',
+            'pgp' : datagroup['pgp'] if 'pgp' in datagroup else '',
             'matrix' : datagroup['matrix'] if 'matrix' in datagroup else '',
             'session' : datagroup['session'] if 'session' in datagroup else '',
             'telegram' : datagroup['telegram'] if 'telegram' in datagroup else '',
@@ -861,6 +862,7 @@ def editgroup(database: int, name: str): # type: ignore
         data['profile'] = ast.literal_eval(form.profiles.data)
         data['jabber'] = form.jabber.data.strip()
         data['mail'] = form.mail.data.strip()
+        data['pgp'] = form.pgp.data.strip()
         data['matrix'] = form.matrix.data.strip()
         data['session'] = form.session.data.strip()
         data['telegram'] = form.telegram.data.strip()

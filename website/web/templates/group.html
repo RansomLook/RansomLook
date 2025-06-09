@@ -62,6 +62,20 @@
           </tbody>
         </table>
         {% endif %}
+        {% if 'pgp' in group and group['pgp'].split()[0] %}
+        <table id="table" class="table" style="display:table; table-layout:auto; width:100%">
+          <thead>
+            <tr>
+                <th> PGP </th>
+            </tr>
+          </thead>
+          <tbody>
+          {% for pgp in group['pgp'].split('|') %}
+          <tr><td>{{pgp}}</td></tr>
+          {% endfor %}
+          </tbody>
+        </table>
+        {% endif %}
         {% if 'matrix' in group and group['matrix'].split()[0] %}
         <table id="table" class="table" style="display:table; table-layout:auto; width:100%">
           <thead>
