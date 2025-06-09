@@ -52,6 +52,7 @@ class EditForm(FlaskForm): # type: ignore
     jabber = TextAreaField()
     mail = TextAreaField()
     pgp = TextAreaField()
+    hash = TextAreaField()
     matrix = TextAreaField()
     session = TextAreaField()
     telegram = TextAreaField()

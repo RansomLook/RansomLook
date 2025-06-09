@@ -34,6 +34,20 @@
           </tbody>
         </table>
         {% endif %}
+        {% if 'hash' in group and group['hash'].split()[0] %}
+        <table id="table" class="table" style="display:table; table-layout:auto; width:100%">
+          <thead>
+            <tr>
+                <th> Known hashes </th>
+            </tr>
+          </thead>
+          <tbody>
+          {% for hash in group['hash'].split() %}
+          <tr><td>{{hash}}</td></tr>
+          {% endfor %}
+          </tbody>
+        </table>
+        {% endif %}
         {% if 'jabber' in group and group['jabber'].split()[0] %}
         <table id="table" class="table" style="display:table; table-layout:auto; width:100%">
           <thead>
