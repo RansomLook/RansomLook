@@ -26,6 +26,22 @@ def main() -> List[Dict[str, str]] :
                     description = div.find('div', {"style": "grid-column: 1 / 3;    grid-row: 3 / 4; font-size: 18px"}).text.strip()
                     link= div.find('a')['href']
                     list_div.append({"title" : title, "description" : description, "link" : link, "slug": filename})
+                divs_name = soup.find_all('div', {"class": "flex flex-row"})
+                for div in divs_name:
+                  try:
+                    title = div.find('div', {"class": "text-xl font-semibold"})
+                    if title is None:
+                        continue
+                    else:
+                        title=title.text.strip()
+                    try:
+                        description = div.find('div', {"class": "line-clamp-3 text-gray-600"}).text.strip()
+                    except:
+                        description =""
+                    link = div.find('a')['href']
+                    list_div.append({"title" : title, "description" : description, "link" : link, "slug": filename})
+                  except:
+                    pass
                 file.close()
         except:
             print("Failed during : " + filename)
