@@ -13,7 +13,7 @@ from datetime import datetime
 import time
 from typing import Dict, List, Any
 from playwright.sync_api import sync_playwright, TimeoutError as PlaywrightTimeoutError
-from playwright_stealth import stealth_sync # type: ignore
+from playwright_stealth import Stealth # type: ignore
 
 from .default.config import get_config, get_homedir, get_socket_path
 
@@ -85,7 +85,8 @@ def threadscape(queuethread, lock): # type: ignore
     '''
     Thread used to scrape our website
     '''
-    with sync_playwright() as play:
+    #with sync_playwright() as play:
+    with Stealth().use_sync(sync_playwright()) as play:
         while True:
             host = queuethread.get()
             stdlog('Starting : ' + host)
@@ -94,7 +95,6 @@ def threadscape(queuethread, lock): # type: ignore
                 context = browser.new_context(ignore_https_errors= True )
                 page = context.new_page()
                 link='https://t.me/s/'+host
-                stealth_sync(page)
                 page.goto(link, wait_until='load', timeout = 60000)
                 page.bring_to_front()
                 page.wait_for_timeout(1000)

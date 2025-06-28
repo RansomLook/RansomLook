@@ -24,9 +24,9 @@ def main() -> List[Dict[str, str]] :
                     div=soup.find('div', {"class": "grid"})
                     divs_name = div.find_all('a') # type: ignore
                     for div in divs_name:
-                        title = div.find('div', {"class": "grid-caption__title"}).contents[0].strip() # type: ignore
+                        title = div.find('div', {"class": "grid-caption__title"}).contents[0].strip()
                         description = ''
-                        link = div['href'] # type: ignore
+                        link = div['href']
                         list_div.append({"title" : title, "description" : description, "link": link, "slug": filename})
                 file.close()
         except:

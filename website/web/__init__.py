@@ -604,7 +604,7 @@ def twitter(name: str): # type: ignore[no-untyped-def]
         sorted_posts : Dict[Any, Any]= {}
         if posts is not None:
             posts = json.loads(posts)
-            sorted_posts = OrderedDict(sorted(posts.items(),reverse=True)) # type: ignore
+            sorted_posts = OrderedDict(sorted(posts.items(),reverse=True))
         return render_template("twitter.html", posts = sorted_posts, name=json.loads(profile))
 
 @app.route("/crypto")
