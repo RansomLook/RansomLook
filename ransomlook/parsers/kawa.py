@@ -20,7 +20,8 @@ def main() -> List[Dict[str, str]] :
                         for entry in data:
                             title = entry['title'].strip()
                             description = entry['description'].strip()
-                            list_div.append({'title':title, 'description': description})
+                            link = '/'+entry['id'].strip()
+                            list_div.append({'title':title, 'description': description, 'link': link, 'slug': filename})
                 file.close()
         except:
             print("Failed during : " + filename)
