@@ -23,11 +23,17 @@ def main() -> List[Dict[str, str]] :
                         list_div.append({'title':title, 'description': description})
                 else :
                     body=soup.find('tbody')
-                    divs_name=body.find_all('tr') # type: ignore
+                    if body != None:
+                        divs_name=body.find_all('tr') # type: ignore
+                        for div in divs_name:
+                            tds = div.find_all('td')
+                            title = tds[1].text.strip()
+                            description =  ''
+                            list_div.append({'title':title, 'description': description})
+                    divs_name=soup.find_all('div', {"class": "ant-card css-ut69n1"})
                     for div in divs_name:
-                        tds = div.find_all('td')
-                        title = tds[1].text.strip()
-                        description =  ''
+                        title = div.find('h2').text.strip()
+                        description=''
                         list_div.append({'title':title, 'description': description})
                 file.close()
         except:

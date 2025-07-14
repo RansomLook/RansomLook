@@ -17,7 +17,14 @@ def main() -> List[Dict[str, str]] :
                     description = div.find('div', {"class": "industry"}).text.strip()
                     link = div.find('a')["href"]
                     list_div.append({"title" : title, "description" : description, "link": link, "slug": filename})
+                divs_name=soup.find_all('div', {"class": "tile"})
+                for div in divs_name:
+                    title =  div.find('a').text.strip()
+                    description = div.find_all('div')[1].text.strip()
+                    link = div.find('a')["href"]
+                    list_div.append({"title" : title, "description" : description, "link": link, "slug": filename})
                 file.close()
+
         except:
             print("Failed during : " + filename)
             pass
