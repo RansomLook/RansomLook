@@ -335,7 +335,7 @@ def countcaptchahosts() -> int :
 '''
 Ransomlook
 '''
-def siteschema(location: str, fs: bool, private: bool, chat: bool, admin: bool, browser: str|None) -> Dict[str, Optional[Any]] :
+def siteschema(location: str, fs: bool, private: bool, chat: bool, admin: bool, browser: str|None, init_script: str|None) -> Dict[str, Optional[Any]] :
     '''
     returns a dict with the site schema
     '''
@@ -355,6 +355,7 @@ def siteschema(location: str, fs: bool, private: bool, chat: bool, admin: bool, 
         'chat': chat,
         'admin': admin,
         'browser': browser,
+        'init_script': init_script,
         'private': private,
         'lastscrape': 'Never'
     }

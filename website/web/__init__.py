@@ -777,7 +777,7 @@ def addgroup(): # type: ignore[no-untyped-def]
                return render_template('add.html',form=form)
            res = twiadder(form.groupname.data, form.url.data)
         else:
-           res = adder(form.groupname.data.lower(), form.url.data, form.category.data, form.fs.data, form.private.data, form.chat.data, form.admin.data, form.browser.data)
+           res = adder(form.groupname.data.lower(), form.url.data, form.category.data, form.fs.data, form.private.data, form.chat.data, form.admin.data, form.browser.data, form.init_script.data)
         if res > 1:
            flash(f'Fail to add: {form.url.data} to {form.groupname.data}.  Url already exists for this group', 'error')
            return render_template('add.html',form=form)
@@ -823,10 +823,10 @@ def editgroup(database: int, name: str): # type: ignore
 
     red = Redis(unix_socket_path=get_socket_path('cache'), db=database)
     datagroup = json.loads(red.get(name)) # type: ignore
-    locations = namedtuple('locations',['slug', 'fqdn', 'timeout', 'delay', 'fs', 'chat', 'admin', 'browser', 'private', 'version', 'available', 'title', 'updated', 'lastscrape', 'header', 'fixedfile'])
+    locations = namedtuple('locations',['slug', 'fqdn', 'timeout', 'delay', 'fs', 'chat', 'admin', 'browser', 'init_script', 'private', 'version', 'available', 'title', 'updated', 'lastscrape', 'header', 'fixedfile'])
     locationlist = []
     for entry in datagroup['locations']:
-        locationlist.append(locations(entry['slug'], entry['fqdn'], entry['timeout'] if 'timeout' in entry else '', entry['delay'] if 'delay' in entry else '', entry['fs'] if 'fs' in entry else False, entry['chat'] if 'chat' in entry else False, entry['admin'] if 'admin' in entry else False, entry['browser'] if 'browser' in entry else '', entry['private'] if 'private' in entry else False, entry['version'], entry['available'], entry['title'], entry['updated'], entry['lastscrape'], entry['header'] if 'header' in entry else '' , entry['fixedfile'] if 'fixedfile' in entry else False))
+        locationlist.append(locations(entry['slug'], entry['fqdn'], entry['timeout'] if 'timeout' in entry else '', entry['delay'] if 'delay' in entry else '', entry['fs'] if 'fs' in entry else False, entry['chat'] if 'chat' in entry else False, entry['admin'] if 'admin' in entry else False, entry['browser'] if 'browser' in entry else '', entry['init_script'] if 'init_script' in entry else '', entry['private'] if 'private' in entry else False, entry['version'], entry['available'], entry['title'], entry['updated'], entry['lastscrape'], entry['header'] if 'header' in entry else '' , entry['fixedfile'] if 'fixedfile' in entry else False))
     data = {'groupname': name,
             'description' : datagroup['meta'],
             'ransomware_galaxy_value': datagroup['ransomware_galaxy_value'] if 'ransomware_galaxy_value' in datagroup else '',
@@ -885,6 +885,7 @@ def editgroup(database: int, name: str): # type: ignore
                         'chat': entry.chat.data,
                         'admin': entry.admin.data,
                         'browser': entry.browser.data,
+                        'init_script': entry.init_script.data,
                         'private': entry.private.data,
                         'version': entry.version.data,
                         'available': entry.available.data,
