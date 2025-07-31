@@ -12,7 +12,7 @@ def main() -> List[Dict[str, str]] :
                 file=open(html_doc,'r')
                 soup=BeautifulSoup(file,'html.parser')
                 tbody=soup.find('tbody', {"id": "table"})
-                trs = tbody.find_all('tr')
+                trs = tbody.find_all('tr') # type: ignore
                 for tr in trs:
                     try:
                         tds = tr.find_all('td')
