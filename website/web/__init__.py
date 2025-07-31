@@ -840,6 +840,7 @@ def editgroup(database: int, name: str): # type: ignore
             'session' : datagroup['session'] if 'session' in datagroup else '',
             'telegram' : datagroup['telegram'] if 'telegram' in datagroup else '',
             'tox' : datagroup['tox'] if 'tox' in datagroup else '',
+            'affiliates' : datagroup['affiliates'] if 'affiliates' in datagroup else '',
             'other' : datagroup['other'] if 'other' in datagroup else '',
             'private' : datagroup['private'] if 'private' in datagroup else False,
             'raas' : datagroup['raas'] if 'raas' in datagroup else False,
@@ -869,6 +870,7 @@ def editgroup(database: int, name: str): # type: ignore
         data['session'] = form.session.data.strip()
         data['telegram'] = form.telegram.data.strip()
         data['tox'] = form.tox.data.strip()
+        data['affiliates'] = form.affiliates.data.strip()
         data['other'] = form.other.data.strip()
         data['private'] = form.private.data
         data['captcha'] = form.captcha.data

@@ -146,6 +146,20 @@
           </tbody>
         </table>
         {% endif %}
+        {% if 'affiliates' in group and group['affiliates'].split()[0] %}
+        <table id="table" class="table" style="display:table; table-layout:auto; width:100%">
+          <thead>
+            <tr>
+                <th> Affiliates </th>
+            </tr>
+          </thead>
+          <tbody>
+          {% for affiliates in group['affiliates'].splitlines() %}
+          <tr><td>{{affiliates}}</td></tr>
+          {% endfor %}
+          </tbody>
+        </table>
+        {% endif %}
         {% if 'other' in group and group['other'].split()[0] %}
         <table id="table" class="table" style="display:table; table-layout:auto; width:100%">
           <thead>

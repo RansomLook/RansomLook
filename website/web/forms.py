@@ -59,6 +59,7 @@ class EditForm(FlaskForm): # type: ignore
     session = TextAreaField()
     telegram = TextAreaField()
     tox = TextAreaField()
+    affiliates = TextAreaField()
     other = TextAreaField()
     links = FieldList(FormField(LinkForm), min_entries=0)
     private = BooleanField('Private Group')
