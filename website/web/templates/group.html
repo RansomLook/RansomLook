@@ -168,7 +168,7 @@
             </tr>
           </thead>
           <tbody>
-          {% for other in group['other'].split() %}
+          {% for other in group['other'].splitlines() %}
           <tr><td>{{other}}</td></tr>
           {% endfor %}
           </tbody>
