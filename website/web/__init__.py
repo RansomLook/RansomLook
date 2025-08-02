@@ -432,7 +432,7 @@ def group(name: str): # type: ignore[no-untyped-def]
                             sorted_posts = []
                         modules = glob.glob(join(dirname(str(get_homedir())+'/ransomlook/parsers/'), "*.py"))
                         parserlist = [ basename(f)[:-3].split('.')[0] for f in modules if isfile(f) and not f.endswith('__init__.py')]
-
+                        group['db']=0
                         return render_template("group.html", group = group, posts=sorted_posts, parser=parserlist, logo=logo)
 
         return redirect(url_for("home"))
@@ -482,6 +482,7 @@ def market(name: str): # type: ignore[no-untyped-def]
                             sorted_posts = sorted(posts, key=lambda x: x['discovered'], reverse=True)
                         else:
                             sorted_posts = []
+                        group['db']=3
                         return render_template("group.html", group = group, posts=sorted_posts, logo=logo)
         return redirect(url_for("home"))
 

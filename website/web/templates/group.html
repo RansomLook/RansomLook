@@ -2,7 +2,8 @@
 {% block title %}{{group['name']}} details{% endblock %}
 {% block content %}
     <article id="main" class="markdown-section">
-	<h1>{{group['name'].title()}}</h1>
+	<h1 style="display:inline">{{group['name'].title()}}
+        {% if current_user.is_authenticated %}</h1><em style="display:inline"><a href="/admin/edit/{{group['db']}}/{{group['name']| urlencode}}" style="color: orange">Edit group</a></em>{%endif%}
         <p>{% for item in logo %}
             <img src="{{item}}" style="max-height:150px;max-width:150px;height:auto;width:auto;" >
         {% endfor %}
