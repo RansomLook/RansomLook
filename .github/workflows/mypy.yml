@@ -1,4 +1,6 @@
 name: Python application - MyPy
+permissions:
+  contents: read
 
 on:
   push:
