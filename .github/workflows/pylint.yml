@@ -1,4 +1,6 @@
 name: pylint
+permissions:
+  contents: read
 on:
   push:
     paths:
