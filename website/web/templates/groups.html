@@ -27,14 +27,14 @@
             {% else %}
             <h3 id="{{entry['name'].title()}}" style="display:inline"> <a href="/group/{{entry['name']|urlencode}}">{{entry['name'].title()}}</a></h3>
             {% endif %}
-            {% if current_user.is_authenticated %}</h1><em style="display:inline"><a href="/admin/edit/0/{{entry['name'] | urlencode}}" style="color: orange">Edit group</a></em>{%endif%}
+            {% if current_user.is_authenticated %}<em style="display:inline"><a href="/admin/edit/0/{{entry['name'] | urlencode}}" style="color: orange">Edit group</a></em>{%endif%}
             {% else %}
             {% if 'private' in entry and entry['private'] is true %}
             <h3 id="{{entry['name'].title()}}" style="display:inline"> <a style="color:purple;" href="/market/{{entry['name']|urlencode}}">{{entry['name'].title()}}</a></h3>
             {% else %}
             <h3 id="{{entry['name'].title()}}" style="display:inline"> <a href="/market/{{entry['name']|urlencode}}">{{entry['name'].title()}}</a></h3>
             {% endif %}
-            {% if current_user.is_authenticated %}</h1><em style="display:inline"><a href="/admin/edit/3/{{entry['name'] | urlencode}}" style="color: orange">Edit group</a></em>{%endif%}
+            {% if current_user.is_authenticated %}<em style="display:inline"><a href="/admin/edit/3/{{entry['name'] | urlencode}}" style="color: orange">Edit group</a></em>{%endif%}
             {% endif %}
             {% if entry['meta'] is not none %}  
             <h4>Description</h4>
