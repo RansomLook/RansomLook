@@ -177,58 +177,58 @@ def groupcount(db: int) -> int :
     return len(groups)
 
 def hostcount(db: int) -> int :
+    hosts = []
     red = redis.Redis(unix_socket_path=get_socket_path('cache'), db=db)
     groups = red.keys()
-    host_count = 0
     for entry in groups:
         group = json.loads(red.get(entry)) # type: ignore
         for host in group['locations']:
-            host_count += 1
-    return host_count
+            hosts.append(host['fqdn'])
+    return len(set(hosts))
 
 def hostcountdls(db: int) -> int :
     red = redis.Redis(unix_socket_path=get_socket_path('cache'), db=db)
     groups = red.keys()
-    host_count = 0
+    hosts = []
     for entry in groups:
         group = json.loads(red.get(entry)) # type: ignore
         for host in group['locations']:
             if (not 'chat' in host or host['chat'] is False) and (not 'fs' in host or host['fs'] is False) and (not 'admin' in host or host['admin'] is False):
-                host_count += 1
-    return host_count
+                hosts.append(host['fqdn'])
+    return len(set(hosts))
 
 def hostcountfs(db: int) -> int :
     red = redis.Redis(unix_socket_path=get_socket_path('cache'), db=db)
     groups = red.keys()
-    host_count = 0
+    hosts =[]
     for entry in groups:
         group = json.loads(red.get(entry)) # type: ignore
         for host in group['locations']:
             if 'fs' in host and host['fs'] is True:
-                host_count += 1
-    return host_count
+                hosts.append(host['fqdn'])
+    return len(set(hosts))
 
 def hostcountchat(db: int) -> int :
     red = redis.Redis(unix_socket_path=get_socket_path('cache'), db=db)
     groups = red.keys()
-    host_count = 0
+    hosts = []
     for entry in groups:
         group = json.loads(red.get(entry)) # type: ignore
         for host in group['locations']:
             if 'chat' in host and host['chat'] is True:
-                host_count += 1
-    return host_count
+                hosts.append(host['fqdn'])
+    return len(set(hosts))
 
 def hostcountadmin(db: int) -> int :
     red = redis.Redis(unix_socket_path=get_socket_path('cache'), db=db)
     groups = red.keys()
-    host_count = 0
+    hosts = []
     for entry in groups:
         group = json.loads(red.get(entry)) # type: ignore
         for host in group['locations']:
             if 'admin' in host and host['admin'] is True:
-                host_count += 1
-    return host_count
+                hosts.append(host['fqdn'])
+    return len(set(hosts))
 
 def postssince(days: int) -> int :
     '''returns the number of posts within the last x days'''
