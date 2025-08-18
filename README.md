@@ -226,3 +226,10 @@ GNU Affero General Public License for more details.
 
 You should have received a copy of the GNU Affero General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
+# Usage of the API and License
+
+All content provided by **ransomlook.io** — including the website, API responses, and datasets — is made available under the [Creative Commons Attribution 4.0 International (CC BY 4.0)](https://creativecommons.org/licenses/by/4.0/) license.  
+
+You are free to share and adapt the material for any purpose, even commercially, provided that appropriate credit is given.
+
