@@ -63,6 +63,7 @@ from PIL import Image
 from PIL.PngImagePlugin import PngInfo
 
 import mimetypes
+import random
 
 dbvalue ={0:'group', 1:'market'}
 
@@ -239,7 +240,12 @@ def home(): # type: ignore[no-untyped-def]
             for entry in groups:
                 post = json.loads(red.get(entry)) # type: ignore
                 alertposts[post['type']].append(post)
-        return render_template("index.html", date=date, data=data,alert=alert, posts=alertposts)
+        logos= get_config('generic','logos') 
+        paths = list(logos.keys())
+        weights = list(logos.values())
+        logo = random.choices(paths, weights=weights, k=1)[0]
+
+        return render_template("index.html", date=date, data=data,alert=alert, posts=alertposts,logo=logo)
 
 @app.route("/recent")
 def recent(): # type: ignore[no-untyped-def]

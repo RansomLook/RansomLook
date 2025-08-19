@@ -72,7 +72,9 @@
     "alertondashboard": false,
     "darkmode": false,
     "siteurl": "http://domain.tld",
+    "logos": {"ransomlook.svg":1.0},
     "_notes": {
+        "logos": "dict of Logos with their associated weight for randomdisplay",
         "malpedia": "malpedia apikey",
         "email": "Email configuration",
         "email_smtp_auth": "SSL configuration for email",
