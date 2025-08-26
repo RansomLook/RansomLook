@@ -12,7 +12,6 @@ def main() -> List[Dict[str, str]] :
             soup=BeautifulSoup(file,'html.parser')
             divs_name=soup.find_all('div', {"class": "card h-100"})
             for div in divs_name:
-                print(div)
                 try:
                     title = div.find('h5').text.strip()
                     description = div.find('p').text.strip()
