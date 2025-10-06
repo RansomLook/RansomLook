@@ -15,8 +15,12 @@ def main() -> List[Dict[str, str]] :
                 for div in divs_name:
                     title = div.find('h1').text.strip()
                     description = div.find('p',{"class":"company-description"}).text.strip()
-                    link = div.find('a')['href']
-                    list_div.append({"title": title, "description": description, "link": link, "slug": filename})
+                    try:
+                        link = div.find('a')['href']
+                        list_div.append({"title": title, "description": description, "link": link, "slug": filename})
+                    except:
+                        list_div.append({"title": title, "description": description})
+
                 file.close()
         except:
             print("Failed during : " + filename)

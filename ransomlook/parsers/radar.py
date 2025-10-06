@@ -14,7 +14,7 @@ def main() -> List[Dict[str, str]] :
                 soup=BeautifulSoup(file,'html.parser')
                 if '-api' in filename:
                    pre = soup.find('pre')
-                   json_text = pre.get_text()          # <-- chaîne décodée (et entités HTML dés-échappées)
+                   json_text = pre.get_text()          # type: ignore
                    data = json.loads(json_text)        # <-- fonctionne maintenant
 
                    for entry in data:
