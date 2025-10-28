@@ -44,6 +44,15 @@ def main() -> List[Dict[str, str]] :
                         list_div.append({'title': title, 'description': description})
                     except:
                         pass
+                divs_name=soup.find_all('table', {"class": "w-full border-collapse"})
+                for div in divs_name:
+                    try:
+                        title = div.find('th').text.strip()
+                        fields = div.find_all('td')
+                        description = fields[3].text.strip()
+                        list_div.append({'title': title, 'description': description})
+                    except:
+                        pass
                 file.close()
 
         except:

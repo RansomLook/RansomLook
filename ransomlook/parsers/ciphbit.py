@@ -19,6 +19,11 @@ def main() -> List[Dict[str, str]] :
                     except:
                         description = ''
                     list_div.append({'title':title, 'description': description.strip()})
+                divs_name=soup.find_all('div', {"class": "card"})
+                for div in divs_name:
+                    title = div.find('h2').text.strip()
+                    description = div.find('p').text.strip()
+                    list_div.append({'title':title, 'description': description.strip()})
                 file.close()
         except:
             print("Failed during : " + filename)
