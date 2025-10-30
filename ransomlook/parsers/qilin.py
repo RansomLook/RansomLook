@@ -14,7 +14,7 @@ def main() -> List[Dict[str, str]] :
                 divs_name=soup.find_all('div', {"class": "item_box"})
                 for div in divs_name:
                     title = div.find('a',{"class": "item_box-title mb-2 mt-1"}).text.strip()
-                    description = div.find('div',{"class": "item_box_text"}).text.strip()
+                    description = div.find('p').text.strip()
                     link = div.find('a')['href']
                     list_div.append({"title" : title, "description" : description, "link": link, "slug": filename})
                 file.close()
