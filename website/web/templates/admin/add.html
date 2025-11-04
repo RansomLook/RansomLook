@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+{% from 'bootstrap5/utils.html' import render_messages %}
+{% block title %}Add group — RansomLook{% endblock %}
+
+{% block content %}
+{{ render_messages(container=True, dismissible=True) }}
+
+<section class="hero">
+  <div class="container">
+    <h1>Add a new group</h1>
+    <p class="lead">Fill in the details to add a group to monitoring.</p>
+  </div>
+</section>
+
+<section class="metrics-section">
+  <div class="container">
+    <form action="" method="post" novalidate class="table-card" style="padding:16px; max-width:720px; margin:auto;">
+      {{ form.hidden_tag() }}
+
+      <div class="form-group" style="margin-bottom:12px;">
+        <label class="label">{{ form.category.label }}</label>
+        {{ form.category(class="input") }}
+        {% for error in form.category.errors %}
+          <div style="color:red;">[{{ error }}]</div>
+        {% endfor %}
+      </div>
+
+      <div class="form-group" style="margin-bottom:12px;">
+        <label class="label">{{ form.groupname.label }}</label>
+        {{ form.groupname(class="input", size=32) }}
+        {% for error in form.groupname.errors %}
+          <div style="color:red;">[{{ error }}]</div>
+        {% endfor %}
+      </div>
+
+      <div class="form-group" style="margin-bottom:12px;">
+        <label class="label">{{ form.url.label }}</label>
+        {{ form.url(class="input", size=96) }}
+        {% for error in form.url.errors %}
+          <div style="color:red;">[{{ error }}]</div>
+        {% endfor %}
+      </div>
+
+      <div class="form-group" style="margin-bottom:12px;">
+        <label class="label">{{ form.browser.label }}</label>
+        {{ form.browser(class="input") }}
+      </div>
+
+      <div class="form-group" style="margin-bottom:12px;">
+        <label class="label">{{ form.init_script.label }}</label>
+        {{ form.init_script(class="input") }}
+      </div>
+
+      <div class="form-check">{{ form.fs() }} {{ form.fs.label }}</div>
+      <div class="form-check">{{ form.chat() }} {{ form.chat.label }}</div>
+      <div class="form-check">{{ form.admin() }} {{ form.admin.label }}</div>
+      <div class="form-check">{{ form.private() }} {{ form.private.label }}</div>
+
+      <div style="margin-top:18px;">
+        {{ form.submit(class="btn btn-primary") }}
+      </div>
+    </form>
+  </div>
+</section>
+{% endblock %}

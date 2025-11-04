@@ -1,167 +1,178 @@
 {% extends "base.html" %}
 
-{% block title %}🦕 RansomLook Search 🦖{% endblock %}
+{% block title %}RansomLook — Search{% endblock %}
 
 {% block content %}
-    <article id="main" class="markdown-section">
-	<h1>Groups</h1>
-        {% if not groups %}
-        <p> No result </p>
-        {% else %}
-        <table  id="table" class="table" style="display:table; table-layout:auto; width:100%">
+<section class="content-section">
+  <div class="container">
+
+    {# ===== Groups ===== #}
+    {% if groups %}
+    <h2 class="section-title">Groups</h2>
+    <article class="section-block">
+      <div class="table-card"><div class="table-scroll">
+        <table class="rl-table" aria-label="Groups">
           <thead>
             <tr>
-                <th style="width:10%"> Group </th>
-                <th> Description </th>
+              <th style="width:10%">Group</th>
+              <th>Description</th>
             </tr>
           </thead>
           <tbody>
           {% for entry in groups %}
             <tr>
-                <td><center><a href="/group/{{entry['name']}}">{{entry['name'].title()}}</a></center></td>
-                <td> {{entry['meta']}} </td>
+              <td><a href="/group/{{entry['name']}}">{{entry['name'].title()}}</a></td>
+              <td>{{entry['meta']}}</td>
+            </tr>
           {% endfor %}
           </tbody>
         </table>
-        {% endif %}
+      </div></div>
+    </article>
+    {% endif %}
 
-	<h1>Markets</h1>
-        {% if not markets %}
-        <p> No result </p>
-        {% else %}
-        <table id="table" class="table" style="display:table; table-layout:auto; width:100%">
+    {# ===== Markets ===== #}
+    {% if markets %}
+    <h2 class="section-title">Markets</h2>
+    <article class="section-block">
+      <div class="table-card"><div class="table-scroll">
+        <table class="rl-table" aria-label="Markets">
           <thead>
             <tr>
-                <th style="width:15%"> Group </th>
-                <th> Description </th>
+              <th style="width:15%">Group</th>
+              <th>Description</th>
             </tr>
           </thead>
           <tbody>
           {% for entry in markets %}
             <tr>
-                <td><center><a href="/market/{{entry['name']}}">{{entry['name'].title()}}</a></center></td>
-                <td> {{entry['meta']}} </td>
+              <td><a href="/market/{{entry['name']}}">{{entry['name'].title()}}</a></td>
+              <td>{{entry['meta']}}</td>
+            </tr>
           {% endfor %}
           </tbody>
         </table>
-        {% endif %}
+      </div></div>
+    </article>
+    {% endif %}
 
-	<h1>Leaks</h1>
-        {% if not leaks %}
-        <p> No result </p>
-        {% else %}
-        <table id="table" class="table" style="display:table; table-layout:auto; width:100%">
+    {# ===== Leaks ===== #}
+    {% if leaks %}
+    <h2 class="section-title">Leaks</h2>
+    <article class="section-block">
+      <div class="table-card"><div class="table-scroll">
+        <table class="rl-table" aria-label="Leaks">
           <thead>
             <tr>
-                <th style="width:15%"> Leak </th>
-                <th> Description </th>
+              <th style="width:15%">Leak</th>
+              <th>Description</th>
             </tr>
           </thead>
           <tbody>
           {% for entry in leaks %}
             <tr>
-                <td><center><a href="/leak/{{entry['key']}}">{{entry['name'].title()}}</a></center></td>
-                <td> {{entry['meta']}} </td>
+              <td><a href="/leak/{{entry['key']}}">{{entry['name'].title()}}</a></td>
+              <td>{{entry['meta']}}</td>
+            </tr>
           {% endfor %}
           </tbody>
         </table>
-        {% endif %}
-      
-        <h1>Posts</h1>
-        {% if not posts %}
-        <p> No result </p>
-        {% else %}
-        <table  id="table" class="table" style="display:table; table-layout:auto; width:100%">
+      </div></div>
+    </article>
+    {% endif %}
+
+    {# ===== Posts ===== #}
+    {% if posts %}
+    <h2 class="section-title">Posts</h2>
+    <article class="section-block">
+      <div class="table-card"><div class="table-scroll">
+        <table class="rl-table" aria-label="Posts">
           <thead>
             <tr>
-                <th style="width:15%"> Group </th>
-                <th>Title</th>
-                <th style="width:10%"> Date </th>
+              <th style="width:15%">Group</th>
+              <th>Title</th>
+              <th style="width:10%">Date</th>
             </tr>
           </thead>
           <tbody>
           {% for entry in posts %}
             <tr>
-                <td><a href="/group/{{entry['group_name']}}">{{entry['group_name'].title()}}</a></td>
-                <td>{{entry['post_title']}}</td>
-                <td>{{entry['discovered'].split(' ')[0]}}</td>
+              <td><a href="/group/{{entry['group_name']}}">{{entry['group_name'].title()}}</a></td>
+              <td>{{entry['post_title']}}</td>
+              <td>{{entry['discovered'].split(' ')[0]}}</td>
+            </tr>
+            {% if 'description' in entry and entry['description'] is not none %}
             <tr>
-                {% if 'description' in entry and entry['description'] is not none %}
-            <tr><td colspan="3"> {{entry['description']}} </td></tr>
-                {% endif %}
-
+              <td colspan="3">{{entry['description']}}</td>
+            </tr>
+            {% endif %}
           {% endfor %}
           </tbody>
         </table>
-        {% endif %}
+      </div></div>
+    </article>
+    {% endif %}
 
-        <h1>Notes</h1>
-        {% if not notes %}
-        <p> No result </p>
-        {% else %}
-        <table  id="table" class="table" style="display:table; table-layout:auto; width:100%">
+    {# ===== Notes ===== #}
+    {% if notes %}
+    <h2 class="section-title">Notes</h2>
+    <article class="section-block">
+      <div class="table-card"><div class="table-scroll">
+        <table class="rl-table" aria-label="Notes">
           <thead>
             <tr>
-                <th style="width:15%"> Group </th>
-                <th>Name of Ransom note</th>
+              <th style="width:15%">Group</th>
+              <th>Name of Ransom note</th>
             </tr>
           </thead>
           <tbody>
           {% for entry in notes %}
             <tr>
-                <td><a href="/group/{{entry['group_name']}}">{{entry['group_name'].title()}}</a></td>
-                <td>{{entry['name']}}</td>
-            <tr>
-            <tr><td colspan="3"> {{entry['content']}} </td></tr>
-
-          {% endfor %}
-          </tbody>
-        </table>
-        {% endif %}
-
-	<h1>Channels</h1>
-        {% if not channels %}
-        <p> No result </p>
-        {% else %}
-        <table  id="table" class="table" style="display:table; table-layout:auto; width:100%">
-          <thead>
-            <tr>
-                <th style="width:10%"> Channel </th>
-                <th> Description </th>
+              <td><a href="/group/{{entry['group_name']}}">{{entry['group_name'].title()}}</a></td>
+              <td>{{entry['name']}}</td>
             </tr>
-          </thead>
-          <tbody>
-          {% for entry in channels %}
             <tr>
-                <td><center><a href="/telegram/{{entry['name']}}">{{entry['name'].title()}}</a></center></td>
-                <td> {{entry['meta']}} </td>
-          {% endfor %}
-          </tbody>
-        </table>
-        {% endif %}
-
-	<h1>Messages</h1>
-        {% if not messages %}
-        <p> No result </p>
-        {% else %}
-        <table  id="table" class="table" style="display:table; table-layout:auto; width:100%">
-          <thead>
-            <tr>
-                <th style="width:10%"> Channel </th>
-                <th> Message </th>
-		<th style="width:10"> Date </th>
+              <td colspan="3">{{entry['content']}}</td>
             </tr>
-          </thead>
-          <tbody>
-          {% for entry in messages %}
-            <tr>
-                <td><center><a href="/telegram/{{entry['group_name']}}">{{entry['group_name'].title()}}</a></center></td>
-                <td> {{entry['message']}} </td>
-		<td> {{entry['date']}} </td>
           {% endfor %}
           </tbody>
         </table>
-        {% endif %}
-
+      </div></div>
     </article>
+    {% endif %}
+
+    {# ===== Cryptocurrencies (remplace Channels / Messages) ===== #}
+    {% if cryptocurrencies %}
+    <h2 class="section-title">Cryptocurrencies</h2>
+    <article class="section-block">
+      <div class="table-card"><div class="table-scroll">
+        <table class="rl-table" aria-label="Cryptocurrencies">
+          <thead>
+            <tr>
+              <th style="width:15%">Blockchain</th>
+              <th>Address</th>
+              <th style="width:10%">Tx</th>
+            </tr>
+          </thead>
+          <tbody>
+          {% for entry in cryptocurrencies %}
+            <tr>
+              <td>{{entry['blockchain']}}</td>
+              <td style="word-break:break-all;"><code>{{entry['address']}}</code></td>
+              <td>{{entry['tx_count']}}</td>
+            </tr>
+          {% endfor %}
+          </tbody>
+        </table>
+      </div></div>
+    </article>
+    {% endif %}
+
+    {# Si vraiment rien à afficher : #}
+    {% if (not groups) and (not markets) and (not leaks) and (not posts) and (not notes) and (not cryptocurrencies) %}
+      <p class="muted">No result</p>
+    {% endif %}
+
+  </div>
+</section>
 {% endblock %}

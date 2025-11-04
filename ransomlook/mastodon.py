@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-import mastodon
 from mastodon import Mastodon
 
 from .sharedutils import errlog

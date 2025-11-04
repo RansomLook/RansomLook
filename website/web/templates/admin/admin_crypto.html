@@ -1,0 +1,64 @@
+{% extends "base.html" %}
+{% from 'bootstrap5/utils.html' import render_messages %}
+{% block title %}Admin · Crypto{% endblock %}
+
+{% block content %}
+{{ render_messages(container=True, dismissible=True) }}
+
+<section class="hero">
+  <div class="container">
+    <h1>Admin · Cryptocurrencies</h1>
+    <p class="lead">Create/read alias mappings for crypto (stored in DB=7 only).</p>
+  </div>
+</section>
+
+<section class="metrics-section">
+  <div class="container">
+
+    <div class="table-card">
+      <div class="card-toolbar" style="border-bottom:1px solid var(--border)">
+        <div style="display:flex;align-items:center;gap:8px;justify-content:space-between;">
+          <span style="font-weight:600">Add / Update alias</span>
+        </div>
+      </div>
+      <form action="" method="post" style="padding:12px">
+        <div class="grid" style="grid-template-columns:1fr 1fr auto; gap:8px;">
+          <input class="input" type="text" name="alias" placeholder="Alias (e.g. Conti)" required>
+          <input class="input" type="text" name="target" placeholder="Target canonical (e.g. conti)" required>
+          <button class="btn" type="submit">Save</button>
+        </div>
+        <p class="help" style="margin-top:8px">Target must correspond to an existing key in DB=7 (family). No writes are made to DB=0.</p>
+      </form>
+    </div>
+
+    <div class="table-card" style="margin-top:12px;">
+      <div class="card-toolbar" style="border-bottom:1px solid var(--border)">
+        <div style="display:flex;align-items:center;gap:8px;justify-content:space-between;">
+          <span style="font-weight:600">Existing aliases</span>
+        </div>
+      </div>
+      <div class="table-scroll">
+        <table class="table">
+          <thead><tr><th>Alias</th><th>→ Target</th><th></th></tr></thead>
+          <tbody>
+            {% for row in aliases %}
+              <tr>
+                <td>{{ row.alias }}</td>
+                <td><a href="{{ url_for('cryptodetails', name=row.target) }}">{{ row.target }}</a></td>
+                <td>
+                  <form action="" method="post" style="display:inline">
+                    <input type="hidden" name="alias" value="{{ row.alias }}">
+                    <input type="hidden" name="target" value="__DELETE__">
+                    <button class="btn btn--sm btn--ghost" type="submit">Delete</button>
+                  </form>
+                </td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </div>
+</section>
+{% endblock %}

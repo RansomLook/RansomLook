@@ -12,7 +12,7 @@ def main() -> List[Dict[str, str]] :
                 html_doc='source/'+filename
                 file=open(html_doc,'r')
                 soup=BeautifulSoup(file,'html.parser')
-                if not '-publication' in filename:
+                if '-publication' not in filename:
                     divs_name=soup.find_all('div', {"class": "p-4"})
                     for div in divs_name:
                         try:

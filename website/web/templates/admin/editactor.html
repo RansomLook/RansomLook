@@ -1,0 +1,233 @@
+{% extends "base.html" %}
+{% from 'bootstrap5/utils.html' import render_messages %}
+{% block title %}Admin · {{ actor_name }}{% endblock %}
+
+{% block content %}
+{{ render_messages(container=True, dismissible=True) }}
+
+<section class="hero">
+  <div class="container">
+    <h1>Edit {{ actor_name }}</h1>
+    <p class="lead">Update identity, contacts, sources and relations.</p>
+    <p><a class="btn btn-secondary" href="{{ images_link }}">Manage images</a></p>
+  </div>
+</section>
+
+<section class="metrics-section">
+  <div class="container">
+    <form action="" method="post" novalidate class="table-card admin-form" style="padding:16px;">
+      {{ form.hidden_tag() }}
+
+      <!-- Two-column grid -->
+      <div class="two-col">
+        <div>
+          <div class="split-2">
+            <div class="full">
+              <label class="label" for="{{ form.name.id }}">Primary pseudonym</label>
+              {{ form.name(class="input", readonly=True, disabled=True) }}
+            </div>
+
+            <div class="full">
+              <label class="label" for="{{ form.aliases.id }}">Alternate aliases (comma-separated)</label>
+              {{ form.aliases(class="input") }}
+            </div>
+
+            <div class="full">
+              <label class="label" for="{{ form.bio.id }}">General description</label>
+              {{ form.bio(class="input", rows="8") }}
+            </div>
+
+            <div class="full">
+              <label class="label" for="{{ form.tags.id }}">Tags (comma-separated)</label>
+              {{ form.tags(class="input") }}
+            </div>
+
+            <div class="full" style="margin-top:6px;">
+              <label class="chk"><span>No active</span> {{ form.noactive() }}</label>
+            </div>
+            <div class="full" style="margin-top:6px;">
+              <label class="chk"><span>Private</span> {{ form.private() }}</label>
+            </div>
+          </div>
+        </div>
+
+        <aside>
+          <div class="table-card">
+            <div class="card-toolbar"><span>Personal information</span></div>
+            <div class="prose" style="padding:10px 12px;">
+              <div class="stack">
+                {{ form.first_name(class="input", placeholder="First name") }}
+                {{ form.last_name(class="input", placeholder="Last name") }}
+                {{ form.age(class="input", placeholder="Age") }}
+                {{ form.dob(class="input", placeholder="YYYY-MM-DD") }}
+                {{ form.nationality(class="input", placeholder="Nationality") }}
+                {{ form.location(class="input", placeholder="Location") }}
+                {{ form.id_notes(class="input", placeholder="Notes") }}
+              </div>
+            </div>
+          </div>
+
+          <div class="table-card" style="margin-top:12px;">
+            <div class="card-toolbar"><span>Wanted</span></div>
+            <div class="prose" style="padding:10px 12px;">
+              <div class="stack">
+                {{ form.fbi_url(class="input", placeholder="FBI Most Wanted URL") }}
+                {{ form.europol_url(class="input", placeholder="Europol URL") }}
+                {{ form.interpol_url(class="input", placeholder="INTERPOL URL") }}
+              </div>
+            </div>
+          </div>
+        </aside>
+      </div>
+
+      <div class="table-card" style="margin-top:12px;">
+        <div class="card-toolbar"><span>Contacts / Social</span></div>
+        <div class="prose" style="padding:10px 12px;">
+          {{ form.tox(class="input", rows="3", placeholder="Tox — one per line (full ID)") }}
+          {{ form.telegram(class="input", rows="3", placeholder="Telegram — @handle or https://t.me/handle (one per line)") }}
+          {{ form.x(class="input", rows="3", placeholder="X/Twitter — @handle or https://x.com/handle (one per line)") }}
+          {{ form.bluesky(class="input", rows="3", placeholder="Bluesky — @handle.bsky.social or URL (one per line)") }}
+          {{ form.email(class="input", rows="3", placeholder="Email — one per line") }}
+        </div>
+      </div>
+
+      <!-- RELATIONS — chips + search (3 independent lists) -->
+      <div class="table-card" style="margin-top:12px;">
+        <div class="card-toolbar"><span>Relations</span></div>
+        <div class="prose" style="padding:10px 12px;">
+
+          <!-- GROUPS -->
+          <div class="rel-widget" style="margin-bottom:12px;">
+            <label class="label">Groups</label>
+            <input id="groups-add" type="search" placeholder="Search & add…" list="groups-datalist"
+                   class="input" autocomplete="off" aria-label="Add a group" style="max-width:520px">
+            <datalist id="groups-datalist">
+              {% for g in groups_all %}<option value="{{ g }}">{% endfor %}
+            </datalist>
+            <div id="groups-tokens" class="tokens"></div>
+            <input type="hidden" name="groups" id="groups-hidden" value="{{ form.groups.data or '' }}">
+            <small class="help">Type then Enter to add. Remove with “×”.</small>
+          </div>
+
+          <hr style="border:0;border-top:1px solid var(--border);margin:10px 0;opacity:.5">
+
+          <!-- MARKETS / FORUMS -->
+          <div class="rel-widget" style="margin-bottom:12px;">
+            <label class="label">Forums / Markets</label>
+            <input id="markets-add" type="search" placeholder="Search & add…" list="markets-datalist"
+                   class="input" autocomplete="off" aria-label="Add a market/forum" style="max-width:520px">
+            <datalist id="markets-datalist">
+              {% for m in markets_all %}<option value="{{ m }}">{% endfor %}
+            </datalist>
+            <div id="markets-tokens" class="tokens"></div>
+            <input type="hidden" name="forums" id="markets-hidden" value="{{ form.forums.data or '' }}">
+            <small class="help">Pick from suggestions or type.</small>
+          </div>
+
+          <hr style="border:0;border-top:1px solid var(--border);margin:10px 0;opacity:.5">
+
+          <!-- PEERS (OTHER ACTORS) -->
+          <div class="rel-widget">
+            <label class="label">Peers (other actors)</label>
+            <input id="peers-add" type="search" placeholder="Search & add…" list="peers-datalist"
+                   class="input" autocomplete="off" aria-label="Add a peer" style="max-width:520px">
+            <datalist id="peers-datalist">
+              {% for a in peers_all %}<option value="{{ a }}">{% endfor %}
+            </datalist>
+            <div id="peers-tokens" class="tokens"></div>
+            <input type="hidden" name="peers" id="peers-hidden" value="{{ form.peers.data or '' }}">
+            <small class="help">E.g., <code>actorA, actorB</code> or select from the list (db=5).</small>
+          </div>
+
+        </div>
+      </div>
+
+      <div class="table-card" style="margin-top:12px;">
+        <div class="card-toolbar"><span>Sources</span></div>
+        <div class="prose" style="padding:10px 12px;">
+          {{ form.sources(class="input", rows="5", placeholder="One URL per line (or “Title — URL”)") }}
+        </div>
+      </div>
+
+      <div style="margin-top:14px;">
+        {{ form.submit(class="btn btn-primary") }}
+        <a class="btn btn-secondary" href="/actor/{{ actor_name|urlencode }}">View public page</a>
+      </div>
+    </form>
+  </div>
+</section>
+
+<style>
+/* Layout */
+.admin-form .two-col{ display:grid; grid-template-columns:minmax(0,2.2fr) minmax(0,1fr); gap:14px; align-items:start; }
+.admin-form .two-col > *{ min-width:0; }
+.admin-form .split-2{ display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1fr); gap:10px; }
+.admin-form .full{ grid-column:1 / -1; }
+.admin-form .input{ width:92%; }
+.admin-form textarea.input{ height:auto !important; min-height:140px; width:95%; box-sizing:border-box; line-height:1.35; padding:10px 12px; resize:vertical; white-space:pre-wrap; }
+.admin-form .prose .input { margin-bottom:10px; }
+.stack { display:flex; flex-direction:column; gap:10px; }
+
+/* Chips / tokens */
+.tokens{ display:flex; flex-wrap:wrap; gap:6px; margin-top:8px; }
+.token{ display:inline-flex; align-items:center; gap:6px; padding:4px 8px; border:1px solid var(--border); border-radius:999px; max-width:100%; }
+.token .x{ cursor:pointer; opacity:.7; }
+.token .x:hover{ opacity:1; }
+
+/* Responsive */
+@media (max-width: 900px){
+  .admin-form .two-col{ grid-template-columns:1fr; }
+  .admin-form .split-2{ grid-template-columns:1fr; }
+}
+</style>
+
+<script>
+(function(){
+  function initTokens(hiddenId, addId, tokensId){
+    const hidden = document.getElementById(hiddenId);
+    const add = document.getElementById(addId);
+    const wrap = document.getElementById(tokensId);
+
+    const setCSV = (arr)=> hidden.value = arr.join(', ');
+    const getCSV = ()=> (hidden.value || '').split(',').map(s=>s.trim()).filter(Boolean);
+
+    function render(){
+      wrap.innerHTML = '';
+      getCSV().forEach(val=>{
+        const b = document.createElement('span');
+        b.className = 'token';
+        b.innerHTML = `<span>${val}</span><span class="x" title="Remove">×</span>`;
+        b.querySelector('.x').addEventListener('click', ()=>{
+          const arr = getCSV().filter(x=>x.toLowerCase() !== val.toLowerCase());
+          setCSV(arr); render();
+        });
+        wrap.appendChild(b);
+      });
+    }
+
+    function addToken(v){
+      v = (v || '').trim();
+      if(!v) return;
+      const arr = getCSV();
+      if(!arr.map(x=>x.toLowerCase()).includes(v.toLowerCase())){ arr.push(v); setCSV(arr); }
+      add.value=''; render();
+    }
+
+    add.addEventListener('keydown', (e)=>{
+      if(e.key === 'Enter'){ e.preventDefault(); addToken(add.value); }
+      if(e.key === ',' ){ e.preventDefault(); addToken(add.value.replace(/,$/,'')); }
+      if(e.key === 'Backspace' && !add.value){
+        const arr = getCSV(); arr.pop(); setCSV(arr); render();
+      }
+    });
+
+    add.addEventListener('change', ()=> addToken(add.value)); // datalist pick
+    render(); // hydrate from current CSV in hidden
+  }
+
+  initTokens('groups-hidden',  'groups-add',  'groups-tokens');
+  initTokens('markets-hidden', 'markets-add', 'markets-tokens');
+  initTokens('peers-hidden',   'peers-add',   'peers-tokens');
+})();
+</script>
+{% endblock %}

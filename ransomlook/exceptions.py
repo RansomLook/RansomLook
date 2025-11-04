@@ -4,4 +4,3 @@
 Exceptions module
 '''
 
-from .default import RansomlookException

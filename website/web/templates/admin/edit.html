@@ -1,0 +1,124 @@
+{% extends "base.html" %}
+{% from 'bootstrap5/utils.html' import render_messages %}
+{% block title %}Admin · Edit{% endblock %}
+
+{% block content %}
+{{ render_messages(container=True, dismissible=True) }}
+
+<section class="hero">
+  <div class="container">
+    <h1>Edit Group or Market</h1>
+    <p class="lead">Pick the type, search, then confirm to edit.</p>
+  </div>
+</section>
+
+<section class="metrics-section">
+  <div class="container">
+
+    <!-- Type switch (no URL hash) -->
+    <div class="table-card" style="padding:12px; margin-bottom:14px;">
+      <div class="type-toggle" role="tablist" aria-label="Choose type to edit">
+        <input type="radio" name="type" id="t-groups" checked>
+        <label for="t-groups" class="btn btn-secondary">Groups</label>
+
+        <input type="radio" name="type" id="t-markets">
+        <label for="t-markets" class="btn btn-secondary">Markets / Forums</label>
+      </div>
+
+      <!-- Shared search box -->
+      <div style="margin-top:10px;">
+        <label class="label" for="picker-search">Search</label>
+        <input id="picker-search" class="input" type="search" placeholder="Filter options…">
+      </div>
+    </div>
+
+    <!-- GROUPS form -->
+    <form id="form-groups" action="" method="post" novalidate class="table-card admin-form" style="padding:16px;">
+      {{ form.hidden_tag() }}
+      <div class="picker-row">
+        <div>
+          <label class="label" for="{{ form.group.id }}">{{ form.group.label }}</label>
+          {{ form.group(class="input", style="width:100%;") }}
+          {% for error in form.group.errors %}<div style="color:#ff9aa2;margin-top:4px">[{{ error }}]</div>{% endfor %}
+        </div>
+        <div style="align-self:end;">
+          {{ form.submit(class="btn btn-primary") }}
+        </div>
+      </div>
+    </form>
+
+    <!-- MARKETS form -->
+    <form id="form-markets" action="" method="post" novalidate class="table-card admin-form" style="padding:16px; display:none;">
+      {{ formMarkets.hidden_tag() }}
+      <div class="picker-row">
+        <div>
+          <label class="label" for="{{ formMarkets.group.id }}">{{ formMarkets.group.label }}</label>
+          {{ formMarkets.group(class="input", style="width:100%;") }}
+          {% for error in formMarkets.group.errors %}<div style="color:#ff9aa2;margin-top:4px">[{{ error }}]</div>{% endfor %}
+        </div>
+        <div style="align-self:end;">
+          {{ formMarkets.submit(class="btn btn-primary") }}
+        </div>
+      </div>
+    </form>
+
+  </div>
+</section>
+
+<style>
+/* small admin helpers to keep UI tidy */
+.label{ display:block; color:var(--muted); font-size:.9rem; margin-bottom:4px }
+.input{ background:#0f1623; color:var(--text); border:1px solid var(--border); border-radius:10px; padding:8px 10px; width:100% }
+.type-toggle{ display:flex; gap:8px; align-items:center; }
+.type-toggle input{ display:none; }
+.type-toggle label{ cursor:pointer; }
+.type-toggle input:checked + label{ box-shadow: inset 0 -2px 0 0 var(--pri); }
+.picker-row{ display:grid; grid-template-columns: 1fr auto; gap:12px; align-items:end; }
+@media (max-width: 640px){ .picker-row{ grid-template-columns: 1fr; } }
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  const rGroups   = document.getElementById('t-groups');
+  const rMarkets  = document.getElementById('t-markets');
+  const fGroups   = document.getElementById('form-groups');
+  const fMarkets  = document.getElementById('form-markets');
+  const searchBox = document.getElementById('picker-search');
+
+  // Toggle without changing URL
+  function applyToggle(){
+    const gOn = rGroups.checked;
+    fGroups.style.display  = gOn ? '' : 'none';
+    fMarkets.style.display = gOn ? 'none' : '';
+    // reset search filter on switch
+    searchBox.value = '';
+    filterSelect('');
+  }
+  rGroups.addEventListener('change', applyToggle);
+  rMarkets.addEventListener('change', applyToggle);
+  applyToggle();
+
+  // Filter options in the visible select
+  function filterSelect(q){
+    q = (q || '').toLowerCase().trim();
+    const select = (fGroups.style.display !== 'none')
+      ? fGroups.querySelector('select')
+      : fMarkets.querySelector('select');
+    if (!select) return;
+
+    // Show all then hide non‑matching (works with long lists)
+    for (const opt of select.options){
+      const txt = (opt.textContent || '').toLowerCase();
+      opt.hidden = q && !txt.includes(q);
+    }
+
+    // Keep a visible option selected if current one is hidden
+    if (select.selectedOptions.length && select.selectedOptions[0].hidden){
+      const firstVisible = [...select.options].find(o => !o.hidden);
+      if (firstVisible) firstVisible.selected = true;
+    }
+  }
+  searchBox.addEventListener('input', e => filterSelect(e.target.value));
+});
+</script>
+{% endblock %}

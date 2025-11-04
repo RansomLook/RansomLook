@@ -2,6 +2,7 @@
 import json
 import redis
 from ransomlook.default import get_socket_path
+import collections
 
 red = redis.Redis(unix_socket_path=get_socket_path('cache'), db=0)
 
@@ -24,7 +25,6 @@ for item in data:
     item.pop('name')
     red.set(name, json.dumps(item))
 
-import collections
 red = redis.Redis(unix_socket_path=get_socket_path('cache'), db=2)
 with open('data/posts.json') as json_file:
     data = json.load(json_file)

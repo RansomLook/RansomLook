@@ -4,11 +4,9 @@ import redis
 import uuid
 
 from datetime import datetime
-from datetime import timedelta
 
 from ransomlook.default.config import get_config, get_socket_path
 from ransomlook.rocket import rocketnotify
-from ransomlook.twitter import twitternotify
 from ransomlook.mastodon import tootnotify
 from ransomlook.bluesky import blueskynotify
 from ransomlook.misp import mispevent
@@ -16,7 +14,7 @@ from ransomlook.email import alertingnotify
 
 from ransomlook.sharedutils import dbglog, stdlog, errlog
 
-from typing import Dict, Optional, Union, Any, List
+from typing import Dict, Optional, Union
 
 def posttemplate(victim: str, description: str, link: Optional[str], timestamp: str , magnet: Optional[str], screen: Optional[str]) -> Dict[str, Optional[str]]:
     '''
@@ -39,7 +37,6 @@ def appender(entry: Union[Dict[str, str|None], str], group_name: str) -> int :
     append a new post to posts.json
     '''
     rocketconfig = get_config('generic','rocketchat')
-    twitterconfig = get_config('generic','twitter')
     mastodonconfig = get_config('generic','mastodon')
     blueskyconfig = get_config('generic','bluesky')
     mispconfig = get_config('generic','misp')
@@ -73,7 +70,7 @@ def appender(entry: Union[Dict[str, str|None], str], group_name: str) -> int :
     if len(post_title) > 90:
         post_title = post_title[:90]
     red = redis.Redis(unix_socket_path=get_socket_path('cache'), db=2)
-    keys = red.keys()
+    red.keys()
     posts=[]
 
     if group_name.encode() in red.keys():
@@ -88,7 +85,7 @@ def appender(entry: Union[Dict[str, str|None], str], group_name: str) -> int :
     posts.append(newpost)
     red.set(group_name, json.dumps(posts))
     # preparing to screen
-    if link != None and link != '' and not screen:
+    if link is not None and link != '' and not screen:
         screenred = redis.Redis(unix_socket_path=get_socket_path('cache'), db=1)
         if 'toscan'.encode() not in screenred.keys():
            toscan=[]
@@ -97,7 +94,7 @@ def appender(entry: Union[Dict[str, str|None], str], group_name: str) -> int :
         toscan.append({'group': group_name, 'title': entry['title'], 'slug': entry['slug'], 'link': entry['link']}) # type: ignore
         screenred.set('toscan', json.dumps(toscan))
     # preparing to torrent
-    if magnet != None and magnet != '':
+    if magnet is not None and magnet != '':
         torrentred = redis.Redis(unix_socket_path=get_socket_path('cache'), db=1)
         if 'totorrent'.encode() not in torrentred.keys():
            totorrent=[]
@@ -125,8 +122,6 @@ def appender(entry: Union[Dict[str, str|None], str], group_name: str) -> int :
 
     if rocketconfig['enable'] == True:
         rocketnotify(rocketconfig, group_name, post_title, description)
-    if twitterconfig['enable'] == True:
-        twitternotify(twitterconfig, group_name, post_title)
     if mastodonconfig['enable'] == True:
         tootnotify(mastodonconfig, group_name, post_title, siteurl)
     if blueskyconfig['enable'] == True:

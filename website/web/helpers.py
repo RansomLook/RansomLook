@@ -6,7 +6,7 @@ from functools import lru_cache
 import flask_login  # type: ignore
 from werkzeug.security import generate_password_hash
 
-from typing import Any, Dict, List, Optional, Union, TypedDict
+from typing import Any, Dict
 
 from ransomlook.default import get_config, get_homedir
 from pathlib import Path

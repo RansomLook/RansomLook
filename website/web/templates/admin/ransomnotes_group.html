@@ -1,0 +1,336 @@
+{% extends "base.html" %}
+{% from 'bootstrap5/utils.html' import render_messages %}
+{% block title %}Admin · Ransom notes · {{ slug }}{% endblock %}
+
+{% block content %}
+{{ render_messages(container=True, dismissible=True) }}
+
+<section class="hero">
+  <div class="container" style="text-align:center">
+    <h1>Ransom notes · {{ slug }}</h1>
+    <p class="lead">Manage <strong>aliases</strong> for this group and its <strong>notes</strong> (add · edit · remove).</p>
+  </div>
+</section>
+
+<section class="metrics-section">
+  <div class="container">
+
+    <!-- =========== Aliases =========== -->
+    <div id="aliases-card" class="table-card" style="padding:16px; margin-bottom:14px;">
+      <h3 class="section-title" style="margin:0 0 10px">Aliases</h3>
+
+      {% if aliases %}
+        <div class="d-flex flex-wrap" style="gap:8px; margin-bottom:10px;">
+          {% for a in aliases %}
+            <form method="post" action="{{ url_for('admin_ransomnotes_alias_del', slug=slug, alias=a) }}" class="d-inline">
+              <span class="badge bg-light text-dark" style="padding:6px 8px; border-radius:999px;">
+                <span class="monospace">{{ a }}</span>
+                <button class="btn btn--sm" type="submit" style="margin-left:6px"
+                        onclick="return confirm('Remove alias “{{ a }}”?')">✕</button>
+              </span>
+            </form>
+          {% endfor %}
+        </div>
+      {% else %}
+        <p class="text-muted" style="margin:0 0 10px">No aliases yet.</p>
+      {% endif %}
+
+      <form class="admin-form" method="post" action="{{ url_for('admin_ransomnotes_alias_add', slug=slug) }}">
+        <div class="picker-row">
+          <div>
+            <label class="label" for="alias-input">New alias</label>
+            <input id="alias-input" class="input" name="alias" placeholder="e.g., 0mega" required>
+          </div>
+          <div style="align-self:end;">
+            <button class="btn btn-primary" type="submit">Add alias</button>
+          </div>
+        </div>
+      </form>
+    </div>
+
+    <!-- =========== Notes toolbar =========== -->
+    <div id="notes-card" class="table-card" style="padding:16px; margin-bottom:14px;">
+      <div class="d-flex justify-content-between align-items-center" style="gap:12px; flex-wrap:wrap;">
+        <h3 class="section-title" style="margin:0">Notes</h3>
+        <a href="#"
+           class="btn btn-primary js-open-note-modal"
+           data-action="{{ url_for('admin_ransomnotes_note_create', slug=slug) }}"
+           data-id=""
+           data-title=""
+           data-format="txt"
+           data-status="active"
+           data-local="1"
+           data-new="1">
+          + New note
+        </a>
+      </div>
+
+      <!-- Notes table -->
+      <div class="table-scroll" style="margin-top:10px;">
+        <table class="table">
+          <thead>
+            <tr>
+              <th>Title</th>
+              <th>Format</th>
+              <th>Status</th>
+              <th>Local override</th>
+              <th>Updated</th>
+              <th width="180">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+          {% for n in notes %}
+            <tr>
+              <td class="monospace">{{ n.title }}</td>
+              <td><code>{{ n.format }}</code></td>
+              <td>{{ n.status }}</td>
+              <td>{{ 'yes' if n.local_override else 'no' }}</td>
+              <td><small class="text-muted">{{ n.updated_at }}</small></td>
+              <td>
+                <a href="#"
+                   class="btn btn-secondary btn--sm js-open-note-modal"
+                   data-action="{{ url_for('admin_ransomnotes_note_update', slug=slug, nid=n.id) }}"
+                   data-id="{{ n.id }}"
+                   data-title="{{ n.title|e }}"
+                   data-format="{{ n.format }}"
+                   data-status="{{ n.status }}"
+                   data-local="{{ '1' if n.local_override else '0' }}">
+                  Edit
+                </a>
+                <form method="post" action="{{ url_for('admin_ransomnotes_note_delete', slug=slug, nid=n.id) }}"
+                      style="display:inline" onsubmit="return confirm('Delete this note?');">
+                  <button class="btn btn--sm" type="submit">Delete</button>
+                </form>
+                <!-- Hidden raw content for prefill -->
+                <textarea id="note-content-{{ n.id }}" hidden>{{ n.content }}</textarea>
+              </td>
+            </tr>
+          {% else %}
+            <tr><td colspan="6" class="text-muted">No notes yet.</td></tr>
+          {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- =========== Modal (no Bootstrap) =========== -->
+<div id="adm-note-modal" class="adm-modal" hidden>
+  <div class="adm-modal__backdrop" data-close></div>
+  <div class="adm-modal__panel table-card" role="dialog" aria-modal="true" aria-labelledby="adm-note-title">
+    <div class="adm-modal__header">
+      <h3 id="adm-note-title" class="section-title" style="margin:0">Edit note</h3>
+      <button class="adm-modal__close" type="button" aria-label="Close" data-close>×</button>
+    </div>
+
+    <form id="adm-note-form" class="admin-form" method="post" action="">
+      <div class="picker-row">
+        <div>
+          <label class="label" for="adm-title">Title</label>
+          <input id="adm-title" class="input" name="title" placeholder="README.txt" style="width:97%">
+        </div>
+        <div>
+          <label class="label" for="adm-format">Format</label>
+          <select id="adm-format" class="input" name="format">
+            <option value="txt">txt</option>
+            <option value="md">md</option>
+            <option value="html">html</option>
+            <option value="rtf">rtf</option>
+          </select>
+        </div>
+        <div>
+          <label class="label" for="adm-status">Status</label>
+          <select id="adm-status" class="input" name="status">
+            <option value="active">active</option>
+            <option value="archived">archived</option>
+          </select>
+        </div>
+      </div>
+
+      <div style="margin-top:10px">
+        <label class="label" for="adm-content">Content</label>
+        <textarea id="adm-content" class="input" name="content" rows="10" placeholder="Raw note content…" style="width:97%;"></textarea>
+      </div>
+
+      <div style="margin-top:10px; display:flex; align-items:center; gap:8px;">
+        <input type="checkbox" id="adm-local" name="local_override">
+        <label for="adm-local">Protect against import overwrite (<code>local_override</code>)</label>
+      </div>
+
+      <div class="adm-modal__footer">
+        <button class="btn btn-primary" type="submit">Save</button>
+        <button class="btn btn-secondary" type="button" data-close>Cancel</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<style>
+/* Helpers aligned with edit.html */
+.label{ display:block; color:var(--muted); font-size:.9rem; margin-bottom:4px }
+.input{ background:#0f1623; color:var(--text); border:1px solid var(--border); border-radius:10px; padding:8px 10px; width:100% }
+.admin-form .picker-row{ display:grid; grid-template-columns: 1fr 180px 180px; gap:12px; align-items:end; }
+@media (max-width: 900px){ .admin-form .picker-row{ grid-template-columns: 1fr; } }
+.badge code{ background:transparent; color:inherit; }
+
+/* Modal (scoped) */
+.adm-modal[hidden]{display:none!important}
+.adm-modal{position:fixed; inset:0; z-index:1300; display:grid}
+.adm-modal__backdrop{position:absolute; inset:0; background:rgba(0,0,0,.55)}
+.adm-modal__panel{position:relative; margin:auto; max-width:min(1000px,92vw); width:100%; padding:0; overflow:hidden}
+.adm-modal__header{display:flex; justify-content:space-between; align-items:center; padding:10px 14px; border-bottom:1px solid var(--border)}
+.adm-modal__close{background:transparent; border:0; font-size:22px; line-height:1; cursor:pointer}
+.adm-modal__footer{margin-top:12px; display:flex; gap:8px}
+
+}
+</style>
+<style>
+/* 1) Les deux cartes prennent toute la largeur de la grille */
+#aliases-card,
+#notes-card{
+  width: 100%;
+  grid-column: 1 / -1; /* si le parent est en grid */
+}
+
+/* 2) Aliases: input + bouton en ligne, pas de chevauchement */
+#aliases-card .picker-row{
+  display: flex;                 /* ligne */
+  align-items: center;
+  gap: 12px;
+}
+#aliases-card .picker-row > :first-child{
+  flex: 1 1 auto;                /* le bloc de l'input prend la place */
+  min-width: 0;
+}
+#aliases-card .picker-row > :last-child{
+  flex: 0 0 auto;                /* le bouton garde sa taille naturelle */
+}
+/* neutralise tout positionnement absolu parasite éventuellement hérité */
+#aliases-card .picker-row .btn{
+  position: static !important;
+  margin: 0 !important;
+}
+#aliases-card .picker-row .input{
+  width: 97%;
+}
+
+/* 3) Responsive: on empile sur petits écrans */
+@media (max-width: 768px){
+  #aliases-card .picker-row{
+    flex-direction: column;
+    align-items: stretch;
+  }
+  #aliases-card .picker-row > :last-child{
+    width: auto;                 /* bouton pleine largeur si tu préfères, sinon laisse comme ça */
+    align-self: flex-start;      /* ou center selon ton goût */
+  }
+}
+
+/* --- Notes: ensure full-width table inside the card --- */
+#notes-card{ width: 100%; grid-column: 1 / -1; } /* spans full grid if parent uses CSS grid */
+#notes-card .table-scroll{ width: 100%; }
+#notes-card .table{
+  width: 100% !important;
+  table-layout: auto !important;   /* avoid shrinking to content */
+}
+</style>
+<style>
+/* Make the editor modal large and comfy */
+.adm-modal { display: grid; place-items: center; }
+
+.adm-modal__panel{
+  /* wider & taller */
+  width: min(1100px, 97vw);
+  max-height: 97vh;
+  /* let header/foot stick and body scroll */
+  display: flex;
+  flex-direction: column;
+}
+
+.adm-modal__header{ flex: 0 0 auto; padding: 12px 16px; }
+#adm-note-form{
+  /* the form becomes the scrollable body */
+  flex: 1 1 auto;
+  overflow: auto;
+  padding: 12px 16px;
+}
+
+.adm-modal__footer{
+  position: sticky; bottom: 0;
+  background: var(--card);
+  border-top: 1px solid var(--border);
+  padding: 12px 16px;
+  margin-top: 8px;
+}
+
+/* Textarea: give space by default */
+#adm-content{ min-height: 40vh; }
+
+/* Slightly wider pickers on desktop; stack on mobile */
+.admin-form .picker-row{ grid-template-columns: 1fr 200px 200px; }
+@media (max-width: 900px){
+  .admin-form .picker-row{ grid-template-columns: 1fr; }
+  #adm-content{ min-height: 30vh; }
+}
+</style>
+
+<script>
+(function(){
+  const modal   = document.getElementById('adm-note-modal');
+  const form    = document.getElementById('adm-note-form');
+  const titleEl = document.getElementById('adm-title');
+  const fmtEl   = document.getElementById('adm-format');
+  const stEl    = document.getElementById('adm-status');
+  const txtEl   = document.getElementById('adm-content');
+  const locEl   = document.getElementById('adm-local');
+  const hdr     = document.getElementById('adm-note-title');
+
+  function openModal(){ modal.removeAttribute('hidden'); document.body.style.overflow='hidden'; }
+  function closeModal(){ modal.setAttribute('hidden',''); document.body.style.overflow=''; }
+
+  modal.addEventListener('click', (e)=>{
+    if (e.target.matches('[data-close]') || e.target.closest('[data-close]')) closeModal();
+    if (e.target.classList.contains('adm-modal__backdrop')) closeModal();
+  });
+  document.addEventListener('keydown', (e)=>{ if(!modal.hasAttribute('hidden') && e.key==='Escape'){ e.preventDefault(); closeModal(); } });
+
+  // autosize for comfort
+  function fit(){ txtEl.style.height='auto'; txtEl.style.height=(txtEl.scrollHeight+2)+'px'; }
+  txtEl.addEventListener('input', fit);
+
+  // open modal (edit or create)
+  document.addEventListener('click', (e)=>{
+    const btn = e.target.closest('.js-open-note-modal');
+    if (!btn) return;
+    e.preventDefault();
+
+    const action = btn.getAttribute('data-action') || '';
+    const id     = btn.getAttribute('data-id') || '';
+    const title  = btn.getAttribute('data-title') || '';
+    const format = (btn.getAttribute('data-format') || 'txt').toLowerCase();
+    const status = (btn.getAttribute('data-status') || 'active').toLowerCase();
+    const local  = btn.getAttribute('data-local') === '1';
+    const isNew  = btn.getAttribute('data-new') === '1';
+
+    form.action   = action;
+    hdr.textContent = isNew ? 'Create note' : 'Edit note';
+
+    titleEl.value = title;
+    fmtEl.value   = ['txt','md','html','rtf'].includes(format) ? format : 'txt';
+    stEl.value    = ['active','archived'].includes(status) ? status : 'active';
+    locEl.checked = !!local;
+
+    if (id){
+      const src = document.getElementById('note-content-' + id);
+      txtEl.value = src ? src.value : '';
+    } else {
+      txtEl.value = '';
+    }
+    fit();
+    openModal();
+  });
+})();
+</script>
+{% endblock %}

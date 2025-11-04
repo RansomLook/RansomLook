@@ -1,28 +1,51 @@
 {% extends "base.html" %}
 {% from 'bootstrap5/utils.html' import render_messages %}
-{% block title %}🦕 RansomLook 🦖{% endblock %}
-{% block content %}
-{{ render_messages(container=True, dismissible=True) }}
+{% block title %}RansomLook — Login{% endblock %}
 
-    <article id="main" class="markdown-section">
-        <h1>Login</h1>
-    <form action="" method="post" novalidate>
+{% block content %}
+
+<!-- En‑tête simple -->
+<section class="hero">
+  <div class="container">
+    <h1>Login</h1>
+    <p class="lead">Sign in to access admin features.</p>
+  </div>
+</section>
+
+<section class="auth-section">
+  <div class="container">
+
+    <div class="flash-container">
+      {{ render_messages(container=False, dismissible=False) }}
+    </div>
+
+    <div class="form-card">
+      <form action="" method="post" novalidate>
         {{ form.hidden_tag() }}
-        <p>
-            {{ form.username.label }}<br>
-            {{ form.username(size=32) }}<br>
-            {% for error in form.username.errors %}
-            <span style="color: red;">[{{ error }}]</span>
-            {% endfor %}
-        </p>
-        <p>
-            {{ form.password.label }}<br>
-            {{ form.password(size=32) }}<br>
-            {% for error in form.password.errors %}
-            <span style="color: red;">[{{ error }}]</span>
-            {% endfor %}
-        </p>
-        <p>{{ form.submit() }}</p>
-    </form>
-    </article>
+
+        <div class="field">
+          {{ form.username.label }}
+          {{ form.username(class_="input", autocomplete="username") }}
+          {% for error in form.username.errors %}
+            <div class="form-error">{{ error }}</div>
+          {% endfor %}
+        </div>
+
+        <div class="field">
+          {{ form.password.label }}
+          {{ form.password(class_="input", autocomplete="current-password") }}
+          {% for error in form.password.errors %}
+            <div class="form-error">{{ error }}</div>
+          {% endfor %}
+        </div>
+
+        <div class="actions">
+          {{ form.submit(class_="btn btn-primary") }}
+        </div>
+      </form>
+    </div>
+
+  </div>
+</section>
+
 {% endblock %}

@@ -1,0 +1,68 @@
+
+{% extends "base.html" %}
+
+{% block title %}RansomLook — Trending (last {{ days }} days){% endblock %}
+
+{% block content %}
+<section class="hero">
+  <div class="container">
+    <h1>Trending</h1>
+    <p class="lead">Top groups by post volume in the last
+      <strong>{{ days }}</strong> day{{ '' if days == 1 else 's' }}.
+      {% if total_posts %}<span style="opacity:.8">Total posts: {{ total_posts }}</span>{% endif %}
+    </p>
+  </div>
+</section>
+
+<div class="page-container">
+<section class="metrics-section">
+  <div class="container">
+
+    <!-- Controls -->
+    <form action="{{ url_for('hot') }}" method="get" class="search-card" style="padding:12px;margin-bottom:12px">
+      <label for="days" class="form-label" style="margin-right:8px">Window:</label>
+      <select id="days" name="days" class="form-select" style="max-width:200px;display:inline-block">
+        {% for d in [1,3,7,14,30,90] %}
+          <option value="{{ d }}" {% if days == d %}selected{% endif %}>Last {{ d }} day{{ '' if d == 1 else 's' }}</option>
+        {% endfor %}
+      </select>
+      <button class="btn" type="submit" style="margin-left:8px">Apply</button>
+    </form>
+
+    {% if rows and rows|length %}
+      <div class="table-card">
+        <div class="table-responsive">
+          <table class="rl-table">
+            <thead>
+              <tr>
+                <th style="width:64px;text-align:right">#</th>
+                <th>Group</th>
+                <th style="width:140px;text-align:right">Posts</th>
+                <th style="width:200px">Last post</th>
+                <th style="width:120px">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for row in rows %}
+                <tr>
+                  <td style="text-align:right">{{ loop.index }}</td>
+                  <td><a href="/group/{{ row.group }}">{{ row.group.title() }}</a></td>
+                  <td style="text-align:right"><strong>{{ row.count }}</strong></td>
+                  <td>{{ row.last_post or '—' }}</td>
+                  <td>
+                    <a class="btn btn-small" href="/group/{{ row.group }}">Open</a>
+                  </td>
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    {% else %}
+      <p class="prose" style="color:var(--muted)">No data for the selected window.</p>
+    {% endif %}
+  </div>
+</section>
+</div>
+
+{% endblock %}

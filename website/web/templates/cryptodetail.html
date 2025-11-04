@@ -1,0 +1,149 @@
+{% extends "base.html" %}
+
+{% block title %}Cryptocurrencies — {{ group|title }}{% endblock %}
+
+{% block content %}
+
+<section class="hero">
+  <div class="container">
+    <h1>{{ group|title }}</h1>
+    <p class="lead">
+      Observed wallets and transactions for this group.
+      {% if aliases and aliases|length %}
+        <span class="muted">Aliases: {{ aliases|join(', ') }}</span>
+      {% endif %}
+    </p>
+  </div>
+</section>
+
+<section class="metrics-section">
+  <div class="container">
+
+    {# Badge style minimal (non intrusif) #}
+    <style>
+      .src-badge{display:inline-block;min-width:1.2em;padding:0 .25em;margin-left:.35em;
+                 border-radius:.35em;font:600 12px/1 var(--font-sans);text-align:center;
+                 background:#263245;color:#cbd5e1;vertical-align:baseline}
+      .src-badge[data-src^="ransomwhe.re"]{background:#20334a}
+      .src-badge[data-src^="ransomlook"]{background:#42304a}
+      .src-badge[data-src^="manual"]{background:#394a32}
+      .src-legend{font-size:12px;color:#8b97a8;margin:.5rem 0 1rem}
+      .flash-border{box-shadow:0 0 0 2px rgba(100,180,255,.35) inset}
+      .addr{word-break:break-all}
+      .mono{font-family:var(--font-mono, ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace)}
+      .hash-full,
+      .hash-full code{
+  white-space: normal !important;
+  word-break: break-all !important;
+  overflow: visible !important;
+  text-overflow: clip !important;
+      }
+    </style>
+
+    <div class="src-legend">
+      Source legend:
+      <span class="src-badge" data-src="ransomwhe.re" title="ransomwhe.re">R</span>
+      <span class="src-badge" data-src="ransomlook"  title="ransomlook">L</span>
+      <span class="src-badge" data-src="manual"      title="manual">M</span>
+    </div>
+
+    {# Niveau 1 : pour chaque blockchain, une section #}
+    {% for chain, wallets in by_chain.items() %}
+      {% set wallets_count = wallets|length %}
+      <details class="section-block level-1" data-accordion open>
+        <summary class="section-summary">
+          <span class="mono">{{ chain }}</span>
+          <span class="count">{{ wallets_count }}</span>
+        </summary>
+
+        {# Niveau 2 : chaque wallet #}
+        {% for crypto in wallets %}
+          {% set txs = crypto.get('transactions', []) %}
+          {% set tx_count = txs|length %}
+          {% set wsrc = (crypto.get('source') or 'unknown') %}
+          {% set wbadge = (wsrc[0]|upper) if wsrc else '?' %}
+
+          <details class="section-block level-2" data-accordion>
+            <summary class="section-summary">
+              <span class="mono">{{ chain }}</span>
+              <span class="count">{{ tx_count }}</span>
+            </summary>
+
+            <div class="table-card" style="margin-top:8px">
+              <div class="table-scroll">
+                <table class="rl-table" aria-label="Wallet">
+                  <thead>
+                    <tr>
+                      <th>Blockchain</th>
+                      <th>Address</th>
+                      <th style="width:14%; text-align:center">Transactions</th>
+                      <th style="width:8%; text-align:center">Src</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td><strong>{{ chain }}</strong></td>
+                      <td class="addr mono"><code>{{ crypto['address'] }}</code></td>
+                      <td style="text-align:center">{{ tx_count }}</td>
+                      <td style="text-align:center">
+                        <span class="src-badge" data-src="{{ wsrc }}" title="source: {{ wsrc }}">{{ wbadge }}</span>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            {% if tx_count > 0 %}
+            {# Niveau 3 : transactions #}
+            <details class="section-block level-3" data-accordion open>
+              <summary class="section-summary">
+                <span>Transactions</span>
+                <span class="count">{{ tx_count }}</span>
+              </summary>
+
+              <div class="table-card">
+                <div class="table-scroll">
+                  <table class="rl-table" aria-label="Transactions">
+                    <thead>
+                      <tr>
+                        <th>Transaction</th>
+                        <th style="width:20%; text-align:right">Amount</th>
+                        <th style="width:18%; text-align:right">Value (USD)</th>
+                        <th style="width:8%; text-align:center">Src</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {% for tr in txs %}
+                        {% set h = tr.get('hash') %}
+                        {% set amt_raw = tr.get('amount') %}
+                        {% set amt = (amt_raw * 0.00000001) if (amt_raw is number) else amt_raw %}
+                        {% set usd = tr.get('amountUSD') %}
+                        {% set tsrc = tr.get('source') or 'unknown' %}
+                        {% set tbadge = (tsrc[0]|upper) if tsrc else '?' %}
+                        <tr>
+                          <td class="hash-full"><code class="mono">{{ h }}</code></td>
+                          <td style="text-align:right">{{ (amt if amt is number else amt)|round(8) }}</td>
+                          <td style="text-align:right">{{ (usd if usd is number else usd)|round(2, 'ceil') }}</td>
+                          <td style="text-align:center">
+                            <span class="src-badge" data-src="{{ tsrc }}" title="source: {{ tsrc }}">{{ tbadge }}</span>
+                          </td>
+                        </tr>
+                      {% endfor %}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </details>
+            {% endif %}
+          </details>
+        {% endfor %}
+      </details>
+    {% else %}
+      <div class="table-card" style="padding:16px">No wallet found for this group.</div>
+    {% endfor %}
+
+  </div>
+</section>
+
+{% endblock %}

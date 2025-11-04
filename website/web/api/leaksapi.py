@@ -5,7 +5,6 @@ from redis import Redis
 
 from flask_restx import Namespace, Resource # type: ignore
 
-from ransomlook import ransomlook
 from ransomlook.default import get_socket_path
 
 from typing import Any, Dict, List

@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+{% from 'bootstrap5/utils.html' import render_messages %}
+{% block title %}Admin · {{ mode|title }} address — {{ group }}{% endblock %}
+{% block content %}
+{{ render_messages(container=True, dismissible=True) }}
+
+<section class="hero">
+  <div class="container">
+    <h1>{{ mode|title }} address — {{ group }}</h1>
+    <p class="lead">Fill the fields; transactions are a JSON array (full objects). Each transaction should have a <code>source</code>.</p>
+  </div>
+</section>
+
+<section class="metrics-section">
+  <div class="container">
+    <form method="post">
+      <div class="table-card" style="padding:12px;display:grid;gap:12px;">
+        <label>
+          <div>Blockchain</div>
+          <input type="text" name="blockchain" value="{{ doc.blockchain or blockchain or '' }}" required>
+        </label>
+
+        <label>
+          <div>Address</div>
+          <input type="text" name="address" value="{{ doc.address or address or '' }}" {{ 'readonly' if mode=='edit' else 'required' }}>
+        </label>
+
+        <label>
+          <div>Source <small class="muted">(e.g., ransomwhe.re, ransomlook, manual)</small></div>
+          <input type="text" name="source" value="{{ doc.source or '' }}" required>
+        </label>
+
+        <label>
+          <div>Label (optional)</div>
+          <input type="text" name="label" value="{{ doc.label or '' }}">
+        </label>
+
+        <label>
+          <div>Transactions (JSON array)</div>
+          <textarea name="transactions" rows="12" spellcheck="false">{{ doc.transactions | tojson(indent=2) if doc.transactions else '[]' }}</textarea>
+        </label>
+
+        <div>
+          <button class="btn" type="submit">Save</button>
+          <a class="btn" href="{{ url_for('admin_crypto_group', group=group) }}">Cancel</a>
+        </div>
+      </div>
+    </form>
+  </div>
+</section>
+
+{% endblock %}

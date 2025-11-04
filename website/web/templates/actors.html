@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+
+{% block title %}Threat Actors / Affiliates{% endblock %}
+
+{% block content %}
+
+<section class="hero">
+  <div class="container">
+    <h1>Actors</h1>
+    <p class="lead">Browse threat actors / affiliates.</p>
+  </div>
+</section>
+
+<section class="metrics-section">
+  <div class="container">
+
+    <!-- Client-side filter (same UI as notes.html) -->
+    <div style="margin-bottom:14px;">
+      <input id="actors-filter" type="search" placeholder="Filter actors… (using names and aliases)" aria-label="Filter actors"
+             style="width:100%;max-width:520px;padding:10px 12px;border-radius:10px;border:1px solid var(--border);background:#0f1623;color:var(--text)">
+    </div>
+
+    <!-- Chip grid (same layout as notes.html) -->
+    <div id="actors-grid" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px;">
+      {% for e in data %}
+        {# data: list of actor dicts: { name: str, aliases: [str], ... } #}
+        <a class="group-chip"
+           href="/actor/{{ e['name']|urlencode }}"
+           data-name="{{ (e['name'] ~ ' ' ~ (e.get('aliases', [])|join(' ')))|lower }}"
+           style="display:flex;align-items:center;justify-content:center;padding:12px 10px;border-radius:12px;border:1px solid var(--border);background:linear-gradient(180deg,#121a28 0%,#0f1623 100%);text-decoration:none;color:var(--text);font-weight:600;text-align:center;">
+          {{ e['name'].title() }}
+        </a>
+      {% endfor %}
+    </div>
+
+  </div>
+</section>
+
+<!-- Inline JS for filtering (same logic as notes.html) -->
+<script>
+(function(){
+  const input = document.getElementById('actors-filter');
+  const items = Array.from(document.querySelectorAll('#actors-grid .group-chip'));
+  if (!input) return;
+  input.addEventListener('input', function(){
+    const q = this.value.trim().toLowerCase();
+    items.forEach(a => {
+      const match = !q || (a.dataset.name || '').includes(q);
+      a.style.display = match ? '' : 'none';
+    });
+  });
+})();
+</script>
+
+{% endblock %}

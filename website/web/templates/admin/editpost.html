@@ -1,0 +1,275 @@
+{% extends "base.html" %}
+{% from 'bootstrap5/utils.html' import render_messages %}
+{% block title %}🦕 RansomLook — Edit posts 🦖{% endblock %}
+
+{% block content %}
+{{ render_messages(container=True, dismissible=True) }}
+
+{# ---------- Robust field render macros (same as you sent) ---------- #}
+{% macro fld(f, idx, name, type='text', class_='input', placeholder='') -%}
+  {% if f is not none and f.__call__ is defined %}
+    {{ f(class_=class_, placeholder=placeholder, type=type) }}
+  {% else %}
+    {% set val = (f if (f is string) else '') %}
+    <input class="{{ class_ }}" type="{{ type }}"
+           name="postslist-{{ idx }}-{{ name }}"
+           value="{{ val|e }}" placeholder="{{ placeholder }}">
+  {% endif %}
+{%- endmacro %}
+
+{% macro ta(f, idx, name, class_='input', rows=6, placeholder='') -%}
+  {% if f is not none and f.__call__ is defined %}
+    {{ f(class_=class_, rows=rows, placeholder=placeholder) }}
+  {% else %}
+    {% set val = (f if (f is string) else '') %}
+    <textarea class="{{ class_ }}" name="postslist-{{ idx }}-{{ name }}" rows="{{ rows }}" placeholder="{{ placeholder }}">{{ val }}</textarea>
+  {% endif %}
+{%- endmacro %}
+
+{% macro cb(f, idx, name, label_txt='') -%}
+  {% if f is not none and f.__call__ is defined %}
+    <label class="chk"><span>{{ label_txt }}</span>{{ f() }}</label>
+  {% else %}
+    <label class="chk"><span>{{ label_txt }}</span>
+      <input type="checkbox" name="postslist-{{ idx }}-{{ name }}" value="y">
+    </label>
+  {% endif %}
+{%- endmacro %}
+
+{% macro filef(f, idx, name, class_='input') -%}
+  {% if f is not none and f.__call__ is defined %}
+    {{ f(class_=class_) }}
+  {% else %}
+    <input type="file" class="{{ class_ }}" name="postslist-{{ idx }}-{{ name }}">
+  {% endif %}
+{%- endmacro %}
+
+<style>
+  /* --- Generic inputs --- */
+  .edit-wrap{max-width:1100px;margin:0 auto}
+  .label{display:block;color:var(--muted);font-size:.9rem;margin:6px 0 3px}
+  .input{width:100%;background:#0b1220;border:1px solid var(--border);border-radius:10px;padding:8px 10px;color:var(--text)}
+  .btn-sm{padding:6px 10px;font-size:.9rem}
+
+  /* Filters card */
+  .filters{display:flex;gap:10px;flex-wrap:wrap;align-items:end}
+
+  /* Collapsible card */
+  details.post{border:1px solid var(--border);border-radius:12px;background:#0f1623;margin-bottom:10px;overflow:hidden}
+  details.post[open]{box-shadow:0 0 0 1px rgba(255,255,255,.04) inset}
+  summary.post-head{list-style:none;cursor:pointer;display:flex;align-items:center;gap:10px;padding:10px 12px}
+  summary.post-head::-webkit-details-marker{display:none}
+  .dot{width:8px;height:8px;border-radius:50%;background:#3b82f6;opacity:.7}
+  .pill{font:600 12px/1 var(--font);padding:6px 10px;border-radius:999px;background:#121a29;border:1px solid var(--border);color:var(--muted)}
+  .title{flex:1 1 auto;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:var(--text)}
+  .badge-id{padding:4px 8px;border:1px solid var(--border);border-radius:8px;background:#0b1220;color:var(--muted);font-size:.8rem}
+  .chev{transform:rotate(-90deg);transition:transform .18s ease;opacity:.7}
+  details[open] .chev{transform:rotate(0deg)}
+
+  /* === FIXED: grid names that match your HTML === */
+  .post-body{padding:12px}
+  .post-grid{
+    display:grid;
+    grid-template-columns:minmax(0,1fr) 360px; /* left grows, right fixed */
+    gap:14px 18px;
+    align-items:start;
+  }
+  .post-main,.post-aside{min-width:0}      /* prevent overflow */
+  .post-main .input,
+  .post-main input,
+  .post-main textarea,
+  .post-main select{width:100%;box-sizing:border-box}
+
+  /* Preview box */
+  .preview-box{
+    background:#0b1220;
+    border:1px solid var(--border);
+    border-radius:10px;
+    height:260px;                /* adjust if you want */
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    overflow:auto;               /* no bleed */
+    color:var(--muted);
+  }
+  .preview-box img{max-width:100%;max-height:100%;height:auto;display:block}
+
+  /* Inline rows */
+  .aside-row{display:flex;gap:12px;align-items:center}
+  .spacer{flex:1}
+
+  /* 2-up fields left side (date + url) */
+  .post-main .row2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+
+  /* Responsive collapse */
+  @media (max-width: 900px){
+    .post-grid{grid-template-columns:1fr}
+    .post-aside{grid-column:1}
+    .post-main .row2{grid-template-columns:1fr}
+  }
+</style>
+
+<section class="hero">
+  <div class="container">
+    <h1>Edit posts</h1>
+    <p class="lead">Search, date filter, screen preview, quick delete — then save changes.</p>
+  </div>
+</section>
+
+<section class="metrics-section">
+  <div class="container edit-wrap">
+
+    <form method="POST" action="" enctype="multipart/form-data" novalidate>
+      {{ form.hidden_tag() }}
+
+      <!-- Filters -->
+      <div class="table-card" style="padding:12px;margin-bottom:12px">
+        <div class="filters">
+          <div>
+            <label class="label" for="flt-q">Search</label>
+            <input id="flt-q" class="input" type="search" placeholder="Title, description…">
+          </div>
+          <div>
+            <label class="label" for="flt-from">From</label>
+            <input id="flt-from" class="input" type="date">
+          </div>
+          <div>
+            <label class="label" for="flt-to">To</label>
+            <input id="flt-to" class="input" type="date">
+          </div>
+
+          <div style="margin-left:auto; display:flex; gap:8px">
+            <button class="btn btn-secondary btn-sm" type="button" id="btn-open-all">Expand all</button>
+            <button class="btn btn-secondary btn-sm" type="button" id="btn-close-all">Collapse all</button>
+            <button class="btn btn-secondary btn-sm" type="button" id="flt-reset">Reset filters</button>
+          </div>
+        </div>
+      </div>
+
+      {% for nested in form.postslist %}
+      {% set idx = loop.index0 %}
+
+      
+{% set f = nested.form %}
+{# values for summary #}
+      {% set _pt = (f.post_title if f.post_title is defined else none) %}
+      {% set _dc = (f.discovered if f.discovered is defined else none) %}
+      {% set _sc = (f.screen if f.screen is defined else none) %}
+      {% set title_txt = (_pt.data if (_pt is not none and _pt.__call__ is defined and _pt.data is not none) else (_pt if _pt is string else '')) %}
+      {% set disc_txt  = (_dc.data if (_dc is not none and _dc.__call__ is defined and _dc.data is not none) else (_dc if _dc is string else '')) %}
+      {% set screen_url= (_sc.data if (_sc is not none and _sc.__call__ is defined and _sc.data is not none) else (_sc if _sc is string else '')) %}
+
+      <details class="post" data-card>
+        <summary class="post-head">
+          <span class="dot" aria-hidden="true"></span>
+          <span class="pill" data-date>{{ disc_txt or '—' }}</span>
+          <strong class="title">{{ title_txt or '(untitled)' }}</strong>
+          <span class="badge-id">{{ (f.post_title.name if f.post_title is defined and f.post_title.__call__ is defined else 'postslist-' ~ idx ~ '-post_title') }}</span>
+          <svg class="chev" width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M8 10l4 4 4-4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+        </summary>
+
+        <div class="post-body">
+          <div class="post-grid">
+            <!-- Left column -->
+            <div class="post-main">
+              <label class="label">Title</label>
+              {{ f.post_title }}
+
+              <label class="label">Description</label>
+              {{ f.description }}
+
+              <div class="row2">
+                <div>
+                  <label class="label">Discovered (ISO 8601 or YYYY‑MM‑DD)</label>
+                  {{ f.discovered }}
+                </div>
+                <div>
+                  <label class="label">Screen URL</label>
+                  {{ f.screen }}
+                </div>
+              </div>
+
+              <label class="label">Link</label>
+              {{ f.link }}
+
+              <label class="label">Magnet</label>
+              {{ f.magnet }}
+            </div>
+
+            <!-- Right column -->
+            <aside class="post-aside">
+              <label class="label">Preview</label>
+              <div class="preview-box">
+                {% if f.screen and f.screen.data %}
+                  <img src="/{{ f.screen.data }}" alt="Preview">
+                {% else %} No preview {% endif %}
+              </div>
+
+              <div class="aside-row" style="margin-top:10px;">
+                <div>
+                  <label class="label">Upload new screen (optional)</label><br>
+                  {{ f.file }}
+                </div>
+                <div class="spacer"></div>
+                <div>
+                  <label class="label">Delete</label><br>
+                  {{ f.delete }}
+                </div>
+              </div>
+            </aside>
+          </div>
+        </div>
+      </details>
+      {% endfor %}
+
+      <div class="toolbar" style="display:flex;justify-content:flex-end;margin-top:14px">
+        <button class="btn btn-primary" type="submit">
+          {{ form.submit.label.text if form.submit and form.submit.label else 'Save changes' }}
+        </button>
+      </div>
+    </form>
+  </div>
+</section>
+
+<script>
+  // Filters + expand/collapse
+  document.addEventListener('DOMContentLoaded', () => {
+    const q = document.getElementById('flt-q');
+    const from = document.getElementById('flt-from');
+    const to = document.getElementById('flt-to');
+    const reset = document.getElementById('flt-reset');
+    const openAll = document.getElementById('btn-open-all');
+    const closeAll = document.getElementById('btn-close-all');
+    const items = [...document.querySelectorAll('details.post')];
+
+    function norm(s){ return (s||'').toLowerCase(); }
+    function extractDate(el){
+      const pill = el.querySelector('[data-date]');
+      return pill ? pill.textContent.trim().slice(0,10) : '';
+    }
+    function inRange(dateStr){
+      const d = dateStr || '';
+      const f = from.value || '0000-01-01';
+      const t = to.value   || '9999-12-31';
+      return (!d || (d >= f && d <= t));
+    }
+    function apply(){
+      const needle = norm(q.value);
+      items.forEach(dtl => {
+        const text = norm(dtl.textContent);
+        const ok = (!needle || text.includes(needle)) && inRange(extractDate(dtl));
+        dtl.style.display = ok ? '' : 'none';
+      });
+    }
+
+    [q, from, to].forEach(el => el.addEventListener('input', apply));
+    reset.addEventListener('click', () => { q.value=''; from.value=''; to.value=''; apply(); });
+
+    openAll.addEventListener('click', () => items.forEach(d => d.open = true));
+    closeAll.addEventListener('click', () => items.forEach(d => d.open = false));
+
+    apply();
+  });
+</script>
+
+{% endblock %}

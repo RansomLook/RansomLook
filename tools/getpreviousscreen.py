@@ -6,16 +6,13 @@ import json
 import glob
 import sys
 
-from datetime import datetime
-from datetime import timedelta
 
-import collections
 
 import redis
 
-from ransomlook.default.config import get_config, get_socket_path
+from ransomlook.default.config import get_socket_path
 
-from ransomlook.sharedutils import dbglog, stdlog, errlog, statsgroup, run_data_viz
+from ransomlook.sharedutils import dbglog, stdlog, errlog
 
 from typing import Dict, Optional
 
@@ -40,11 +37,10 @@ def appender(entry, group_name: str) -> None: # type: ignore
     '''
     if type(entry) is str :
        post_title = entry
-       description = ''
        link = ''
     else :
        post_title=entry['title']
-       description = entry['description']
+       entry['description']
        if 'link' in entry:
            link = entry['link']
        else:
@@ -60,7 +56,7 @@ def appender(entry, group_name: str) -> None: # type: ignore
     if len(post_title) > 90:
         post_title = post_title[:90]
  
-    if link != None and link != '':
+    if link is not None and link != '':
         screenred = redis.Redis(unix_socket_path=get_socket_path('cache'), db=1)
         if 'toscan'.encode() not in screenred.keys():
            toscan=[]
@@ -69,7 +65,7 @@ def appender(entry, group_name: str) -> None: # type: ignore
         toscan.append({'group': group_name, 'title': entry['title'], 'slug': entry['slug'], 'link': entry['link']})
         screenred.set('toscan', json.dumps(toscan))
     # preparing to torrent
-    if magnet != None and magnet != '':
+    if magnet is not None and magnet != '':
         torrentred = redis.Redis(unix_socket_path=get_socket_path('cache'), db=1)
         if 'totorrent'.encode() not in torrentred.keys():
            totorrent=[]

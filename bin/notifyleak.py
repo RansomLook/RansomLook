@@ -6,16 +6,14 @@ import smtplib
 import ssl
 from email.message import EmailMessage
 
-from typing import List, Any, Dict
+from typing import List, Dict
 
 from datetime import date
 from datetime import timedelta
 
 import redis
 
-from collections import defaultdict
 
-from ransomlook.sharedutils import dbglog, stdlog
 from ransomlook.default.config import get_config, get_socket_path
 
 def getnewbreach(date: str) -> List[Dict[str, str]] :

@@ -3,17 +3,101 @@
 {% block title %}Notes ;-){% endblock %}
 
 {% block content %}
-    <article id="main" class="markdown-section">
-	<h1>List of notes</h1>
-        {% for entry in data %}
-        <h2> {{ entry['name'] }}</h2>
-        <table id="table" class="table" style="display:table; table-layout:auto; width:100%">
-          <tbody><td>
-            {% for para in  entry['content'].split('\n') %}
-               {{para}}<br>
-            {% endfor %}
-          </td></tbody>
-        </table>
-        {% endfor %}
-    </article>
+
+<section class="hero">
+  <div class="container">
+    <h1>{{ group_name|title }}</h1>
+    <p class="lead">Original ransom notes collected for this group.</p>
+  </div>
+</section>
+
+<section class="metrics-section">
+  <div class="container">
+
+    {% for entry in data %}
+      <details class="section-block" data-accordion>
+        <summary class="section-summary">
+          <span>{{ entry['name'] }}</span>
+          <span class="count">{{ (entry['content'] or '')|length }}</span>
+        </summary>
+
+        <div class="table-card">
+          <div class="table-scroll">
+            <table class="rl-table" aria-label="Note content">
+              <thead>
+                <tr>
+                  <th>Content</th>
+                  <th style="width:1%;white-space:nowrap;text-align:right">Action</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>
+                    <pre class="note-body" data-note>
+{{ entry['content'] }}
+                    </pre>
+                  </td>
+                  <td style="text-align:right;vertical-align:top">
+                    <button class="btn btn-secondary btn-sm" data-copy>Copy</button>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </details>
+    {% endfor %}
+
+  </div>
+</section>
+
+<!-- JS inline: copy to clipboard -->
+<script>
+(function(){
+  function copyText(txt){
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      return navigator.clipboard.writeText(txt);
+    }
+    // fallback
+    const ta = document.createElement('textarea');
+    ta.value = txt;
+    ta.style.position = 'fixed';
+    ta.style.opacity = '0';
+    document.body.appendChild(ta);
+    ta.select();
+    try { document.execCommand('copy'); } catch(e){}
+    document.body.removeChild(ta);
+    return Promise.resolve();
+  }
+
+  document.addEventListener('click', function(e){
+    const btn = e.target.closest('[data-copy]');
+    if (!btn) return;
+    const pre = btn.closest('tr')?.querySelector('[data-note]');
+    if (!pre) return;
+
+    const txt = pre.textContent || '';
+    copyText(txt).then(()=>{
+      const orig = btn.textContent;
+      btn.textContent = 'Copied!';
+      setTimeout(()=>{ btn.textContent = orig; }, 1200);
+    });
+  });
+})();
+</script>
+
+<style>
+/* Rendu propre du bloc note */
+.note-body{
+  margin:0;
+  padding:12px;
+  white-space:pre-wrap;      /* wrap conservant les retours à la ligne */
+  word-break:break-word;     /* évite dépassement horizontal */
+  background:#0f1623;
+  border:1px solid var(--border);
+  border-radius:10px;
+  line-height:1.45;
+}
+</style>
+
 {% endblock %}

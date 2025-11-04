@@ -1,0 +1,165 @@
+{% extends "base.html" %}
+{% from 'bootstrap5/utils.html' import render_messages %}
+{% block title %}Admin — RansomLook{% endblock %}
+
+{% block content %}
+{{ render_messages(container=True, dismissible=False) }}
+
+<!-- ===== HERO ===== -->
+<section class="hero">
+  <div class="container">
+    <h1>Admin zone</h1>
+    <p class="lead">Welcome back, <strong>{{ current_user.get_id() }}</strong>. Manage groups, posts, alerts and more.</p>
+  </div>
+</section>
+
+<!-- ===== DASHBOARD ===== -->
+<section class="metrics-section">
+  <div class="container">
+
+    <!-- Group & Monitoring -->
+    <h2 class="section-title">Group &amp; Monitoring</h2>
+    <div class="metrics-grid">
+      <!-- Add group -->
+      <a class="table-card" href="/admin/add" style="text-decoration:none;">
+        <div class="card-toolbar" style="border-bottom:1px solid var(--border)">
+          <span style="font-weight:600">Add</span>
+          <span aria-hidden="true">➕</span>
+        </div>
+        <div class="prose" style="padding:10px 12px;">
+          <p>Create a new group/market entry and configure its locations.</p>
+        </div>
+      </a>
+
+      <!-- Edit group -->
+      <a class="table-card" href="/admin/edit" style="text-decoration:none;">
+        <div class="card-toolbar" style="border-bottom:1px solid var(--border)">
+          <span style="font-weight:600">Edit</span>
+          <span aria-hidden="true">✏️</span>
+        </div>
+        <div class="prose" style="padding:10px 12px;">
+          <p>Update metadata, descriptions, links and flags (FS/Chat/Admin).</p>
+        </div>
+      </a>
+
+      <!-- Logo -->
+      <a class="table-card" href="/admin/logo" style="text-decoration:none;">
+        <div class="card-toolbar" style="border-bottom:1px solid var(--border)">
+          <span style="font-weight:600">Logo</span>
+          <span aria-hidden="true">🖼️</span>
+        </div>
+        <div class="prose" style="padding:10px 12px;">
+          <p>Upload or change logos associated with groups/markets.</p>
+        </div>
+      </a>
+    </div>
+
+    <!-- Posts -->
+    <h2 class="section-title" style="margin-top:24px;">Post actions</h2>
+    <div class="metrics-grid">
+      <!-- Add post -->
+      <a class="table-card" href="/admin/addpost" style="text-decoration:none;">
+        <div class="card-toolbar" style="border-bottom:1px solid var(--border)">
+          <span style="font-weight:600">Add post</span>
+          <span aria-hidden="true">📝</span>
+        </div>
+        <div class="prose" style="padding:10px 12px;">
+          <p>Manually insert a new post entry (title, date, description, screen).</p>
+        </div>
+      </a>
+
+      <!-- Edit post -->
+      <a class="table-card" href="/admin/editpost" style="text-decoration:none;">
+        <div class="card-toolbar" style="border-bottom:1px solid var(--border)">
+          <span style="font-weight:600">Edit post</span>
+          <span aria-hidden="true">🛠️</span>
+        </div>
+        <div class="prose" style="padding:10px 12px;">
+          <p>Search and modify existing posts (fix typos, attach screenshots, etc.).</p>
+        </div>
+      </a>
+    </div>
+
+    <!-- Affiliate -->
+    <h2 class="section-title" style="margin-top:24px;">Actor actions</h2>
+    <div class="metrics-grid">
+      <!-- Add Affiliate -->
+      <a class="table-card" href="/admin/addactor" style="text-decoration:none;">
+        <div class="card-toolbar" style="border-bottom:1px solid var(--border)">
+          <span style="font-weight:600">Add actor</span>
+          <span aria-hidden="true">📝</span>
+        </div>
+        <div class="prose" style="padding:10px 12px;">
+          <p>Create a new T.A.</p>
+        </div>
+      </a>
+
+      <!-- Edit actor -->
+      <a class="table-card" href="/admin/editactor" style="text-decoration:none;">
+        <div class="card-toolbar" style="border-bottom:1px solid var(--border)">
+          <span style="font-weight:600">Edit Actor</span>
+          <span aria-hidden="true">🛠️</span>
+        </div>
+        <div class="prose" style="padding:10px 12px;">
+          <p>Search and modify existing actors (fix typos, attach screenshots, etc.).</p>
+        </div>
+      </a>
+    </div>
+
+    <!-- Notes -->
+    <h2 class="section-title" style="margin-top:24px;">Notes actions</h2>
+    <div class="metrics-grid">
+      <!-- Add Affiliate -->
+      <a class="table-card" href="/admin/ransomnotes" style="text-decoration:none;">
+        <div class="card-toolbar" style="border-bottom:1px solid var(--border)">
+          <span style="font-weight:600">Edit ransomnotes</span>
+          <span aria-hidden="true">📝</span>
+        </div>
+        <div class="prose" style="padding:10px 12px;">
+          <p>Edit ransomnotes, manage aliases...</p>
+        </div>
+      </a>
+
+    </div>
+
+    <!-- Other -->
+    <h2 class="section-title" style="margin-top:24px;">Other</h2>
+    <div class="metrics-grid">
+      <!-- Alerting -->
+      <a class="table-card" href="/admin/alerting" style="text-decoration:none;">
+        <div class="card-toolbar" style="border-bottom:1px solid var(--border)">
+          <span style="font-weight:600">Alerting</span>
+          <span aria-hidden="true">🔔</span>
+        </div>
+        <div class="prose" style="padding:10px 12px;">
+          <p>Configure notifications (RocketChat / email) and thresholds.</p>
+        </div>
+      </a>
+
+      <!-- Logs -->
+      <a class="table-card" href="/admin/logs" style="text-decoration:none;">
+        <div class="card-toolbar" style="border-bottom:1px solid var(--border)">
+          <span style="font-weight:600">Logs</span>
+          <span aria-hidden="true">📜</span>
+        </div>
+        <div class="prose" style="padding:10px 12px;">
+          <p>Inspect recent activities, parser runs and system messages.</p>
+        </div>
+      </a>
+
+      <!-- Logout -->
+      <a class="table-card" href="/logout" style="text-decoration:none;">
+        <div class="card-toolbar" style="border-bottom:1px solid var(--border)">
+          <span style="font-weight:600">Logout</span>
+          <span aria-hidden="true">🚪</span>
+        </div>
+        <div class="prose" style="padding:10px 12px;">
+          <p>Sign out from the administration interface.</p>
+        </div>
+      </a>
+    </div>
+
+  </div>
+</section>
+
+{% endblock %}

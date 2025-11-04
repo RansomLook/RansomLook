@@ -23,7 +23,7 @@ def main() -> List[Dict[str, str]] :
                         list_div.append({'title':title, 'description': description})
                 else :
                     body=soup.find('tbody')
-                    if body != None:
+                    if body is not None:
                         divs_name=body.find_all('tr') # type: ignore
                         for div in divs_name:
                             tds = div.find_all('td')

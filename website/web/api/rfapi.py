@@ -5,12 +5,10 @@ from redis import Redis
 
 from flask_restx import Namespace, Resource # type: ignore
 
-from ransomlook import ransomlook
-from ransomlook.default import get_socket_path, get_homedir
+from ransomlook.default import get_socket_path
 
-from collections import OrderedDict
 
-from typing import Any, List, Dict
+from typing import List
 
 api = Namespace('RecordedFutureAPI', description='RecordedFuture Ransomlook API', path='/api/rf')
 

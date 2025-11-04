@@ -1,104 +1,75 @@
+
 {% extends "base.html" %}
-{% from 'bootstrap5/utils.html' import render_messages %}
-{% block title %}🦕 RansomLook 🦖{% endblock %}
+
+{% macro metric_card(label, value, sublabel=None) -%}
+<div class="metric-card">
+  <div class="metric-label">{{ label }}</div>
+  <div class="metric-value">{{ value if value is not none else '—' }}</div>
+  {% if sublabel %}<div class="metric-sublabel">{{ sublabel }}</div>{% endif %}
+</div>
+{%- endmacro %}
+
+{% block title %}RansomLook — Open ransomware intelligence{% endblock %}
+
 {% block content %}
-{{ render_messages(container=True, dismissible=True) }}
-
-    <article id="main" class="markdown-section">
-        <center>
-                <h1>Welcome to 🦕 RansomLook 🦖 !</h1>
-        </center>
-    <div class="container" style="display: flex;">
-        <div style="width: 50%;">
-        <p><em>{{ date.title() }}</em></p>
-
-        <p>Currently tracking <code>{{data['nbgroups']}}</code> groups across <code>{{data['nblocations']}}</code> uniq relays & mirrors - <em><code>{{data['online']}}</code> currently online</em>
-        <p>Got <code>{{data['nbdls']}}</code> DLS, <code>{{data['nbfs']}}</code> FS, <code>{{data['nbchat']}}</code> Chats and <code>{{data['nbadmin']}}</code> Admin/Affiliates servers.</p>
-        <p>Currently tracking <code>{{data['nbforum']}}</code> forums & markets across <code>{{data['nbforumlocations']}}</code> relays & mirrors - <em><code>{{data['forumonline']}}</code> currently online</em>
-        <p>Currently tracking <code>{{data['nbtelegram']}}</code> telegram channels.
-
-        <p>There have been <code>{{data['24h']}}</code> posts within the last 24 hours</p>
-
-        <p>There have been <code>{{data['monthlypost']}}</code> posts within the month of {{data['month']}}</p>
-
-        <p>There have been <code>{{data['90d']}}</code> posts within the last 90 days</p>
-
-        <p>There have been <code>{{data['yearlypost']}}</code> posts within the year of {{data['year']}}</p>
-
-        <p>There have been <code>{{data['nbposts']}}</code> posts since the dawn of ransomlook</p>
-
-        <p>There are <code>{{data['nbparsers']}}</code> custom parsers indexing posts</p>
-        </div>
-        <div style="flex-grow: 1;">
-                <center><img src="/static/{{logo}}"      width="400" /></center>
-        </div>
+<section class="hero">
+  <div class="container">
+    <!-- Logo centré sans encadré -->
+    <div class="hero-logo">
+      <img src="{{ url_for('static', filename=logo) }}"
+           alt="RansomLook logo"
+           class="hero-logo-img">
     </div>
 
-        {% if alert is true %}
-           <h1>Alerts within the last 24h</h1>
-           {% if 'group' in posts %}
-           <h3>Groups and Markets</h3>
-           <div class="table-responsive">
-            <table id="table" class="table" style="display:table; table-layout:auto; width:100%">
-            <thead>
-                <tr>
-                    <th style="width:15%"> Name </th>
-                    <th style="width:15%"> Title </th>
-                    <th> Description </th>
-                </tr>
-            </thead>
-            <tbody>
-              {% for item in posts['group'] %}
-                 <tr>
-                  <td> {{ item['group_name'] }} </td><td> {{ item['post_title'] }} </td><td> {{ item['description'] }} </td>
-                 </tr>
-              {% endfor %}
-            </tbody>
-            </table>
-           </div>
-           {% endif %}
+    <h1>{{ _('Welcome to RansomLook') if _ else 'Welcome to RansomLook' }}</h1>
+    <p class="lead">
+      {{ _('Open-source project providing real-time ransomware intelligence.') 
+         if _ else 'Open-source project providing real-time ransomware intelligence.' }}
+    </p>
 
-           {% if 'telegram' in posts %}
-           <h3>Telegram</h3>
-           <div class="table-responsive">
-            <table id="table" class="table" style="display:table; table-layout:auto; width:100%">
-            <thead>
-                <tr>
-                    <th style="width:15%"> Name </th>
-                    <th> Message </th>
-                </tr>
-            </thead>
-            <tbody>
-              {% for item in posts['telegram'] %}
-                 <tr>
-                  <td> {{ item['group_name'] }} </td><td> {{ item['description'] }} </td>
-                 </tr>
-              {% endfor %}
-            </tbody>
-            </table>
-           </div>
-           {% endif %}
+    <div class="cta-row">
+      <a href="/recent" class="btn btn-primary">Explore Recent Posts</a>
+      <a href="/doc/" class="btn btn-secondary">Use the API</a>
+    </div>
+  </div>
+</section>
 
-           {% if 'twitter' in posts %}
-           <h3>Twitter</h3>
-           <div class="table-responsive">
-            <table id="table" class="table" style="display:table; table-layout:auto; width:100%">
-            <thead>
-                <tr>
-                    <th style="width:15%"> Name </th>
-                    <th> Tweet </th>
-                </tr>
-            </thead>
-            <tbody>
-              {% for item in posts['twitter'] %}
-                 <tr>
-                  <td> {{ item['group_name'] }} </td><td> {{ item['description'] }} </td>
-                 </tr>
-              {% endfor %}
-            </tbody>
-            </table>
-           </div>
-           {% endif %}
-        {% endif %}
-    </article>
+<div class="page-container">
+<section class="metrics-section" id="group-metrics" role="region" aria-labelledby="group-metrics-title">
+  <h2 class="section-title" id="group-metrics-title">Group metrics</h2>
+  <div class="metrics-grid">
+      {{ metric_card('Groups tracked',     (data['nbgroups'] if data and 'nbgroups' in data else None)) }}
+      {{ metric_card('Relays online',      (data['online'] if data and 'online' in data else None), sublabel=('of %s total' % (data['nblocations']) if data and 'nblocations' in data else None)) }}
+      {{ metric_card('DLS',   (data['nbdls'] if data and 'nbdls' in data else None)) }}
+      {{ metric_card('FS',    (data['nbfs'] if data and 'nbfs' in data else None)) }}
+      {{ metric_card('Chats', (data['nbchat'] if data and 'nbchat' in data else None)) }}
+      {{ metric_card('Admin/Affiliates', (data['nbadmin'] if data and 'nbadmin' in data else None)) }}
+  </div>
+</section>
+
+<section class="metrics-section" id="post-metrics" role="region" aria-labelledby="post-metrics-title">
+  <h2 class="section-title" id="post-metrics-title">Post metrics</h2>
+  <div class="metrics-grid">
+      {{ metric_card('Posts (24h)',        (data['24h'] if data and '24h' in data else None)) }}
+      {{ metric_card('Posts (this month)', (data['monthlypost'] if data and 'monthlypost' in data else None), sublabel=(data['month'].title() if data and 'month' in data else None)) }}
+      {{ metric_card('Posts (90 days)', (data['90d'] if data and '90d' in data else None)) }}
+      {{ metric_card('Posts (this year)', (data['yearlypost'] if data and 'yearlypost' in data else None), sublabel=(data['year'] if data and 'year' in data else None)) }}
+      {{ metric_card('Total posts', (data['nbposts'] if data and 'nbposts' in data else None)) }}
+  </div>
+</section>
+
+<section class="metrics-section" id="post-metrics" role="region" aria-labelledby="post-metrics-title">
+  <h2 class="section-title" id="post-metrics-title">Other metrics</h2>
+  <div class="metrics-grid">
+      {{ metric_card('Markets', (data['nbforum'] if data and 'nbforum' in data else None)) }}
+      {{ metric_card('Markets relays online', (data['forumonline'] if data and 'forumonline' in data else None), sublabel=('of %s total' % (data['nbforumlocations']) if data and 'nbforumlocations' in data else None)) }}
+  </div>
+</section>
+
+<section class="metrics-section" id="post-metrics" role="region" aria-labelledby="post-metrics-title">
+  <div class="metrics-grid">
+      {{ metric_card('Parsers', (data['nbparsers'] if data and 'nbparsers' in data else None)) }}
+  </div>
+</section>
+</div>
 {% endblock %}

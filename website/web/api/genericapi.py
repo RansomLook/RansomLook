@@ -1,30 +1,19 @@
 #!/usr/bin/env python3
 
 import base64
-import hashlib
 import json
 from typing import Any, Dict, Optional, List
 from redis import Redis
 
-import flask_login  # type: ignore
 from flask import request
-from flask import send_file
+from flask_restx import Namespace, Resource  # type: ignore
 
-from flask_restx import Api, Namespace, Resource, abort, fields  # type: ignore
-from werkzeug.security import check_password_hash
-
-from ransomlook import ransomlook
-from ransomlook.default import get_socket_path, get_homedir, get_config
+from ransomlook.default import get_socket_path, get_homedir
 from ransomlook.sharedutils import createfile, striptld
 
-import tempfile
 import os
 
-import matplotlib.pyplot as plt
-import plotly.express as px # type: ignore
-import plotly.io as pio     # type: ignore
-import pandas as pd
-
+from datetime import timezone
 from datetime import datetime, timedelta
 
 api = Namespace('GenericAPI', description='Generic Ransomlook API', path='/api')
@@ -150,13 +139,13 @@ class GroupPost(Resource): # type: ignore[misc]
                 posts = json.loads(red.get(key)) # type: ignore
                 for post in posts:
                     if post['post_title'] == postname:
-                        if 'screen' in post and post['screen'] != None :
+                        if 'screen' in post and post['screen'] is not None :
                             screenpath = str(get_homedir()) + '/source/' + post['screen']
                             if os.path.exists(screenpath):
                                 with open(screenpath, "rb") as image_file:
                                      screenencoded = base64.b64encode(image_file.read()).decode("ascii")
                                 post.update({'screen':screenencoded})
-                        if 'link' in post and post['link'] != None :
+                        if 'link' in post and post['link'] is not None :
                             filepath = os.path.normpath(str(get_homedir()) + '/source/' + name + '/' + createfile(postname)+'.html')
                             if not filepath.startswith(str(get_homedir())):
                                 raise Exception("not allowed")
@@ -234,13 +223,108 @@ class Exportdb(Resource): # type: ignore[misc]
                 dump[key.decode()]=temp
         return dump
 
+
+# Utils de temps
+def _parse_iso_maybe_z(s: str) -> datetime | None:
+    """Parse ISO 8601, accepte ...Z et avec offset. Renvoie un datetime timezone-aware en UTC."""
+    if not s:
+        return None
+    try:
+        # remplace 'Z' par +00:00 pour fromisoformat
+        if s.endswith('Z'):
+            s = s[:-1] + '+00:00'
+        dt = datetime.fromisoformat(s)
+        if dt.tzinfo is None:
+            # on considère UTC si pas d’info de TZ
+            dt = dt.replace(tzinfo=timezone.utc)
+        return dt.astimezone(timezone.utc)
+    except Exception:
+        return None
+
+def _date_only_to_utc_start(day: str) -> datetime:
+    # YYYY-MM-DD -> 00:00:00Z
+    return datetime.fromisoformat(day).replace(tzinfo=timezone.utc)
+
+def _date_only_to_utc_end(day: str) -> datetime:
+    # YYYY-MM-DD -> 23:59:59.999999Z
+    d = datetime.fromisoformat(day).replace(tzinfo=timezone.utc)
+    return d.replace(hour=23, minute=59, second=59, microsecond=999999)
+
+@api.route('/posts')
+@api.doc(description='Return raw posts (group_name, discovered) for client-side stats', tags=['stats'])
+class Posts(Resource):  # type: ignore[misc]
+    @api.doc(params={
+        'days': 'Relative period in days (e.g. 7, 14, 30, 90). Ignored if "from" and "to" are provided.',
+        'from': 'Start date (YYYY-MM-DD) UTC (inclusive).',
+        'to':   'End date (YYYY-MM-DD) UTC (inclusive).',
+        'groups': 'Comma-separated group names to include (optional).'
+    })
+    def get(self) -> dict:
+        # --- Time window ---
+        now = datetime.now(timezone.utc)
+        days = request.args.get('days', type=int)
+        from_s = request.args.get('from')
+        to_s   = request.args.get('to')
+
+        if from_s and to_s:
+            try:
+                start = _date_only_to_utc_start(from_s)
+                end   = _date_only_to_utc_end(to_s)
+            except Exception:
+                # fallback si mauvais format -> dernière 30j
+                start = now - timedelta(days=30)
+                end   = now
+        else:
+            if not days:
+                days = 30
+            start = now - timedelta(days=days)
+            end   = now
+
+        # --- Optional group filter ---
+        groups_param = request.args.get('groups', '') or ''
+        groups_wanted = set([g.strip() for g in groups_param.split(',') if g.strip()]) if groups_param else None
+
+        # --- Read Redis db=2 as in your script ---
+        red = Redis(unix_socket_path=get_socket_path('cache'), db=2)
+
+        out: list[dict] = []
+        for key in red.keys():
+            group_name = key.decode()
+            if groups_wanted and group_name not in groups_wanted:
+                continue
+
+            raw = red.get(key)
+            if not raw:
+                continue
+
+            try:
+                posts = json.loads(raw)
+            except Exception:
+                continue
+
+            for p in posts:
+                ts_s = p.get('discovered')
+                dt = _parse_iso_maybe_z(ts_s)
+                if not dt:
+                    continue
+                if start <= dt <= end:
+                    out.append({
+                        "group_name": group_name,
+                        "discovered": dt.isoformat().replace('+00:00','Z')  # propre ISO en Z
+                    })
+
+        # On peut trier par date pour plus de cohérence (optionnel)
+        out.sort(key=lambda r: r['discovered'])
+
+        return {"posts": out}
+
 @api.route('/posts/<year>/<month>')
 @api.route('/posts/<year>')
 @api.doc(description='Dump posts for a month/year', tags=['posts'])
 class PostPerMonth(Resource): # type: ignore[misc]
     def get(self, year: int, month: Optional[int]=None) -> List[Dict[str, Any]]:
         posts = []
-        if month != None:
+        if month is not None:
             date = str(year)+'-'+str(month)
         else:
             date = str(year)+'-'
@@ -268,407 +352,3 @@ class PostPerPeriod(Resource): # type: ignore[misc]
                         posts.append(entry)
         sorted_posts = sorted(posts, key=lambda x: x['discovered'], reverse=True)
         return sorted_posts
-
-
-period_groups = api.model('PeriodGroups', {
-    'groups': fields.List(fields.String(), description="List of groups to capture", example='["lockbit3", "8base"]'),
-    'start_date': fields.String(description="Start date for stats", example='2024-01-31'),
-    'end_date': fields.String(description="End date for stats", example='2024-03-31')
-})
-
-@api.route('/graphs/heatmap/<year>/<month>')
-@api.route('/graphs/heatmap/<year>')
-@api.doc(description='Density heatmap for a month', tags=['posts'])
-class DensityHeatmap(Resource): # type: ignore[misc]
-    def get(self, year: int, month: Optional[int]=None): # type: ignore[no-untyped-def]
-        group_names = []
-        timestamps = []
-        if month != None:
-            date = str(year)+'-'+str(month)
-        else :
-            date = str(year)+'-'
-        red = Redis(unix_socket_path=get_socket_path('cache'), db=2)
-        for key in red.keys():
-                entries = json.loads(red.get(key)) # type: ignore
-                for entry in entries:
-                    if entry['discovered'].startswith(date):
-                        group_names.append(key.decode())
-                        timestamps.append(entry['discovered'])
-        df = pd.DataFrame({'group_name': group_names, 'timestamp': timestamps})
-        df['timestamp'] = pd.to_datetime(df['timestamp'],format='mixed')
-
-        df_sorted = df.groupby(['group_name', 'timestamp']).size().reset_index(name='count')
-        df_sorted = df_sorted.sort_values(by='count', ascending=False)
-        fig = px.density_heatmap(df_sorted, x='timestamp', y='group_name', z='count', title='Posts per group per day (heatmap)', width=1050, height=750)
-        fig.update_layout(font=dict(family='Roboto'))
-        filename = tempfile.TemporaryFile()
-        fig.write_image(filename)
-        filename.seek(0)
-        return send_file(filename, mimetype='image/gif')
-
-@api.route('/graphs/scatter/<year>')
-@api.route('/graphs/scatter/<year>/<month>')
-@api.doc(description='Distribution per days for a month', tags=['posts'])
-class Scatter(Resource): # type: ignore[misc]
-    def get(self, year: int, month: Optional[int]=None): # type: ignore[no-untyped-def]
-        group_names = []
-        timestamps = []
-        if month != None:
-            date = str(year)+'-'+str(month)
-        else:
-            date = str(year)+'-'
-        red = Redis(unix_socket_path=get_socket_path('cache'), db=2)
-        for key in red.keys():
-                entries = json.loads(red.get(key)) # type: ignore
-                for entry in entries:
-                    if entry['discovered'].startswith(date):
-                        group_names.append(key.decode())
-                        timestamps.append(entry['discovered'])
-        df = pd.DataFrame({'group_name': group_names, 'timestamp': timestamps})
-        df['timestamp'] = pd.to_datetime(df['timestamp'],format='mixed')
-
-        df_sorted = df.groupby(['group_name', 'timestamp']).size().reset_index(name='count')
-        df_sorted = df_sorted.sort_values(by='count', ascending=False)
-        fig = px.scatter(df_sorted, x='timestamp', y='group_name', color='group_name', title='Distribution per days', color_continuous_scale='Plotly3', width=1050, height=750)
-        fig.update_layout(font=dict(family='Roboto'))
-        filename = tempfile.TemporaryFile()
-        fig.write_image(filename)
-        filename.seek(0)
-        return send_file(filename, mimetype='image/gif')
-
-@api.route('/graphs/pie/<year>')
-@api.route('/graphs/pie/<year>/<month>')
-@api.doc(description='Percentage of total post during the month', tags=['posts'])
-class Pie(Resource): # type: ignore[misc]
-    def get(self, year: int, month: Optional[int]=None): # type: ignore[no-untyped-def]
-        group_names = []
-        timestamps = []
-        if month != None:
-            date = str(year)+'-'+str(month)
-        else:
-            date = str(year)+'-'
-        red = Redis(unix_socket_path=get_socket_path('cache'), db=2)
-        for key in red.keys():
-                entries = json.loads(red.get(key)) # type: ignore
-                for entry in entries:
-                    if entry['discovered'].startswith(date):
-                        group_names.append(key.decode())
-                        timestamps.append(entry['discovered'])
-        df = pd.DataFrame({'group_name': group_names, 'timestamp': timestamps})
-        df['timestamp'] = pd.to_datetime(df['timestamp'],format='mixed')
-
-        df_sorted = df.groupby(['group_name', 'timestamp']).size().reset_index(name='count')
-        df_sorted = df_sorted.sort_values(by='count', ascending=False)
-        df_sorted = df.groupby('group_name').size().reset_index(name='count').sort_values(by='count', ascending=True)
-        fig = px.pie(df_sorted, values='count', names='group_name', title='Percentage of total post during the period', width=1050, height=750)
-        fig.update_layout(font=dict(family='Roboto'))
-        filename = tempfile.TemporaryFile()
-        fig.write_image(filename)
-        filename.seek(0)
-        return send_file(filename, mimetype='image/gif')
-
-@api.route('/graphs/bar/<year>')
-@api.route('/graphs/bar/<year>/<month>')
-@api.doc(description='Posts per group during the month', tags=['posts'])
-class Bar(Resource): # type: ignore[misc]
-    def get(self, year: int, month: Optional[int]=None): # type: ignore[no-untyped-def]
-        group_names = []
-        timestamps = []
-        if month != None:
-            date = str(year)+'-'+str(month)
-        else:
-            date = str(year)+'-'
-        red = Redis(unix_socket_path=get_socket_path('cache'), db=2)
-        for key in red.keys():
-                entries = json.loads(red.get(key)) # type: ignore
-                for entry in entries:
-                    if entry['discovered'].startswith(date):
-                        group_names.append(key.decode())
-                        timestamps.append(entry['discovered'])
-        df = pd.DataFrame({'group_name': group_names, 'timestamp': timestamps})
-        df['timestamp'] = pd.to_datetime(df['timestamp'],format='mixed')
-
-        df_sorted = df.groupby(['group_name', 'timestamp']).size().reset_index(name='count')
-        df_sorted = df_sorted.sort_values(by='count', ascending=False)
-        df_sorted = df.groupby('group_name').size().reset_index(name='count').sort_values(by='count', ascending=True)
-        fig = px.bar(df_sorted, x='group_name', y='count', color='count', title='Posts per group during the month', color_continuous_scale='Portland',width=1050, height=750)
-        fig.update_layout(font=dict(family='Roboto'))
-        filename = tempfile.TemporaryFile()
-        fig.write_image(filename)
-        filename.seek(0)
-        return send_file(filename, mimetype='image/gif')
-
-@api.route('/graphs/period/heatmap/<start_date>/<end_date>')
-@api.doc(description='Density heatmap for a period', tags=['posts'])
-class PeriodDensityHeatmap(Resource): # type: ignore[misc]
-    def get(self, start_date: str, end_date: str ): # type: ignore[no-untyped-def]
-        group_names = []
-        timestamps = []
-
-        red = Redis(unix_socket_path=get_socket_path('cache'), db=2)
-        for key in red.keys():
-                entries = json.loads(red.get(key)) # type: ignore
-                for entry in entries:
-                    if start_date <= entry['discovered'].split(' ')[0] <= end_date:
-                        group_names.append(key.decode())
-                        timestamps.append(entry['discovered'])
-        df = pd.DataFrame({'group_name': group_names, 'timestamp': timestamps})
-        df['timestamp'] = pd.to_datetime(df['timestamp'],format='mixed')
-
-        df_sorted = df.groupby(['group_name', 'timestamp']).size().reset_index(name='count')
-        df_sorted = df_sorted.sort_values(by='count', ascending=False)
-        fig = px.density_heatmap(df_sorted, x='timestamp', y='group_name', z='count', title='Posts per group per day (heatmap)', width=1050, height=750)
-        fig.update_layout(font=dict(family='Roboto'))
-        filename = tempfile.TemporaryFile()
-        fig.write_image(filename)
-        filename.seek(0)
-        return send_file(filename, mimetype='image/gif')
-
-@api.route('/graphs/period/heatmap/<start_date>/<end_date>/<group>')
-@api.doc(description='Density heatmap for a period for a group', tags=['posts'])
-class PeriodDensityHeatmapGroup(Resource): # type: ignore[misc]
-    def get(self, start_date: str, end_date: str, group: str ): # type: ignore[no-untyped-def]
-        group_names = []
-        timestamps = []
-
-        red = Redis(unix_socket_path=get_socket_path('cache'), db=2)
-        entries = json.loads(red.get(group)) # type: ignore
-        for entry in entries:
-            if start_date <= entry['discovered'].split(' ')[0] <= end_date:
-                 group_names.append(group)
-                 timestamps.append(entry['discovered'])
-        df = pd.DataFrame({'group_name': group_names, 'timestamp': timestamps})
-        df['timestamp'] = pd.to_datetime(df['timestamp'],format='mixed')
-        df_sorted = df.groupby(['group_name', 'timestamp']).size().reset_index(name='count')
-        df_sorted = df_sorted.sort_values(by='count', ascending=False)
-        fig = px.density_heatmap(df_sorted, x='timestamp', y='group_name', z='count', title='Posts per group per day (heatmap)', width=1050, height=750)
-        fig.update_layout(font=dict(family='Roboto'))
-        filename = tempfile.TemporaryFile()
-        fig.write_image(filename)
-        filename.seek(0)
-        return send_file(filename, mimetype='image/gif')
-
-@api.route('/graphs/period/heatmap/groups', methods=["POST"])
-@api.doc(description='Density heatmap for a period for different groups', tags=['posts'])
-class PeriodDensityHeatmapGroups(Resource): # type: ignore[misc]
-    @api.doc(body=period_groups)
-    def post(self ): # type: ignore[no-untyped-def]
-        req = request.get_json()
-        groups = req['groups']
-        start_date = req['start_date']
-        end_date = req['end_date']
-        group_names = []
-        timestamps = []
-
-        red = Redis(unix_socket_path=get_socket_path('cache'), db=2)
-        for group in groups:
-            entries = json.loads(red.get(group.lower())) # type: ignore
-            for entry in entries:
-                if start_date <= entry['discovered'].split(' ')[0] <= end_date:
-                    group_names.append(group)
-                    timestamps.append(entry['discovered'])
-        df = pd.DataFrame({'group_name': group_names, 'timestamp': timestamps})
-        df['timestamp'] = pd.to_datetime(df['timestamp'],format='mixed')
-        df_sorted = df.groupby(['group_name', 'timestamp']).size().reset_index(name='count')
-        df_sorted = df_sorted.sort_values(by='count', ascending=False)
-        fig = px.density_heatmap(df_sorted, x='timestamp', y='group_name', z='count', title='Posts per group per day (heatmap)', width=1050, height=750)
-        fig.update_layout(font=dict(family='Roboto'))
-        filename = tempfile.TemporaryFile()
-        fig.write_image(filename)
-        filename.seek(0)
-        return send_file(filename, mimetype='image/gif')
-
-
-@api.route('/graphs/period/scatter/<start_date>/<end_date>')
-@api.doc(description='Distribution per days for a period', tags=['posts'])
-class PeriodScatter(Resource): # type: ignore[misc]
-    def get(self, start_date: str, end_date: str): # type: ignore[no-untyped-def]
-        group_names = []
-        timestamps = []
-
-        red = Redis(unix_socket_path=get_socket_path('cache'), db=2)
-        for key in red.keys():
-                entries = json.loads(red.get(key)) # type: ignore
-                for entry in entries:
-                    if start_date <= entry['discovered'].split(' ')[0] <= end_date:
-                        group_names.append(key.decode())
-                        timestamps.append(entry['discovered'])
-        df = pd.DataFrame({'group_name': group_names, 'timestamp': timestamps})
-        df['timestamp'] = pd.to_datetime(df['timestamp'],format='mixed')
-
-        df_sorted = df.groupby(['group_name', 'timestamp']).size().reset_index(name='count')
-        df_sorted = df_sorted.sort_values(by='count', ascending=False)
-        fig = px.scatter(df_sorted, x='timestamp', y='group_name', color='group_name', title='Distribution per days', color_continuous_scale='Plotly3', width=1050, height=750)
-        fig.update_layout(font=dict(family='Roboto'))
-        filename = tempfile.TemporaryFile()
-        fig.write_image(filename)
-        filename.seek(0)
-        return send_file(filename, mimetype='image/gif')
-
-@api.route('/graphs/period/scatter/<start_date>/<end_date>/<group>')
-@api.doc(description='Distribution per days for a period for a group', tags=['posts'])
-class PeriodScatterGroup(Resource): # type: ignore[misc]
-    def get(self, start_date: str, end_date: str, group: str): # type: ignore[no-untyped-def]
-        group_names = []
-        timestamps = []
-
-        red = Redis(unix_socket_path=get_socket_path('cache'), db=2)
-        entries = json.loads(red.get(group)) # type: ignore
-        for entry in entries:
-            if start_date <= entry['discovered'].split(' ')[0] <= end_date:
-                group_names.append(group)
-                timestamps.append(entry['discovered'])
-        df = pd.DataFrame({'group_name': group_names, 'timestamp': timestamps})
-        df['timestamp'] = pd.to_datetime(df['timestamp'],format='mixed')
-
-        df_sorted = df.groupby(['group_name', 'timestamp']).size().reset_index(name='count')
-        df_sorted = df_sorted.sort_values(by='count', ascending=False)
-        fig = px.scatter(df_sorted, x='timestamp', y='group_name', color='group_name', title='Distribution per days', color_continuous_scale='Plotly3', width=1050, height=750)
-        fig.update_layout(font=dict(family='Roboto'))
-        filename = tempfile.TemporaryFile()
-        fig.write_image(filename)
-        filename.seek(0)
-        return send_file(filename, mimetype='image/gif')
-
-
-
-@api.route('/graphs/period/scatter/groups', methods=["POST"])
-@api.doc(description='Distribution per days for a period for groups', tags=['posts'])
-class PeriodScatterGroups(Resource): # type: ignore[misc]
-    @api.doc(body=period_groups)
-    def post(self): # type: ignore[no-untyped-def]
-
-        req = request.get_json()
-        groups = req['groups']
-        start_date = req['start_date']
-        end_date = req['end_date']
-        group_names = []
-        timestamps = []
-        red = Redis(unix_socket_path=get_socket_path('cache'), db=2)
-        for group in groups:
-            entries = json.loads(red.get(group.lower())) # type: ignore
-            for entry in entries:
-                if start_date <= entry['discovered'].split(' ')[0] <= end_date:
-                    group_names.append(group)
-                    timestamps.append(entry['discovered'])
-        df = pd.DataFrame({'group_name': group_names, 'timestamp': timestamps})
-        df['timestamp'] = pd.to_datetime(df['timestamp'],format='mixed')
-
-        df_sorted = df.groupby(['group_name', 'timestamp']).size().reset_index(name='count')
-        df_sorted = df_sorted.sort_values(by='count', ascending=False)
-        fig = px.scatter(df_sorted, x='timestamp', y='group_name', color='group_name', title='Distribution per days', color_continuous_scale='Plotly3', width=1050, height=750)
-        fig.update_layout(font=dict(family='Roboto'))
-        filename = tempfile.TemporaryFile()
-        fig.write_image(filename)
-        filename.seek(0)
-        return send_file(filename, mimetype='image/gif')
-
-
-@api.route('/graphs/period/pie/<start_date>/<end_date>')
-@api.doc(description='Percentage of total post during the period', tags=['posts'])
-class PeriodPie(Resource): # type: ignore[misc]
-    def get(self, start_date: str, end_date: str): # type: ignore[no-untyped-def]
-        group_names = []
-        timestamps = []
-        red = Redis(unix_socket_path=get_socket_path('cache'), db=2)
-        for key in red.keys():
-                entries = json.loads(red.get(key)) # type: ignore
-                for entry in entries:
-                    if start_date <= entry['discovered'].split(' ')[0] <= end_date:
-                        group_names.append(key.decode())
-                        timestamps.append(entry['discovered'])
-        df = pd.DataFrame({'group_name': group_names, 'timestamp': timestamps})
-        df['timestamp'] = pd.to_datetime(df['timestamp'],format='mixed')
-
-        df_sorted = df.groupby(['group_name', 'timestamp']).size().reset_index(name='count')
-        df_sorted = df_sorted.sort_values(by='count', ascending=False)
-        df_sorted = df.groupby('group_name').size().reset_index(name='count').sort_values(by='count', ascending=True)
-        fig = px.pie(df_sorted, values='count', names='group_name', title='Percentage of total post during the period', width=1050, height=750)
-        fig.update_layout(font=dict(family='Roboto'))
-        filename = tempfile.TemporaryFile()
-        fig.write_image(filename)
-        filename.seek(0)
-        return send_file(filename, mimetype='image/gif')
-
-@api.route('/graphs/period/bar/<start_date>/<end_date>')
-@api.doc(description='Posts per group during the period', tags=['posts'])
-class PeriodBar(Resource): # type: ignore[misc]
-    def get(self, start_date: str, end_date: str): # type: ignore[no-untyped-def]
-        group_names = []
-        timestamps = []
-        red = Redis(unix_socket_path=get_socket_path('cache'), db=2)
-        for key in red.keys():
-                entries = json.loads(red.get(key)) # type: ignore
-                for entry in entries:
-                    if start_date <= entry['discovered'].split(' ')[0] <= end_date:
-                        group_names.append(key.decode())
-                        timestamps.append(entry['discovered'])
-        df = pd.DataFrame({'group_name': group_names, 'timestamp': timestamps})
-        df['timestamp'] = pd.to_datetime(df['timestamp'],format='mixed')
-
-        df_sorted = df.groupby(['group_name', 'timestamp']).size().reset_index(name='count')
-        df_sorted = df_sorted.sort_values(by='count', ascending=False)
-        df_sorted = df.groupby('group_name').size().reset_index(name='count').sort_values(by='count', ascending=True)
-        fig = px.bar(df_sorted, x='group_name', y='count', color='count', title='Posts per group during the month', color_continuous_scale='Portland',width=1050, height=750)
-        fig.update_layout(font=dict(family='Roboto'))
-        filename = tempfile.TemporaryFile()
-        fig.write_image(filename)
-        filename.seek(0)
-        return send_file(filename, mimetype='image/gif')
-
-@api.route('/graphs/period/bar/<start_date>/<end_date>/<group>')
-@api.doc(description='Posts per group during the period for a group', tags=['posts'])
-class PeriodBarGroup(Resource): # type: ignore[misc]
-    def get(self, start_date: str, end_date: str, group: str): # type: ignore[no-untyped-def]
-        red = Redis(unix_socket_path=get_socket_path('cache'), db=2)
-        entries = json.loads(red.get(group)) # type: ignore
-        victim_counts: Dict[str, int] = {}
-        dates = (Any)
-        counts = (Any)
-
-        post_data = json.loads(red.get(group)) # type: ignore
-        # Count the number of victims per day
-        for post in post_data:
-            if start_date <= post['discovered'].split(' ')[0] <= end_date:
-                date = post['discovered'].split(' ')[0]
-                victim_counts[date] = victim_counts.get(date, 0) + 1 
-
-        # Sort the victim counts by date
-        sorted_counts = sorted(victim_counts.items())
-
-        # Extract the dates and counts for plotting
-        dates, counts = zip(*sorted_counts) # type: ignore
-        # Plot the graph
-        plt.clf()
-        # Create a new figure and axes for each group with a larger figure size
-        px = 1/plt.rcParams['figure.dpi']
-        if get_config("generic","darkmode"):
-            fig,ax = plt.subplots(figsize=(1050*px, 750*px), facecolor='#272b30')
-        else:
-            fig,ax = plt.subplots(figsize=(1050*px, 750*px))
-        # plt.plot(dates, counts)
-        color = '#505d6b'
-        if get_config("generic","darkmode"):
-            color ='#ddd'
-        ax.bar(dates, counts, color = '#6ad37a') # type: ignore
-        ax.set_xlabel('New daily discovery when parsing', color = color)
-        ax.set_ylabel('Number of Victims', color = color)
-        ax.set_title('Number of Victims for Group: ' + group.title(), color = color)
-        ax.tick_params(axis='x', bottom=False, labelbottom=False)
-        if get_config("generic","darkmode"):
-            #ax.set_xtick
-            for pos in ['top', 'bottom', 'right', 'left']:
-                ax.spines[pos].set_edgecolor(color)
-            ax.tick_params(colors=color)
-            ax.set_facecolor("#272b30")
-
-        # Set the x-axis limits
-        #ax.set_xlim(str(dates[0]), str(dates[-1:]))
-        # Format y-axis ticks as whole numbers without a comma separator
-
-        plt.tight_layout()
-
-        filename = tempfile.TemporaryFile()
-        plt.savefig(filename)
-        filename.seek(0)
-        return send_file(filename, mimetype='image/gif')

@@ -1,0 +1,193 @@
+{% extends "base.html" %}
+{% from 'bootstrap5/utils.html' import render_messages %}
+{% block title %}Add post · Admin{% endblock %}
+
+{% block content %}
+{{ render_messages(container=True, dismissible=True) }}
+
+<style>
+  /* Layout */
+  .add-wrap{max-width:1100px;margin:0 auto}
+  .post-form{display:grid;grid-template-columns:1.1fr .9fr;gap:16px}
+  .card{border:1px solid var(--border);background:#0f1623;border-radius:12px}
+  .card + .card{margin-top:12px}
+  .card-hd{padding:10px 12px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
+  .card-bd{padding:12px}
+  .muted{color:var(--muted)}
+  .label{display:block;color:var(--muted);font-size:.9rem;margin:6px 0 4px}
+  .input, .textarea{width:90%;background:#0b1220;border:1px solid var(--border);border-radius:10px;padding:10px 12px;color:var(--text)}
+  .textarea{min-height:170px;resize:vertical}
+  .row2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+  .hint{font-size:.85rem;color:var(--muted)}
+  .toolbar{display:flex;gap:8px;justify-content:flex-end}
+  .btn-sm{padding:6px 10px;font-size:.9rem}
+
+  /* Preview panel */
+  .preview-box{border:1px solid var(--border);border-radius:10px;background:#0b1220;aspect-ratio:16/10;display:grid;place-items:center;overflow:hidden}
+  .preview-box img{width:100%;height:100%;object-fit:contain}
+  .kv{display:grid;grid-template-columns:auto 1fr;gap:6px 12px;font-size:.95rem}
+  .kv dt{color:var(--muted)}
+  .kv dd{margin:0;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+
+  .counter{font-size:.85rem;color:var(--muted);text-align:right;margin-top:6px}
+
+  @media (max-width: 920px){
+    .post-form{grid-template-columns:1fr}
+  }
+</style>
+
+<section class="hero">
+  <div class="container">
+    <h1>Add post</h1>
+    <p class="lead">Create a new post with optional screenshot, custom date, link and magnet.</p>
+  </div>
+</section>
+
+<section class="metrics-section">
+  <div class="container add-wrap">
+    <form action="" method="post" enctype="multipart/form-data" novalidate>
+      {{ form.hidden_tag() }}
+
+      <div class="post-form">
+        <!-- Left column: main fields -->
+        <div class="card">
+          <div class="card-hd">
+            <strong>New post</strong>
+            <span class="muted">Fields marked * are required</span>
+          </div>
+          <div class="card-bd">
+
+            <label class="label" for="title">Post title *</label>
+            {{ form.title(class_="input", id="title", placeholder="e.g. New victim on blog…") }}
+
+            <label class="label" for="desc">Description</label>
+            {{ form.description(class_="textarea", id="desc", placeholder="Summary, key points, etc.") }}
+            <div class="counter"><span id="desc-count">0</span> characters</div>
+
+            <div class="row2" style="margin-top:14px">
+              <div>
+                <label class="label" for="date">Date</label>
+                {{ form.date(class_="input", id="date", placeholder="YYYY-MM-DD HH:MM:SS") }}
+                <div class="hint" style="margin-top:6px">
+                  <button class="btn btn-secondary btn-sm" type="button" id="btn-now">Now</button>
+                  <span class="muted">Fills the current UTC timestamp.</span>
+                </div>
+              </div>
+              <div>
+                <label class="label" for="link">Link (relative or full)</label>
+                {{ form.link(class_="input", id="link", placeholder="/relative/or/full/url") }}
+              </div>
+            </div>
+
+            <label class="label" for="magnet" style="margin-top:12px">Magnet</label>
+            {{ form.magnet(class_="input", id="magnet", placeholder="magnet:?xt=urn:btih:…") }}
+
+          </div>
+        </div>
+
+        <!-- Right column: preview & upload -->
+        <aside class="card">
+          <div class="card-hd"><strong>Preview</strong></div>
+          <div class="card-bd">
+            <div class="preview-box" id="shot-box">
+              <span class="muted" id="shot-empty">No image selected</span>
+            </div>
+
+            <dl class="kv" style="margin-top:12px">
+              <dt>Title:</dt><dd id="pv-title">—</dd>
+              <dt>Date:</dt><dd id="pv-date">—</dd>
+              <dt>Link:</dt><dd id="pv-link">—</dd>
+            </dl>
+
+            <div style="margin-top:14px">
+              <label class="label" for="file">Upload screenshot (optional)</label>
+              <!-- keep the original name="file" to avoid backend changes -->
+              <input type="file" name="file" id="file" class="input" accept="image/*">
+              <div class="hint" style="margin-top:6px">PNG/JPG/WebP recommended (reasonable size).</div>
+            </div>
+
+            <div class="toolbar" style="margin-top:16px">
+              {{ form.submit(class_="btn btn-primary") }}
+            </div>
+          </div>
+        </aside>
+      </div>
+    </form>
+  </div>
+</section>
+
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const title = document.getElementById('title');
+    const date  = document.getElementById('date');
+    const link  = document.getElementById('link');
+    const file  = document.getElementById('file');
+    const desc  = document.getElementById('desc');
+
+    const pvTitle = document.getElementById('pv-title');
+    const pvDate  = document.getElementById('pv-date');
+    const pvLink  = document.getElementById('pv-link');
+
+    const shotBox   = document.getElementById('shot-box');
+    const shotEmpty = document.getElementById('shot-empty');
+
+    const btnNow = document.getElementById('btn-now');
+    const descCount = document.getElementById('desc-count');
+
+    function fmtISO(dt){
+      // ISO‑ish without timezone: YYYY‑MM‑DD HH:MM:SS
+      const pad = n => String(n).padStart(2,'0');
+      return dt.getUTCFullYear() + '-' + pad(dt.getUTCMonth()+1) + '-' + pad(dt.getUTCDate()) +
+             ' ' + pad(dt.getUTCHours()) + ':' + pad(dt.getUTCMinutes()) + ':' + pad(dt.getUTCSeconds());
+    }
+
+    function updatePreview(){
+      pvTitle.textContent = title.value.trim() || '—';
+      pvDate.textContent  = date.value.trim()  || '—';
+      pvLink.textContent  = link.value.trim()  || '—';
+    }
+
+    function updateDescCount(){
+      descCount.textContent = (desc.value || '').length;
+    }
+
+    function setNow(){
+      date.value = fmtISO(new Date());
+      updatePreview();
+    }
+
+    function clearShot(){
+      shotBox.innerHTML = '<span class="muted" id="shot-empty">No image selected</span>';
+    }
+    function showShot(src){
+      shotBox.innerHTML = '';
+      const img = document.createElement('img');
+      img.alt = 'Screenshot preview';
+      img.src = src;
+      shotBox.appendChild(img);
+    }
+
+    // Events
+    ['input','change'].forEach(ev => title.addEventListener(ev, updatePreview));
+    ['input','change'].forEach(ev => date.addEventListener(ev,  updatePreview));
+    ['input','change'].forEach(ev => link.addEventListener(ev,  updatePreview));
+    ['input','change'].forEach(ev => desc.addEventListener(ev,  updateDescCount));
+
+    btnNow.addEventListener('click', setNow);
+
+    file.addEventListener('change', () => {
+      const f = file.files && file.files[0];
+      if (!f){ clearShot(); return; }
+      if (!f.type.startsWith('image/')) { clearShot(); return; }
+      const reader = new FileReader();
+      reader.onload = e => showShot(e.target.result);
+      reader.readAsDataURL(f);
+    });
+
+    // Initial preview
+    updatePreview();
+    updateDescCount();
+  });
+</script>
+
+{% endblock %}

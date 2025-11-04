@@ -1,0 +1,392 @@
+{% extends "base.html" %}
+{% block title %}{{ actor['name'] }} — Threat Actor{% endblock %}
+
+{% block content %}
+<section class="hero">
+  <div class="container">
+    <h1 style="display:inline">{{ actor['name'] }}</h1>
+    {% if current_user.is_authenticated %}
+      <a class="edit-link" href="/admin/editactor/{{ actor['name']|urlencode }}">Edit</a>
+    {% endif %}
+  </div>
+</section>
+
+<section class="metrics-section">
+  <div class="container">
+
+    <!-- Badges -->
+    <div class="profile-badges" style="margin-bottom:14px;">
+      {% set w = actor.get('wanted') or {} %}
+      {% if (w.get('fbi',{}).get('url') or w.get('europol',{}).get('url') or w.get('interpol',{}).get('url')) %}
+        <span class="badge-neutral">Wanted listing</span>
+      {% endif %}
+      {% if actor.get('noactive') %}<span class="badge-noactive">No more active</span>{% endif %}
+      {% if actor.get('private') %}<span class="badge-private">Private</span>{% endif %}
+    </div>
+
+    <!-- 2 columns -->
+    <div class="ta-grid">
+      <!-- Main column -->
+      <div class="col-main">
+<!-- Aliases -->
+{% set _aliases_raw = actor.get('aliases', actor.get('alias', [])) %}
+{% if _aliases_raw %}
+  {% if _aliases_raw is string %}
+    {% set aliases = _aliases_raw.replace(',', ' ').replace('|', ' ').split() %}
+  {% else %}
+    {% set aliases = _aliases_raw %}
+  {% endif %}
+  <div class="table-card">
+    <div class="card-toolbar"><span class="card-title">Aliases <span class="muted">({{ aliases|length }})</span></span></div>
+    <div class="prose pad">
+      <div class="alias-chips" role="list">
+        {% for a in aliases %}
+          {% set alias = a|string %}
+          <span class="chip" role="listitem" title="{{ alias }}">{{ alias }}</span>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+{% endif %}
+
+        <!-- Description -->
+        <div class="table-card">
+          <div class="card-toolbar"><span class="card-title">General description</span></div>
+          <div class="prose pad">
+            <p style="white-space:pre-wrap">{{ actor.get('bio','No description available.') }}</p>
+          </div>
+        </div>
+
+        <!-- Sources -->
+        <div class="table-card">
+          <div class="card-toolbar"><span class="card-title">Documentation / Sources</span></div>
+          <div class="prose pad">
+            {% set src = actor.get('sources') or [] %}
+            {% if not src %}
+              <p class="muted">No public sources.</p>
+            {% else %}
+              <ul class="tight">
+                {% for s in src %}
+                  <li>
+                    <a href="{{ s.get('url') }}" rel="noopener" target="_blank">{{ s.get('title') or s.get('url') }}</a>
+                    {% if s.get('date') %} — <span class="muted">{{ s.get('date') }}</span>{% endif %}
+                    {% if s.get('note') %} — <em>{{ s.get('note') }}</em>{% endif %}
+                  </li>
+                {% endfor %}
+              </ul>
+            {% endif %}
+          </div>
+        </div>
+
+        <!-- Relations -->
+        <div class="table-card">
+          <div class="card-toolbar"><span class="card-title">Relations</span></div>
+          <div class="prose pad">
+            <div class="rel-grid">
+              <div>
+                <h4 class="h4">Groups <span class="muted">({{ rel_groups|length }})</span></h4>
+                {% if rel_groups or rel_groupsunk %}
+                  <ul class="tight">
+                    {% for g in rel_groups %}
+                      <li><a href="/group/{{ g|urlencode }}">{{ g|title }}</a></li>
+                    {% endfor %}
+                    {% for g in rel_groupsunk %}
+                      <li class="muted">{{ g|title }}</a></li>
+                    {% endfor %}
+                  </ul>
+                {% else %}
+                  <p class="muted">No known group links.</p>
+                {% endif %}
+              </div>
+
+              <div>
+                <h4 class="h4">Forums / Markets <span class="muted">({{ rel_forums|length }})</span></h4>
+                {% if rel_forums or rel_forumsunk %}
+                  <ul class="tight">
+                    {% for f in rel_forums %}
+                      <li><a href="/market/{{ f|urlencode }}">{{ f|title }}</a></li>
+                    {% endfor %}
+                    {% for f in rel_forumsunk %}
+                      <li class="muted">{{ f|title }}</a></li>
+                    {% endfor %}
+                  </ul>
+                {% else %}
+                  <p class="muted">No known forum links.</p>
+                {% endif %}
+              </div>
+
+              <div>
+                <h4 class="h4">Other actors
+                  <span class="muted">({{ (peers_known|length) + (peers_unknown|length) }})</span>
+                </h4>
+                {% if peers_known or peers_unknown %}
+                  <ul class="tight">
+                    {% for pname in peers_known %}
+                      <li><a href="/actor/{{ pname|urlencode }}">{{ pname }}</a></li>
+                    {% endfor %}
+                    {% for pname in peers_unknown %}
+                      <li class="muted">{{ pname }}</li>
+                    {% endfor %}
+                  </ul>
+                {% else %}
+                  <p class="muted">No peers documented.</p>
+                {% endif %}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Images gallery -->
+        {% if images and images|length > 0 %}
+        <div class="table-card">
+          <div class="card-toolbar"><span class="card-title">Images / Documents</span></div>
+          <div class="prose pad">
+            <div class="thumbs">
+              {% for img in images %}
+                <a href="/logo/actor/{{ actor['name']|urlencode }}/{{ img|urlencode }}"
+                   class="thumb-link" data-img="/logo/actor/{{ actor['name']|urlencode }}/{{ img|urlencode }}"
+                   aria-label="Open image {{ img }}">
+                  <img src="/logo/actor/{{ actor['name']|urlencode }}/{{ img|urlencode }}"
+                       alt="{{ actor['name'] }} image {{ loop.index }}" loading="lazy">
+                </a>
+              {% endfor %}
+            </div>
+          </div>
+        </div>
+        {% endif %}
+
+      </div>
+
+      <!-- Side column -->
+      <aside class="col-side">
+
+        <!-- Identity -->
+        <div class="table-card">
+          <div class="card-toolbar"><span class="card-title">Personal information</span></div>
+          <div class="prose pad">
+            {% set idt = actor.get('identity') or {} %}
+            <ul class="tight">
+              {% if idt.get('first_name') %}<li><strong>First name:</strong> {{ idt['first_name'] }}</li>{% endif %}
+              {% if idt.get('last_name') %}<li><strong>Last name:</strong> {{ idt['last_name'] }}</li>{% endif %}
+              {% if idt.get('age') %}<li><strong>Age:</strong> {{ idt['age'] }}</li>{% endif %}
+              {% if idt.get('dob') %}<li><strong>DOB:</strong> {{ idt['dob'] }}</li>{% endif %}
+              {% if idt.get('nationality') %}<li><strong>Nationality:</strong> {{ idt['nationality'] }}</li>{% endif %}
+              {% if idt.get('location') %}<li><strong>Location:</strong> {{ idt['location'] }}</li>{% endif %}
+              {% if idt.get('notes') %}<li><em>{{ idt['notes'] }}</em></li>{% endif %}
+            </ul>
+          </div>
+        </div>
+
+        <!-- Contacts -->
+        <div class="table-card">
+          <div class="card-toolbar"><span class="card-title">Contacts / Social</span></div>
+          <div class="prose pad">
+            {% set c = actor.get('contacts') or {} %}
+            {% set ns = namespace(has=False) %}
+            {% for k, vals in c.items() %}
+              {% if vals and vals|length > 0 %}{% set ns.has = True %}{% endif %}
+            {% endfor %}
+            {% if not ns.has %}
+              <p class="muted">No contacts listed.</p>
+            {% else %}
+              <ul class="tight">
+                {% for k, vals in c.items() %}
+                  {% for v in vals %}
+                    <li><strong>{{ k|title }}:</strong>
+                      {% if (v|string).startswith('http') %}
+                        <a href="{{ v }}" target="_blank" rel="noopener">{{ v }}</a>
+                      {% else %}
+                        {{ v }}
+                      {% endif %}
+                    </li>
+                  {% endfor %}
+                {% endfor %}
+              </ul>
+            {% endif %}
+          </div>
+        </div>
+
+        <!-- Wanted -->
+        <div class="table-card">
+          <div class="card-toolbar"><span class="card-title">Wanted listings</span></div>
+          <div class="prose pad">
+            {% set w = actor.get('wanted') or {} %}
+            <ul class="tight">
+              <li><strong>FBI:</strong> {% if w.get('fbi',{}).get('url') %}<a href="{{ w['fbi']['url'] }}" target="_blank" rel="noopener">View</a>{% else %}<span class="muted">—</span>{% endif %}</li>
+              <li><strong>Europol:</strong> {% if w.get('europol',{}).get('url') %}<a href="{{ w['europol']['url'] }}" target="_blank" rel="noopener">View</a>{% else %}<span class="muted">—</span>{% endif %}</li>
+              <li><strong>INTERPOL:</strong> {% if w.get('interpol',{}).get('url') %}<a href="{{ w['interpol']['url'] }}" target="_blank" rel="noopener">View</a>{% else %}<span class="muted">—</span>{% endif %}</li>
+            </ul>
+          </div>
+        </div>
+
+      </aside>
+    </div>
+  </div>
+</section>
+
+<!-- Lightbox with navigation -->
+<div id="ta-lightbox" class="ta-lightbox" hidden role="dialog" aria-modal="true" aria-label="Image viewer">
+  <div class="lb-backdrop" data-close></div>
+  <figure class="lb-figure">
+    <button class="lb-nav lb-prev" type="button" aria-label="Previous image">‹</button>
+    <img id="lb-img" alt="">
+    <figcaption id="lb-cap" class="muted"></figcaption>
+    <div id="lb-count" class="lb-count">0/0</div>
+    <button class="lb-nav lb-next" type="button" aria-label="Next image">›</button>
+    <button class="lb-close" type="button" aria-label="Close" data-close>×</button>
+  </figure>
+</div>
+
+<style>
+/* Layout */
+.ta-grid{ display:grid; grid-template-columns:minmax(0,2.1fr) minmax(0,1fr); gap:14px; align-items:start; }
+.ta-grid > *{ min-width:0; }
+.col-main{ display:flex; flex-direction:column; gap:12px; }
+.col-side{ display:flex; flex-direction:column; gap:12px; }
+
+/* Cards */
+.table-card{ border-radius:14px; overflow:visible; }
+.card-toolbar{ display:flex; align-items:center; gap:8px; padding:10px 12px; border-bottom:1px solid var(--border); }
+.card-title{ font-weight:600; }
+.pad{ padding:10px 12px; }
+.muted{ opacity:.7; }
+.h4{ margin:0 0 6px 0; font-weight:600; }
+.tight{ margin:0; padding-left:18px; }
+
+/* Relations grid */
+.rel-grid{ display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:12px; }
+
+/* Thumbnails */
+.thumbs{ display:grid; grid-template-columns:repeat(auto-fill,minmax(120px,1fr)); gap:10px; }
+.thumbs img{ width:100%; height:90px; object-fit:cover; border-radius:10px; border:1px solid var(--border); transition:transform .15s ease; background:#0c121d; }
+.thumbs img:hover{ transform:scale(1.02); }
+.thumb-link{ display:block; }
+
+/* Lightbox */
+.ta-lightbox[hidden]{ display:none; }
+.ta-lightbox{ position:fixed; inset:0; z-index:1000; }
+.lb-backdrop{ position:absolute; inset:0; background:rgba(0,0,0,.6); }
+.lb-figure{ position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); max-width:min(92vw,1100px); max-height:90vh; padding:0; margin:0; }
+#lb-img{ max-width:100%; max-height:80vh; display:block; border-radius:12px; box-shadow:0 10px 30px rgba(0,0,0,.5); background:#0c121d; }
+#lb-cap{ text-align:center; margin-top:6px; max-width:100%; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+
+/* Close + nav */
+.lb-close{ position:absolute; top:-10px; right:-10px; width:32px; height:32px; border-radius:50%;
+  border:1px solid var(--border); background:#0f1623; color:var(--text); cursor:pointer; }
+.lb-close:hover{ opacity:.9; }
+
+.lb-nav{ position:absolute; top:50%; transform:translateY(-50%); width:38px; height:38px; border-radius:50%;
+  border:1px solid var(--border); background:#0f1623; color:var(--text); cursor:pointer; opacity:.95;
+  display:flex; align-items:center; justify-content:center; font-size:22px; line-height:1; }
+.lb-nav:hover{ opacity:1; }
+.lb-prev{ left:-12px; }
+.lb-next{ right:-12px; }
+
+/* Counter */
+.lb-count{ position:absolute; right:0; bottom:-30px; font-size:.9rem; opacity:.8; }
+
+/* Responsive */
+@media (max-width: 900px){
+  .ta-grid{ grid-template-columns:1fr; }
+}
+@media (max-width: 600px){
+  .lb-prev{ left:0; } .lb-next{ right:0; }
+}
+
+
+/* Aliases chips */
+.alias-chips{ display:flex; flex-wrap:wrap; gap:8px; }
+.chip{
+  display:inline-flex; align-items:center; justify-content:center;
+  padding:6px 10px; border-radius:999px;
+  font-size:13px; line-height:1; border:1px solid var(--border);
+  background:var(--bg-muted, #0f1523); color:var(--text, #e5e7eb);
+}
+.chip:hover{ filter:brightness(1.1); }
+</style>
+
+<script>
+(function(){
+  const lb   = document.getElementById('ta-lightbox');
+  const img  = document.getElementById('lb-img');
+  const cap  = document.getElementById('lb-cap');
+  const cnt  = document.getElementById('lb-count');
+  const btnN = lb.querySelector('.lb-next');
+  const btnP = lb.querySelector('.lb-prev');
+
+  const thumbs = Array.from(document.querySelectorAll('.thumb-link'));
+  let idx = -1;
+
+  function srcFor(a){ return a.dataset.img || a.getAttribute('href'); }
+  function capFor(a){
+    return a.getAttribute('aria-label')
+        || (a.querySelector('img') ? a.querySelector('img').alt : '')
+        || '';
+  }
+
+  function preload(i){
+    if(!thumbs.length) return;
+    if(i < 0) i = thumbs.length - 1;
+    if(i >= thumbs.length) i = 0;
+    const pre = new Image();
+    pre.src = srcFor(thumbs[i]);
+  }
+
+  function openAt(i){
+    if(!thumbs.length) return;
+    if(i < 0) i = thumbs.length - 1;
+    if(i >= thumbs.length) i = 0;
+    idx = i;
+
+    const t = thumbs[idx];
+    img.src = srcFor(t);
+    cap.textContent = capFor(t);
+    cnt.textContent = (idx+1) + " / " + thumbs.length;
+
+    lb.hidden = false;
+    document.addEventListener('keydown', onKey);
+    preload(idx+1);
+  }
+
+  function close(){
+    lb.hidden = true;
+    img.src = ''; cap.textContent = ''; cnt.textContent = '';
+    document.removeEventListener('keydown', onKey);
+  }
+
+  function next(){ openAt(idx+1); }
+  function prev(){ openAt(idx-1); }
+
+  function onKey(e){
+    if(e.key === 'Escape') close();
+    else if(e.key === 'ArrowRight') next();
+    else if(e.key === 'ArrowLeft')  prev();
+  }
+
+  // Clicks
+  document.addEventListener('click', function(e){
+    const a = e.target.closest('a.thumb-link');
+    if(a){
+      e.preventDefault();
+      const i = thumbs.indexOf(a);
+      openAt(i >= 0 ? i : 0);
+      return;
+    }
+    if(e.target.hasAttribute('data-close')) close();
+  });
+
+  btnN.addEventListener('click', next);
+  btnP.addEventListener('click', prev);
+
+  // Touch swipe
+  let touchX = null;
+  lb.addEventListener('touchstart', e => { touchX = e.changedTouches[0].clientX; }, {passive:true});
+  lb.addEventListener('touchend',   e => {
+    if(touchX == null) return;
+    const dx = e.changedTouches[0].clientX - touchX;
+    touchX = null;
+    if(Math.abs(dx) > 30){ dx < 0 ? next() : prev(); }
+  }, {passive:true});
+})();
+</script>
+{% endblock %}

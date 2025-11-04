@@ -15,7 +15,7 @@ def main() -> List[Dict[str, str]] :
                 for div in divs_name:
                     try :
                         title = div.find('a').text.strip()
-                        description = div.find('p',{"class" : "card-text"}).text.strip()
+                        div.find('p',{"class" : "card-text"}).text.strip()
                         list_div.append({"title" : title, "description" : '', "link" : div.find('a')['href'], "slug": filename})
                     except:
                         pass
@@ -23,7 +23,6 @@ def main() -> List[Dict[str, str]] :
                 for div in divs_name:
                     try :
                         title = div.find('div', {"class":"card-title text-center"}).text.strip()
-                        description = ""
                         list_div.append({"title" : title, "description" : '', "link" : div.find('a')['href'], "slug": filename})
                     except:
                         pass

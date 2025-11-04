@@ -1,33 +1,724 @@
-
 {% extends "base.html" %}
-
 {% block title %}Stats{% endblock %}
 
 {% block content %}
-    <article id="main" class="markdown-section">
-	<center><h1>Stats for 7 days</h1>
-                <img src='stats/bar_chart_7.png'>
-                <img src='stats/pie_chart_7.png'>
-                <img src='stats/scatter_plot_7.png'>
-                <img src='stats/density_heatmap_7.png'>
-        </center>
-	<center><h1>Stats for 14 days</h1>
-                <img src='stats/bar_chart_14.png'>
-                <img src='stats/pie_chart_14.png'>
-                <img src='stats/scatter_plot_14.png'>
-                <img src='stats/density_heatmap_14.png'>
-        </center>
-	<center><h1>Stats for 30 days</h1>
-                <img src='stats/bar_chart_30.png'>
-                <img src='stats/pie_chart_30.png'>
-                <img src='stats/scatter_plot_30.png'>
-                <img src='stats/density_heatmap_30.png'>
-        </center>
-	<center><h1>Stats for 90 days</h1>
-                <img src='stats/bar_chart_90.png'>
-                <img src='stats/pie_chart_90.png'>
-                <img src='stats/scatter_plot_90.png'>
-                <img src='stats/density_heatmap_90.png'>
-        </center>
-    </article>
+
+<section class="hero">
+  <div class="container">
+    <h1>Interactive statistics</h1>
+    <p class="lead">Explore posts by period, groups, and aggregation — fully client‑side & interactive.</p>
+  </div>
+</section>
+
+<section class="metrics-section">
+  <div class="container">
+
+    <!-- Controls -->
+    <div class="table-card" style="padding:12px; margin-bottom:18px;">
+      <form id="stats-controls" onsubmit="return false" aria-label="Filters">
+        <div style="display:flex; flex-wrap:wrap; gap:14px; align-items:end">
+
+          <!-- Period -->
+          <div>
+            <label class="label" for="period">Period</label>
+            <select id="period" class="input">
+              <option value="7">Last 7 days</option>
+              <option value="14">Last 14 days</option>
+              <option value="30" selected>Last 30 days</option>
+              <option value="90">Last 90 days</option>
+              <option value="custom">Custom…</option>
+            </select>
+          </div>
+
+          <div id="custom-range" style="display:none; gap:8px; align-items:end">
+            <div>
+              <label class="label" for="from">From</label>
+              <input id="from" type="date" class="input">
+            </div>
+            <div>
+              <label class="label" for="to">To</label>
+              <input id="to" type="date" class="input">
+            </div>
+          </div>
+
+          <!-- Aggregation -->
+          <div>
+            <label class="label" for="bucket">Aggregation</label>
+            <select id="bucket" class="input">
+              <option value="hour">Hourly</option>
+              <option value="day" selected>Daily</option>
+              <option value="week">Weekly</option>
+            </select>
+          </div>
+
+          <!-- Rolling average -->
+          <div>
+            <label class="label" for="roll">Rolling avg.</label>
+            <select id="roll" class="input">
+              <option value="0" selected>Off</option>
+              <option value="3">3</option>
+              <option value="7">7</option>
+              <option value="14">14</option>
+            </select>
+          </div>
+
+          <!-- Top N -->
+          <div>
+            <label class="label" for="topn">Top‑N groups</label>
+            <select id="topn" class="input">
+              <option value="0">All</option>
+              <option value="5">Top 5</option>
+              <option value="10" selected>Top 10</option>
+              <option value="20">Top 20</option>
+            </select>
+          </div>
+
+          <!-- Normalize -->
+          <div style="display:flex; gap:8px; align-items:center; padding:0 6px 6px;">
+            <input id="normalize" type="checkbox">
+            <label for="normalize">Normalize (%)</label>
+          </div>
+
+          <!-- Search + pickers -->
+          <div style="flex:1 1 360px; max-width:640px">
+            <label class="label" for="group-search">Groups</label>
+            <div style="display:flex; gap:8px; align-items:center">
+              <input id="group-search" class="input" type="search" placeholder="Search groups…">
+              <button id="select-all"  class="btn btn-secondary" type="button">All</button>
+              <button id="select-none" class="btn btn-secondary" type="button">None</button>
+            </div>
+            <div id="group-list" class="chip-grid"
+                 style="display:grid; grid-template-columns:repeat(auto-fit,minmax(140px,1fr)); gap:8px; margin-top:8px;">
+              <!-- chips built dynamically -->
+            </div>
+          </div>
+
+          <div style="margin-left:auto; display:flex; gap:8px">
+            <button id="refresh" class="btn btn-primary" type="button" title="Reload from API">Refresh</button>
+            <button id="exportcsv" class="btn btn-secondary" type="button" title="Export filtered data to CSV">Export CSV</button>
+            <button id="shareurl" class="btn btn-secondary" type="button" title="Copy a shareable URL with current filters">Share URL</button>
+          </div>
+
+        </div>
+      </form>
+    </div>
+
+    <!-- Charts -->
+    <div class="stats-grid" style="display:grid; grid-template-columns:repeat(auto-fit,minmax(360px,1fr)); gap:18px;">
+      <div class="table-card">
+        <div class="card-toolbar"><span>Top‑N (bar)</span><button data-dl="chart-bar" class="btn btn-secondary btn-sm">PNG</button></div>
+        <div id="chart-bar" style="height:420px"></div>
+      </div>
+
+      <div class="table-card">
+        <div class="card-toolbar"><span>Share (pie)</span><button data-dl="chart-pie" class="btn btn-secondary btn-sm">PNG</button></div>
+        <div id="chart-pie" style="height:420px"></div>
+      </div>
+
+      <div class="table-card">
+        <div class="card-toolbar"><span>Stacked area</span><button data-dl="chart-area" class="btn btn-secondary btn-sm">PNG</button></div>
+        <div id="chart-area" style="height:420px"></div>
+      </div>
+
+      <div class="table-card">
+        <div class="card-toolbar"><span>Heatmap</span><button data-dl="chart-heatmap" class="btn btn-secondary btn-sm">PNG</button></div>
+        <div id="chart-heatmap" style="height:420px"></div>
+      </div>
+
+      <div class="table-card">
+        <div class="card-toolbar"><span>Timeline (scatter)</span><button data-dl="chart-scatter" class="btn btn-secondary btn-sm">PNG</button></div>
+        <div id="chart-scatter" style="height:420px"></div>
+      </div>
+
+      <div class="table-card">
+        <div class="card-toolbar"><span>Sparklines</span><button data-dl="chart-sparks" class="btn btn-secondary btn-sm">PNG</button></div>
+        <div id="chart-sparks" style="height:420px"></div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<script
+  src="{{ url_for('static', filename='js/plotly.min.js') }}"
+  integrity="{{ get_sri('static','plotly.min.js') }}"
+  crossorigin="anonymous"
+  defer></script>
+
+<script>
+// Base layout to force light text on dark background everywhere
+function withBase(layout){
+  function cssVar(name, fallback){
+    const v = getComputedStyle(document.documentElement).getPropertyValue(name).trim();
+    return v || fallback;
+  }
+  function rgbaFrom(rgb, a){
+    const m = String(rgb).match(/rgba?\(([^)]+)\)/);
+    if (!m) return rgb || `rgba(0,0,0,${a})`;
+    const [r,g,b] = m[1].split(',').slice(0,3).map(s=>s.trim());
+    return `rgba(${r}, ${g}, ${b}, ${a})`;
+  }
+  const hostBg   = getComputedStyle(document.body).backgroundColor;
+  const paper    = cssVar('--fg', cssVar('--card', hostBg || '#111827'));
+  const panel    = paper;
+  const text     = cssVar('--text', getComputedStyle(document.body).color || '#e5e7eb');
+  const border   = cssVar('--border', 'rgba(255,255,255,.12)');
+  const grid     = rgbaFrom(border, 0.35);
+
+  layout = layout || {};
+  const base = {
+    font:{ family:'Roboto, system-ui, sans-serif', color:text },
+    paper_bgcolor: paper,
+    plot_bgcolor:  panel,
+    legend:{ font:{ color:text } },
+    hoverlabel:{ font:{color:text}, bordercolor:border, bgcolor:'rgba(0,0,0,.65)' },
+    xaxis:{ tickfont:{color:text}, titlefont:{color:text}, gridcolor: grid, zerolinecolor: border },
+    yaxis:{ tickfont:{color:text}, titlefont:{color:text}, gridcolor: grid, zerolinecolor: border }
+  };
+  const out = Object.assign({}, base, layout);
+  out.paper_bgcolor = paper;
+  out.plot_bgcolor  = panel;
+  if (out.legend) out.legend.font = Object.assign({}, out.legend.font||{}, { color: text });
+  if (out.xaxis) { 
+    out.xaxis.tickfont = Object.assign({}, out.xaxis.tickfont||{}, { color: text });
+    out.xaxis.titlefont = Object.assign({}, out.xaxis.titlefont||{}, { color: text });
+    out.xaxis.gridcolor = grid; out.xaxis.zerolinecolor = border;
+  }
+  if (out.yaxis) { 
+    out.yaxis.tickfont = Object.assign({}, out.yaxis.tickfont||{}, { color: text });
+    out.yaxis.titlefont = Object.assign({}, out.yaxis.titlefont||{}, { color: text });
+    out.yaxis.gridcolor = grid; out.yaxis.zerolinecolor = border;
+  }
+  return out;
+}
+
+// Sort legend by total descending (legend only)
+function orderLegendByTotal(traces, descending=true){
+  const totals = traces.map(t => (t.y || []).reduce((s,v)=> s + (Number.isFinite(v)?v:0), 0));
+  traces.forEach((t,i) => {
+    const rank = totals[i] + i*1e-6;         // plus petit -> affiché en haut
+    t.legendrank = descending ? -rank : rank; // inverser via le signe
+  });
+}
+
+
+</script>
+
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  // ---------- State ----------
+  const S = {
+    raw: [],            // [{group_name, discovered}]
+    filtered: [],       // after server params + client refine
+    groups: new Set(),  // all groups in raw
+    selected: new Set() // selected groups
+  };
+
+  // ---------- DOM ----------
+  const $ = id => document.getElementById(id);
+  const $period = $('period'), $custom = $('custom-range'), $from = $('from'), $to = $('to');
+  const $bucket = $('bucket'), $roll = $('roll'), $topn = $('topn'), $norm = $('normalize');
+  const $search = $('group-search'), $chips = $('group-list');
+  const $btnAll = $('select-all'), $btnNone = $('select-none'), $btnRefresh = $('refresh');
+  const $btnCSV = $('exportcsv'), $btnShare = $('shareurl');
+
+  // ---------- Helpers ----------
+  const fmtDay = (d) => d.toISOString().slice(0,10);
+  const parseISO = (s) => new Date(s);
+  const toUTCDate = (d) => new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()));
+  const weekKey = (d) => {
+    const dt = toUTCDate(d);
+    const day = dt.getUTCDay() || 7;
+    dt.setUTCDate(dt.getUTCDate() - day + 1);
+    return fmtDay(dt); // monday of the week
+  };
+
+  function getURLParams() {
+    const u = new URL(location.href);
+    return Object.fromEntries(u.searchParams.entries());
+  }
+  function setURLParams(dict) {
+    const u = new URL(location.href);
+    Object.keys(dict).forEach(k => {
+      const v = dict[k];
+      if (v === null || v === undefined || v === '' || v === '0' || (Array.isArray(v) && v.length===0)) u.searchParams.delete(k);
+      else if (Array.isArray(v)) u.searchParams.set(k, v.join(','));
+      else u.searchParams.set(k, v);
+    });
+    history.replaceState(null, '', u.toString());
+  }
+
+  function rolling(arr, w) {
+    if (!w || w<=1) return arr;
+    const out = [];
+    let sum = 0;
+    for (let i=0;i<arr.length;i++){
+      sum += arr[i];
+      if (i>=w) sum -= arr[i-w];
+      out.push(i>=w-1 ? +(sum/w).toFixed(3) : null);
+    }
+    return out;
+  }
+
+  // ---------- Fetch ----------
+  async function fetchPosts() {
+    let url = '/api/posts';
+    const p = new URLSearchParams();
+    if ($period.value === 'custom' && $from.value && $to.value) {
+      p.set('from', $from.value);
+      p.set('to', $to.value);
+    } else {
+      p.set('days', $period.value);
+    }
+    url += '?' + p.toString();
+
+    const res = await fetch(url, {headers:{'Accept':'application/json'}});
+    if (!res.ok) throw new Error('fetch failed');
+    const data = await res.json();
+    const posts = (data.posts || data.data || data) || [];
+    S.raw = posts.map(x => ({
+      group_name: x.group_name || x.group || x.name || 'unknown',
+      discovered: x.discovered || x.timestamp || x.time
+    })).filter(x => x.discovered);
+  }
+
+  // ---------- Groups ----------
+  function rebuildGroups() {
+    const prev = new Set(S.selected);
+    S.groups = new Set(S.raw.map(x=>x.group_name));
+    // keep previous selection if possible; select all by default
+    S.selected = prev.size ? new Set([...S.groups].filter(g => prev.has(g))) : new Set(S.groups);
+    renderChips();
+  }
+  function renderChips() {
+    const q = ($search.value||'').trim().toLowerCase();
+    $chips.innerHTML = '';
+    const list = [...S.groups].sort((a,b)=> a.localeCompare(b));
+    for (const g of list) {
+      if (q && !g.toLowerCase().includes(q)) continue;
+      const b = document.createElement('button');
+      b.type='button';
+      b.className='btn btn-secondary';
+      b.style.cssText='justify-content:center;white-space:nowrap;';
+      b.textContent = g;
+      b.dataset.g = g;
+      if (S.selected.has(g)) b.classList.add('active');
+      b.addEventListener('click', ()=>{
+        if (S.selected.has(g)) S.selected.delete(g); else S.selected.add(g);
+        b.classList.toggle('active');
+        updateCharts();
+        persistState();
+      });
+      $chips.appendChild(b);
+    }
+  }
+
+  $btnAll.addEventListener('click', ()=>{ S.selected = new Set(S.groups); renderChips(); updateCharts(); persistState(); });
+  $btnNone.addEventListener('click', ()=>{ S.selected.clear(); renderChips(); updateCharts(); persistState(); });
+  $search.addEventListener('input', renderChips);
+
+  // ---------- Filtering + Bucketing ----------
+  function applyFilters() {
+    const sel = S.selected;
+    let rows = S.raw.filter(x => sel.size===0 || sel.has(x.group_name))
+                    .map(x => ({ g:x.group_name, ts: parseISO(x.discovered) }))
+                    .filter(x => !isNaN(x.ts));
+    S.filtered = rows;
+  }
+
+  function bucketize() {
+    // returns: {keys:[timeKeys], groups:[...], matrix: 2D counts per group per timeKey}
+    const bucket = $bucket.value;
+    const selGroups = [...new Set(S.filtered.map(r=>r.g))].sort();
+    const keyOf = (d) => bucket==='hour' ? d.toISOString().slice(0,13)+':00'
+                    : bucket==='week' ? weekKey(d)
+                    : fmtDay(d);
+
+    const map = new Map(); // (key|group) -> count
+    const timeSet = new Set();
+    S.filtered.forEach(r => {
+      const k = keyOf(r.ts);
+      timeSet.add(k);
+      const mkey = k+'|'+r.g;
+      map.set(mkey, (map.get(mkey)||0)+1);
+    });
+
+    const keys = [...timeSet].sort();
+    // normalize matrix
+    const matrix = selGroups.map(g => keys.map(k => map.get(k+'|'+g) || 0));
+
+    // optional rolling
+    const w = +$roll.value || 0;
+    if (w>0 && bucket!=='week') { // rolling weekly sur week serait bizarre; on peut mais je limite
+      for (let i=0;i<matrix.length;i++) matrix[i] = rolling(matrix[i], w);
+    }
+
+    // normalize in %
+    if ($norm.checked) {
+      for (let t=0; t<keys.length; t++){
+        let colSum = 0;
+        for (let r=0;r<matrix.length;r++){ colSum += (matrix[r][t]||0); }
+        if (colSum>0){
+          for (let r=0;r<matrix.length;r++){ matrix[r][t] = +( (matrix[r][t]||0)*100/colSum ).toFixed(2); }
+        }
+      }
+    }
+
+    return { keys, groups: selGroups, matrix };
+  }
+
+  function countsByGroup() {
+    const c = new Map();
+    S.filtered.forEach(r => c.set(r.g, (c.get(r.g)||0)+1));
+    return [...c.entries()].map(([group,count])=>({group,count})).sort((a,b)=>b.count-a.count);
+  }
+
+  // ---------- Charts ----------
+  function updateCharts() {
+    applyFilters();
+    const agg = bucketize();
+    const counts = countsByGroup();
+    const topN = +$topn.value || 0;
+
+    // Top‑N selection for some charts
+    const groupsOrder = [...agg.groups]; // alphabetic
+    const groupsByCount = counts.map(d=>d.group);
+    const selectedForN = (topN>0) ? groupsByCount.slice(0, topN) : groupsByCount;
+
+    // HEATMAP (all selected groups)
+const yR = [...selectedForN].reverse();
+const zR = yR.map(g => agg.matrix[agg.groups.indexOf(g)]);
+    Plotly.react('chart-heatmap', [{
+      type:'heatmap',
+      x: agg.keys,
+      y: yR,
+      z: zR,
+      colorscale: 'Portland',
+      hovertemplate: `${$bucket.value}: %{x}<br>Group: %{y}<br>${$norm.checked?'Share':'Posts'}: %{z}<extra></extra>`
+    }], withBase({
+      margin:{l:90,r:10,t:10,b:40},
+       
+      yaxis:{ automargin:true }
+    }), {displayModeBar:false});
+
+    // SCATTER TIMELINE (points)
+    const scatter = selectedForN.map(g => {
+      const pts = S.filtered.filter(x=>x.g===g).sort((a,b)=>a.ts-b.ts);
+      return { type:'scatter', mode:'markers', name:g, x:pts.map(p=>p.ts), y: pts.map(_=>g),
+               hovertemplate: '%{x|%Y-%m-%d %H:%M:%S}<extra>'+g+'</extra>' };
+    });
+    Plotly.react('chart-scatter', scatter, withBase({
+      margin:{l:80,r:10,t:10,b:40},
+       
+      yaxis:{ type:'category', automargin:true }
+    }), {displayModeBar:false});
+    // STACKED AREA (top‑N)
+    
+    const areaTraces = selectedForN.map(g => {
+      const row = agg.matrix[agg.groups.indexOf(g)];
+
+      return { type:'scatter', mode:'lines', name:g, x: agg.keys, y: row, stackgroup:'one',
+               hovertemplate: `${$bucket.value}: %{x}<br>${$norm.checked?'Share':'Posts'}: %{y}<extra>`+g+`</extra>` };
+    });
+orderLegendByTotal(areaTraces, false);
+
+    Plotly.react('chart-area', areaTraces, withBase({
+      margin:{l:80,r:10,t:10,b:50},
+       
+      xaxis:{ tickangle:-20, automargin:true }
+    }), {displayModeBar:false});    
+
+    // BAR (Top‑N)
+    const barData = (topN>0 ? counts.slice(0,topN) : counts);
+    Plotly.react('chart-bar', [{
+      type:'bar',
+      x: barData.map(d=>d.group),
+      y: barData.map(d=>d.count),
+      hovertemplate: '%{x}: %{y} posts<extra></extra>'
+    }], withBase({
+      margin:{l:70,r:10,t:10,b:80},
+       
+      xaxis:{ tickangle:-35, automargin:true }
+    }), {displayModeBar:false});
+
+    // PIE (Top‑N, sinon tous)
+    const pieData = (topN>0 ? counts.slice(0,topN) : counts);
+    Plotly.react('chart-pie', [{
+      type:'pie',
+      labels: pieData.map(d=>d.group),
+      values: pieData.map(d=>d.count),
+      textinfo:'label+percent',
+      hovertemplate: '%{label}: %{value} posts<extra></extra>'
+    }], withBase({
+      margin:{l:10,r:10,t:10,b:10},
+      }), {displayModeBar:false});
+
+    // SPARKLINES (petits line charts par groupe dans un seul graphe)
+    const sparkTraces = selectedForN.map((g,i) => {
+      const row = agg.matrix[agg.groups.indexOf(g)];
+      return { type:'scatter', mode:'lines', name:g, x: agg.keys, y: row, hovertemplate: '%{x}<br>'+g+': %{y}<extra></extra>' };
+    });
+    Plotly.react('chart-sparks', sparkTraces, withBase({
+      margin:{l:70,r:10,t:10,b:50},
+      xaxis:{ tickangle:-20, automargin:true }
+    }), {displayModeBar:false});
+  }
+
+  // ---------- Exports ----------
+  function download(filename, blob){
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = filename;
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(()=>URL.revokeObjectURL(a.href), 1500);
+  }
+
+  $btnCSV.addEventListener('click', () => {
+    // Build CSV from filtered & bucketed (daily/hourly/week).
+    const agg = bucketize();
+    const header = ['time', ...agg.groups];
+    const rows = [];
+    for (let i=0;i<agg.keys.length;i++){
+      const line = [agg.keys[i], ...agg.groups.map((_,r)=> agg.matrix[r][i] ?? '')];
+      rows.push(line.map(v=> (v===null||v===undefined)?'':v).join(','));
+    }
+    const csv = [header.join(','), ...rows].join('\n');
+    download(`ransomlook_stats_${Date.now()}.csv`, new Blob([csv], {type:'text/csv'}));
+  });
+
+  document.addEventListener('click', async (e) => {
+    const btn = e.target.closest('[data-dl]');
+    if (!btn) return;
+    const id = btn.getAttribute('data-dl');
+    const node = document.getElementById(id);
+    if (!node) return;
+    try {
+      const dataUrl = await Plotly.toImage(node, {format:'png', width:1200, height:700});
+      const res = await fetch(dataUrl);
+      const blob = await res.blob();
+      download(`${id}_${Date.now()}.png`, blob);
+    } catch (err) {
+      console.error(err);
+    }
+  });
+
+  // ---------- URL <-> UI sync ----------
+  function persistState(){
+    setURLParams({
+      days: $period.value==='custom' ? null : $period.value,
+      from: $period.value==='custom' ? $from.value || null : null,
+      to:   $period.value==='custom' ? $to.value   || null : null,
+      bucket: $bucket.value,
+      roll: $roll.value,
+      topn: $topn.value,
+      norm: $norm.checked ? 1 : 0,
+      groups: [...S.selected].join(',')
+    });
+  }
+  $btnShare.addEventListener('click', async () => {
+    persistState();
+    try { await navigator.clipboard.writeText(location.href); } catch {}
+    $btnShare.textContent = 'Copied!';
+    setTimeout(()=> $btnShare.textContent = 'Share URL', 1200);
+  });
+
+  function restoreFromURL(){
+    const p = getURLParams();
+    if (p.days) $period.value = p.days;
+    if ($period.value==='custom') $custom.style.display = 'flex';
+    if (p.from) $from.value = p.from;
+    if (p.to)   $to.value   = p.to;
+    if (p.bucket) $bucket.value = p.bucket;
+    if (p.roll)   $roll.value   = p.roll;
+    if (p.topn)   $topn.value   = p.topn;
+    if (p.norm)   $norm.checked = (p.norm==='1' || p.norm==='true');
+    // groups restored after fetch (need list)
+    return p;
+  }
+
+  // ---------- init ----------
+  const saved = restoreFromURL();
+
+  $period.addEventListener('change', ()=>{
+    $custom.style.display = ($period.value==='custom') ? 'flex' : 'none';
+  });
+  [$period,$from,$to,$bucket,$roll,$topn,$norm].forEach(el => {
+    el.addEventListener('change', ()=>{ updateCharts(); persistState(); });
+  });
+
+  $btnRefresh.addEventListener('click', async ()=>{ await reload(); });
+
+  async function reload(){
+    await fetchPosts();
+    rebuildGroups();
+    // restore group selection from URL if present
+    const p = getURLParams();
+    if (p.groups){
+      const want = new Set(p.groups.split(',').filter(Boolean));
+      S.selected = new Set([...S.groups].filter(g => want.has(g)));
+      renderChips();
+    }
+    updateCharts();
+    persistState();
+  }
+
+  reload().catch(err => {
+    console.error(err);
+    // still draw empty
+    updateCharts();
+  });
+});
+</script>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  const modal = document.getElementById('chart-modal');
+  const modalPlot = document.getElementById('chart-modal-plot');
+
+  // Trouve l'ID du chart pour une carte donnée.
+  function findChartIdFromCard(card){
+    // Cas 1: nos cartes ont .card-toolbar puis le conteneur du chart juste après.
+    // Cas 2: parfois h3.card-title puis le chart en dessous.
+    // On cherche le premier DIV avec id dans la carte.
+    const chartDiv = card.querySelector('div[id]');
+    return chartDiv ? chartDiv.id : null;
+  }
+
+  // Ouvre la modale pour le chart ayant chartId
+async function openModalFor(chartId){
+  const modal     = document.getElementById('chart-modal');
+  const dialog    = modal.querySelector('.chart-modal__dialog');
+  const modalPlot = document.getElementById('chart-modal-plot');
+  const src       = document.getElementById(chartId);
+  if (!src || !src.data) return;
+
+  // Deep‑copy the chart’s data & layout
+  const data       = JSON.parse(JSON.stringify(src.data));
+  let layoutObj    = JSON.parse(JSON.stringify(src.layout || {})); // <-- mutable name
+
+  // Show modal first so we can compute available size
+  modal.setAttribute('aria-hidden', 'false');
+
+  // Tweak layout without reassigning the const
+  layoutObj.autosize       = true;
+  layoutObj.paper_bgcolor = getComputedStyle(document.body).backgroundColor;
+  layoutObj.plot_bgcolor = layoutObj.paper_bgcolor;
+  layoutObj.margin         = layoutObj.margin || { l:60, r:20, t:30, b:60 };
+  layoutObj.font           = Object.assign({ color: '#e5e7eb' }, layoutObj.font || {});
+  layoutObj.xaxis          = Object.assign({ color: '#e5e7eb' }, layoutObj.xaxis || {});
+  layoutObj.yaxis          = Object.assign({ color: '#e5e7eb', automargin:true }, layoutObj.yaxis || {});
+
+  // Size to dialog’s inner box
+  const rect = dialog.getBoundingClientRect();
+  const w = Math.floor(rect.width  - 4);
+  const h = Math.floor(window.innerHeight * 0.90 - 48);
+
+  // Mount then adjust precisely
+  await Plotly.newPlot(modalPlot, data, layoutObj, { responsive:true, displayModeBar:true });
+  await Plotly.relayout(modalPlot, { width:w, height:h });
+
+  // Final resize polish
+  requestAnimationFrame(() => Plotly.Plots.resize(modalPlot));
+}
+
+
+  function closeModal(){
+    modal.setAttribute('aria-hidden', 'true');
+    // Démonter le plot pour libérer mémoire GPU
+    if (modalPlot && modalPlot.data) {
+      Plotly.purge(modalPlot);
+    }
+  }
+
+  // Click sur titre pour ouvrir (card-toolbar span ou h3.card-title)
+  document.addEventListener('click', (e) => {
+    const titleSpan = e.target.closest('.card-toolbar span, .card-title');
+    if (!titleSpan) return;
+    const card = titleSpan.closest('.table-card');
+    if (!card) return;
+    const chartId = findChartIdFromCard(card);
+    if (chartId) {
+      openModalFor(chartId);
+    }
+  });
+
+  // Fermer via X / backdrop / ESC
+  document.addEventListener('click', (e) => {
+    if (e.target.matches('[data-close-modal]')) {
+      closeModal();
+    }
+  });
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && modal.getAttribute('aria-hidden') === 'false') {
+      closeModal();
+    }
+  });
+
+  // Re‑ajuste si la fenêtre change
+  window.addEventListener('resize', () => {
+    if (modal.getAttribute('aria-hidden') === 'false' && modalPlot && modalPlot.data) {
+      Plotly.relayout(modalPlot, {
+        height: Math.round(window.innerHeight * 0.78),
+        width:  Math.round(window.innerWidth  * 0.90)
+      });
+    }
+  });
+});
+</script>
+
+<style>
+.label{ display:block; color:var(--muted); font-size:.9rem; margin-bottom:4px }
+.input{ background:#0f1623; color:var(--text); border:1px solid var(--border); border-radius:10px; padding:8px 10px; }
+.card-toolbar{ display:flex; align-items:center; justify-content:space-between; gap:10px; padding:8px 10px; border-bottom:1px solid var(--border); }
+.btn-sm{ padding:6px 10px; font-size:.9rem }
+.btn.btn-secondary.active{ box-shadow: inset 0 -2px 0 0 var(--pri) }
+
+/* ===== Modal for enlarged charts ===== */
+/* ===== Modal for enlarged charts (fix right overflow) ===== */
+.chart-modal{ position:fixed; inset:0; display:none; z-index:1400; }
+.chart-modal[aria-hidden="false"]{ display:block; }
+
+.chart-modal__backdrop{
+  position:absolute; inset:0; background:rgba(0,0,0,.65);
+  backdrop-filter: blur(2px);
+}
+
+/* Utilise width en vw et box-sizing pour que padding/border ne fassent pas déborder */
+.chart-modal__dialog{
+  position:absolute; top:50%; left:50%; transform:translate(-50%, -50%);
+  background:var(--bg); border:1px solid var(--border); border-radius:14px;
+  box-shadow: 0 20px 60px rgba(0,0,0,.6);
+  padding:12px;
+  width:min(96vw, 1400px);      /* -> jamais plus large que l’écran */
+  max-height:90vh;              /* on borne la hauteur */
+  overflow:hidden;              /* évite tout débordement interne */
+  box-sizing:border-box;        /* très important pour compter padding/border dans la width */
+}
+
+.chart-modal__close{
+  position:absolute; top:6px; right:8px; border:0; background:transparent;
+  color:var(--text); font-size:24px; line-height:1; cursor:pointer;
+  padding:4px; border-radius:8px;
+}
+.chart-modal__close:hover{ background:rgba(255,255,255,.08); }
+
+/* Le conteneur du graphe occupe toute la boîte dialog */
+#chart-modal-plot{
+  width:100%;
+  height:calc(90vh - 48px);     /* 90vh moins un peu d’espace pour le padding/bouton */
+}
+
+
+</style>
+
+<!-- Modal overlay for enlarged charts -->
+<div id="chart-modal" class="chart-modal" aria-hidden="true">
+  <div class="chart-modal__backdrop" data-close-modal></div>
+  <div class="chart-modal__dialog" role="dialog" aria-modal="true" aria-label="Enlarged chart">
+    <button class="chart-modal__close" type="button" aria-label="Close" data-close-modal>×</button>
+    <div id="chart-modal-plot" style="height:78vh; width:90vw;"></div>
+  </div>
+</div>
+
 {% endblock %}

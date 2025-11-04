@@ -1,5 +1,4 @@
 from ldap3 import Server, Connection, SAFE_SYNC, Tls
-from ldap3.core.exceptions import LDAPException, LDAPBindError
 import ssl
 from typing import Dict, Any
 

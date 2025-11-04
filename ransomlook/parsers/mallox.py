@@ -18,7 +18,7 @@ def main() -> List[Dict[str, str]] :
                     for p in div.find_all('p'):
                         description+=p.text+'\n'
                     linktmp = div.find('a', {"class" :"btn btn-primary btn-sm"})
-                    if linktmp != None:
+                    if linktmp is not None:
                         link = linktmp['href']
                         list_div.append({"title" : title, "description" : description, "link": link, "slug": filename})
                     else:
@@ -29,7 +29,7 @@ def main() -> List[Dict[str, str]] :
                     title=data[0].text.strip()
                     description=data[1].text.strip()
                     linkdata=data[2].find('a')
-                    if linkdata == None:
+                    if linkdata is None:
                         list_div.append({"title" : title, "description" : description})
                     else:
                         link = linkdata['href']

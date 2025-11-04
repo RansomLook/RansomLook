@@ -1,0 +1,186 @@
+{% extends "base.html" %}
+{% from 'bootstrap5/utils.html' import render_messages %}
+{% block title %}Alerts · Keywords{% endblock %}
+
+{% block content %}
+{{ render_messages(container=True, dismissible=True) }}
+
+<style>
+  .wrap{max-width:1100px;margin:0 auto}
+  .panel{border:1px solid var(--border);background:#0f1623;border-radius:12px}
+  .panel + .panel{margin-top:14px}
+  .panel-hd{padding:10px 12px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
+  .panel-bd{padding:12px}
+  .muted{color:var(--muted)}
+  .label{display:block;color:var(--muted);font-size:.9rem;margin:6px 0 4px}
+  .input,.textarea{width:%;background:#0b1220;border:1px solid var(--border);border-radius:10px;padding:10px 12px;color:var(--text)}
+  .textarea{min-height:520px;resize:vertical}
+  .toolbar{display:flex;gap:8px;flex-wrap:wrap}
+  .toolbar-right{margin-left:auto;display:flex;gap:8px}
+  .row{display:grid;grid-template-columns:1.2fr .8fr;gap:16px}
+  @media (max-width: 920px){ .row{grid-template-columns:1fr} }
+  .hint{font-size:.85rem;color:var(--muted)}
+  .counter{font-size:.85rem;color:var(--muted)}
+  .pill{font:600 12px/1 var(--font);padding:6px 10px;border-radius:999px;background:#121a29;border:1px solid var(--border);color:var(--muted)}
+  .result{border:1px solid var(--border);border-radius:10px;background:#0b1220;padding:10px;min-height:120px;white-space:pre-wrap}
+  .kw-badge{display:inline-block;margin:2px 6px 2px 0;padding:.2rem .5rem;border:1px solid var(--border);border-radius:999px;background:#121a29;color:var(--text);font-size:.85rem}
+  .btn-sm{padding:6px 10px;font-size:.9rem}
+</style>
+
+<section class="hero">
+  <div class="container">
+    <h1>Alerts – Keywords</h1>
+    <p class="lead">Manage alert keywords (one per line). Use tools to clean, deduplicate, and test quickly.</p>
+  </div>
+</section>
+
+<section class="metrics-section">
+  <div class="container wrap">
+
+    <form action="" method="post" novalidate>
+      {{ form.hidden_tag() }}
+
+      <div class="row">
+        <!-- Keywords panel -->
+        <div class="panel">
+          <div class="panel-hd">
+            <strong>Keywords</strong>
+            <span class="pill"><span id="line-count">0</span> lines</span>
+          </div>
+          <div class="panel-bd">
+            <div class="toolbar" style="margin-bottom:8px">
+              <button class="btn btn-secondary btn-sm" type="button" id="btn-trim">Trim</button>
+              <button class="btn btn-secondary btn-sm" type="button" id="btn-dedupe">Deduplicate</button>
+              <button class="btn btn-secondary btn-sm" type="button" id="btn-sort">Sort</button>
+              <button class="btn btn-secondary btn-sm" type="button" id="btn-lower">lowercase</button>
+              <button class="btn btn-secondary btn-sm" type="button" id="btn-upper">UPPERCASE</button>
+
+              <span class="toolbar-right">
+                <button class="btn btn-secondary btn-sm" type="button" id="btn-import">Import .txt</button>
+                <button class="btn btn-secondary btn-sm" type="button" id="btn-export">Export .txt</button>
+              </span>
+            </div>
+
+            {{ form.keywords(class_="textarea", id="kw") }}
+            <div class="counter" style="margin-top:6px">
+              Empty lines are ignored. Matching is case-insensitive by default.
+            </div>
+
+            <div class="toolbar" style="margin-top:12px;justify-content:flex-end">
+              {{ form.submit(class_="btn btn-primary") }}
+            </div>
+          </div>
+        </div>
+
+        <!-- Tester panel -->
+        <aside class="panel">
+          <div class="panel-hd">
+            <strong>Quick tester</strong>
+            <span class="muted">Paste some text to see matches</span>
+          </div>
+          <div class="panel-bd">
+            <label class="label" for="t-input">Sample text</label>
+            <textarea id="t-input" class="input" rows="6" placeholder="Paste a log line, title, description…"></textarea>
+
+            <div class="toolbar" style="margin:10px 0 8px">
+              <label class="btn btn-secondary btn-sm" style="display:inline-flex;align-items:center;gap:8px;cursor:pointer">
+                <input type="checkbox" id="t-case" style="transform:scale(1.1)"> Case sensitive
+              </label>
+              <button class="btn btn-secondary btn-sm" type="button" id="t-run">Test</button>
+              <button class="btn btn-secondary btn-sm" type="button" id="t-clear">Clear</button>
+            </div>
+
+            <div class="hint">Matches:</div>
+            <div id="t-matches" class="result" aria-live="polite">—</div>
+          </div>
+        </aside>
+      </div>
+    </form>
+  </div>
+</section>
+
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const ta = document.getElementById('kw');
+    const lineCount = document.getElementById('line-count');
+
+    function lines() {
+      return (ta.value || '')
+        .split(/\r?\n/)
+        .map(s => s.trim())
+        .filter(Boolean);
+    }
+    function updateCount() { lineCount.textContent = String(lines().length); }
+    function setLines(arr) { ta.value = arr.join('\n'); updateCount(); }
+
+    // Tools
+    document.getElementById('btn-trim').addEventListener('click', () => {
+      setLines(lines().map(s => s.trim()));
+    });
+    document.getElementById('btn-dedupe').addEventListener('click', () => {
+      const seen = new Set(); const out = [];
+      for (const s of lines()) { const k = s.toLowerCase(); if (!seen.has(k)) { seen.add(k); out.push(s); } }
+      setLines(out);
+    });
+    document.getElementById('btn-sort').addEventListener('click', () => {
+      setLines(lines().sort((a,b)=> a.localeCompare(b)));
+    });
+    document.getElementById('btn-lower').addEventListener('click', () => {
+      setLines(lines().map(s => s.toLowerCase()));
+    });
+    document.getElementById('btn-upper').addEventListener('click', () => {
+      setLines(lines().map(s => s.toUpperCase()));
+    });
+
+    // Import / Export
+    document.getElementById('btn-export').addEventListener('click', () => {
+      const blob = new Blob([ta.value || ''], {type:'text/plain'});
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = 'keywords.txt';
+      document.body.appendChild(a); a.click(); a.remove();
+      setTimeout(()=>URL.revokeObjectURL(a.href), 1200);
+    });
+
+    document.getElementById('btn-import').addEventListener('click', () => {
+      const inp = document.createElement('input');
+      inp.type = 'file'; inp.accept = '.txt,text/plain';
+      inp.addEventListener('change', () => {
+        const f = inp.files && inp.files[0]; if (!f) return;
+        const r = new FileReader();
+        r.onload = () => { ta.value = String(r.result || ''); updateCount(); };
+        r.readAsText(f);
+      });
+      inp.click();
+    });
+
+    // Counter live update
+    ta.addEventListener('input', updateCount);
+    updateCount();
+
+    // Tester
+    const tInput = document.getElementById('t-input');
+    const tMatches = document.getElementById('t-matches');
+    const tCase = document.getElementById('t-case');
+
+    function runTest(){
+      const text = tInput.value || '';
+      const kws = lines();
+      if (!text || kws.length === 0) { tMatches.textContent = '—'; return; }
+
+      const hay = tCase.checked ? text : text.toLowerCase();
+      const hits = [];
+      for (const k of kws) {
+        const needle = tCase.checked ? k : k.toLowerCase();
+        if (needle && hay.includes(needle)) hits.push(k);
+      }
+      if (hits.length === 0) { tMatches.textContent = 'No match'; return; }
+      tMatches.innerHTML = hits.map(h => `<span class="kw-badge">${h.replace(/[&<>"]/g, s => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[s]))}</span>`).join(' ');
+    }
+
+    document.getElementById('t-run').addEventListener('click', runTest);
+    document.getElementById('t-clear').addEventListener('click', () => { tInput.value=''; tMatches.textContent='—'; });
+  });
+</script>
+
+{% endblock %}

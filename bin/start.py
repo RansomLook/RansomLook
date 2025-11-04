@@ -2,7 +2,7 @@
 
 from subprocess import Popen, run
 
-from ransomlook.default import get_config, get_homedir
+from ransomlook.default import get_homedir
 
 
 def main() -> None:

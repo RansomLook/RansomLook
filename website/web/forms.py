@@ -1,10 +1,10 @@
 from flask_wtf import FlaskForm # type: ignore
 from wtforms import StringField, PasswordField, BooleanField, SubmitField, SelectField, TextAreaField, FieldList, Form, FormField, IntegerField # type: ignore
 from flask_wtf.file import FileField # type: ignore
-from wtforms.validators import DataRequired, Optional, ReadOnly # type: ignore
+from wtforms.validators import DataRequired, Optional # type: ignore
 
 class AddForm(FlaskForm): # type: ignore
-    category = SelectField('Database', choices=[('','Select a database'),(0, 'Group'),(3,'Market'),(5,'Telegram'),(8,'Twitter')],  default='', validators=[DataRequired()])
+    category = SelectField('Database', choices=[('','Select a database'),(0, 'Group'),(3,'Market')],  default='', validators=[DataRequired()])
     groupname = StringField('Group name', validators=[DataRequired()])
     url = StringField('Url', validators=[Optional()])
     browser = SelectField('Browser', choices=[('','Select a browser'),('chrome', 'chrome'),('firefix','firefox'),('webkit','webkit')],  default='')
@@ -106,3 +106,54 @@ class EditPostForm(Form): # type: ignore
 class EditPostsForm(FlaskForm): # type: ignore
     postslist = FieldList(FormField(EditPostForm), min_entries=0)
     submit = SubmitField('Save changes')
+
+
+# --- Threat Actors ---
+
+class ActorSelectForm(FlaskForm):  # type: ignore
+    actor = SelectField('Actor to edit', coerce=str, validate_choice=True, validators=[DataRequired()])  # type: ignore
+    submit = SubmitField('Edit this actor')
+
+class AddActorForm(FlaskForm):  # type: ignore
+    # Identité / base
+    name = StringField('Pseudonyme principal', validators=[DataRequired()])  # type: ignore
+    aliases = StringField('Pseudos alternatifs (séparés par des virgules)')  # type: ignore
+    bio = TextAreaField('Description générale', render_kw={'rows': 6})  # type: ignore
+    private = BooleanField('Privé')  # type: ignore
+    noactive = BooleanField('No more active')  # type: ignore
+    tags = StringField('Tags (séparés par des virgules)')  # type: ignore
+
+    # Infos personnelles
+    first_name = StringField('Prénom')  # type: ignore
+    last_name  = StringField('Nom')  # type: ignore
+    age        = IntegerField('Âge', validators=[Optional()])  # type: ignore
+    dob        = StringField('Date de naissance (YYYY-MM-DD)')  # type: ignore
+    nationality= StringField('Nationalité')  # type: ignore
+    location   = StringField('Localisation')  # type: ignore
+    id_notes   = StringField('Notes identité')  # type: ignore
+
+    # Wanted
+    fbi_url      = StringField('FBI Most Wanted URL')  # type: ignore
+    europol_url  = StringField('Europol Most Wanted URL')  # type: ignore
+    interpol_url = StringField('INTERPOL Red Notice URL')  # type: ignore
+
+    # Contacts / réseaux (un par ligne)
+    tox       = TextAreaField('Tox (un par ligne)', render_kw={'rows': 2})  # type: ignore
+    telegram  = TextAreaField('Telegram (un par ligne)', render_kw={'rows': 2})  # type: ignore
+    x         = TextAreaField('X/Twitter (un par ligne)', render_kw={'rows': 2})  # type: ignore
+    bluesky   = TextAreaField('Bluesky (un par ligne)', render_kw={'rows': 2})  # type: ignore
+    email     = TextAreaField('Email (un par ligne)', render_kw={'rows': 2})  # type: ignore
+
+    # Relations (séparés par virgules)
+    groups = StringField('Relations Group (clés db=0, séparées par des virgules)')  # type: ignore
+    forums = StringField('Relations Forum/Market (clés db=3, séparées par des virgules)')  # type: ignore
+    peers  = StringField('Autres acteurs (noms, séparés par des virgules)')  # type: ignore
+
+    # Sources (un URL par ligne — titre/notes optionnels seront gérés plus tard)
+    sources = TextAreaField('Liens de documentation/source (un par ligne)', render_kw={'rows': 4})  # type: ignore
+
+    submit = SubmitField('Save')  # type: ignore
+
+class EditActorForm(AddActorForm):  # type: ignore
+    # même champs ; on désactivera "name" côté template pour éviter de renommer la clé
+    pass

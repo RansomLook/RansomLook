@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 import redis
-import os
-from ransomlook.default import get_socket_path, get_config
+from ransomlook.default import get_socket_path
 
 import json
 import csv

@@ -1,12 +1,7 @@
 {
   "static": {
-    "d3.v7.min.js": "vc58qvvBdrDR4etbxMdlTt4GBQk1qjvyORR2nrsPsFPyrs+/u5c3+1Ct6upOgdZoIl7eq6k3a1UPDSNAQi/32A==",
-    "datatables.min.css": "ACFzyS/pMaB3CoarK7aekHljDkNfixvotP0GnePbD6PFbvn7PT4v3nM2uDXyM13ceqESH9CJ7aCRz19rNInvgg==",
-    "datatables.min.js": "VUgHTv8zUr1K/xtRWvjLwZx2RiyuMfhxefJuDMNFQ2KYT9Y/qGKxgLJ2PBSQzyqbb9uoCzYzccAeF2hC7Qa91Q==",
-    "generic-dark.css": "LnVvTJERu8awgf+IwWSGVbJ6Y8Qtykimc4wHmQQmLGdzSkI88DKkSl0K4reUW4VORhainwvZ/eqCllCesc4Cjg==",
-    "generic.css": "aRqh2zXqttrxGDka6eEQaygd+/nWkokZVEPk69q8Ra+ogTZpMIsEg16aKWYv0j7EujZ5k9dzhCLJoYTyLNFC+w==",
-    "generic.js": "UmFl4fHmB/UjMdUuYdFy9BfzQlJTyeImNHCFyBO4SdLxBCwCGxkF3NQvel1PKqW8JTnoPlPpq/n9d+vCfPeegA==",
-    "jquery.min.js": "aVKKRRi/Q/YV+4mjoKBsE4x3H+BkegoM/em46NNlCqNTmUYADjBbeNefNxYV7giUp0VxICtqdrbqU7iVaeZNXA==",
-    "ransomlook.svg": "GZ1A3iwkr/BZ6trI0EVaeh2yFL9huO3QzHvNNt+BZ33XZr/TOg6d3ucpQDpc8VIc/oYrvqRk74t13RnY+AwL6w=="
+    "main.css": "Y6hY6KL9sHC1KnPhrFmGruseQW4iEolBBhc68y363ZPhzRVlF/GnJpJuMhCYE96XVgxvAc1STiyQXRpaVCBrgg==",
+    "main.js": "XuopJqLSyyDyAfrLDD7BIl4JgP2t53tPRYSOufljt3I0q6sigMDPS41P/H8wxATWYJFGHXBWgfgxZuy7c2tdqw==",
+    "plotly.min.js": "7i9wEYbrbsYuFcCvlOk0icJsijxfLfpUsOwh9J7S9baGIZKseOh8L/YMxM1v/PD9/J6PYxKcqmIYIsSQrZ5S7Q=="
   }
 }

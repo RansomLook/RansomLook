@@ -1,0 +1,300 @@
+{% extends "base.html" %}
+{% from 'bootstrap5/utils.html' import render_messages %}
+{% block title %}Compare{% endblock %}
+
+{% block content %}
+{{ render_messages(container=True, dismissible=True) }}
+
+{# ---------- robust defaults ---------- #}
+{% set kind = kind|default('group') %}
+{% set choices_groups = choices_groups|default([]) %}
+{% set choices_markets = choices_markets|default([]) %}
+{% set sel_a = sel_a|default('') %}
+{% set sel_b = sel_b|default('') %}
+{% set a = a|default(None) %}
+{% set b = b|default(None) %}
+{% set error = error|default(None) %}
+
+<section class="hero">
+  <div class="container">
+    <h1>Compare two sources</h1>
+    <p class="lead">Pick two {{ 'groups' if kind=='group' else 'markets/forums' }} to compare (posts 7/30/365, mirrors up, 30-day uptime).</p>
+  </div>
+</section>
+
+<section class="metrics-section">
+  <div class="container">
+
+    <!-- Type switch (same spirit as edit.html) -->
+    <div class="table-card" style="padding:12px; margin-bottom:14px;">
+      <div class="type-toggle" role="tablist" aria-label="Choose type to compare">
+        <input type="radio" name="type" id="t-groups" {% if kind=='group' %}checked{% endif %}>
+        <label for="t-groups" class="btn btn-secondary">Groups</label>
+
+        <input type="radio" name="type" id="t-markets" {% if kind=='market' %}checked{% endif %}>
+        <label for="t-markets" class="btn btn-secondary">Markets / Forums</label>
+      </div>
+    </div>
+
+    <!-- GROUPS form -->
+    <form id="form-groups" action="{{ url_for('compare') }}" method="get" class="table-card admin-form"
+          style="padding:16px; {% if kind!='group' %}display:none;{% endif %}">
+      <input type="hidden" name="kind" value="group">
+
+      <div class="compare-grid">
+        <div>
+          <label class="label" for="gsearchA">Search A</label>
+          <input id="gsearchA" class="input" type="search" placeholder="Filter options for Source A…">
+          <div style="height:8px"></div>
+          <label class="label" for="ga">Source A</label>
+          <select id="ga" name="a" class="input" style="width:100%;">
+            <option value="" disabled {% if not sel_a %}selected{% endif %}>Select a group…</option>
+            {% for g in choices_groups %}
+              <option value="{{ g }}" {% if sel_a and sel_a|lower == g|lower %}selected{% endif %}>{{ g }}</option>
+            {% endfor %}
+          </select>
+        </div>
+
+        <div>
+          <label class="label" for="gsearchB">Search B</label>
+          <input id="gsearchB" class="input" type="search" placeholder="Filter options for Source B…">
+          <div style="height:8px"></div>
+          <label class="label" for="gb">Source B</label>
+          <select id="gb" name="b" class="input" style="width:100%;">
+            <option value="" disabled {% if not sel_b %}selected{% endif %}>Select a group…</option>
+            {% for g in choices_groups %}
+              <option value="{{ g }}" {% if sel_b and sel_b|lower == g|lower %}selected{% endif %}>{{ g }}</option>
+            {% endfor %}
+          </select>
+        </div>
+      </div>
+
+      <div class="actions-row">
+        <button type="button" id="swap-g" class="btn btn-secondary">Swap A ↔ B</button>
+        <div class="spacer"></div>
+        <button class="btn btn-primary" type="submit">Compare</button>
+      </div>
+    </form>
+
+    <!-- MARKETS form -->
+    <form id="form-markets" action="{{ url_for('compare') }}" method="get" class="table-card admin-form"
+          style="padding:16px; {% if kind!='market' %}display:none;{% endif %}">
+      <input type="hidden" name="kind" value="market">
+
+      <div class="compare-grid">
+        <div>
+          <label class="label" for="msearchA">Search A</label>
+          <input id="msearchA" class="input" type="search" placeholder="Filter options for Source A…">
+          <div style="height:8px"></div>
+          <label class="label" for="ma">Source A</label>
+          <select id="ma" name="a" class="input" style="width:100%;">
+            <option value="" disabled {% if not sel_a %}selected{% endif %}>Select a market/forum…</option>
+            {% for m in choices_markets %}
+              <option value="{{ m }}" {% if sel_a and sel_a|lower == m|lower %}selected{% endif %}>{{ m }}</option>
+            {% endfor %}
+          </select>
+        </div>
+
+        <div>
+          <label class="label" for="msearchB">Search B</label>
+          <input id="msearchB" class="input" type="search" placeholder="Filter options for Source B…">
+          <div style="height:8px"></div>
+          <label class="label" for="mb">Source B</label>
+          <select id="mb" name="b" class="input" style="width:100%;">
+            <option value="" disabled {% if not sel_b %}selected{% endif %}>Select a market/forum…</option>
+            {% for m in choices_markets %}
+              <option value="{{ m }}" {% if sel_b and sel_b|lower == m|lower %}selected{% endif %}>{{ m }}</option>
+            {% endfor %}
+          </select>
+        </div>
+      </div>
+
+      <div class="actions-row">
+        <button type="button" id="swap-m" class="btn btn-secondary">Swap A ↔ B</button>
+        <div class="spacer"></div>
+        <button class="btn btn-primary" type="submit">Compare</button>
+      </div>
+    </form>
+
+    <hr class="soft-divider">
+
+    {% if error %}
+      <div class="alert error" style="margin-top:12px">{{ error }}</div>
+    {% endif %}
+
+    {% if a and b %}
+      <!-- Result cards -->
+      <div class="compare-result-grid">
+        <div class="table-card" style="padding:16px;">
+          <h3 style="margin:0 0 8px">{{ a.name }}</h3>
+          <ul class="metric-list">
+            <li><span>Posts 7d</span><b>{{ a.posts7 }}</b></li>
+            <li><span>Posts 30d</span><b>{{ a.posts30 }}</b></li>
+            <li><span>Posts 365d</span><b>{{ a.posts365 }}</b></li>
+            <li><span>Mirrors up</span><b>{{ a.mirrors_up }}/{{ a.mirrors_total }}</b></li>
+            <li><span>Uptime 30d</span>
+              <b>
+                {% if a.uptime30 is not none %}
+                  {{ a.uptime30 }}%
+                {% else %}
+                  {{ ((a.mirrors_up * 100) / (a.mirrors_total or 1))|round(0) }}%
+                {% endif %}
+              </b>
+            </li>
+            <li><span>Captcha</span><b>{{ 'Yes' if a.captcha else 'No' }}</b></li>
+            <li><span>RaaS</span><b>{{ 'Yes' if a.raas else 'No' }}</b></li>
+          </ul>
+        </div>
+
+        <div class="table-card" style="padding:16px;">
+          <h3 style="margin:0 0 8px">{{ b.name }}</h3>
+          <ul class="metric-list">
+            <li><span>Posts 7d</span><b>{{ b.posts7 }}</b></li>
+            <li><span>Posts 30d</span><b>{{ b.posts30 }}</b></li>
+            <li><span>Posts 365d</span><b>{{ b.posts365 }}</b></li>
+            <li><span>Mirrors up</span><b>{{ b.mirrors_up }}/{{ b.mirrors_total }}</b></li>
+            <li><span>Uptime 30d</span>
+              <b>
+                {% if b.uptime30 is not none %}
+                  {{ b.uptime30 }}%
+                {% else %}
+                  {{ ((b.mirrors_up * 100) / (b.mirrors_total or 1))|round(0) }}%
+                {% endif %}
+              </b>
+            </li>
+            <li><span>Captcha</span><b>{{ 'Yes' if b.captcha else 'No' }}</b></li>
+            <li><span>RaaS</span><b>{{ 'Yes' if b.raas else 'No' }}</b></li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- Charts -->
+      <div class="compare-result-grid" style="margin-top:16px">
+        <div class="table-card" style="padding:0">
+          <div id="posts-bars" style="height:340px; margin:8px"></div>
+        </div>
+        <div class="table-card" style="padding:0">
+          <div id="mirrors-gauges" style="height:340px; margin:8px"></div>
+        </div>
+      </div>
+    {% endif %}
+
+  </div>
+</section>
+
+<style>
+/* align with admin/edit look */
+.label{ display:block; color:var(--muted); font-size:.9rem; margin-bottom:4px }
+.input{ background:#0f1623; color:var(--text); border:1px solid var(--border); border-radius:10px; padding:8px 10px; width:100% }
+.type-toggle{ display:flex; gap:8px; align-items:center; }
+.type-toggle input{ display:none; }
+.type-toggle label{ cursor:pointer; }
+.type-toggle input:checked + label{ box-shadow: inset 0 -2px 0 0 var(--pri); }
+
+.compare-grid{ display:grid; grid-template-columns: 1fr 1fr; gap:16px; }
+.actions-row{ display:flex; align-items:center; gap:10px; margin-top:12px; }
+.actions-row .spacer{ flex:1; }
+
+.soft-divider{ border:0; border-top:1px solid var(--border); margin:18px 0; }
+
+.compare-result-grid{ display:grid; grid-template-columns: 1fr 1fr; gap:16px; }
+@media (max-width: 900px){
+  .compare-grid, .compare-result-grid{ grid-template-columns: 1fr; }
+}
+
+/* small metric tiles */
+.metric-list{ list-style:none; padding:0; margin:0; display:grid; grid-template-columns:1fr 1fr; gap:10px }
+.metric-list li{ display:flex; justify-content:space-between; gap:10px; padding:10px 12px; border:1px solid var(--border); border-radius:10px; background:#0f1623 }
+@media (max-width: 900px){ .metric-list{ grid-template-columns:1fr; } }
+</style>
+
+<script src="/static/js/plotly.min.js" defer></script>
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  const rGroups   = document.getElementById('t-groups');
+  const rMarkets  = document.getElementById('t-markets');
+  const fGroups   = document.getElementById('form-groups');
+  const fMarkets  = document.getElementById('form-markets');
+
+  function applyToggle(){
+    const gOn = rGroups.checked;
+    fGroups.style.display  = gOn ? '' : 'none';
+    fMarkets.style.display = gOn ? 'none' : '';
+    // clear all search boxes on switch so nothing is filtered unexpectedly
+    ['gsearchA','gsearchB','msearchA','msearchB'].forEach(id => { const el=document.getElementById(id); if(el) el.value=''; });
+    // reset hidden flags
+    [fGroups, fMarkets].forEach(form => {
+      form.querySelectorAll('select').forEach(sel => {
+        [...sel.options].forEach(o => o.hidden=false);
+      });
+    });
+  }
+  rGroups.addEventListener('change', applyToggle);
+  rMarkets.addEventListener('change', applyToggle);
+  applyToggle();
+
+  // Filter helper — affects only the target select
+  function wireSearch(inputId, selectId){
+    const input = document.getElementById(inputId);
+    const select = document.getElementById(selectId);
+    if(!input || !select) return;
+    input.addEventListener('input', () => {
+      const q = (input.value || '').toLowerCase().trim();
+      for(const opt of select.options){
+        const txt = (opt.textContent || '').toLowerCase();
+        opt.hidden = q && !txt.includes(q);
+      }
+      // keep a visible option selected if current is hidden
+      if (select.selectedOptions.length && select.selectedOptions[0].hidden){
+        const firstVisible = [...select.options].find(o => !o.hidden && !o.disabled);
+        if (firstVisible) firstVisible.selected = true;
+      }
+    });
+  }
+
+  // Per-list search (independent)
+  wireSearch('gsearchA','ga'); wireSearch('gsearchB','gb');
+  wireSearch('msearchA','ma'); wireSearch('msearchB','mb');
+
+  // Swap buttons
+  function hookSwap(btnId, aId, bId){
+    const btn = document.getElementById(btnId);
+    const aSel = document.getElementById(aId);
+    const bSel = document.getElementById(bId);
+    if (!btn || !aSel || !bSel) return;
+    btn.addEventListener('click', () => {
+      const va = aSel.value, vb = bSel.value;
+      aSel.value = vb || '';
+      bSel.value = va || '';
+    });
+  }
+  hookSwap('swap-g', 'ga', 'gb');
+  hookSwap('swap-m', 'ma', 'mb');
+
+  // Charts
+  {% if a and b %}
+  function bars(){
+    if (!window.Plotly) return;
+    Plotly.newPlot('posts-bars', [
+      { name: '{{ a.name|e }}', y: [{{ a.posts7 }}, {{ a.posts30 }}, {{ a.posts365 }}], x: ['7d','30d','365d'], type:'bar' },
+      { name: '{{ b.name|e }}', y: [{{ b.posts7 }}, {{ b.posts30 }}, {{ b.posts365 }}], x: ['7d','30d','365d'], type:'bar' }
+    ], { barmode:'group', paper_bgcolor:'rgba(0,0,0,0)', plot_bgcolor:'rgba(0,0,0,0)',
+         font:{color:'#e5e7eb'}, margin:{l:48,r:18,t:18,b:48} }, {displayModeBar:false});
+  }
+  function gauges(){
+    if (!window.Plotly) return;
+    const aPct = {{ a.uptime30 if a.uptime30 is not none else ((a.mirrors_up * 100) / (a.mirrors_total or 1))|round(0) }};
+    const bPct = {{ b.uptime30 if b.uptime30 is not none else ((b.mirrors_up * 100) / (b.mirrors_total or 1))|round(0) }};
+    Plotly.newPlot('mirrors-gauges', [
+      { type:'indicator', mode:'gauge+number', value:aPct,
+        gauge:{axis:{range:[0,100]}}, domain:{x:[0,0.48],y:[0,1]}, title:{text:'{{ a.name|e }} UP %'} },
+      { type:'indicator', mode:'gauge+number', value:bPct,
+        gauge:{axis:{range:[0,100]}}, domain:{x:[0.52,1],y:[0,1]}, title:{text:'{{ b.name|e }} UP %'} }
+    ], { paper_bgcolor:'rgba(0,0,0,0)', font:{color:'#e5e7eb'}, margin:{l:40,r:40,t:24,b:16} }, {displayModeBar:false});
+  }
+  if (document.readyState === 'complete') { bars(); gauges(); }
+  else window.addEventListener('load', () => { bars(); gauges(); });
+  {% endif %}
+});
+</script>
+{% endblock %}

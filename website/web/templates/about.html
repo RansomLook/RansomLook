@@ -1,68 +1,138 @@
 {% extends "base.html" %}
-{% from 'bootstrap5/utils.html' import render_messages %}
-{% block title %}About...{% endblock %}
+
+{% block title %}RansomLook — {{ _('About') if _ else 'About' }}{% endblock %}
+
 {% block content %}
-{{ render_messages(container=True, dismissible=True) }}
 
-    <article id="main" class="markdown-section">
-        <center>
-                <h1>About 🦕 RansomLook 🦖 !</h1><br/>
-                <img src="/static/ransomlook.svg" width="400">
-        </center>
-        <h3>What is RansomLook ?</h3>
-		
-       <p>RansomLook is an open-source project aimed at assisting users in tracking ransomware-related posts and activities across various sites, forums, and Telegram channels. <br/>The main components include:</p>
-		<ul>
-			<li>Blog monitoring and victim extraction</li>
-			<li>Forum monitoring (parsing is not available)</li>
-			<li>Overview of Ransomware Notes</li>
-			<li>Tracking leaks from public sources</li>
-			<li>Leak tracking from RecordedFuture provider (private API required)</li>
-			<li>Monitoring of public Telegram channels</li>
-			<li>Twitter account monitoring</li>
-			<li>Monitoring of various known Bitcoin wallets</li>
-		</ul>
+<!-- Hero -->
+<section class="hero">
+  <div class="container">
+      <center><img src="{{ url_for('static', filename=logo) }}" alt="RansomLook logo" width="400"></center>
+    <h1>{{ _('About RansomLook') if _ else 'About RansomLook' }}</h1>
+    <p class="lead">
+      {{ _("Open-source project providing real‑time ransomware intelligence: tracked groups, posts, mirrors, forums, and more.") 
+         if _ else "Open‑source project providing real‑time ransomware intelligence: tracked groups, posts, mirrors, forums, and more." }}
+    </p>
+  </div>
+</section>
 
-		<h3>Is it free?</h3>
-	    <p>Yes, it is free, and more importantly, it is <b>open-source</b>.</p>
-	    <p>RansomLook is licensed under the GNU General Public License v3.0.</p>
+<!-- What is RansomLook? -->
+<section class="about-section">
+  <div class="container prose">
+    <h2 id="what-is">{{ _('What is RansomLook?') if _ else 'What is RansomLook?' }}</h2>
+    <p>
+      {{ _("RansomLook is an open‑source project aimed at assisting users in tracking ransomware‑related posts and activities across various sites and forums.") 
+         if _ else "RansomLook is an open‑source project aimed at assisting users in tracking ransomware‑related posts and activities across various sites and forums." }}
+    </p>
+    <p>{{ _("The main components include:") if _ else "The main components include:" }}</p>
+    <ul>
+      <li>{{ _("Blog monitoring and victim extraction") if _ else "Blog monitoring and victim extraction" }}</li>
+      <li>{{ _("Forum monitoring (parsing is not available)") if _ else "Forum monitoring (parsing is not available)" }}</li>
+      <li>{{ _("Overview of Ransomware Notes") if _ else "Overview of Ransomware Notes" }}</li>
+      <li>{{ _("Tracking leaks from public sources") if _ else "Tracking leaks from public sources" }}</li>
+      <li>{{ _("Leak tracking from RecordedFuture provider (private API required)") if _ else "Leak tracking from RecordedFuture provider (private API required)" }}</li>
+      <li>{{ _("Monitoring of various known Bitcoin wallets") if _ else "Monitoring of various known Bitcoin wallets" }}</li>
+    </ul>
+  </div>
+</section>
 
-		<h3>How can I follow new posts?</h3>
-		<p>There are various ways to stay updated with new posts:</p>
-		<ul>
-			<li>By running your own instance and enabling RocketChat and/or email notifications</li>
-			<li>By checking the public instance: <a href='https://www.ransomlook.io'>https://www.ransomlook.io</a></li>
-			<li>By accessing the <a href='https://www.ransomlook.io/doc'>API</a></li>
-			<li>By following us on Mastodon: <a href='https://social.circl.lu/@Ransomlook'>@Ransomlook@social.circl.lu</a></li>
-		</ul>
-		<p>There is NO official Telegram Channel!</p>
+<!-- Is it free? -->
+<section class="about-section">
+  <div class="container prose">
+    <h2 id="license">{{ _('Is it free?') if _ else 'Is it free?' }}</h2>
+    <p>
+      {{ _("Yes, it is free—and more importantly, it is open‑source.") 
+         if _ else "Yes, it is free—and more importantly, it is open‑source." }}
+    </p>
+    <p>
+      {{ _("RansomLook is licensed under the GNU Affero General Public License (AGPL) v3.0.") 
+         if _ else "RansomLook is licensed under the GNU Affero General Public License (AGPL) v3.0." }}
+    </p>
+  </div>
+</section>
 
-		<h3>Want to Be Part of the RansomLook Community?</h3>
-		<p>Join us in making RansomLook even better! Here's how you can contribute:</p>
-		<ul>
-			<li>Create an issue on our <a href='https://github.com/RansomLook/RansomLook'>GitHub repository</a>.</li>
-			<li>Submit your pull requests with new features or improvements.</li>
-			<li>Share new sources of DLS (Darknet Leak Sites) with us.</li>
-			<li>Report any bugs you come across.</li>
-			<li>Suggest exciting new functionalities that could enhance RansomLook.</li>
-		</ul>
+<!-- How to follow new posts -->
+<section class="about-section">
+  <div class="container prose">
+    <h2 id="follow">{{ _('How can I follow new posts?') if _ else 'How can I follow new posts?' }}</h2>
+    <p>{{ _("There are various ways to stay updated with new posts:") if _ else "There are various ways to stay updated with new posts:" }}</p>
+    <ul>
+      <li>{{ _("Run your own instance and enable RocketChat and/or email notifications") if _ else "Run your own instance and enable RocketChat and/or email notifications" }}</li>
+      <li>
+        {{ _("Check the public instance") if _ else "Check the public instance" }}:
+        <a href="https://www.ransomlook.io" target="_blank" rel="noopener">ransomlook.io</a>
+      </li>
+      <li>
+        {{ _("Access the API") if _ else "Access the API" }} —
+        <a href="/doc/">{{ _('Documentation') if _ else 'Documentation' }}</a>
+      </li>
+      <li>
+        {{ _("Follow us on Mastodon") if _ else "Follow us on Mastodon" }}:
+        <a href="https://social.circl.lu/@Ransomlook" target="_blank" rel="me noopener">@Ransomlook@social.circl.lu</a>
+      </li>
+    </ul>
+    <p><strong>{{ _("There is NO official Telegram Channel!") if _ else "There is NO official Telegram Channel!" }}</strong></p>
+  </div>
+</section>
 
-        <h3>Credits & Thanks</h3>
-        <p>RansomLook is maintained by <a href='https://github.com/adulau/'>Alexandre Dulaunoy</a> and <a href='https://github.com/fafnerkeyzee'>Fafner [_KeyZee_]</a>.</p>
-        <p>We thank <a href='https://www.linkedin.com/in/tammyharper11'>Tammy Harper</a> for her contributions to adding new groups and her regular feedback to improve the project.</p>
-        <p>The code is based on <a href='https://github.com/joshhighet/ransomwatch'>RansomWatch</a>.
-        <p>External data are from:
-        <ul>
-        <li>Malpedia for description</li>
-        <li>Ransomwhe.re for cryptoCurrency</li>
-        <li>threatlabz for the RansomNotes</li>
-        <li>leak-lookup for the public leaks</li>
-        </ul>
-        </p>
+<!-- Community -->
+<section class="about-section">
+  <div class="container prose">
+    <h2 id="community">{{ _('Want to be part of the RansomLook community?') if _ else 'Want to be part of the RansomLook community?' }}</h2>
+    <p>{{ _("Join us in making RansomLook even better! Here's how you can contribute:") if _ else "Join us in making RansomLook even better! Here's how you can contribute:" }}</p>
+    <ul>
+      <li>
+        {{ _("Create an issue on our GitHub repository") if _ else "Create an issue on our GitHub repository" }} —
+        <a href="https://github.com/RansomLook/RansomLook" target="_blank" rel="noopener">GitHub</a>
+      </li>
+      <li>{{ _("Submit pull requests with new features or improvements") if _ else "Submit pull requests with new features or improvements" }}</li>
+      <li>{{ _("Share new sources of DLS (Darknet Leak Sites)") if _ else "Share new sources of DLS (Darknet Leak Sites)" }}</li>
+      <li>{{ _("Report any bugs you come across") if _ else "Report any bugs you come across" }}</li>
+      <li>{{ _("Suggest new functionalities that could enhance RansomLook") if _ else "Suggest new functionalities that could enhance RansomLook" }}</li>
+    </ul>
+  </div>
+</section>
 
-        <h3>Usage of the API and License</h3>
-        <p>All content provided by <b>ransomlook.io</b> - including the website, API responses, and datasets - is made available under the <a href="https://creativecommons.org/licenses/by/4.0/">Creative Commons Attribution 4.0 International (CC BY 4.0)</a> license.
-        <p>You are free to share and adapt the material for any purpose, even commercially, provided that appropriate credit is given.</p>
+<!-- Credits -->
+<section class="about-section">
+  <div class="container prose">
+    <h2 id="credits">{{ _('Credits & Thanks') if _ else 'Credits & Thanks' }}</h2>
+    {% set maint_html = 'RansomLook is maintained by <a href="https://github.com/adulau/" target="_blank" rel="noopener">Alexandre Dulaunoy</a> and <a href="https://github.com/fafnerkeyzee" target="_blank" rel="noopener">Fafner [_KeyZee_]</a>.' %}
+    <p>{{ (_(maint_html) if _ else maint_html) | safe }}</p>
+    {% set thanks_html = 'We thank <a href="https://www.linkedin.com/in/tammyharper11" target="_blank" rel="noopener">Tammy Harper</a> for her contributions to adding new groups and her regular feedback to improve the project.' %}
+    <p>{{ (_(thanks_html) if _ else thanks_html) | safe }}</p>
+    <p>We warmly thank <a href="https://ecrime.ch" target="_blank" rel="noopener">Ecrime.ch</a> for its feedback and sharing on the group.</p>
+    <p>We also thank <a href="https://ransom-isac.com/" target="_blank" rel="noopener">Ransom-ISAC</a>. Ransom-ISAC takes a left-field, unique approach to threat intelligence by building a community-driven, vendor-neutral ecosystem focused on openness and collaboration. It connects defenders of all sizes to share actionable ransomware insights in a trusted, transparent space, strengthening global resilience through collective knowledge and shared purpose.</p>
+    <p>Main members of RansomLook have an opportunity to earn a <a href="https://ransom-isac.com/lockstar-members/" target="_blank" rel="noopener">LOCKSTAR</a>. The LOCK STAR Initiative empowers researchers, cybersecurity professionals, and enthusiasts to share their knowledge and intelligence through blogs, conference presentations, and active community contributions. By creating space for open collaboration and knowledge exchange, the initiative encourages diverse voices to contribute insights, tools, and real-world experiences — strengthening collective understanding and resilience against ransomware and other evolving cyber threats.</p>
+    <p>{{ _("The code is based on RansomWatch.") if _ else "The code is based on RansomWatch." }}</p>
+  </div>
+</section>
 
-    </article>
+<!-- External data -->
+<section class="about-section">
+  <div class="container prose">
+    <h2 id="sources">{{ _('External data sources') if _ else 'External data sources' }}</h2>
+    <ul>
+      <li>{{ _("Ransomwhe.re for cryptocurrency addresses") if _ else "Ransomwhe.re for cryptocurrency addresses" }}</li>
+      <li>{{ _("ThreatLabz for the RansomNotes") if _ else "ThreatLabz for the RansomNotes" }}</li>
+      <li>{{ _("leak-lookup for public leaks") if _ else "leak-lookup for public leaks" }}</li>
+    </ul>
+  </div>
+</section>
+
+<!-- API & License -->
+<section class="about-section">
+  <div class="container prose">
+    <h2 id="license-usage">{{ _('Usage of the API and License') if _ else 'Usage of the API and License' }}</h2>
+    <p>
+      {{ _("All content provided by ransomlook.io — including the website, API responses, and datasets — is made available under the Creative Commons Attribution 4.0 International (CC BY 4.0) license.") 
+         if _ else "All content provided by ransomlook.io — including the website, API responses, and datasets — is made available under the Creative Commons Attribution 4.0 International (CC BY 4.0) license." }}
+    </p>
+    <p>
+      {{ _("You are free to share and adapt the material for any purpose, even commercially, provided that appropriate credit is given.") 
+         if _ else "You are free to share and adapt the material for any purpose, even commercially, provided that appropriate credit is given." }}
+    </p>
+  </div>
+</section>
+
 {% endblock %}

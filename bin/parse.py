@@ -3,21 +3,15 @@
 import importlib
 from os.path import dirname, basename, isfile, join
 import glob
-import json
 
-from datetime import datetime
-from datetime import timedelta
 
-import collections
 
 import redis
 
-from ransomlook.default.config import get_config, get_socket_path
+from ransomlook.default.config import get_socket_path
 
 from ransomlook.posts import appender
-from ransomlook.sharedutils import dbglog, stdlog, errlog, statsgroup, run_data_viz
 
-from typing import Dict, Optional, Union, Any, List
 
 def main() -> None:
     modules = glob.glob(join(dirname('ransomlook/parsers/'), "*.py"))
@@ -34,12 +28,6 @@ def main() -> None:
             print(e)
             pass
     red = redis.Redis(unix_socket_path=get_socket_path('cache'), db=2)
-    for key in red.keys():
-        statsgroup(key)
-    run_data_viz(7)
-    run_data_viz(14)
-    run_data_viz(30)
-    run_data_viz(90)
 
 if __name__ == '__main__':
     main()

@@ -13,7 +13,13 @@ if __name__ == '__main__':
 
     to_save: Dict[str, Dict[str, str]] = {'static': {}}
 
-    for resource in (dest_dir / 'static').glob('*'):
+    for resource in (dest_dir / 'static/js').glob('*'):
+        if resource.name[0] == '.':
+            continue
+        with resource.open('rb') as f:
+            to_save['static'][resource.name] = base64.b64encode(hashlib.sha512(f.read()).digest()).decode('utf-8')
+
+    for resource in (dest_dir / 'static/css').glob('*'):
         if resource.name[0] == '.':
             continue
         with resource.open('rb') as f:

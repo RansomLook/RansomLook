@@ -1,326 +1,1009 @@
 {% extends "base.html" %}
-{% block title %}{{group['name']}} details{% endblock %}
+{% block title %}{{ group['name'] }} details{% endblock %}
+
 {% block content %}
-    <article id="main" class="markdown-section">
-	<h1 style="display:inline">{{group['name'].title()}}</h1>
-        {% if current_user.is_authenticated %}<em style="display:inline"><a href="/admin/edit/{{group['db']}}/{{group['name']| urlencode}}" style="color: orange">Edit group</a></em>{%endif%}
-        <p>{% for item in logo %}
-            <img src="{{item}}" style="max-height:150px;max-width:150px;height:auto;width:auto;" >
-        {% endfor %}
-        </p>
-        {% if group['name'].lower() in parser %}
-        <p><em>Parsing : <code>Enabled</code></em></p>
-        {% endif %} 
-        {% if 'raas' in group and group['raas'] is true %}
-        <p><em>Known to be a RaaS</em></p>
-        {% endif %}
-        {% if 'captcha' in group and group['captcha'] is true %}
-        <p><em>Known to use a Captcha to block crawling.</em></p>
-        {% endif %}
-        {% if group['meta'] is not none %}
-        <h4>Description</h4>
-        <p>{{group['meta']|safe}}</p>
-        {% endif %}
-        {% if group['profile'][0] %}
-        <table id="table" class="table" style="display:table; table-layout:auto; width:100%">
-          <thead>
-            <tr>
-                <th> External Analysis </th>
-            </tr>
-          </thead>
-          <tbody>
-          {% for profile in group['profile'] %}
-          <tr><td>{{profile}}</td></tr>
-          {% endfor %}
-          </tbody>
-        </table>
-        {% endif %}
-        {% if 'hash' in group and group['hash'].split()[0] %}
-        <table id="table" class="table" style="display:table; table-layout:auto; width:100%">
-          <thead>
-            <tr>
-                <th> Known hashes </th>
-            </tr>
-          </thead>
-          <tbody>
-          {% for hash in group['hash'].split() %}
-          <tr><td>{{hash}}</td></tr>
-          {% endfor %}
-          </tbody>
-        </table>
-        {% endif %}
-        {% if 'jabber' in group and group['jabber'].split()[0] %}
-        <table id="table" class="table" style="display:table; table-layout:auto; width:100%">
-          <thead>
-            <tr>
-                <th> Jabber </th>
-            </tr>
-          </thead>
-          <tbody>
-          {% for jabber in group['jabber'].split() %}
-          <tr><td>{{jabber}}</td></tr>
-          {% endfor %}
-          </tbody>
-        </table>
-        {% endif %}
-        {% if 'mail' in group and group['mail'].split()[0] %}
-        <table id="table" class="table" style="display:table; table-layout:auto; width:100%">
-          <thead>
-            <tr>
-                <th> Mail </th>
-            </tr>
-          </thead>
-          <tbody>
-          {% for mail in group['mail'].split() %}
-          <tr><td>{{mail}}</td></tr>
-          {% endfor %}
-          </tbody>
-        </table>
-        {% endif %}
-        {% if 'pgp' in group and group['pgp'].split()[0] %}
-        <table id="table" class="table" style="display:table; table-layout:auto; width:100%">
-          <thead>
-            <tr>
-                <th> PGP </th>
-            </tr>
-          </thead>
-          <tbody>
-          {% for pgp in group['pgp'].split('|') %}
-          <tr><td>{{pgp}}</td></tr>
-          {% endfor %}
-          </tbody>
-        </table>
-        {% endif %}
-        {% if 'matrix' in group and group['matrix'].split()[0] %}
-        <table id="table" class="table" style="display:table; table-layout:auto; width:100%">
-          <thead>
-            <tr>
-                <th> Matrix </th>
-            </tr>
-          </thead>
-          <tbody>
-          {% for matrix in group['matrix'].split() %}
-          <tr><td>{{matrix}}</td></tr>
-          {% endfor %}
-          </tbody>
-        </table>
-        {% endif %}
-        {% if 'session' in group and group['session'].split()[0] %}
-        <table id="table" class="table" style="display:table; table-layout:auto; width:100%">
-          <thead>
-            <tr>
-                <th> Session </th>
-            </tr>
-          </thead>
-          <tbody>
-          {% for session in group['session'].split() %}
-          <tr><td>{{session}}</td></tr>
-          {% endfor %}
-          </tbody>
-        </table>
-        {% endif %}
-        {% if 'telegram' in group and group['telegram'].split()[0] %}
-        <table id="table" class="table" style="display:table; table-layout:auto; width:100%">
-          <thead>
-            <tr>
-                <th> Telegram </th>
-            </tr>
-          </thead>
-          <tbody>
-          {% for telegram in group['telegram'].split() %}
-          <tr><td>{{telegram}}</td></tr>
-          {% endfor %}
-          </tbody>
-        </table>
-        {% endif %}
-        {% if 'tox' in group and group['tox'].split()[0] %}
-        <table id="table" class="table" style="display:table; table-layout:auto; width:100%">
-          <thead>
-            <tr>
-                <th> Tox </th>
-            </tr>
-          </thead>
-          <tbody>
-          {% for tox in group['tox'].split() %}
-          <tr><td>{{tox}}</td></tr>
-          {% endfor %}
-          </tbody>
-        </table>
-        {% endif %}
-        {% if 'affiliates' in group and group['affiliates'].split()[0] %}
-        <table id="table" class="table" style="display:table; table-layout:auto; width:100%">
-          <thead>
-            <tr>
-                <th> Affiliates </th>
-            </tr>
-          </thead>
-          <tbody>
-          {% for affiliates in group['affiliates'].splitlines() %}
-          <tr><td>{{affiliates}}</td></tr>
-          {% endfor %}
-          </tbody>
-        </table>
-        {% endif %}
-        {% if 'other' in group and group['other'].split()[0] %}
-        <table id="table" class="table" style="display:table; table-layout:auto; width:100%">
-          <thead>
-            <tr>
-                <th> Other </th>
-            </tr>
-          </thead>
-          <tbody>
-          {% for other in group['other'].splitlines() %}
-          <tr><td>{{other}}</td></tr>
-          {% endfor %}
-          </tbody>
-        </table>
-        {% endif %}
-        <table id="table" class="table" style="display:table; table-layout:auto; width:100%">
-          <thead>
-            <tr>
-                <th>Urls</th>
-                <th style="width:10%" ><center>Screen</center></th>
-            </tr>
-          </thead>
-          <tbody>
-        {% for location in group['locations'] %}
-          {% if current_user.is_authenticated or not 'private' in location or location['private'] is false %}
-            {% if (not 'fs' in location or location['fs'] is false) and (not 'chat' in location or location['chat'] is false) and (not 'admin' in location or location['admin'] is false) %}
-            {% if location['private'] is true %}
-            <tr><td style="color: red;"> {{location['slug']}} </td>
-            {% else %}
-            <tr><td> {{location['slug']}} </td>
-            {% endif %}
-                {% if 'screen' in location %}
-                <td><center><a href="{{ location['screen'] }}" rel="noopener noreferrer" target="_blank">Screen</a></center></td>
-                {% else %}
-                <td> </td>
-                {% endif %}
-            </tr>
-            {% endif %}
-          {% endif %}
-        {% endfor %}
-          </tbody>
-        </table>
 
-        <table id="table" class="table" style="display:table; table-layout:auto; width:100%">
-          <thead>
-            <tr>
-                <th>File servers</th>
-                <th style="width:10%" ><center>Screen</center></th>
-            </tr>
-          </thead>
-          <tbody>
-        {% for location in group['locations'] %}
-          {% if current_user.is_authenticated or not 'private' in location or location['private'] is false %} 
-            {% if 'fs' in location and location['fs'] is true %}
-            {% if location['private'] is true %}
-            <tr><td style="color: red;"> {{location['slug']}} </td>
-            {% else %}
-            <tr><td> {{location['slug']}} </td>
-            {% endif %}
-                {% if 'screen' in location %}
-                <td><center><a href="{{ location['screen'] }}" rel="noopener noreferrer" target="_blank">Screen</a></center></td>
-                {% else %}
-                <td> </td>
-                {% endif %}
-            </tr>
-            {% endif %}
-          {% endif %}
-        {% endfor %}
-          </tbody>
-        </table>
+<!-- ===== HERO ===== -->
+<section class="hero">
+  <div class="container">
+    <h1 style="display:inline">{{ group['name'].title() }}</h1>
+    {% if current_user.is_authenticated %}
+      <a class="edit-link" href="/admin/edit/{{ group['db'] }}/{{ group['name']|urlencode }}">Edit group</a>
+    {% endif %}
+      <a class="btn" href="{{ url_for('compare') }}">Compare</a>
+  </div>
 
-        <table id="table" class="table" style="display:table; table-layout:auto; width:100%">
-          <thead>
-            <tr>
-                <th>Chat servers</th>
-                <th style="width:10%" ><center>Screen</center></th>
-            </tr>
-          </thead>
-          <tbody>
-        {% for location in group['locations'] %}
-          {% if current_user.is_authenticated or not 'private' in location or location['private'] is false %} 
-            {% if 'chat' in location and location['chat'] is true %}
-            {% if location['private'] is true %}
-            <tr><td style="color: red;"> {{location['slug']}} </td>
-            {% else %}
-            <tr><td> {{location['slug']}} </td>
-            {% endif %}
-                {% if 'screen' in location %}
-                <td><center><a href="{{ location['screen'] }}" rel="noopener noreferrer" target="_blank">Screen</a></center></td>
-                {% else %}
-                <td> </td>
-                {% endif %}
-            </tr>
-            {% endif %}
-           {% endif %}
-        {% endfor %}
-          </tbody>
-        </table>
+<style>
+.badge-status{display:inline-block;padding:2px 8px;border-radius:999px;font-size:12px;border:1px solid var(--border)}
+.badge-up{background:#11371e;color:#b5f7c8;border-color:#1e6b37}
+.badge-down{background:#3a1111;color:#ffc0c0;border-color:#7a2a2a}
+.badge-unknown{background:#2a2f3a;color:#d1d5db;border-color:#4b5563}
+.spark{width:120px;height:28px}.uptime-cell{white-space:nowrap}
+</style>
+</section>
 
-        <table id="table" class="table" style="display:table; table-layout:auto; width:100%">
-          <thead>
-            <tr>
-                <th>Admin servers</th>
-                <th style="width:10%" ><center>Screen</center></th>
-            </tr>
-          </thead>
-          <tbody>
-        {% for location in group['locations'] %}
-          {% if current_user.is_authenticated or not 'private' in location or location['private'] is false %} 
-            {% if 'admin' in location and location['admin'] is true %}
-            {% if location['private'] is true %}
-            <tr><td style="color: red;"> {{location['slug']}} </td>
-            {% else %}
-            <tr><td> {{location['slug']}} </td>
-            {% endif %}
-                {% if 'screen' in location %}
-                <td><center><a href="{{ location['screen'] }}" rel="noopener noreferrer" target="_blank">Screen</a></center></td>
-                {% else %}
-                <td> </td>
-                {% endif %}
-            </tr>
-            {% endif %}
-           {% endif %}
-        {% endfor %}
-          </tbody>
-        </table>
+<section class="metrics-section">
+  <div class="container">
 
-        {% if posts %}
-        <center><img src="/stats/{{ group['name'] }}.png"></center>
-        
-        <h4>Posts</h4>
-        <table id="table" class="table" style="display:table; table-layout:auto; width:100%">
-          <thead>
-            <tr>
-                <th style="width:10%"> Date </th>
-                <th style="width:25%"> Title </th>
-                <th style="word-break:break-all width:55%"> Description </th>
-                <th style="width:10%"> Screen </th>
-            </tr>
-          </thead>
-          <tbody>
-            {% for entry in posts %}
+    {# ===== Logos ===== #}
+    {% if logo %}
+      <div class="logo-grid">
+        {% for item in logo %}
+          <img src="{{ item }}" alt="{{ group['name'] }} logo">
+        {% endfor %}
+      </div>
+    {% endif %}
+
+    {# ===== Badges infos ===== #}
+    <div class="profile-badges" style="margin-bottom:14px;">
+      {% if group['name'].lower() in parser %}<span class="badge-neutral">Parsing: enabled</span>{% endif %}
+      {% if group.get('raas') %}<span class="badge-neutral">Known RaaS</span>{% endif %}
+      {% if group.get('captcha') %}<span class="badge-neutral">Captcha in place</span>{% endif %}
+      {% if group.get('private') %}<span class="badge-private">Private</span>{% endif %}
+    </div>
+
+    
+<div class="table-card" style="padding:12px;margin:12px 0">
+  <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap">
+    <!-- RIGHT: Export URLs -->
+    <form method="get"
+          action="{% if group['db'] == 0 %}{{ url_for('group_urls_csv', name=group['name']) }}{% else %}{{ url_for('market_urls_csv', name=group['name']) }}{% endif %}"
+          class="filters"
+          style="display:inline-flex;gap:8px;align-items:center">
+      <label for="csv-status" class="label" style="margin:0">Export URLs (CSV)</label>
+      <select id="csv-status" name="status" class="input" style="padding:6px 8px">
+        <option value="all" selected>All statuses</option>
+        <option value="active">Active</option>
+        <option value="inactive">Inactive</option>
+      </select>
+      <button type="submit" class="btn btn-secondary btn-sm">CSV</button>
+    </form>
+    <!-- LEFT: Export Posts -->
+    {% if posts %}
+    <form method="get"
+          action="{% if group['db'] == 0 %}{{ url_for('group_posts_csv', name=group['name']) }}{% else %}{{ url_for('market_posts_csv', name=group['name']) }}{% endif %}"
+          class="filters" style="display:inline-flex;gap:8px;align-items:center;flex-wrap:wrap">
+      <label class="label" style="margin:0">Export Posts (CSV)</label>
+      <input type="date" name="from" aria-label="From date">
+      <span>→</span>
+      <input type="date" name="to" aria-label="To date">
+      <button type="submit" class="btn btn-secondary btn-sm">CSV</button>
+    </form>
+    {% endif %}
+
+  </div>
+</div>
+
+{% if crypto_link %}
+  <p class="lead" style="margin-top: .5rem">
+    <a class="btn" href="{{ crypto_link }}" title="View crypto">
+      View crypto
+    </a>
+  </p>
+{% endif %}
+
+
+{# ===== Description ===== #}
+    {% if group['meta'] is not none %}
+      <div class="profile-desc prose">
+        <h3 class="section-title" style="padding:0">Description</h3>
+        <p>{{ group['meta']|safe }}</p>
+      </div>
+    {% endif %}
+
+    {# ===== Pré-calcul des listes par catégorie ===== #}
+    {% set ns = namespace(urls=[], fs=[], chat=[], admin=[]) %}
+    {% for location in group['locations'] %}
+      {% set visible = current_user.is_authenticated or not location.get('private') %}
+      {% if visible %}
+        {% if location.get('fs') %}
+          {% set ns.fs = ns.fs + [location] %}
+        {% elif location.get('chat') %}
+          {% set ns.chat = ns.chat + [location] %}
+        {% elif location.get('admin') %}
+          {% set ns.admin = ns.admin + [location] %}
+        {% else %}
+          {% set ns.urls = ns.urls + [location] %}
+        {% endif %}
+      {% endif %}
+    {% endfor %}
+
+    {# ===== External analysis ===== #}
+    {% set ext_count = (group['profile']|length) if (group['profile'] and group['profile'][0]) else 0 %}
+    {% if ext_count %}
+    <details class="section-block" data-accordion>
+      <summary class="section-summary">
+        <span>External Analysis</span><span class="count">{{ ext_count }}</span>
+      </summary>
+      <div class="table-card">
+        <div class="table-scroll">
+          <table class="rl-table" aria-label="External analysis">
+            <thead><tr><th>External Analysis</th></tr></thead>
+            <tbody>
+              {% for profile in group['profile'] %}
+                <tr><td>{{ profile }}</td></tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </details>
+    {% endif %}
+
+{# ===== Ransom notes ===== #}
+{% if note_count is defined and note_count > 0%}
+<details class="section-block" data-accordion>
+  <summary class="section-summary">
+    <span>Ransom notes</span><span class="count">{{ note_count }}</span>
+  </summary>
+
+  {# IMPORTANT: id="ransom-notes" pour scoper le JS #}
+  <div id="ransom-notes" class="table-card" style="padding:12px;">
+    {% if note_previews and note_previews|length %}
+      <div class="list-group">
+        <ul>
+        {% for n in note_previews %}
+          <li><a href="#"
+             class="list-group-item list-group-item-action d-flex justify-content-between align-items-center js-open-note"
+             data-note-id="{{ n.id }}" role="button">
+            <span>
+              <strong>{{ n.title }}</strong>
+            </span>
+            <span class="badge bg-light text-dark">(Format: {{ n.format }})</span>
+          </a></li>
+        {% endfor %}
+        </ul>
+      </div>
+      <div class="mt-2" style="display:flex;justify-content:center;">
+        <a class="btn" href="{{ url_for('notesdetails', name=group['name']) }}">View all notes</a>
+      </div>
+    {% else %}
+      <p class="text-muted" style="margin:8px 0 0">No note linked.</p>
+    {% endif %}
+  </div>
+</details>
+{% endif %}
+
+    {# ===== Known hashes ===== #}
+    {% set hashes = (group.get('hash') or '').split() %}
+    {% if hashes %}
+    <details class="section-block" data-accordion>
+      <summary class="section-summary">
+        <span>Known hashes</span><span class="count">{{ hashes|length }}</span>
+      </summary>
+      <div class="table-card">
+        <div class="table-scroll">
+          <table class="rl-table" aria-label="Known hashes">
+            <thead><tr><th>Hash</th></tr></thead>
+            <tbody>
+              {% for h in hashes %}
+                <tr><td><code>{{ h }}</code></td></tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </details>
+    {% endif %}
+
+    {# ===== Jabber ===== #}
+    {% set jabbers = (group.get('jabber') or '').split() %}
+    {% if jabbers %}
+    <details class="section-block" data-accordion>
+      <summary class="section-summary">
+        <span>Jabber</span><span class="count">{{ jabbers|length }}</span>
+      </summary>
+      <div class="table-card"><div class="table-scroll">
+        <table class="rl-table" aria-label="Jabber">
+          <thead><tr><th>Jabber</th></tr></thead>
+          <tbody>{% for j in jabbers %}<tr><td>{{ j }}</td></tr>{% endfor %}</tbody>
+        </table>
+      </div></div>
+    </details>
+    {% endif %}
+
+    {# ===== Mail ===== #}
+    {% set mails = (group.get('mail') or '').split() %}
+    {% if mails %}
+    <details class="section-block" data-accordion>
+      <summary class="section-summary">
+        <span>Mail</span><span class="count">{{ mails|length }}</span>
+      </summary>
+      <div class="table-card"><div class="table-scroll">
+        <table class="rl-table" aria-label="Mail">
+          <thead><tr><th>Mail</th></tr></thead>
+          <tbody>{% for m in mails %}<tr><td>{{ m }}</td></tr>{% endfor %}</tbody>
+        </table>
+      </div></div>
+    </details>
+    {% endif %}
+
+    {# ===== PGP ===== #}
+    {% set pgps = (group.get('pgp') or '').split('|') if group.get('pgp') else [] %}
+    {% if pgps %}
+    <details class="section-block" data-accordion>
+      <summary class="section-summary">
+        <span>PGP</span><span class="count">{{ pgps|length }}</span>
+      </summary>
+      <div class="table-card"><div class="table-scroll">
+        <table class="rl-table" aria-label="PGP">
+          <thead><tr><th>PGP</th></tr></thead>
+          <tbody>{% for p in pgps %}<tr><td>{{ p }}</td></tr>{% endfor %}</tbody>
+        </table>
+      </div></div>
+    </details>
+    {% endif %}
+
+    {# ===== Matrix ===== #}
+    {% set matrixes = (group.get('matrix') or '').split() %}
+    {% if matrixes %}
+    <details class="section-block" data-accordion>
+      <summary class="section-summary">
+        <span>Matrix</span><span class="count">{{ matrixes|length }}</span>
+      </summary>
+      <div class="table-card"><div class="table-scroll">
+        <table class="rl-table" aria-label="Matrix">
+          <thead><tr><th>Matrix</th></tr></thead>
+          <tbody>{% for mx in matrixes %}<tr><td>{{ mx }}</td></tr>{% endfor %}</tbody>
+        </table>
+      </div></div>
+    </details>
+    {% endif %}
+
+    {# ===== Session ===== #}
+    {% set sessions = (group.get('session') or '').split() %}
+    {% if sessions %}
+    <details class="section-block" data-accordion>
+      <summary class="section-summary">
+        <span>Session</span><span class="count">{{ sessions|length }}</span>
+      </summary>
+      <div class="table-card"><div class="table-scroll">
+        <table class="rl-table" aria-label="Session">
+          <thead><tr><th>Session</th></tr></thead>
+          <tbody>{% for s in sessions %}<tr><td>{{ s }}</td></tr>{% endfor %}</tbody>
+        </table>
+      </div></div>
+    </details>
+    {% endif %}
+
+    {# ===== Telegram ===== #}
+    {% set telegrams = (group.get('telegram') or '').split() %}
+    {% if telegrams %}
+    <details class="section-block" data-accordion>
+      <summary class="section-summary">
+        <span>Telegram</span><span class="count">{{ telegrams|length }}</span>
+      </summary>
+      <div class="table-card"><div class="table-scroll">
+        <table class="rl-table" aria-label="Telegram">
+          <thead><tr><th>Telegram</th></tr></thead>
+          <tbody>{% for t in telegrams %}<tr><td>{{ t }}</td></tr>{% endfor %}</tbody>
+        </table>
+      </div></div>
+    </details>
+    {% endif %}
+
+    {# ===== Tox ===== #}
+    {% set toxs = (group.get('tox') or '').split() %}
+    {% if toxs %}
+    <details class="section-block" data-accordion>
+      <summary class="section-summary">
+        <span>Tox</span><span class="count">{{ toxs|length }}</span>
+      </summary>
+      <div class="table-card"><div class="table-scroll">
+        <table class="rl-table" aria-label="Tox">
+          <thead><tr><th>Tox</th></tr></thead>
+          <tbody>{% for tx in toxs %}<tr><td>{{ tx }}</td></tr>{% endfor %}</tbody>
+        </table>
+      </div></div>
+    </details>
+    {% endif %}
+
+    {# ===== Affiliates ===== #}
+    {% set affiliates = (group.get('affiliates') or '').splitlines() %}
+    {% if affiliates %}
+    <details class="section-block" data-accordion>
+      <summary class="section-summary">
+        <span>Affiliates</span><span class="count">{{ affiliates|length }}</span>
+      </summary>
+      <div class="table-card"><div class="table-scroll">
+        <table class="rl-table" aria-label="Affiliates">
+          <thead><tr><th>Affiliates</th></tr></thead>
+          <tbody>{% for a in aff_known %}<tr><td><a href="/actor/{{ a|urlencode }}">{{ a }}</a></td></tr>{% endfor %}</tbody>
+          <tbody>{% for a in aff_unknown %}<tr><td>{{ a }}</td></tr>{% endfor %}</tbody>
+        </table>
+      </div></div>
+    </details>
+    {% endif %}
+
+    {# ===== Other ===== #}
+    {% set others = (group.get('other') or '').splitlines() %}
+    {% if others %}
+    <details class="section-block" data-accordion>
+      <summary class="section-summary">
+        <span>Other</span><span class="count">{{ others|length }}</span>
+      </summary>
+      <div class="table-card"><div class="table-scroll">
+        <table class="rl-table" aria-label="Other">
+          <thead><tr><th>Other</th></tr></thead>
+          <tbody>{% for o in others %}<tr><td>{{ o }}</td></tr>{% endfor %}</tbody>
+        </table>
+      </div></div>
+    </details>
+    {% endif %}
+
+    {# ===== URLs génériques ===== #}
+    {% if ns.urls %}
+    <details class="section-block" data-accordion>
+      <summary class="section-summary">
+        <span>Urls</span><span class="count">{{ ns.urls|length }}</span>
+      </summary>
+      <div class="table-card">
+        <div class="table-scroll">
+          <table class="rl-table" aria-label="URLs">
+            <thead>
+              <tr>
+                <th>Url</th>
+                <th style="width:12%"><center>Status</center></th>
+                <th style="width:12%"><center>Screen</center></th>
+                <th style="width:10%"><center>Uptime 30d</center></th>
+                <th style="width:18%"><center>Health</center></th>
+              </tr>
+</thead>
+            <tbody>
+              {% for location in ns.urls %}
                 <tr>
-                    <td><center> {{entry['discovered'].split(' ')[0]}} </center></td>
-                    <td> {{entry['post_title']}} </td>
-                    {% if entry['description'] is not none %}
-                    <td style="word-break:break-all"> {{entry['description']}} </td>
+                  <td class="url-cell {% if location.get('private') %}is-private{% endif %}">{{ location['slug'] }}</td>
+                  <td>
+                    {% if location.get('available') %}
+                      <span class="badge-status badge-up">Up</span>
+                    {% elif location.get('available') is not none %}
+                      <span class="badge-status badge-down">Down</span>
                     {% else %}
-                    <td> </td>
+                      <span class="badge-status badge-unknown">Unknown</span>
                     {% endif %}
-                    
-                    {% if 'screen' in entry and entry['screen'] is not none %}
-                    <td><center><a href="/{{ entry['screen']|quote_plus }}" rel="noopener noreferrer" target="_blank">Screen</a></center></td>
-                    {% else %}
-                    <td> </td>
+                  </td>
+                  <td class="thumb-cell">
+                    {% if location.get('screen') %}
+                      <a href="{{ location['screen'] }}" class="open-shot" data-caption="{{ location['slug'] }}">
+                        <img class="thumb" src="{{ location['screen'] }}" alt="Screen">
+                      </a>
                     {% endif %}
-
+                  </td>
+                  <td class="uptime-cell"><center>{% if location.get('uptime30') is not none %}{{ location['uptime30'] }}%{% else %}—{% endif %}</center></td>
+                  <td><div class="spark" data-health="{{ location.get('health')|tojson if location.get('health') is not none else '' }}"></div></td>
                 </tr>
-            {% endfor %}
-          </tbody>
-        </table>
-        {% endif %}
-    </article>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </details>
+    {% endif %}
+
+    {# ===== FS ===== #}
+    {% if ns.fs %}
+    <details class="section-block" data-accordion>
+      <summary class="section-summary">
+        <span>File servers</span><span class="count">{{ ns.fs|length }}</span>
+      </summary>
+      <div class="table-card">
+        <div class="table-scroll">
+          <table class="rl-table" aria-label="File servers">
+            <thead>
+              <tr>
+                <th>Url</th>
+                <th style="width:12%"><center>Status</center></th>
+                <th style="width:12%"><center>Screen</center></th>
+                <th style="width:10%"><center>Uptime 30d</center></th>
+                <th style="width:18%"><center>Health</center></th>
+              </tr>
+</thead>
+            <tbody>
+              {% for location in ns.fs %}
+                <tr>
+                  <td class="url-cell {% if location.get('private') %}is-private{% endif %}">{{ location['slug'] }}</td>
+                  <td>
+                    {% if location.get('available') %}
+                      <span class="badge-status badge-up">Up</span>
+                    {% elif location.get('available') is not none %}
+                      <span class="badge-status badge-down">Down</span>
+                    {% else %}
+                      <span class="badge-status badge-unknown">Unknown</span>
+                    {% endif %}
+                  </td>
+                  <td class="thumb-cell">
+                    {% if location.get('screen') %}
+                      <a href="{{ location['screen'] }}" class="open-shot" data-caption="{{ location['slug'] }}">
+                        <img class="thumb" src="{{ location['screen'] }}" alt="Screen">
+                      </a>
+                    {% endif %}
+                  </td>
+                  <td class="uptime-cell"><center>{% if location.get('uptime30') is not none %}{{ location['uptime30'] }}%{% else %}—{% endif %}</center></td>
+                  <td><div class="spark" data-health="{{ location.get('health')|tojson if location.get('health') is not none else '' }}"></div></td>
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </details>
+    {% endif %}
+
+    {# ===== Chat ===== #}
+    {% if ns.chat %}
+    <details class="section-block" data-accordion>
+      <summary class="section-summary">
+        <span>Chat servers</span><span class="count">{{ ns.chat|length }}</span>
+      </summary>
+      <div class="table-card">
+        <div class="table-scroll">
+          <table class="rl-table" aria-label="Chat servers">
+            <thead>
+              <tr>
+                <th>Url</th>
+                <th style="width:12%"><center>Status</center></th>
+                <th style="width:12%"><center>Screen</center></th>
+                <th style="width:10%"><center>Uptime 30d</center></th>
+                <th style="width:18%"><center>Health</center></th>
+              </tr>
+</thead>
+            <tbody>
+              {% for location in ns.chat %}
+                <tr>
+                  <td class="url-cell {% if location.get('private') %}is-private{% endif %}">{{ location['slug'] }}</td>
+                  <td>
+                    {% if location.get('available') %}
+                      <span class="badge-status badge-up">Up</span>
+                    {% elif location.get('available') is not none %}
+                      <span class="badge-status badge-down">Down</span>
+                    {% else %}
+                      <span class="badge-status badge-unknown">Unknown</span>
+                    {% endif %}
+                  </td>
+                  <td class="thumb-cell">
+                    {% if location.get('screen') %}
+                      <a href="{{ location['screen'] }}" class="open-shot" data-caption="{{ location['slug'] }}">
+                        <img class="thumb" src="{{ location['screen'] }}" alt="Screen">
+                      </a>
+                    {% endif %}
+                  </td>
+                  <td class="uptime-cell"><center>{% if location.get('uptime30') is not none %}{{ location['uptime30'] }}%{% else %}—{% endif %}</center></td>
+                  <td><div class="spark" data-health="{{ location.get('health')|tojson if location.get('health') is not none else '' }}"></div></td>
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </details>
+    {% endif %}
+
+    {# ===== Admin ===== #}
+    {% if ns.admin %}
+    <details class="section-block" data-accordion>
+      <summary class="section-summary">
+        <span>Admin servers</span><span class="count">{{ ns.admin|length }}</span>
+      </summary>
+      <div class="table-card">
+        <div class="table-scroll">
+          <table class="rl-table" aria-label="Admin servers">
+            <thead>
+              <tr>
+                <th>Url</th>
+                <th style="width:12%"><center>Status</center></th>
+                <th style="width:12%"><center>Screen</center></th>
+                <th style="width:10%"><center>Uptime 30d</center></th>
+                <th style="width:18%"><center>Health</center></th>
+              </tr>
+</thead>
+            <tbody>
+              {% for location in ns.admin %}
+                <tr>
+                  <td class="url-cell {% if location.get('private') %}is-private{% endif %}">{{ location['slug'] }}</td>
+                  <td>
+                    {% if location.get('available') %}
+                      <span class="badge-status badge-up">Up</span>
+                    {% elif location.get('available') is not none %}
+                      <span class="badge-status badge-down">Down</span>
+                    {% else %}
+                      <span class="badge-status badge-unknown">Unknown</span>
+                    {% endif %}
+                  </td>
+                  <td class="thumb-cell">
+                    {% if location.get('screen') %}
+                      <a href="{{ location['screen'] }}" class="open-shot" data-caption="{{ location['slug'] }}">
+                        <img class="thumb" src="{{ location['screen'] }}" alt="Screen">
+                      </a>
+                    {% endif %}
+                  </td>
+                  <td class="uptime-cell"><center>{% if location.get('uptime30') is not none %}{{ location['uptime30'] }}%{% else %}—{% endif %}</center></td>
+                  <td><div class="spark" data-health="{{ location.get('health')|tojson if location.get('health') is not none else '' }}"></div></td>
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </details>
+    {% endif %}
+
+    {# ===== STATS (inchangé) ===== #}
+    {% if posts and posts|length > 0 %}
+    <details class="section-block" data-accordion open>
+      <summary class="section-summary">
+        <span>Activity (interactive)</span>
+        <span class="count">{{ posts|length }}</span>
+      </summary>
+
+      <div class="table-card">
+        <div class="card-toolbar" style="display:flex;justify-content:space-between;align-items:center;padding:8px 10px;border-bottom:1px solid var(--border)">
+          <span class="card-title" style="font-weight:600;opacity:.9;cursor:pointer" title="Open large view">Activity charts</span>
+          <div style="display:flex;gap:10px;align-items:center">
+            <label for="grp-bucket" class="label" style="margin:0">Aggregation</label>
+            <select id="grp-bucket" class="input" style="padding:6px 8px">
+              <option value="day" selected>Daily</option>
+              <option value="week">Weekly</option>
+            </select>
+            <label for="grp-roll" class="label" style="margin-left:8px;margin-bottom:0">Rolling avg.</label>
+            <select id="grp-roll" class="input" style="padding:6px 8px">
+              <option value="0" selected>Off</option>
+              <option value="3">3</option>
+              <option value="7">7</option>
+              <option value="14">14</option>
+            </select>
+            <button data-dl="grp-bar" class="btn btn-secondary btn-sm" type="button" title="Download PNG">PNG</button>
+          </div>
+        </div>
+        <div id="grp-bar" style="height:360px"></div>
+      </div>
+    </details>
+
+    <script src="/static/js/plotly.min.js" defer></script>
+
+    <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const POSTS = {{ posts|tojson }};
+      const COLOR_TEXT = '#e5e7eb';
+      const fmtDay = d => d.toISOString().slice(0,10);
+      const parseISO = s => new Date(s);
+      const toMonday = d => { const x=new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate())); const w=x.getUTCDay()||7; x.setUTCDate(x.getUTCDate()-w+1); return x; };
+      const weekKey = d => fmtDay(toMonday(d));
+      const rolling = (arr,w)=>{ if(!w||w<=1) return arr; const out=[]; let sum=0; for(let i=0;i<arr.length;i++){ sum+=arr[i]; if(i>=w) sum-=arr[i-w]; out.push(i>=w-1? +(sum/w).toFixed(3): null);} return out; };
+      const $bucket = document.getElementById('grp-bucket');
+      const $roll   = document.getElementById('grp-roll');
+
+      function baseLayout(extra={}){ return Object.assign({
+        paper_bgcolor:'rgba(0,0,0,0)', plot_bgcolor:'rgba(0,0,0,0)',
+        font:{color:COLOR_TEXT}, margin:{l:60,r:10,t:10,b:60},
+        xaxis:{ tickfont:{color:COLOR_TEXT}, titlefont:{color:COLOR_TEXT} },
+        yaxis:{ tickfont:{color:COLOR_TEXT}, titlefont:{color:COLOR_TEXT} },
+        legend:{ font:{color:COLOR_TEXT} }
+      }, extra); }
+
+      function bucketize() {
+        const bucket = $bucket.value, map = new Map();
+        POSTS.forEach(p => {
+          const ts = parseISO(p.discovered || p.timestamp || p.time);
+          if (!isNaN(ts)) map.set(bucket==='week'? fmtDay(toMonday(ts)) : fmtDay(ts), (map.get(bucket==='week'? fmtDay(toMonday(ts)) : fmtDay(ts))||0)+1);
+        });
+        const keys = [...map.keys()].sort(), counts = keys.map(k => map.get(k)||0);
+        const roll = (v => { const w=+$roll.value||0; if(!w||w<=1) return counts.map(x=>x); let s=0,o=[]; for(let i=0;i<counts.length;i++){ s+=counts[i]; if(i>=w) s-=counts[i-w]; o.push(i>=w-1? +(s/w).toFixed(3): null);} return o; })();
+        return { keys, counts, roll };
+      }
+
+      function draw() {
+        const {keys, counts, roll} = bucketize();
+        const traces = [{type:'bar', x:keys, y:counts, name:'Posts', hovertemplate:'%{x}: %{y}<extra></extra>'}];
+        if ((+($roll.value||0)) > 0) traces.push({type:'scatter', mode:'lines', name:`Rolling ${$roll.value}`, x:keys, y:roll});
+        Plotly.react('grp-bar', traces, baseLayout({ xaxis:{ tickangle:-25, automargin:true } }), {displayModeBar:false});
+      }
+      [$bucket, $roll].forEach(el => el.addEventListener('change', draw));
+      draw();
+
+      // PNG
+      document.addEventListener('click', async (e) => {
+        const btn = e.target.closest('[data-dl="grp-bar"]');
+        if (!btn) return;
+        const dataUrl = await Plotly.toImage('grp-bar', {format:'png', width:1200, height:700});
+        const res = await fetch(dataUrl); const blob = await res.blob();
+        const a = document.createElement('a'); a.href = URL.createObjectURL(blob);
+        a.download = `{{ group['name'] }}_activity.png`; document.body.appendChild(a); a.click(); a.remove();
+        setTimeout(()=>URL.revokeObjectURL(a.href), 1500);
+      });
+    });
+    </script>
+    {% endif %}
+
+    {# ===== Posts (ouvert par défaut) ===== #}
+    {% if posts %}
+    <details class="section-block" data-accordion open>
+      <summary class="section-summary">
+        <span>Posts</span><span class="count">{{ posts|length }}</span>
+      </summary>
+
+      <div class="table-card">
+        <div class="table-scroll">
+          <table class="rl-table" aria-label="Posts">
+            <thead>
+              <tr>
+                <th style="width:12%">Date</th>
+                <th style="width:28%">Title</th>
+                <th>Description</th>
+                <th style="width:14%">Screen</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for entry in posts %}
+                <tr>
+                  <td><center><time datetime="{{ entry['discovered'] }}">{{ entry['discovered'].split(' ')[0] }}</time></center></td>
+                  <td>{{ entry['post_title'] }}</td>
+                  <td style="word-break:break-all">{% if entry['description'] is not none %}{{ entry['description'] }}{% endif %}</td>
+                  <td class="thumb-cell">
+                    {% if entry.get('screen') %}
+                      <a href="/{{ entry['screen']|quote_plus }}" class="open-shot" data-caption="{{ entry['post_title']|default('') }}">
+                        <img class="thumb" src="/{{ entry['screen']|quote_plus }}" alt="Post screen">
+                      </a>
+                    {% endif %}
+                  </td>
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </details>
+    {% endif %}
+
+  </div>
+</section>
+
+<!-- ===== Chart enlarge modal (inchangé) ===== -->
+<div id="chart-modal" class="chart-modal" aria-hidden="true">
+  <div class="chart-modal__backdrop" data-close-modal></div>
+  <div class="chart-modal__dialog" role="dialog" aria-modal="true" aria-label="Enlarged chart">
+    <button class="chart-modal__close" type="button" aria-label="Close" data-close-modal>×</button>
+    <div id="chart-modal-plot" style="height:78vh; width:90vw;"></div>
+  </div>
+</div>
+
+<!-- ===== LIGHTBOX images (plein écran + légende dessous) ===== -->
+<div id="imgModal" class="rl-modal rl-modal--lightbox" role="dialog" aria-modal="true" aria-labelledby="imgModalCaption" hidden>
+  <div class="rl-modal__backdrop" data-close></div>
+  <figure class="rl-modal__panel rl-modal__panel--image" role="document">
+    <button class="rl-modal__close" aria-label="Close" data-close>&times;</button>
+
+    <button class="img-nav img-prev" aria-label="Previous">‹</button>
+
+    <div class="img-stage"><img id="imgModalImg" alt=""></div>
+
+    <button class="img-nav img-next" aria-label="Next">›</button>
+
+    <figcaption id="imgModalCaption" class="img-caption"></figcaption>
+  </figure>
+  </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function(){
+  var SPARKS = document.querySelectorAll('.spark[data-health]');
+  SPARKS.forEach(function(el){
+    var series = [];
+    try { series = JSON.parse(el.getAttribute('data-health')||'[]'); } catch(e){ series = []; }
+    if(!series || !series.length){ el.textContent = '—'; return; }
+    var x = series.map(function(v,i){ return i; });
+    var data = [{ x:x, y:series, mode:'lines', hoverinfo:'skip', line:{ width:2 }, connectgaps:true }];
+    var layout = { margin:{l:2,r:2,t:0,b:0}, height:28, width:120, paper_bgcolor:'rgba(0,0,0,0)', plot_bgcolor:'rgba(0,0,0,0)',
+                   xaxis:{visible:false}, yaxis:{visible:false, range:[0,1]} };
+    if (window.Plotly) {
+      Plotly.newPlot(el, data, layout, {displayModeBar:false, staticPlot:true});
+    } else {
+      el.textContent = '—';
+    }
+  });
+});
+</script>
+</div>
+
+<style>
+/* Lightbox overrides: plein écran, sans carte */
+.rl-modal--lightbox .rl-modal__panel{
+  background: transparent; border: none; box-shadow: none; border-radius: 0;
+  width: 100vw; height: 100vh; padding: 0;
+  display: grid; grid-template-rows: 1fr auto; align-items: center; justify-items: center;
+}
+.rl-modal__backdrop{ background: rgba(0,0,0,.75); }
+
+/* Zone image */
+.rl-modal__panel--image .img-stage{
+  width: 100%; height: 100%;
+  display: flex; align-items: center; justify-content: center; overflow: hidden;
+}
+#imgModalImg{ max-width: 96vw; max-height: 88vh; object-fit: contain; display: block; border-radius: 8px; }
+
+/* Légende en bas */
+.img-caption{
+  width: 100%; padding: 12px 18px; text-align: center;
+  color: var(--muted); font-size: 14px; line-height: 1.4; border-top: 1px solid var(--border);
+  background: rgba(0,0,0,.25); backdrop-filter: blur(2px);
+}
+.img-caption:empty{ display:none; }
+
+/* Boutons */
+.rl-modal__close{
+  position: absolute; top: 12px; right: 12px; width: 40px; height: 40px;
+  border: 1px solid var(--border); background: rgba(0,0,0,.25); color: var(--text);
+  border-radius: 12px; cursor: pointer;
+}
+.rl-modal__close:hover{ background: rgba(255,255,255,.12); }
+
+.img-nav{
+  position: absolute; top: 50%; transform: translateY(-50%);
+  width: 56px; height: 56px; border: 1px solid var(--border);
+  background: rgba(0,0,0,.25); color: var(--text); border-radius: 14px; cursor: pointer;
+}
+.img-prev{ left: 16px; } .img-next{ right: 16px; }
+.img-nav:hover{ background: rgba(255,255,255,.12); }
+
+/* Focus pour accessibilité */
+.rl-modal--lightbox:focus{ outline: none; }
+
+.rl-modal--lightbox .rl-modal__panel{ width: min(84vw, 1300px); height: min(82vh, 92svh); }
+#imgModalImg{ max-width: 82vw; max-height: 74vh; }
+</style>
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+  /* ==== LIGHTBOX images ==== */
+  const links = Array.from(document.querySelectorAll('a.open-shot'));
+  if (links.length) {
+    const modal   = document.getElementById('imgModal');
+    const img     = document.getElementById('imgModalImg');
+    const caption = document.getElementById('imgModalCaption');
+    const closeEls = modal.querySelectorAll('[data-close], .rl-modal__backdrop');
+    const prevBtn = modal.querySelector('.img-prev');
+    const nextBtn = modal.querySelector('.img-next');
+    let index = 0;
+
+    function openAt(i){
+      index = (i + links.length) % links.length;
+      const a = links[index];
+      img.src = a.getAttribute('href');
+      img.alt = a.querySelector('img')?.alt || a.getAttribute('data-caption') || '';
+      caption.textContent = a.getAttribute('data-caption') || img.alt || '';
+      modal.hidden = false; document.body.style.overflow = 'hidden'; modal.focus();
+    }
+    function closeModal(){ modal.hidden = true; document.body.style.overflow=''; img.src=''; }
+    function next(){ openAt(index + 1); } function prev(){ openAt(index - 1); }
+
+    links.forEach((a, i) => a.addEventListener('click', (e) => { e.preventDefault(); openAt(i); }));
+    closeEls.forEach(el => el.addEventListener('click', closeModal));
+    nextBtn.addEventListener('click', next); prevBtn.addEventListener('click', prev);
+    modal.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeModal(); if (e.key === 'ArrowRight') next(); if (e.key === 'ArrowLeft') prev(); });
+    modal.setAttribute('tabindex','-1');
+  }
+
+  /* ==== Chart enlarge (inchangé) ==== */
+  const chartModal = document.getElementById('chart-modal');
+  const dialog = chartModal.querySelector('.chart-modal__dialog');
+  const modalPlot = document.getElementById('chart-modal-plot');
+
+  function closeChart(){ chartModal.setAttribute('aria-hidden','true'); if (modalPlot && modalPlot.data) Plotly.purge(modalPlot); }
+  async function openChartModalFor(chartId){
+    const src = document.getElementById(chartId); if (!src || !src.data) return;
+    const data = JSON.parse(JSON.stringify(src.data)); const layout = JSON.parse(JSON.stringify(src.layout||{}));
+    const COLOR_TEXT='#e5e7eb'; layout.font=Object.assign({color:COLOR_TEXT},layout.font||{});
+    layout.xaxis=Object.assign({tickfont:{color:COLOR_TEXT}, titlefont:{color:COLOR_TEXT}}, layout.xaxis||{});
+    layout.yaxis=Object.assign({tickfont:{color:COLOR_TEXT}, titlefont:{color:COLOR_TEXT}}, layout.yaxis||{});
+    layout.legend=Object.assign({font:{color:COLOR_TEXT}}, layout.legend||{});
+    chartModal.setAttribute('aria-hidden','false');
+    const rect = dialog.getBoundingClientRect(); const w=Math.floor(rect.width-4); const h=Math.floor(window.innerHeight*0.90-48);
+    await Plotly.newPlot(modalPlot, data, layout, {responsive:true, displayModeBar:true});
+    await Plotly.relayout(modalPlot, {width:w, height:h}); requestAnimationFrame(()=> Plotly.Plots.resize(modalPlot));
+  }
+  document.addEventListener('click', (e) => { const t=e.target.closest('.card-title'); if(t) openChartModalFor('grp-bar'); if (e.target.matches('[data-close-modal]')) closeChart(); });
+  document.addEventListener('keydown', (e) => { if (e.key==='Escape' && chartModal.getAttribute('aria-hidden')==='false') closeChart(); });
+  window.addEventListener('resize', () => { if (chartModal.getAttribute('aria-hidden')==='false' && modalPlot && modalPlot.data){ Plotly.relayout(modalPlot, { height: Math.round(window.innerHeight*0.90-48), width: Math.round(dialog.getBoundingClientRect().width-4) }); }});
+});
+</script>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  // Détecte /group/<name> ou /market/<name>
+  const m = location.pathname.match(/^\/(group|market)\/([^\/]+)\/?$/);
+  if (!m) return;
+  const kind = m[1] === 'group' ? 'group' : 'market';
+  const name = decodeURIComponent(m[2]);
+  // Réécrit tous les liens vers /compare pour pré-remplir A
+  document.querySelectorAll('a[href="/compare"], a[href^="/compare?"]').forEach(a => {
+    const url = new URL(a.getAttribute('href'), location.origin);
+    if (!url.searchParams.get('a')) url.searchParams.set('a', name);
+    if (!url.searchParams.get('kind')) url.searchParams.set('kind', kind);
+    a.setAttribute('href', url.pathname + '?' + url.searchParams.toString());
+  });
+});
+</script>
+
+
+<!-- NOTE OVERLAY (pur HTML/JS, sans dépendance) -->
+<!-- Overlay Ransom Note (texte brut) -->
+<div id="noteLayer" style="position:fixed;inset:0;z-index:2147483647;">
+  <div class="rl-modal__backdrop" data-close></div>
+  <div role="dialog" aria-modal="true" aria-labelledby="noteLayerTitle"
+       style="position:relative;margin:auto;top:5vh;width:min(1000px,92vw);max-height:90vh;background:#fff;border-radius:12px;overflow:hidden;display:flex;flex-direction:column;">
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 14px;border-bottom:1px solid var(--border,#e5e7eb);background:var(--card,#f8f9fa);">
+      <h5 id="noteLayerTitle" style="margin:0;font-size:16px;font-weight:600;">Note</h5>
+      <button type="button" data-close aria-label="Close"
+              style="background:transparent;border:0;font-size:20px;line-height:1;cursor:pointer">&times;</button>
+    </div>
+    <div style="padding:12px;overflow:auto;max-height:calc(90vh - 52px);">
+      <pre id="noteLayerText" style="margin:0;white-space:pre-wrap;word-break:break-word;"></pre>
+      <div id="noteLayerHtml" hidden></div>
+    </div>
+  </div>
+</div>
+
+<!-- Garde CSS : la modale n’apparaît QUE si data-open="1" -->
+<style>
+#noteLayer:not([data-open="1"]) { display: none !important; }
+#noteLayer[data-open="1"]        { display: grid; }
+</style>
+
+<script>
+(function(){
+  const layer   = document.getElementById('noteLayer');
+  if (!layer) return;
+  const titleEl = document.getElementById('noteLayerTitle');
+  const textEl  = document.getElementById('noteLayerText');
+  const htmlEl  = document.getElementById('noteLayerHtml');
+
+  // petite sanitization DOM (pas de regex, pas de script dans le code)
+  function sanitizeHtml(input){
+    const tpl = document.createElement('template');
+    tpl.innerHTML = String(input || '');
+    tpl.content.querySelectorAll('script').forEach(el => el.remove());
+    tpl.content.querySelectorAll('*').forEach(el => {
+      for (const attr of [...el.attributes]) {
+        if (/^on/i.test(attr.name)) el.removeAttribute(attr.name);
+        const v = attr.value || '';
+        if ((attr.name === 'href' || attr.name === 'src') && /^javascript:/i.test(v)) {
+          if (attr.name === 'href') el.setAttribute('href', '#'); else el.removeAttribute('src');
+        }
+        if (attr.name === 'srcdoc') el.removeAttribute('srcdoc');
+      }
+    });
+    const wrap = document.createElement('div');
+    wrap.appendChild(tpl.content.cloneNode(true));
+    return wrap.innerHTML;
+  }
+
+  function openOverlay(){ layer.setAttribute("data-open","1"); document.body.style.overflow = "hidden"; }
+  function closeOverlay(){ layer.removeAttribute("data-open"); document.body.style.overflow = ""; textEl.textContent=""; htmlEl.innerHTML=""; textEl.hidden=false; htmlEl.hidden=true; titleEl.textContent="Note"; }
+
+  layer.addEventListener('click', (e)=>{
+    if (e.target.matches('[data-close]') || e.target.closest('[data-close]')) {
+      e.preventDefault(); closeOverlay();
+    }
+  });
+  document.addEventListener('keydown', (e)=>{
+    if (layer.style.display !== 'none' && e.key === 'Escape') { e.preventDefault(); closeOverlay(); }
+  });
+
+async function openNote(id){
+  try{
+    const res = await fetch(`/api/notes/${encodeURIComponent(id)}`, {
+      headers: { 'Accept': 'application/json' }
+    });
+    if(!res.ok) throw new Error('HTTP '+res.status);
+    const n = await res.json();
+
+    titleEl.textContent = n.title || 'Note';
+
+    // Affichage 100% brut (aucune interprétation)
+    htmlEl.hidden = true;               // ne jamais utiliser le conteneur HTML
+    textEl.hidden = false;
+    textEl.textContent = n.content || '';// <-- RAW: pas d'innerHTML, pas de sanitize
+
+    openOverlay();
+  }catch(err){
+    console.error('[note overlay] error:', err);
+    alert('Impossible d’ouvrir la note.');
+  }
+}
+  // Intercepte UNIQUEMENT les clics sur .js-open-note — sinon, navigation normale
+  
+  // Scoped bind only inside #ransom-notes
+  function bindNoteTriggers(){
+    const scope = document.getElementById('ransom-notes');
+    if (!scope) return;
+    scope.querySelectorAll('a.js-open-note[data-note-id]').forEach(el=>{
+      if (el.dataset.boundNote === '1') return;
+      el.dataset.boundNote = '1';
+      el.addEventListener('click', (ev)=>{
+        ev.preventDefault();
+        ev.stopPropagation();
+        ev.stopImmediatePropagation && ev.stopImmediatePropagation();
+        const id = el.getAttribute('data-note-id');
+        if (id) openNote(id);
+      });
+    });
+  }
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', bindNoteTriggers);
+  } else {
+    bindNoteTriggers();
+  }
+})();
+</script>
+<style>
+/* ---- Thème local à la modale de notes (match notesdetails.html) ---- */
+#noteLayer{
+  /* valeurs par défaut (clair) — héritent de ton design system si présent */
+  --note-bg: var(--card, #ffffff);
+  --note-fg: var(--fg, #0f172a);
+  --note-border: var(--border, #e5e7eb);
+  --note-muted: var(--muted, #64748b);
+  --note-shadow: 0 20px 60px rgba(0,0,0,.45);
+}
+/* variante sombre, si ton site suit prefers-color-scheme */
+@media (prefers-color-scheme: dark){
+  #noteLayer{
+    --note-bg: var(--card, #0f1216);
+    --note-fg: var(--fg, #e6e9ef);
+    --note-border: var(--border, #2a2f36);
+    --note-muted: var(--muted, #94a3b8);
+  }
+}
+
+/* Conteneur de la boîte (carte) */
+#noteLayer [role="dialog"]{
+  background: var(--note-bg) !important;
+  color: var(--note-fg) !important;
+  border: 1px solid var(--note-border);
+  border-radius: 12px;
+  box-shadow: var(--note-shadow);
+}
+
+/* En-tête style notesdetails: fin, discret */
+#noteLayer header{
+  background: linear-gradient(180deg, rgba(0,0,0,.03), transparent);
+  border-bottom: 1px solid var(--note-border);
+}
+#noteLayerTitle{
+  margin: 0;
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: .2px;
+  color: var(--note-muted);
+}
+
+/* Corps texte brut (monospace lisible, bon contraste) */
+#noteLayerText{
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+  font-size: 13.5px;
+  line-height: 1.6;
+  color: var(--note-fg);
+  background: transparent;
+}
+/* Si jamais du HTML était inséré par erreur, on évite qu'il recolore le fond/texte */
+#noteLayerHtml, #noteLayerHtml *{
+  color: var(--note-fg) !important;
+  background: transparent !important;
+}
+#noteLayerHtml a{ text-decoration: underline; }
+#noteLayerHtml img{ max-width: 100%; height: auto; }
+</style>
+
+<style>
+/* Force texte modale en #e5e7eb */
+#noteLayer {
+  --note-fg: #e5e7eb;   /* variables que la modale utilise déjà */
+  --note-muted: #e5e7eb;
+}
+#noteLayer [role="dialog"],
+#noteLayerText,
+#noteLayerHtml,
+#noteLayerHtml * {
+  color: #e5e7eb !important;
+}
+</style>
 {% endblock %}

@@ -1,52 +1,58 @@
 {% extends "base.html" %}
 
-{% block title %}Cryptocurrencies{% endblock %}
+{% block title %}Cryptocurrencies from Groups{% endblock %}
 
 {% block content %}
-    <article id="main" class="markdown-section">
-	<h1>Group profiles</h1>
-        {% for entry in data %}
-            <h3 id="{{entry.title}}"> {{ entry.title() }}<h3>
-            <h4>Wallets</h4>
-            <div class="table-responsive">
-            <table id="table" class="table" style="display:table; table-layout:auto; width:100%">
-            <thead>
-                <tr>
-                    <th style="width:25%"> Type </th>
-                    <th style="width:75%"> Value </th>
-                </tr>
-            </thead>
-            <tbody>
-            {% for crypto in data[entry] %}
-                <tr>
-                <td> {{ crypto['blockchain'] }}  </td>
-                <td> {{ crypto['address'] }}</td>
-                </tr>
-                {% if crypto['transactions']|length > 0 %}
-                <tr>
-                <td></td>
-                <td><table id="table" class="table" style="display:table; table-layout:auto; width:100%">
-                <thead>
-                   <tr>
-                       <th style="width:65%"> Transaction </th>
-                       <th style="width:25%"> Amount </th>
-                       <th style="width:10%"> Value ($) </th>
-                   </tr>
-               </thead>
 
-                {% for transactions in crypto['transactions'] %}
-                    <tr><td>{{ transactions['hash'] }}</td>
-                    <td>{{ transactions['amount'] * 0.00000001}}</td>
-                    <td>{{ transactions['amountUSD' ]|round(2, 'ceil') }}</td></tr>
-                {% endfor %}
-                </table></td>
-                </tr>
-                {% endif %}
+<section class="hero">
+  <div class="container">
+    <h1>Groups with crypto</h1>
+    <p class="lead">Browse cryptocurrency wallets grouped by actor.</p>
+  </div>
+</section>
 
-            {% endfor %}
-           </tbody>
-           </table>
-           </div>
-        {% endfor %}
-    </article>
+<section class="metrics-section">
+  <div class="container">
+
+    <!-- Filtre client -->
+    <div style="margin-bottom:14px;">
+      <input id="crypto-filter" type="search" placeholder="Filter groups…" aria-label="Filter groups"
+             style="width:100%;max-width:520px;padding:10px 12px;border-radius:10px;border:1px solid var(--border);background:#0f1623;color:var(--text)">
+    </div>
+
+    <!-- Grille de groupes -->
+    <div id="groups-grid" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px;">
+      {% for name in data %}
+         {% for item in name %}
+          <a class="group-chip"
+             href="/crypto/{{ item }}"
+             data-name="{{ item|lower }}{% if aliases and aliases.get(item) %} {{ aliases[item]|join(' ') }}{% endif %}"
+             style="display:flex;align-items:center;justify-content:center;padding:12px 10px;border-radius:12px;border:1px solid var(--border);background:linear-gradient(180deg,#121a28 0%,#0f1623 100%);text-decoration:none;color:var(--text);font-weight:600;text-align:center;">
+             {{ item|title }} 
+          </a>
+         {% endfor %}
+      {% endfor %}
+    </div>
+
+  </div>
+</section>
+
+<!-- JS inline pour le filtre -->
+<script>
+(function(){
+  const input = document.getElementById('crypto-filter');
+  const items = Array.from(document.querySelectorAll('#groups-grid .group-chip'));
+  if (!input) return;
+  input.addEventListener('input', function(){
+    const q = this.value.trim().toLowerCase();
+    items.forEach(a => {
+      // On cherche dans 'data-tokens' (nom + alias), avec fallback sur 'data-name'
+      const tokens = ((a.dataset.tokens || a.dataset.name || '') + '').toLowerCase();
+      const match = !q || tokens.includes(q);
+      a.style.display = match ? '' : 'none';
+    });
+  });
+})();
+</script>
+
 {% endblock %}

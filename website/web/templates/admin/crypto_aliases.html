@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+{% from 'bootstrap5/utils.html' import render_messages %}
+{% block title %}Admin · Crypto aliases{% endblock %}
+{% block content %}
+{{ render_messages(container=True, dismissible=True) }}
+
+<section class="hero">
+  <div class="container">
+    <h1>Crypto — Aliases</h1>
+    <p class="lead">Manage alias → canonical group resolution (DB=7 only).</p>
+  </div>
+</section>
+
+<section class="metrics-section">
+  <div class="container">
+
+    <div class="table-card" style="padding:12px;margin-bottom:12px;">
+      <form method="post" style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;">
+        <input type="hidden" name="action" value="upsert">
+        <input type="text" name="alias" placeholder="Alias" required>
+        <input type="text" name="canon" placeholder="Canonical slug" required>
+        <button class="btn" type="submit">Save</button>
+      </form>
+    </div>
+
+    <div class="table-card">
+      <div class="table-scroll">
+        <table class="rl-table" aria-label="Aliases">
+          <thead>
+            <tr>
+              <th>Alias</th>
+              <th>Canonical</th>
+              <th style="width:20%;text-align:center">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for row in aliases %}
+              <tr>
+                <td class="mono">{{ row.alias }}</td>
+                <td class="mono">{{ row.canon }}</td>
+                <td style="text-align:center">
+                  <form method="post" style="display:inline">
+                    <input type="hidden" name="action" value="delete">
+                    <input type="hidden" name="alias" value="{{ row.alias }}">
+                    <button class="btn btn-danger" type="submit">Delete</button>
+                  </form>
+                </td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+{% endblock %}

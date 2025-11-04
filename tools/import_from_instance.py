@@ -29,15 +29,3 @@ groups = requests.get(remote_instance +'/export/4').json()
 red = redis.Redis(unix_socket_path=get_socket_path('cache'), db=4)
 for key in groups:
     red.set(key, json.dumps(groups[key]))
-
-print('Importing Telegram channels')
-groups = requests.get(remote_instance +'/export/5').json()
-red = redis.Redis(unix_socket_path=get_socket_path('cache'), db=5)
-for key in groups:
-    red.set(key, json.dumps(groups[key]))
-
-print('Importing Telegram message')
-groups = requests.get(remote_instance +'/export/6').json()
-red = redis.Redis(unix_socket_path=get_socket_path('cache'), db=6)
-for key in groups:
-    red.set(key, json.dumps(groups[key]))

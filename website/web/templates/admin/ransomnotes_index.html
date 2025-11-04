@@ -1,0 +1,73 @@
+{% extends "base.html" %}
+
+{% block title %}Notes from Groups (Admin){% endblock %}
+
+{% block content %}
+
+<section class="hero">
+  <div class="container">
+    <h1>Create a new group.</h1>
+    <p class="lead">Create a new group and its first ransomnote.</p>
+  </div>
+  <div class="container">
+
+<form class="row g-2" method="post" action="{{ url_for('admin_ransomnotes_open') }}" style="margin-bottom:10px;">
+  <div class="col-sm-6 col-md-4">
+    <input class="form-control" type="text" name="group" placeholder="new-group-slug (ex: antefrigus)" required style="width:100%;max-width:520px;padding:10px 12px;border-radius:10px;border:1px solid var(--border);background:#0f1623;color:var(--text)">
+  </div>
+</br>
+  <div class="col-auto">
+    <button class="btn" type="submit">Open / Create</button>
+  </div>
+</form>
+</div>
+</section>
+
+<section class="hero">
+  <div class="container">
+    <h1>Groups with notes</h1>
+    <p class="lead">Browse ransomware note samples grouped by actor.</p>
+  </div>
+  <div class="container">
+
+    <!-- Filtre client (identique à /notes) -->
+    <div style="margin-bottom:14px;">
+      <input id="notes-filter" type="search" placeholder="Filter groups and aliases…" aria-label="Filter groups"
+             style="width:100%;max-width:520px;padding:10px 12px;border-radius:10px;border:1px solid var(--border);background:#0f1623;color:var(--text)">
+    </div>
+
+    <!-- Grille de groupes (identique à /notes) -->
+    <div id="groups-grid" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px;">
+      {% for entry in data %}
+        {% for item in entry %}
+          <!-- Seul changement: href + data-name enrichi des alias -->
+          <a class="group-chip"
+             href="{{ url_for('admin_ransomnotes_group', slug=item) }}"
+             data-name="{{ item|lower }} {% for a in (aliases_by_canon.get(item, [])) %}{{ a }} {% endfor %}"
+             style="display:flex;align-items:center;justify-content:center;padding:12px 10px;border-radius:12px;border:1px solid var(--border);background:linear-gradient(180deg,#121a28 0%,#0f1623 100%);text-decoration:none;color:var(--text);font-weight:600;text-align:center;">
+            {{ item.title() }}
+          </a>
+        {% endfor %}
+      {% endfor %}
+    </div>
+
+  </div>
+</section>
+
+<!-- JS inline pour le filtre (identique à /notes) -->
+<script>
+(function(){
+  const input = document.getElementById('notes-filter');
+  const items = Array.from(document.querySelectorAll('#groups-grid .group-chip'));
+  if (!input) return;
+  input.addEventListener('input', function(){
+    const q = this.value.trim().toLowerCase();
+    items.forEach(a => {
+      const match = !q || (a.dataset.name || '').includes(q);
+      a.style.display = match ? '' : 'none';
+    });
+  });
+})();
+</script>
+
+{% endblock %}

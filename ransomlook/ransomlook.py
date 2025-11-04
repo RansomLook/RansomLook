@@ -34,6 +34,72 @@ from .sharedutils import stdlog, errlog
 from .sharedutils import createfile
 from .sharedutils import format_bytes
 
+# --- Health series config (per-mirror daily 0/1) ---
+try:
+    HEALTH_DB = int(os.environ.get("RL_HEALTH_DB", "6"))
+except Exception:
+    HEALTH_DB = 6
+
+HEALTH_SERIES_LEN     = int(os.environ.get("RL_HEALTH_SERIES_LEN", "90"))
+HEALTH_DAY_THRESHOLD  = float(os.environ.get("RL_HEALTH_DAY_THRESHOLD", "0.5"))
+HEALTH_COUNTER_TTL_D  = int(os.environ.get("RL_HEALTH_COUNTER_TTL_D", "120"))
+
+def update_mirror_health(red_health, group_name: str, loc, is_up: bool,
+                         series_len: int = HEALTH_SERIES_LEN,
+                         threshold: float = HEALTH_DAY_THRESHOLD,
+                         counter_ttl_days: int = HEALTH_COUNTER_TTL_D) -> None:
+    """
+    Aggregate checks into a daily 0/1 sample per mirror, robust to variable scrape frequency.
+    Keys used:
+      - health:cnt:<group>:<slug>:<YYYYMMDD>  (hash: up/total)
+      - health:<group>:<slug>                 (JSON list of 0/1 per day, last N)
+      - health:lastday:<group>:<slug>         (last written YYYYMMDD)
+    """
+    try:
+        slug = (loc.get('slug') or '').strip()
+        if not slug:
+            return
+        group = group_name if isinstance(group_name, str) else str(group_name)
+        today = datetime.utcnow().strftime("%Y%m%d")
+        # 1) daily counters
+        hcnt_key = f"health:cnt:{group}:{slug}:{today}"
+        pipe = red_health.pipeline()
+        pipe.hincrby(hcnt_key, "total", 1)
+        if is_up:
+            pipe.hincrby(hcnt_key, "up", 1)
+        pipe.expire(hcnt_key, counter_ttl_days * 86400)
+        pipe.execute()
+        # 2) aggregated day value
+        counts = red_health.hgetall(hcnt_key) or {}
+        up    = int(counts.get(b"up", b"0"))
+        total = max(1, int(counts.get(b"total", b"1")))
+        day_val = 1 if (up / total) >= threshold else 0
+        # 3) series
+        series_key  = f"health:{group}:{slug}"
+        lastday_key = f"health:lastday:{group}:{slug}"
+        raw = red_health.get(series_key) or b"[]"
+        try:
+            series = json.loads(raw)
+            if not isinstance(series, list):
+                series = []
+        except Exception:
+            series = []
+        last_day = red_health.get(lastday_key)
+        last_day = last_day.decode() if last_day else None
+        if last_day == today:
+            series[-1:] = [day_val] if series else [day_val]
+        else:
+            series.append(day_val)
+            red_health.set(lastday_key, today)
+        if len(series) > series_len:
+            series = series[-series_len:]
+        red_health.set(series_key, json.dumps(series))
+    except Exception:
+        # Never let health tracking break the scraper
+        pass
+        pass
+
+
 # pylint: disable=W0703
 
 redislacus = Redis(unix_socket_path=get_socket_path('cache'), db=15)
@@ -76,6 +142,11 @@ async def run_captures() -> None:
 def scraper(base: int) -> None:
     '''main scraping function'''
     red = redis.Redis(unix_socket_path=get_socket_path('cache'), db=base)
+    # Health DB connection
+    try:
+        red_health = redis.Redis(unix_socket_path=get_socket_path('cache'), db=HEALTH_DB)
+    except Exception:
+        red_health = None
     groups=[]
     running_capture = {}
     validationDate = datetime.now() - relativedelta(months=6)
@@ -131,6 +202,11 @@ def scraper(base: int) -> None:
                 for location in group['locations']:
                     if location['slug']==running_capture[str(key)]['slug']:
                         location.update({'available':False})
+                        if red_health:
+                            try:
+                                update_mirror_health(red_health, group['name'], location, False)
+                            except Exception:
+                                pass
                         red.set(running_capture[str(key)]['group'], json.dumps(group))
                         break
                 running_capture.pop(str(key))
@@ -181,6 +257,11 @@ def scraper(base: int) -> None:
                     host.update({'available':True, 'title':result['har']['log']['pages'][0]['title'], # type: ignore
                              'lastscrape':result['har']['log']['pages'][0]['startedDateTime'].replace('T',' ').replace('Z',''), # type: ignore
                              'updated':result['har']['log']['pages'][0]['startedDateTime'].replace('T',' ').replace('Z','')}) # type: ignore
+                    if red_health:
+                        try:
+                            update_mirror_health(red_health, name, host, True)
+                        except Exception:
+                            pass
                 elif 'har' in result and 'log' in result['har'] and 'entries' in result['har']['log'] : # type: ignore
                     try:
                         html = result['har']['log']['entries'][0]['response']['content']['text'] # type: ignore
@@ -191,10 +272,25 @@ def scraper(base: int) -> None:
                         host.update({'available':True, 'title':result['har']['log']['pages'][0]['title'], # type: ignore
                              'lastscrape':result['har']['log']['pages'][0]['startedDateTime'].replace('T',' ').replace('Z',''), # type: ignore
                              'updated':result['har']['log']['pages'][0]['startedDateTime'].replace('T',' ').replace('Z','')}) # type: ignore
+                        if red_health:
+                            try:
+                                update_mirror_health(red_health, name, host, True)
+                            except Exception:
+                                pass
                     except:
                         host.update({'available':False})
+                        if red_health:
+                            try:
+                                update_mirror_health(red_health, name, host, False)
+                            except Exception:
+                                pass
                 else:
                     host.update({'available':False})
+                    if red_health:
+                        try:
+                            update_mirror_health(red_health, name, host, False)
+                        except Exception:
+                            pass
                 red.set(name, json.dumps(group))
                 running_capture.pop(str(key))
 

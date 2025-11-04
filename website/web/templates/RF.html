@@ -3,28 +3,335 @@
 {% block title %}RF Dumps{% endblock %}
 
 {% block content %}
-    <article id="main" class="markdown-section">
-	<h1>Leaks listing</h1>
-           <div class="table-responsive">
-           <table id="table" class="table" style="display:table; table-layout:auto; width:100%">
-           <thead>
-               <tr>
-                   <th style="width:20%"> Dump </th>
-                   <th style="width:70%"> Description </th>
-                   <th style="width:10%"> Downloaded </th>
-               </tr>
-           </thead>
-           <tbody>
-             {% for entry in data %}
-                <tr>
-                <td> <a href="/RF/{{entry['name']}}">{{ entry['name'].title() }}</a>  </td>
-                <td> {{ entry['description'] }} </td>
-                <td> {{ entry['downloaded'].split('T')[0] }} </td>
-                </tr>
-             {% endfor %}
-           </tbody>
-           </table>
-           </div>
 
-    </article>
+<style>
+  /* Small helpers local to this page */
+  .th-sort{ all: unset; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; }
+  .th-sort:focus{ outline: 2px solid rgba(106,160,255,.6); outline-offset: 2px; border-radius: 6px; }
+  .th-sort .ind{ opacity:.6; font-size:.9em }
+</style>
+
+<!-- Hero -->
+<section class="hero">
+  <div class="container">
+    <h1>RF dumps</h1>
+    <p class="lead">Browse RF dumps. Click a dump to view details.</p>
+  </div>
+</section>
+
+<section class="metrics-section">
+  <div class="container">
+    <div id="filters-top-rf"></div>
+
+    <!-- Filters (centered, unified width with site CSS) -->
+    <div class="table-card search-card" style="padding:12px;margin-bottom:12px">
+      <div class="filters-wrap">
+        <div class="filters">
+          <div class="field field--search">
+            <label class="sr-only" for="flt-q">Search RF dumps</label>
+            <input id="flt-q" class="input" type="search"
+                   aria-label="Search RF dumps by name or description"
+                   placeholder="Dump name or description…">
+            <button class="input-clear" type="button" aria-label="Clear search">×</button>
+          </div>
+        </div>
+        <div class="filters-meta"><span id="flt-count"></span></div>
+      </div>
+    </div>
+
+    <!-- Listing -->
+    <div class="table-card">
+      <div class="table-scroll">
+        <table class="rl-table" aria-label="RF dumps">
+          <thead>
+            <tr>
+              <th style="width:20%">
+                <button class="th-sort" data-sort="name" aria-sort="none" type="button">Dump <span class="ind" aria-hidden="true">↕</span></button>
+              </th>
+              <th style="width:70%">Description</th>
+              <th style="width:10%">
+                <button class="th-sort" data-sort="date" aria-sort="none" type="button" title="Sort by date">
+                  Downloaded <span class="ind" aria-hidden="true">↕</span>
+                </button>
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for entry in data %}
+            <tr>
+              <td>
+                <a class="rf-link"
+                   href="{{ url_for('rfdetails', name=entry['name']) }}?format=json"
+                   data-rf-name="{{ entry['name'].title() }}">
+                  {{ entry['name'].title() }}
+                </a>
+              </td>
+              <td>{{ entry['description'] }}</td>
+              <td>{{ entry['downloaded'].split('T')[0] }}</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- Modal (unified site modal classes) -->
+<div id="rf-modal" class="modal-root" aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="rf-modal-title">
+  <div class="modal-backdrop" data-dismiss="modal"></div>
+  <div class="modal-dialog" role="document">
+    <header class="modal-header">
+      <h2 id="rf-modal-title">RF dump</h2>
+      <button class="modal-close" type="button" aria-label="Close" data-dismiss="modal">×</button>
+    </header>
+    <div class="modal-body">
+      <!-- Head table -->
+      <div class="table-card">
+        <div class="table-scroll">
+          <table class="rl-table" aria-label="RF head">
+            <thead>
+              <tr>
+                <th style="width:20%">Dump</th>
+                <th style="width:60%">Source</th>
+                <th style="width:20%">Downloaded</th>
+              </tr>
+            </thead>
+            <tbody id="rf-head-tbody">
+              <tr><td colspan="3">Loading…</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Extra info -->
+      <div class="table-card">
+        <div class="table-scroll">
+          <table class="rl-table" aria-label="RF extra">
+            <thead>
+              <tr>
+                <th style="width:15%">Size</th>
+                <th style="width:15%">Records</th>
+                <th style="width:15%">Detection</th>
+                <th style="width:55%">Columns</th>
+              </tr>
+            </thead>
+            <tbody id="rf-extra-tbody">
+              <tr><td colspan="4">—</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Breaches key/values -->
+      <div class="table-card">
+        <div class="table-scroll">
+          <table class="rl-table" aria-label="RF breaches">
+            <thead>
+              <tr>
+                <th style="width:30%">Key</th>
+                <th>Value</th>
+              </tr>
+            </thead>
+            <tbody id="rf-breaches-tbody">
+              <tr><td colspan="2">—</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+  // ===== Listing: search + sort + counter =====
+  const qInput   = document.getElementById('flt-q');
+  const clearBtn = document.querySelector('.input-clear');
+  const countEl  = document.getElementById('flt-count');
+  const table    = document.querySelector('table[aria-label="RF dumps"]');
+  const tbody    = table.querySelector('tbody');
+  const rows     = [...tbody.querySelectorAll('tr')];
+
+  let sortKey = 'date';   // 'name' | 'date' | null
+  let sortDir = -1;      // 1 asc, -1 desc
+  const collator = new Intl.Collator(undefined, { sensitivity: 'base', numeric: true });
+
+  function getRowData(tr){
+    const nameCell = tr.querySelector('td:nth-child(1)');
+    const descCell = tr.querySelector('td:nth-child(2)');
+    const dateCell = tr.querySelector('td:nth-child(3)');
+    const name = (nameCell?.textContent || '').trim();
+    const desc = (descCell?.textContent || '').trim();
+    const dateText = (dateCell?.textContent || '').trim();
+    const dateKey = dateText; // already ISO YYYY-MM-DD
+    return { name, desc, dateText, dateKey, tr };
+  }
+
+  function updateCount(visible){
+    if (countEl) countEl.textContent = visible + ' dumps';
+  }
+
+  function apply(){
+    const q = (qInput?.value || '').trim().toLowerCase();
+    let list = rows.map(getRowData);
+
+    // filter
+    if (q){
+      list = list.filter(r => r.name.toLowerCase().includes(q) || r.desc.toLowerCase().includes(q));
+    }
+
+    // sort
+    if (sortKey){
+      list.sort((a,b) => {
+        if (sortKey === 'name'){
+          const cmp = collator.compare(a.name, b.name);
+          return cmp * sortDir;
+        } else if (sortKey === 'date'){
+          const cmp = a.dateKey.localeCompare(b.dateKey);
+          return cmp * sortDir;
+        }
+        return 0;
+      });
+    }
+
+    // render
+    const frag = document.createDocumentFragment();
+    list.forEach(item => frag.appendChild(item.tr));
+    tbody.innerHTML = '';
+    tbody.appendChild(frag);
+    updateCount(list.length);
+  }
+
+  function setSort(key){
+    if (sortKey === key){
+      sortDir = -1 * sortDir;  // toggle
+    } else {
+      sortKey = key;
+      sortDir = 1;
+    }
+    document.querySelectorAll('.th-sort').forEach(btn => {
+      const state = (btn.dataset.sort === sortKey) ? (sortDir === 1 ? 'ascending' : 'descending') : 'none';
+      btn.setAttribute('aria-sort', state);
+      const ind = btn.querySelector('.ind');
+      if (ind){
+        ind.textContent = state === 'ascending' ? '▲' : state === 'descending' ? '▼' : '↕';
+      }
+    });
+    apply();
+  }
+
+  document.querySelectorAll('.th-sort').forEach(btn => {
+    btn.addEventListener('click', () => setSort(btn.dataset.sort));
+    btn.addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setSort(btn.dataset.sort); } });
+  });
+
+  clearBtn?.addEventListener('click', () => { qInput.value=''; apply(); qInput.focus(); });
+  let t; qInput?.addEventListener('input', () => { clearTimeout(t); t=setTimeout(apply, 120); });
+
+  // initial
+  apply();
+
+  // ===== Modal fetch & display =====
+  const modal        = document.getElementById("rf-modal");
+  const titleEl      = document.getElementById("rf-modal-title");
+  const headBody     = document.getElementById("rf-head-tbody");
+  const extraBody    = document.getElementById("rf-extra-tbody");
+  const breachesBody = document.getElementById("rf-breaches-tbody");
+
+  function escapeHtml(val){
+    if (val === null || val === undefined) return '';
+    return String(val)
+      .replace(/&/g,'&amp;')
+      .replace(/</g,'&lt;')
+      .replace(/>/g,'&gt;')
+      .replace(/"/g,'&quot;')
+      .replace(/'/g,'&#39;');
+  }
+
+  function openModal() {
+    modal.setAttribute('aria-hidden','false');
+    document.body.classList.add('modal-open');
+  }
+  function closeModal() {
+    modal.setAttribute('aria-hidden','true');
+    document.body.classList.remove('modal-open');
+    headBody.innerHTML     = '<tr><td colspan="3">Loading…</td></tr>';
+    extraBody.innerHTML    = '<tr><td colspan="4">—</td></tr>';
+    breachesBody.innerHTML = '<tr><td colspan="2">—</td></tr>';
+  }
+
+  // Delegated click for rf-link
+  document.addEventListener("click", async (e) => {
+    const a = e.target.closest(".rf-link");
+    if (!a) return;
+    e.preventDefault();
+
+    const url  = a.getAttribute('href');
+    const name = a.dataset.rfName || 'RF dump';
+
+    try {
+      const res = await fetch(url, { headers: { 'Accept': 'application/json' } });
+      if (!res.ok) throw new Error('Fetch failed');
+      const payload = await res.json();
+      const g = payload.group || payload.data || payload;
+
+      titleEl.textContent = name;
+
+      headBody.innerHTML = `
+        <tr>
+          <td>${escapeHtml(g.name ?? name)}</td>
+          <td>${escapeHtml(g.source ?? '—')}</td>
+          <td><center>${escapeHtml((g.downloaded || '').toString().split('T')[0])}</center></td>
+        </tr>`;
+
+      let columns = g.columns ?? '—';
+      if (Array.isArray(columns)) columns = columns.join(', ');
+
+      extraBody.innerHTML = `
+        <tr>
+          <td><center>${escapeHtml(g.size ?? '—')}</center></td>
+          <td>${escapeHtml(g.records ?? '—')}</td>
+          <td>${escapeHtml(g.indexed ?? '—')}</td>
+          <td>${escapeHtml(columns)}</td>
+        </tr>`;
+
+      if (Array.isArray(g.breaches) && g.breaches.length && g.breaches[0] && typeof g.breaches[0] === 'object') {
+        const obj  = g.breaches[0];
+        const rows = Object.keys(obj).map(k => `
+          <tr>
+            <td>${escapeHtml(k)}</td>
+            <td>${escapeHtml(String(obj[k]))}</td>
+          </tr>`).join("");
+        breachesBody.innerHTML = rows || '<tr><td colspan="2">—</td></tr>';
+      } else {
+        breachesBody.innerHTML = '<tr><td colspan="2">—</td></tr>';
+      }
+
+      openModal();
+    } catch (err) {
+      console.error(err);
+      headBody.innerHTML     = '<tr><td colspan="3" style="color:#fca5a5;">Unable to load details.</td></tr>';
+      extraBody.innerHTML    = '<tr><td colspan="4">—</td></tr>';
+      breachesBody.innerHTML = '<tr><td colspan="2">—</td></tr>';
+      // fallback: navigate to HTML page if available
+      window.location.href = url.replace('?format=json','');
+    }
+  });
+
+  // Close handlers (backdrop, close btn, ESC)
+  document.addEventListener('click', (e) => {
+    if (e.target.matches('[data-dismiss="modal"], .modal-backdrop')) {
+      e.preventDefault();
+      closeModal();
+    }
+  });
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') closeModal();
+  });
+});
+</script>
+
 {% endblock %}

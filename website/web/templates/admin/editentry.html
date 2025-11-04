@@ -1,0 +1,347 @@
+{% extends "base.html" %}
+{% from 'bootstrap5/utils.html' import render_messages %}
+{% block title %}Edit {{ form.groupname.data or 'group' }}{% endblock %}
+
+{% block content %}
+{{ render_messages(container=True, dismissible=True) }}
+
+<section class="hero">
+  <div class="container" style="display:flex;align-items:center;gap:12px;flex-wrap:wrap">
+    <h1 style="margin:0">Edit {{ form.groupname.data or 'group' }}</h1>
+    <a href="/admin/edit" class="btn btn-secondary" style="margin-left:auto">Back</a>
+  </div>
+</section>
+
+<section class="metrics-section">
+  <div class="container">
+
+    <form action="" method="post" enctype="multipart/form-data" novalidate>
+      {{ form.hidden_tag() }}
+
+      <!-- ===== Card: Meta ===== -->
+      <div class="table-card admin-card">
+        <div class="card-toolbar"><span>Identity</span></div>
+
+        <div class="form-grid">
+          <label>Group name</label>
+          <div>{{ form.groupname(class_="input") }}</div>
+
+          <label>Galaxy name</label>
+          <div>{{ form.galaxy(class_="input") }}</div>
+        </div>
+
+        <div class="switch-row">
+          <label class="switch">{{ form.raas() }} <span>RaaS ?</span></label>
+          <label class="switch">{{ form.captcha() }} <span>Captcha protected ?</span></label>
+          <label class="switch">{{ form.private() }} <span>Private group ?</span></label>
+        </div>
+
+        <label class="block-label">Description</label>
+        {{ form.description( style="height: 150px;", class_="textarea auto-ta", rows="6") }}
+      </div>
+
+      <!-- ===== Card: References & contacts (tabs) ===== -->
+      <div class="table-card admin-card">
+        <div class="card-toolbar">
+          <span>References &amp; contacts</span>
+          <small class="muted">Compteurs = nb de lignes (ou entrées séparées)</small>
+        </div>
+
+        <div class="tabs">
+          <div class="tabs-nav" role="tablist">
+            <button type="button" class="tab active" data-tab="profiles">Profiles <span class="badge" data-count="profiles">0</span></button>
+            <button type="button" class="tab" data-tab="hash">Hash <span class="badge" data-count="hash">0</span></button>
+            <button type="button" class="tab" data-tab="jabber">Jabber <span class="badge" data-count="jabber">0</span></button>
+            <button type="button" class="tab" data-tab="mail">Mail <span class="badge" data-count="mail">0</span></button>
+            <button type="button" class="tab" data-tab="pgp">PGP <span class="badge" data-count="pgp">0</span></button>
+            <button type="button" class="tab" data-tab="matrix">Matrix <span class="badge" data-count="matrix">0</span></button>
+            <button type="button" class="tab" data-tab="session">Session <span class="badge" data-count="session">0</span></button>
+            <button type="button" class="tab" data-tab="telegram">Telegram <span class="badge" data-count="telegram">0</span></button>
+            <button type="button" class="tab" data-tab="tox">Tox <span class="badge" data-count="tox">0</span></button>
+            <button type="button" class="tab" data-tab="affiliates">Affiliates <span class="badge" data-count="affiliates">0</span></button>
+            <button type="button" class="tab" data-tab="other">Other <span class="badge" data-count="other">0</span></button>
+          </div>
+
+          <div class="tabs-body">
+            <div class="tab-pane active" id="pane-profiles">
+              <div class="pane-head">
+                <strong>Profiles (one per line)</strong>
+              </div>
+              {{ form.profiles(class_="textarea auto-ta", rows="7") }}
+            </div>
+
+            <div class="tab-pane" id="pane-hash">
+              <div class="pane-head"><strong>Hash (one per line)</strong></div>
+              {{ form.hash(class_="textarea auto-ta", rows="6") }}
+            </div>
+
+            <div class="tab-pane" id="pane-jabber">
+              <div class="pane-head"><strong>Jabber (one per line)</strong></div>
+              {{ form.jabber(class_="textarea auto-ta", rows="5") }}
+            </div>
+
+            <div class="tab-pane" id="pane-mail">
+              <div class="pane-head"><strong>Mail (one per line)</strong></div>
+              {{ form.mail(class_="textarea auto-ta", rows="5") }}
+            </div>
+
+            <div class="tab-pane" id="pane-pgp">
+              <div class="pane-head"><strong>PGP (separator “|”)</strong></div>
+              {{ form.pgp(class_="textarea auto-ta", rows="5") }}
+              <small class="muted">Astuce : une clé = une ligne ; plusieurs blocs dans la même ligne séparés par “|”.</small>
+            </div>
+
+            <div class="tab-pane" id="pane-matrix">
+              <div class="pane-head"><strong>Matrix (one per line)</strong></div>
+              {{ form.matrix(class_="textarea auto-ta", rows="5") }}
+            </div>
+
+            <div class="tab-pane" id="pane-session">
+              <div class="pane-head"><strong>Session (one per line)</strong></div>
+              {{ form.session(class_="textarea auto-ta", rows="5") }}
+            </div>
+
+            <div class="tab-pane" id="pane-telegram">
+              <div class="pane-head"><strong>Telegram (one per line)</strong></div>
+              {{ form.telegram(class_="textarea auto-ta", rows="5") }}
+            </div>
+
+            <div class="tab-pane" id="pane-tox">
+              <div class="pane-head"><strong>Tox (one per line)</strong></div>
+              {{ form.tox(class_="textarea auto-ta", rows="5") }}
+            </div>
+
+            <div class="tab-pane" id="pane-affiliates">
+              <div class="pane-head"><strong>Affiliates (one per line)</strong></div>
+              {{ form.affiliates(class_="textarea auto-ta", rows="5") }}
+            </div>
+
+            <div class="tab-pane" id="pane-other">
+              <div class="pane-head"><strong>Other (one per line)</strong></div>
+              {{ form.other(class_="textarea auto-ta", rows="5") }}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ===== Card: Links (nested form) ===== -->
+      <div class="table-card admin-card">
+        <div class="card-toolbar"><span>Links</span></div>
+
+        {% for nested in form.links %}
+        <fieldset class="link-block">
+          <legend>
+            Link #{{ loop.index }}
+            {% if nested.title.data %}<span class="pill">{{ nested.title.data }}</span>{% endif %}
+          </legend>
+
+          <div class="form-grid two">
+            <label>Slug / URL</label>
+            <div>{{ nested.slug(class_="input") }}</div>
+
+            <label>FQDN</label>
+            <div>{{ nested.fqdn(class_="input") }}</div>
+
+            <label>Page title</label>
+            <div>{{ nested.title(class_="input") }}</div>
+          </div>
+
+          <div class="switch-row wrap">
+            <label class="switch">{{ nested.fs() }} <span>File Server</span></label>
+            <label class="switch">{{ nested.chat() }} <span>Chat</span></label>
+            <label class="switch">{{ nested.admin() }} <span>Admin</span></label>
+            <label class="switch">{{ nested.private() }} <span>Private link</span></label>
+            <label class="switch">{{ nested.available() }} <span>Available</span></label>
+            <label class="switch">{{ nested.fixedfile() }} <span>Don't update screen</span></label>
+            <label class="switch" style="margin-left:auto;color:#ef4444">{{ nested.delete() }} <span>Delete this link</span></label>
+          </div>
+
+          <div class="form-grid three">
+            <label>Timeout (s)</label>
+            <div>{{ nested.timeout(class_="input") }}</div>
+
+            <label>Delay (s)</label>
+            <div>{{ nested.delay(class_="input") }}</div>
+
+            <label>Browser</label>
+            <div>{{ nested.browser(class_="input") }}</div>
+
+            <label>Header</label>
+            <div class="span2">{{ nested.header(class_="input") }}</div>
+
+            <label>Version</label>
+            <div>{{ nested.version(class_="input") }}</div>
+          </div>
+
+          <label class="block-label">Init script</label>
+          {{ nested.init_script(class_="textarea auto-ta", rows="6", style="width:98%;") }}
+
+          <div class="meta-row">
+            <div>
+              <label class="block-label">File (screenshot)</label>
+              {{ nested.file() }}
+            </div>
+            <div>
+              <label class="block-label">Updated</label>
+              {{ nested.updated(class_="input", readonly=true) }}
+            </div>
+            <div>
+              <label class="block-label">Last scrape</label>
+              {{ nested.lastscrape(class_="input", readonly=true) }}
+            </div>
+          </div>
+        </fieldset>
+        {% endfor %}
+      </div>
+
+      <div class="form-actions">
+        {{ form.submit(class_="btn btn-primary") }}
+      </div>
+    </form>
+
+    <!-- Delete group -->
+    <form action="" method="post" novalidate style="margin-top:12px;">
+      {{ deleteform.hidden_tag() }}
+      <div class="danger-row">
+        <label class="switch" style="color:#ef4444">{{ deleteform.delete() }} <span>Check to delete</span></label>
+        {{ deleteform.submit(class_="btn btn-secondary") }}
+      </div>
+    </form>
+
+  </div>
+</section>
+
+<style>
+/* --- Admin polish --- */
+.admin-card{ padding:12px; }
+.card-toolbar{ display:flex; align-items:center; justify-content:space-between; gap:10px; padding:8px 10px; border-bottom:1px solid var(--border); }
+.muted{ color:var(--muted); }
+
+.form-grid{ display:grid; grid-template-columns: 180px 1fr; gap:10px 14px; align-items:center; margin:12px 0; }
+.form-grid.two{ grid-template-columns: 180px 1fr; }
+.form-grid.three{ grid-template-columns: 180px 1fr 180px 1fr 180px 1fr; }
+.form-grid.three .span2{ grid-column: 2 / span 3; }
+
+.switch-row{ display:flex; gap:16px; align-items:center; padding:6px 2px; border-top:1px solid var(--border); border-bottom:1px solid var(--border); margin:10px 0; }
+.switch-row.wrap{ flex-wrap:wrap; }
+.switch{ display:inline-flex; align-items:center; gap:8px; cursor:pointer; }
+.block-label{ display:block; margin:10px 0 6px; color:var(--muted); }
+
+.input, .textarea, select{
+  background:#0f1623; color:var(--text);
+  border:1px solid var(--border); border-radius:10px; padding:8px 10px;
+}
+
+.textarea{width:98%; min-height:80px; resize:vertical; }
+
+
+.link-block{
+  border:1px solid var(--border); border-radius:12px; padding:12px; margin:12px 0;
+  background:linear-gradient(180deg,#121a28 0%,#0f1623 100%);
+}
+.link-block legend{ padding:0 6px; font-weight:700; color:var(--text); }
+
+.pill{ background:#1d2a40; border:1px solid var(--border); padding:2px 8px; border-radius:999px; margin-left:8px; font-size:.85rem; }
+.meta-row{ display:grid; grid-template-columns: 1fr 1fr 1fr; gap:12px; margin-top:10px; }
+
+.form-actions{ display:flex; gap:10px; justify-content:flex-end; }
+.danger-row{ display:flex; align-items:center; gap:12px; justify-content:flex-end; padding:10px; border:1px dashed #3b1f1f; border-radius:10px; }
+
+.tabs{ margin-top:10px; }
+.tabs-nav{ display:flex; flex-wrap:wrap; gap:8px; margin-bottom:12px; }
+.tab{
+  background:#0f1623; border:1px solid var(--border); border-radius:999px; padding:8px 12px; cursor:pointer;
+  color:var(--text);
+}
+.tab.active{ box-shadow: inset 0 -2px 0 0 var(--pri); }
+.badge{ background:#1a2537; border:1px solid var(--border); border-radius:999px; padding:1px 6px; margin-left:6px; font-size:.8rem; color:var(--text); }
+.tab-pane{ display:none; }
+.tab-pane.active{ display:block; }
+.pane-head{ display:flex; align-items:center; justify-content:space-between; margin-bottom:6px; color:var(--muted); }
+@media (max-width: 860px){
+  .form-grid, .form-grid.two{ grid-template-columns: 1fr; }
+  .form-grid.three{ grid-template-columns: 1fr 1fr; }
+  .form-grid.three .span2{ grid-column: 1 / -1; }
+  .meta-row{ grid-template-columns: 1fr; }
+}
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  // ------ Tabs ------
+  const tabBtns = [...document.querySelectorAll('.tabs-nav .tab')];
+  const panes   = {
+    profiles: document.getElementById('pane-profiles'),
+    hash:     document.getElementById('pane-hash'),
+    jabber:   document.getElementById('pane-jabber'),
+    mail:     document.getElementById('pane-mail'),
+    pgp:      document.getElementById('pane-pgp'),
+    matrix:   document.getElementById('pane-matrix'),
+    session:  document.getElementById('pane-session'),
+    telegram: document.getElementById('pane-telegram'),
+    tox:      document.getElementById('pane-tox'),
+    affiliates: document.getElementById('pane-affiliates'),
+    other:    document.getElementById('pane-other')
+  };
+  function activate(tab){
+    tabBtns.forEach(b => b.classList.toggle('active', b.dataset.tab===tab));
+    Object.entries(panes).forEach(([k,el]) => el.classList.toggle('active', k===tab));
+  }
+  tabBtns.forEach(b => b.addEventListener('click', ()=> activate(b.dataset.tab)));
+  // Activate first visible
+  activate(document.querySelector('.tabs-nav .tab.active')?.dataset.tab || 'profiles');
+
+  // ------ Auto-resize textareas + counters ------
+  const counterMap = {
+    profiles: { selector: '#pane-profiles textarea', split: '\n' },
+    hash:     { selector: '#pane-hash textarea',     split: '\n' },
+    jabber:   { selector: '#pane-jabber textarea',   split: '\n' },
+    mail:     { selector: '#pane-mail textarea',     split: '\n' },
+    pgp:      { selector: '#pane-pgp textarea',      split: '|'  }, // PGP traité par bloc "|"
+    matrix:   { selector: '#pane-matrix textarea',   split: '\n' },
+    session:  { selector: '#pane-session textarea',  split: '\n' },
+    telegram: { selector: '#pane-telegram textarea', split: '\n' },
+    tox:      { selector: '#pane-tox textarea',      split: '\n' },
+    affiliates:{selector:'#pane-affiliates textarea', split: '\n'},
+    other:    { selector: '#pane-other textarea',    split: '\n' }
+  };
+  function autoResize(ta){
+    ta.style.height = 'auto';
+    ta.style.height = Math.min(500, ta.scrollHeight) + 'px';
+  }
+  function updateBadge(key){
+    const conf = counterMap[key];
+    if (!conf) return;
+    const ta = document.querySelector(conf.selector);
+    const badge = document.querySelector(`.badge[data-count="${key}"]`);
+    if (!ta || !badge) return;
+    const raw = (ta.value || '').trim();
+    const parts = (conf.split === '|')
+      ? raw.split('\n').flatMap(line => line.split('|'))   // PGP: plusieurs par ligne, séparés par |
+      : raw.split('\n');
+    const count = parts.filter(s => (s||'').trim().length>0).length;
+    badge.textContent = count;
+  }
+  // init + listeners
+  document.querySelectorAll('.auto-ta').forEach(ta => {
+    autoResize(ta);
+    ta.addEventListener('input', () => {
+      autoResize(ta);
+      // retrouve l’onglet associé pour mettre à jour
+      for (const k of Object.keys(counterMap)) {
+        if (ta.matches(counterMap[k].selector)) { updateBadge(k); break; }
+      }
+    });
+  });
+  Object.keys(counterMap).forEach(updateBadge);
+
+  // ------ Keep selected tab in URL hash (optional, no side effects) ------
+  const initialHash = (location.hash || '').replace('#','');
+  if (initialHash && panes[initialHash]) activate(initialHash);
+  tabBtns.forEach(b => b.addEventListener('click', () => {
+    history.replaceState(null, '', '#'+b.dataset.tab);
+  }));
+});
+</script>
+
+{% endblock %}

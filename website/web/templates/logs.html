@@ -1,26 +1,249 @@
 {% extends "base.html" %}
 {% from 'bootstrap5/utils.html' import render_messages %}
-{% block title %}🦕 RansomLook 🦖{% endblock %}
+{% block title %}Logs{% endblock %}
+
 {% block content %}
+
 {{ render_messages(container=True, dismissible=True) }}
 
-    <article id="main" class="markdown-section">
-        <h1>Logs</h1>
-        <table id="table" class="table" style="display:table; table-layout:auto; width:100%">
+<section class="hero">
+  <div class="container">
+    <h1>Logs</h1>
+    <p class="lead">Recherche, filtres (niveau & dates), affichage repliable et copie rapide.</p>
+  </div>
+</section>
+
+<section class="metrics-section">
+  <div class="container">
+
+    <!-- Toolbar -->
+    <div class="table-card" style="padding:12px; margin-bottom:16px;">
+      <form id="log-filters" onsubmit="return false" aria-label="Filters">
+        <div style="display:flex; flex-wrap:wrap; gap:12px; align-items:end;">
+
+          <!-- Date range -->
+          <div>
+            <label class="label" for="from-date">From</label>
+            <input id="from-date" type="date" class="input">
+          </div>
+          <div>
+            <label class="label" for="to-date">To</label>
+            <input id="to-date" type="date" class="input">
+          </div>
+
+          <!-- Level -->
+          <div>
+            <label class="label" for="level-filter">Level</label>
+            <select id="level-filter" class="input">
+              <option value="">All</option>
+              <option value="ERROR">ERROR</option>
+              <option value="WARN">WARN</option>
+              <option value="INFO">INFO</option>
+              <option value="DEBUG">DEBUG</option>
+            </select>
+          </div>
+
+          <!-- Search -->
+          <div style="flex:1 1 360px; min-width:280px;">
+            <label class="label" for="log-search">Search</label>
+            <input id="log-search" class="input" type="search" placeholder="Text, level (ERROR/WARN/INFO/DEBUG)…">
+          </div>
+
+          <!-- Wrap toggle -->
+          <div style="display:flex; gap:8px; align-items:center; padding:0 6px 6px;">
+            <input id="wrap-toggle" type="checkbox">
+            <label for="wrap-toggle">Wrap long lines</label>
+          </div>
+
+          <!-- Actions -->
+          <div style="margin-left:auto; display:flex; gap:8px;">
+            <button id="expand-all"   class="btn btn-secondary" type="button">Expand all</button>
+            <button id="collapse-all" class="btn btn-secondary" type="button">Collapse all</button>
+            <button id="reset-filters" class="btn btn-secondary" type="button">Reset</button>
+          </div>
+
+        </div>
+      </form>
+    </div>
+
+    <!-- Table -->
+    <div class="table-card">
+      <div class="table-scroll">
+        <table class="rl-table" aria-label="Logs">
           <thead>
             <tr>
-                <th style="width:10%"> Date </th>
-                <th style="width:90%"> Title </th>
+              <th style="width:14%; position:sticky; top:0;">Date</th>
+              <th style="width:8%;  position:sticky; top:0;">Level</th>
+              <th style="position:sticky; top:0;">Message</th>
+              <th style="width:6%; position:sticky; top:0;">Copy</th>
             </tr>
           </thead>
-          <tbody>
+          <tbody id="log-body">
             {% for entry in logs %}
-                <tr>
-                    <td><center> {{entry[1]}} </center></td>
-                    <td>{{ entry[0] }}</td>
-                </tr>
+              {% set msg  = entry[0] %}
+              {% set when = entry[1] %}
+              {% set lvl  = ('ERROR' if 'ERROR' in msg
+                             else 'WARN'  if 'WARN'  in msg
+                             else 'INFO'  if 'INFO'  in msg
+                             else 'DEBUG' if 'DEBUG' in msg
+                             else '') %}
+              <tr data-level="{{ lvl }}" data-date="{{ when }}">
+                <td><time datetime="{{ when }}">{{ when }}</time></td>
+                <td>
+                  {% if lvl %}
+                    <span class="badge {{ 'badge-danger' if lvl=='ERROR'
+                                           else 'badge-warn'  if lvl=='WARN'
+                                           else 'badge-ok'    if lvl=='INFO'
+                                           else 'badge-neutral' }}">
+                      {{ lvl }}
+                    </span>
+                  {% endif %}
+                </td>
+                <td>
+                  <details class="log-details">
+                    <summary class="log-summary">{{ msg }}</summary>
+                    <pre class="log-pre">{{ msg }}</pre>
+                  </details>
+                </td>
+                <td>
+                  <button class="btn btn-secondary btn-sm copy-btn" type="button" data-msg="{{ msg|e }}">Copy</button>
+                </td>
+              </tr>
             {% endfor %}
           </tbody>
         </table>
-    </article>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<style>
+/* badges */
+.badge{ padding:2px 8px; border-radius:999px; font-size:.85rem; }
+.badge-danger { background:rgba(220, 38, 38, .15); color:#fca5a5; border:1px solid rgba(220,38,38,.35); }
+.badge-warn   { background:rgba(234,179, 8, .12); color:#fde68a; border:1px solid rgba(234,179,8,.35); }
+.badge-ok     { background:rgba(34,197, 94,.12); color:#86efac;  border:1px solid rgba(34,197,94,.35); }
+.badge-neutral{ background:rgba(148,163,184,.12); color:#e5e7eb; border:1px solid rgba(148,163,184,.35); }
+
+/* log folding */
+.log-summary{
+  display:block;
+  max-height:2.4em;            /* ~2 lines */
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+}
+.log-details[open] .log-summary{
+  white-space:var(--log-wrap, nowrap);
+  max-height:none;
+}
+.log-pre{
+  margin:8px 0 0;
+  padding:10px;
+  border:1px solid var(--border);
+  border-radius:10px;
+  background:#0f1623;
+  white-space:var(--log-wrap, pre); /* basculé par toggle wrap */
+  overflow:auto;
+}
+
+/* sticky header already set inline; make sure header stays above content */
+.rl-table thead th{ background: var(--bg); z-index: 1; }
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  const $tbody   = document.getElementById('log-body');
+  const $search  = document.getElementById('log-search');
+  const $level   = document.getElementById('level-filter');
+  const $from    = document.getElementById('from-date');
+  const $to      = document.getElementById('to-date');
+  const $wrap    = document.getElementById('wrap-toggle');
+  const $reset   = document.getElementById('reset-filters');
+
+  const rows = [...$tbody.querySelectorAll('tr')];
+
+  // parse YYYY-MM-DD (éventuellement avec heure) en Date (seulement la date est prise en compte)
+  function parseDateOnly(s){
+    if (!s) return null;
+    // on garde la partie date au format YYYY-MM-DD
+    const m = String(s).trim().match(/^(\d{4}-\d{2}-\d{2})/);
+    if (!m) return null;
+    const d = new Date(m[1] + 'T00:00:00Z'); // UTC midnight
+    return isNaN(d) ? null : d;
+  }
+
+  function update(){
+    const q    = ($search.value || '').toLowerCase();
+    const want = ($level.value || '').toUpperCase();
+    const dFrom = $from.value ? new Date($from.value + 'T00:00:00Z') : null;
+    const dTo   = $to.value   ? new Date($to.value   + 'T00:00:00Z') : null;
+
+    rows.forEach(tr => {
+      const txt   = tr.querySelector('.log-summary')?.textContent.toLowerCase() || '';
+      const level = (tr.dataset.level || '').toUpperCase();
+      const rowD  = parseDateOnly(tr.dataset.date);
+
+      let ok = true;
+
+      // text filter
+      if (q && !txt.includes(q)) ok = false;
+
+      // level filter
+      if (ok && want && level !== want) ok = false;
+
+      // date range filter (inclusif)
+      if (ok && dFrom && rowD && rowD < dFrom) ok = false;
+      if (ok && dTo   && rowD && rowD > dTo)   ok = false;
+
+      tr.style.display = ok ? '' : 'none';
+    });
+  }
+
+  // wrap toggle
+  function setWrap(on){
+    document.documentElement.style.setProperty('--log-wrap', on ? 'pre-wrap' : 'pre');
+  }
+  setWrap(false);
+
+  // events
+  [$search, $level].forEach(el => el.addEventListener('input', update));
+  [$from, $to].forEach(el => el.addEventListener('change', update));
+  $wrap.addEventListener('change', ()=> setWrap($wrap.checked));
+
+  document.getElementById('expand-all').addEventListener('click', () => {
+    document.querySelectorAll('.log-details').forEach(d => d.open = true);
+  });
+  document.getElementById('collapse-all').addEventListener('click', () => {
+    document.querySelectorAll('.log-details').forEach(d => d.open = false);
+  });
+
+  $reset.addEventListener('click', () => {
+    $search.value = '';
+    $level.value  = '';
+    $from.value   = '';
+    $to.value     = '';
+    setWrap(false);
+    $wrap.checked = false;
+    rows.forEach(r => r.style.display = '');
+  });
+
+  // copy buttons (delegation)
+  $tbody.addEventListener('click', async (e) => {
+    const btn = e.target.closest('.copy-btn');
+    if (!btn) return;
+    try {
+      await navigator.clipboard.writeText(btn.dataset.msg || '');
+      const old = btn.textContent;
+      btn.textContent = 'Copied!';
+      setTimeout(()=> btn.textContent = old, 900);
+    } catch {}
+  });
+
+  // first render
+  update();
+});
+</script>
+
 {% endblock %}

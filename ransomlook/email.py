@@ -7,7 +7,6 @@ import smtplib
 import ssl
 from email.message import EmailMessage
 
-from .sharedutils import errlog
 from .default import get_config
 
 from typing import Dict, Any, List

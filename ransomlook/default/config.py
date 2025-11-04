@@ -5,7 +5,7 @@ from pathlib import Path
 from typing import Any, Dict, Optional, Union
 
 from . import env_global_name
-from .exceptions import ConfigError, CreateDirectoryException, MissingEnv
+from .exceptions import ConfigError, MissingEnv
 
 configs: Dict[str, Dict[str, Any]] = {}
 logger = logging.getLogger('Config')

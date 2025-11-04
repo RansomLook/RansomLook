@@ -1,0 +1,85 @@
+{% extends "base.html" %}
+{% from 'bootstrap5/utils.html' import render_messages %}
+{% block title %}🦕 RansomLook — Manage Logo{% endblock %}
+
+{% block content %}
+{{ render_messages(container=True, dismissible=True) }}
+
+<section class="hero">
+  <div class="container">
+    <h1>Manage Logos</h1>
+    <p class="lead">Preview existing logos, remove the ones you don’t need, and upload new ones.</p>
+  </div>
+</section>
+
+<section class="metrics-section">
+  <div class="container">
+    <form action="" method="post" enctype="multipart/form-data" novalidate>
+      {{ form.hidden_tag() }}
+
+      <!-- Logos existants -->
+      <div class="table-card" style="margin-bottom:16px;">
+        <div class="card-toolbar"><span>Current logos</span></div>
+
+        {% if form.logos and form.logos|length > 0 %}
+          <div class="logo-grid">
+            {% for nested in form.logos %}
+              <div class="logo-card">
+                <div class="logo-imgwrap">
+                  <img src="{{ nested.link.data }}" alt="Logo" loading="lazy">
+                </div>
+                <div class="logo-fields">
+                  {{ nested }}
+                </div>
+              </div>
+            {% endfor %}
+          </div>
+        {% else %}
+          <div class="empty-note">No logo yet for this entity.</div>
+        {% endif %}
+      </div>
+
+      <!-- Upload -->
+      <div class="table-card" style="margin-bottom:14px;">
+        <div class="card-toolbar"><span>Add logo</span></div>
+        <div class="uploader">
+          <label for="{{ form.file.id }}" class="dropzone" id="dropzone">
+            <strong>Drop an image here</strong>
+            <span>or click to browse</span>
+          </label>
+          {{ form.file(class_="input-file", style="display:none;") }}
+        </div>
+      </div>
+
+      <div class="actions">
+        {{ form.submit(class_="btn btn-primary") }}
+      </div>
+    </form>
+  </div>
+</section>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  const fileInput = document.getElementById('{{ form.file.id }}');
+  const drop = document.getElementById('dropzone');
+
+  if (!fileInput || !drop) return;
+
+  // click -> open chooser
+  drop.addEventListener('click', () => fileInput.click());
+
+  // drag & drop
+  ;['dragenter','dragover'].forEach(ev =>
+    drop.addEventListener(ev, e => { e.preventDefault(); e.stopPropagation(); drop.classList.add('dragover'); })
+  );
+  ;['dragleave','drop'].forEach(ev =>
+    drop.addEventListener(ev, e => { e.preventDefault(); e.stopPropagation(); drop.classList.remove('dragover'); })
+  );
+  drop.addEventListener('drop', e => {
+    if (e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files.length){
+      fileInput.files = e.dataTransfer.files;
+    }
+  });
+});
+</script>
+{% endblock %}

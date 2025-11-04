@@ -24,7 +24,7 @@ def main() -> List[Dict[str, str]] :
                     for div in divs_name:
                         title = div.find('div', {'class': 'text-2xl font-bold'}).text.strip()
                         description = div.find('div', {'class': 'blog-preview'}).text.strip()
-                        div2 = div.find('div', {'class': 'post-footer-right'})
+                        div.find('div', {'class': 'post-footer-right'})
                         list_div.append({'title':title, 'description': description})
                 file.close()
         except:

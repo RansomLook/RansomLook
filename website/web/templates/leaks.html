@@ -3,28 +3,222 @@
 {% block title %}Leaks{% endblock %}
 
 {% block content %}
-    <article id="main" class="markdown-section">
-	<h1>Leaks listing</h1>
-           <div class="table-responsive">
-           <table id="table" class="table" style="display:table; table-layout:auto; width:100%">
-           <thead>
-               <tr>
-                   <th style="width:70%"> Page title </th>
-                   <th style="width:20%"> Entries </th>
-                   <th style="width:10%"> Detection </th>
-               </tr>
-           </thead>
-           <tbody>
-             {% for entry in data %}
-                <tr>
-                <td> <a href="/leak/{{entry['id'].decode()}}">{{ entry['name'].title() }}</a>  </td>
-                <td><center> {{ entry['records'] }} </center></td>
-                <td> {{ entry['indexed'] }} </td>
-                </tr>
-             {% endfor %}
-           </tbody>
-           </table>
-           </div>
 
-    </article>
+<!-- Hero -->
+<section class="hero">
+  <div class="container">
+    <h1>Leaks listing</h1>
+    <p class="lead">Browse known public leaks. Click a leak to view details.</p>
+  </div>
+</section>
+
+<section class="metrics-section">
+  <div class="container">
+    <div id="filters-top-leaks"></div>
+    <!-- Filters -->
+    <div class="table-card search-card" style="padding:12px;margin-bottom:12px">
+      <div class="filters-wrap">
+        <div class="filters">
+          <div class="field field--search">
+            <label class="sr-only" for="flt-q">Search</label>
+            <input id="flt-q" class="input" type="search"
+                   aria-label="Search"
+                   placeholder="Name, description, URL, page title…">
+            <button class="input-clear" type="button" aria-label="Clear search">×</button>
+          </div>
+        </div>
+        <div class="filters-meta"><span id="flt-count"></span></div>
+      </div>
+    </div>
+
+
+    <div class="table-card">
+      <div class="table-scroll">
+        <table class="rl-table" aria-label="Leaks">
+          <thead>
+            <tr>
+              <th style="width:70%">Page title</th>
+              <th style="width:20%">Entries</th>
+              <th style="width:10%">Detection</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for entry in data %}
+              {% set leak_id = entry['id'].decode() %}
+              <tr>
+                <td>
+                  <a class="leak-link"
+                     href="/leak/{{ leak_id }}"
+                     data-leak-id="{{ leak_id }}">
+                    {{ entry['name'].title() }}
+                  </a>
+                </td>
+                <td><center>{{ entry['records'] }}</center></td>
+                <td>{{ entry['indexed'] }}</td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- Modal -->
+<div id="leak-modal" class="modal-root" aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="leak-modal-title">
+  <div class="modal-backdrop" data-dismiss="modal"></div>
+  <div class="modal-dialog" role="document">
+    <header class="modal-header">
+      <h2 id="leak-modal-title">Leak details</h2>
+      <button class="modal-close" type="button" aria-label="Close" data-dismiss="modal">×</button>
+    </header>
+    <div class="modal-body">
+      <div class="table-card">
+        <div class="table-scroll">
+          <table class="rl-table" aria-label="Leak data">
+            <thead>
+              <tr>
+                <th style="width:10%">Size</th>
+                <th style="width:15%">Records</th>
+                <th style="width:10%">Indexed</th>
+                <th style="width:65%">Columns</th>
+              </tr>
+            </thead>
+            <tbody id="leak-modal-tbody">
+              <!-- filled dynamically -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <div class="modal-footnote" id="leak-modal-footnote"></div>
+    </div>
+  </div>
+</div>
+
+<!-- JS INLINE (dans content, pas besoin de block scripts) -->
+<script>
+(function() {
+  const modal = document.getElementById('leak-modal');
+  const tbody = document.getElementById('leak-modal-tbody');
+  const foot = document.getElementById('leak-modal-footnote');
+
+  function escapeHtml(val){
+    if (val === null || val === undefined) return '';
+    return String(val)
+      .replace(/&/g,'&amp;')
+      .replace(/</g,'&lt;')
+      .replace(/>/g,'&gt;')
+      .replace(/"/g,'&quot;')
+      .replace(/'/g,'&#39;');
+  }
+
+  function openModal() {
+    modal.setAttribute('aria-hidden','false');
+    document.body.classList.add('modal-open');
+  }
+  function closeModal() {
+    modal.setAttribute('aria-hidden','true');
+    document.body.classList.remove('modal-open');
+    tbody.innerHTML = '';
+    foot.textContent = '';
+  }
+
+  // close handlers
+  modal.addEventListener('click', (e) => {
+    if (e.target.matches('[data-dismiss="modal"]')) {
+      e.preventDefault();
+      closeModal();
+    }
+  });
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') closeModal();
+  });
+
+  function withJsonParam(url){
+    return url + (url.includes('?') ? '&' : '?') + 'format=json';
+  }
+
+  async function fetchLeakJSON(url) {
+    const res = await fetch(withJsonParam(url), { headers: { 'Accept': 'application/json' } });
+    if (!res.ok) throw new Error('not ok');
+    const ct = (res.headers.get('content-type') || '').toLowerCase();
+    if (!ct.includes('application/json')) throw new Error('not json');
+    return res.json();
+  }
+
+  function renderRow(group) {
+    const size = group.size ?? '';
+    const records = group.records ?? '';
+    const indexed = group.indexed ?? '';
+    let cols = group.columns ?? '';
+    if (Array.isArray(cols)) cols = cols.join(', ');
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td><center>${escapeHtml(size)}</center></td>
+      <td>${escapeHtml(records)}</td>
+      <td>${escapeHtml(indexed)}</td>
+      <td style="word-break:break-all">${escapeHtml(cols)}</td>
+    `;
+    return tr;
+  }
+
+  // Event delegation (marche même si la table est rechargée)
+  document.addEventListener('click', async (e) => {
+    const a = e.target.closest('a.leak-link');
+    if (!a) return;
+
+    e.preventDefault();
+    const url = a.getAttribute('href');
+
+    try {
+      const payload = await fetchLeakJSON(url);
+      // supporte plusieurs formes: {group:{...}}, {data:{...}}, {...direct...}
+      const g = payload.group || payload.data || payload;
+      if (!g || typeof g !== 'object') throw new Error('bad payload');
+
+      tbody.innerHTML = '';
+      tbody.appendChild(renderRow(g));
+      foot.textContent = payload.name ? `Source: ${payload.name}` : '';
+
+      openModal();
+    } catch (err) {
+      // Fallback: navigation normale si pas de JSON dispo
+      window.location.href = url;
+    }
+  });
+})();
+</script>
+
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  const qInput = document.getElementById('flt-q');
+  const clearBtn = document.querySelector('.input-clear');
+  const table = document.querySelector('table[aria-label="Leaks"]');
+  if (!table) return;
+  const tbody = table.querySelector('tbody');
+  const rows = [...tbody.querySelectorAll('tr')];
+  const countEl = document.getElementById('flt-count');
+
+  function apply(){
+    const q = (qInput?.value || '').trim().toLowerCase();
+    let visible = 0;
+    rows.forEach(tr => {
+      const t = tr.textContent.toLowerCase();
+      const show = !q || t.includes(q);
+      tr.style.display = show ? '' : 'none';
+      if (show) visible++;
+    });
+    if (countEl) countEl.textContent = visible + ' leaks';
+  }
+
+  let t; qInput?.addEventListener('input', () => { clearTimeout(t); t=setTimeout(apply,120); });
+  clearBtn?.addEventListener('click', () => { qInput.value=''; apply(); qInput.focus(); });
+
+  apply();
+});
+</script>
+
+
 {% endblock %}
