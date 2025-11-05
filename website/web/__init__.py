@@ -2720,7 +2720,7 @@ def alerting(): # type: ignore[no-untyped-def]
         red.set('keywords',str(keywords))
         flash('Success to update keywords', 'success')
     form.keywords.data=keywords
-    return render_template('alerts.html', form=form)
+    return render_template('admin/alerts.html', form=form)
 
 if __name__ == "__main__":
 	app.run()
