@@ -1737,7 +1737,7 @@ def addpostentry(database: int, name: str): # type: ignore
             entry['magnet'] = form.magnet.data
         if form.link.data and form.magnet.data:
             flash(f'Error to add post to : {name} - You should select Magnet or Link not both', 'error')
-            return render_template('addpostentry.html', form=form)
+            return render_template('admin/addpostentry.html', form=form)
         if form.date.data:
             entry['date'] = str(parser.parse(form.date.data))
         uploaded_file = request.files['file']
@@ -1747,7 +1747,7 @@ def addpostentry(database: int, name: str): # type: ignore
             if file_ext not in app.config['UPLOAD_EXTENSIONS'] or \
               file_ext != validate_image(uploaded_file.stream): # type: ignore
                 flash(f'Error to add post to : {name} - Screen should be a PNG', 'error')
-                return render_template('addpostentry.html', form=form)
+                return render_template('admin/addpostentry.html', form=form)
             filenamepng = createfile(form.title.data) + file_ext
             base_path = os.path.normpath(str(get_homedir()) + '/source/screenshots')
             path = os.path.normpath(os.path.join(base_path, name))
@@ -1760,7 +1760,7 @@ def addpostentry(database: int, name: str): # type: ignore
             entry['screen'] = str(os.path.join('screenshots', name, filenamepng))
         if appender(entry, name):
             flash(f'Error to add post to : {name} - The entry already exists', 'error')
-            return render_template('addpostentry.html', form=form)
+            return render_template('admin/addpostentry.html', form=form)
         else:
             #statsgroup(name.encode())
             #run_data_viz(7)
