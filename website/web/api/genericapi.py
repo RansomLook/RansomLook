@@ -100,10 +100,8 @@ class Groupinfo(Resource): # type: ignore[misc]
 
                         if group['meta'] is not None:
                             group['meta']=group['meta'].replace('\n', '<br/>')
+                        group['locations'] = [location for location in group['locations'] if not ('private' in location and location['private'] is True)]
                         for location in group['locations']:
-                            if 'private' in location and location['private'] is True:
-                                group['locations'].remove(location)
-                                continue
                             screenfile = '/screenshots/' + name.lower() + '-' + createfile(location['slug']) + '.png'
                             screenpath = os.path.normpath(str(get_homedir()) + '/source' + screenfile)
                             if not screenpath.startswith(str(get_homedir())):
@@ -172,10 +170,8 @@ class Marketinfo(Resource): # type: ignore[misc]
                            return [[],{}]
                         if group['meta'] is not None:
                             group['meta']=group['meta'].replace('\n', '<br/>')
+                        group['locations'] = [location for location in group['locations'] if not ('private' in location and location['private'] is True)]
                         for location in group['locations']:
-                            if 'private' in location and location['private'] is True:
-                                group['locations'].remove(location)
-                                continue
                             screenfile = '/screenshots/' + name.lower() + '-' + createfile(location['slug']) + '.png'
                             screenpath = os.path.normpath(str(get_homedir()) + '/source' + screenfile)
                             if not screenpath.startswith(str(get_homedir())):
@@ -217,9 +213,7 @@ class Exportdb(Resource): # type: ignore[misc]
                 if 'private' in temp and temp['private'] is True:
                     continue
                 if 'locations' in temp:
-                    for location in temp['locations']:
-                        if 'private' in location and location['private'] is True:
-                            temp['locations'].remove(location)
+                    temp['locations'] = [location for location in temp['locations'] if not ('private' in location and location['private'] is True)]
                 dump[key.decode()]=temp
         return dump
 
