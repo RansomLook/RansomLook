@@ -1685,7 +1685,7 @@ def editlogo(database: int, name: str): # type: ignore
             if file_ext not in app.config['UPLOAD_EXTENSIONS'] or \
                 file_ext != validate_image(form.file.data): # type: ignore
                 flash(f'Error to add post to : {name} - Screen should be a PNG', 'error')
-                return render_template('editlogo.html', form=form)
+                return render_template('admin/editlogo.html', form=form)
             filename = createfile(os.path.splitext(filename)[0])+ file_ext
             if not os.path.exists(logofolder):
                 os.mkdir(logofolder)
