@@ -137,7 +137,6 @@
     <span>Ransom notes</span><span class="count">{{ note_count }}</span>
   </summary>
 
-  {# IMPORTANT: id="ransom-notes" pour scoper le JS #}
   <div id="ransom-notes" class="table-card" style="padding:12px;">
     {% if note_previews and note_previews|length %}
       <div class="list-group">
@@ -641,7 +640,7 @@
                   <td class="thumb-cell">
                     {% if entry.get('screen') %}
                       <a href="/{{ entry['screen']|quote_plus }}" class="open-shot" data-caption="{{ entry['post_title']|default('') }}">
-                        <img class="thumb" src="/{{ entry['screen']|quote_plus }}" alt="Post screen">
+                          Screen 
                       </a>
                     {% endif %}
                   </td>
