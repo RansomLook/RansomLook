@@ -1008,7 +1008,9 @@ def actor_details(name: str):  # type: ignore
         "actor.html",
         actor=actor,
         rel_groups=rel_groups,
+        rel_groupsunk=rel_groupsunk,
         rel_forums=rel_forums,
+        rel_forumsunk=rel_forumsunk,
         peers_known=peers_known,
         peers_unknown=peers_unknown,
         images=images
