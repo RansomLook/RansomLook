@@ -1,0 +1,177 @@
+{% extends "base.html" %}
+{% block title %}RansomLook — Glossary{% endblock %}
+
+{% block content %}
+<section class="hero">
+  <div class="container">
+    <h1>Glossary</h1>
+    <p class="subtitle">
+      Technical terms used across RansomLook: groups, actors, infrastructure types, metrics and relationships.
+    </p>
+  </div>
+</section>
+
+<section class="page-section">
+  <div class="container glossary">
+
+    <h2>Core concepts</h2>
+
+    <dl>
+      <dt>Group</dt>
+      <dd>
+        A ransomware group or data-extortion collective tracked by RansomLook. Groups usually operate one or more
+        leak sites, file servers and communication channels.
+      </dd>
+
+      <dt>Actor</dt>
+      <dd>
+        A named individual or pseudonym (threat actor, developer, affiliate, broker, admin, etc.) related to
+        ransomware or data-extortion activity.
+      </dd>
+
+      <dt>Victim / Post</dt>
+      <dd>
+        A single entry published by a group about a targeted organisation. In RansomLook this is usually stored as a
+        “post” and is associated with one group and one discovery timestamp.
+      </dd>
+
+      <dt>RaaS (Ransomware-as-a-Service)</dt>
+      <dd>
+        Operating model where a core team develops the ransomware and infrastructure, while affiliates perform
+        intrusions and share the profits.
+      </dd>
+    </dl>
+
+    <h2>Infrastructure types</h2>
+
+    <dl>
+      <dt>DLS (Dedicated Leak Site / Darknet Leak Site)</dt>
+      <dd>
+        Tor-based website operated by a group to list victims and publish stolen data when ransoms are not paid.
+        This is the main “blog” used for extortion pressure.
+      </dd>
+
+      <dt>FS (File Server / File Storage)</dt>
+      <dd>
+        Infrastructure used to host or distribute stolen data (archives, samples, full dumps). This can be a separate
+        Tor service, a clearnet file host, or another storage endpoint distinct from the public DLS.
+      </dd>
+
+      <dt>Chat</dt>
+      <dd>
+        Communication endpoints used for negotiation or contact with victims and affiliates. This includes web-based
+        chat on Tor portals, Telegram channels, X/Twitter accounts, email and other messaging systems.
+      </dd>
+
+      <dt>Admin / Affiliates panel</dt>
+      <dd>
+        Administrative or affiliate-focused infrastructure that is not intended for public victim browsing. Typical
+        examples: recruitment panels for affiliates, management portals for campaigns, internal status or payment pages.
+      </dd>
+
+      <dt>Relay / Mirror</dt>
+      <dd>
+        A technical copy of a group’s site (DLS, FS, chat portal, admin panel) accessible at a different domain or
+        onion address. RansomLook tracks each relay or mirror as a separate location, with its own online/offline status.
+      </dd>
+
+      <dt>Slug</dt>
+      <dd>
+        Normalised name used internally to build URLs for a specific location of a group (for example a particular
+        DLS, FS or chat endpoint). Slugs are used to create deterministic filenames and links.
+      </dd>
+
+      <dt>Private location</dt>
+      <dd>
+        A location (DLS, FS, chat, admin) that is stored in the database but intentionally not displayed to
+        unauthenticated visitors. It is still used for scraping, monitoring and metrics.
+      </dd>
+    </dl>
+
+    <h2>Data and metrics</h2>
+
+    <dl>
+      <dt>Parser</dt>
+      <dd>
+        Piece of code dedicated to a specific group or site. The parser extracts structured data from HTML pages
+        (victim name, sector, country, dates, etc.) and populates the internal database.
+      </dd>
+
+      <dt>Discovery date / Discovered</dt>
+      <dd>
+        Timestamp at which RansomLook first observed a victim post on a group’s infrastructure. It may differ from
+        the original intrusion or encryption date.
+      </dd>
+
+      <dt>Leak / Dataleak</dt>
+      <dd>
+        Public dataset containing credentials or other information exposed in previous breaches. RansomLook integrates
+        external leak databases for enrichment and pivoting.
+      </dd>
+
+      <dt>Ransomware notes / Ransom notes</dt>
+      <dd>
+        Text files or HTML pages left on compromised systems by ransomware operators. RansomLook indexes ransom notes
+        from external sources to help identify families and operations.
+      </dd>
+
+      <dt>Crypto address / Wallet</dt>
+      <dd>
+        Cryptocurrency address controlled or used by a group or affiliate to receive ransom payments. These addresses
+        are monitored and correlated with known ransomware activity.
+      </dd>
+    </dl>
+
+    <h2>Ecosystem and sources</h2>
+
+    <dl>
+      <dt>Markets / Forums</dt>
+      <dd>
+        Darknet or clearnet platforms where actors trade access, data, tools or services. RansomLook tracks these as
+        separate entities from ransomware groups, with their own relays and metrics.
+      </dd>
+
+      <dt>RF Dumps / Recorded Future</dt>
+      <dd>
+        Optional private integration providing additional leak information and dumps from Recorded Future. When
+        enabled, it appears as an extra data source in RansomLook.
+      </dd>
+
+      <dt>Onion service (Tor)</dt>
+      <dd>
+        Hidden service accessible through the Tor network. Most DLS, FS and negotiation panels are onion services,
+        sometimes with multiple relays or versions.
+      </dd>
+
+      <dt>v3 onion</dt>
+      <dd>
+        Current version of Tor hidden service addresses (56-character <code>.onion</code> domains). RansomLook tracks
+        onion versions to better classify and monitor infrastructure changes.
+      </dd>
+    </dl>
+
+    <h2>Relationships</h2>
+
+    <dl>
+      <dt>Affiliates</dt>
+      <dd>
+        External operators who work with a core ransomware group or service. Affiliates perform intrusions, deploy
+        ransomware and share a percentage of the ransom with the core operators.
+      </dd>
+
+      <dt>Peers</dt>
+      <dd>
+        In the actor model, “peers” are other actors linked to a given individual or pseudonym. This can represent
+        collaboration, shared infrastructure or repeated co-appearance in the same operations.
+      </dd>
+
+      <dt>Groups / Forums (relations)</dt>
+      <dd>
+        Links between one actor and multiple groups or markets. RansomLook stores these relations so users can explore
+        which actors appear to operate across which ecosystems.
+      </dd>
+    </dl>
+
+  </div>
+</section>
+{% endblock %}

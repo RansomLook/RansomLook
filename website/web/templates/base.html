@@ -109,6 +109,9 @@ document.addEventListener("DOMContentLoaded", function () {
           <a role="menuitem" href="/doc/" {% if request.path.startswith('/doc') %}aria-current="page" class="active"{% endif %}>{{ _('Docs') if _ else 'Docs' }}</a>
         </li>
         <li role="none">
+          <a role="menuitem" href="/glossary" {% if request.path.startswith('/glossary') %}aria-current="page" class="active"{% endif %}>{{ _('Glossary') if _ else 'Glossary' }}</a>
+        </li>
+        <li role="none">
           <a role="menuitem" href="/about" {% if request.path.startswith('/about') %}aria-current="page" class="active"{% endif %}>{{ _('About') if _ else 'About' }}</a>
         </li>
       </ul>

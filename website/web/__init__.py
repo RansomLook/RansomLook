@@ -1443,6 +1443,10 @@ def logofile(database: str, group: str, file: str):  # type: ignore[no-untyped-d
 
     return resp
 
+@app.route("/glossary")
+def glossary():  # type: ignore[no-untyped-def]
+    return render_template("glossary.html")
+
 # Admin Zone
 
 @app.route('/admin/')
