@@ -76,7 +76,7 @@ def jsarray_to_json(js: str) -> str:
                 out.append(ch); i+=1
     s=''.join(out)
 
-    out=[]; in_str=False; esc=False; quote=''; prev=[]
+    out=[]; in_str=False; esc=False; quote=''; prev=[] # type: ignore
     for ch in s:
         if in_str:
             out.append(ch)
@@ -113,7 +113,7 @@ def jsarray_to_json(js: str) -> str:
                 out.append(ch if code>=0x20 or ch in '\t\n\r' else ' ')
     return ''.join(out)
 
-def parse_file(path: str):
+def parse_file(path: str): # type: ignore
     with open(path, 'r', encoding='utf-8', errors='replace') as f:
         raw=f.read().lstrip("\ufeff")
     block = extract_companies_block(raw)
