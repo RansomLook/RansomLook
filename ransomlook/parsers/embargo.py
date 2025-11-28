@@ -14,7 +14,7 @@ def main() -> List[Dict[str, str]] :
                 if 'api-blog-get' in filename:
                     jsonpart= soup.pre.contents # type: ignore
                     data = json.loads(jsonpart[0]) # type: ignore
-                    for entry in data:
+                    for entry in data['blogs']:
                         title = entry['comname'].strip()
                         description = entry['descr'].strip()
                         link= str(entry['_id'])
@@ -24,7 +24,7 @@ def main() -> List[Dict[str, str]] :
                     for div in divs_name:
                         title = div.find('div', {'class': 'text-2xl font-bold'}).text.strip()
                         description = div.find('div', {'class': 'blog-preview'}).text.strip()
-                        div.find('div', {'class': 'post-footer-right'})
+                        div2 = div.find('div', {'class': 'post-footer-right'})
                         list_div.append({'title':title, 'description': description})
                 file.close()
         except:
