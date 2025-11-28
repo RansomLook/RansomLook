@@ -14,7 +14,7 @@ def main() -> List[Dict[str, str]] :
                 if 'api-blog-get' in filename:
                     jsonpart= soup.pre.contents # type: ignore
                     data = json.loads(jsonpart[0]) # type: ignore
-                    for entry in data:
+                    for entry in data['blogs']:
                         title = entry['comname'].strip()
                         description = entry['descr'].strip()
                         link= str(entry['_id'])
