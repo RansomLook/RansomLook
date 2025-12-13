@@ -11,12 +11,11 @@ def main() -> List[Dict[str, str]] :
                 html_doc='source/'+filename
                 file=open(html_doc,'r')
                 soup=BeautifulSoup(file,'html.parser')
-                as_name=soup.find_all('a', {"class": "leak-card"})
-                for a in as_name:
-                    title = a.find('h2').text.strip()
-                    description = ''
-                    link = a["href"]
-                    list_div.append({"title" : title, "description" : description, "link" : link, "slug": filename})
+                div_name=soup.find_all('div', {"class": "card"})
+                for div in div_name:
+                    title = div.find('span', {"class": "title"}).text.strip()
+                    description = div.find('div', {"class": "card-desc"}).text.strip() 
+                    list_div.append({"title" : title, "description" : description})
                 file.close()
         except:
             print("Failed during : " + filename)
