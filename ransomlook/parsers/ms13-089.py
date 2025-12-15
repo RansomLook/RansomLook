@@ -16,7 +16,7 @@ def main() -> List[Dict[str, str]] :
                     title_div = div.find('div', {"class": "post-title-block"})
                     title = title_div.find('div').text.strip()
                     description = div.find('div', {"class": "post-text"}).text.strip()
-                    link = div.find('a')["onclick"].split('=')[2]
+                    link = div.find('a')["onclick"].split('=')[2].split("'")[0]
                     list_div.append({"title" : title, "description" : description, "link": '/'+link, "slug": filename})
                 file.close()
         except:
