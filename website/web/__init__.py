@@ -146,8 +146,8 @@ ldap = ldap_config['enable']
 login_manager = flask_login.LoginManager()
 login_manager.init_app(app)
 
-@login_manager.user_loader # type: ignore[misc]
-def user_loader(username: str) -> Optional[str]:
+@login_manager.user_loader # type: ignore[untyped-decorator]
+def user_loader(username: str) -> User | None:
     if not ldap:
         if username not in build_users_table():
             return None
