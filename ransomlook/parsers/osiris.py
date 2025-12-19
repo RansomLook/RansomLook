@@ -1,0 +1,29 @@
+import os
+from bs4 import BeautifulSoup
+from typing import Dict, List
+import json
+
+def main() -> List[Dict[str, str]] :
+    list_div=[]
+
+    for filename in os.listdir('source'):
+        try:
+            if filename.startswith(__name__.split('.')[-1]+'-'):
+                html_doc='source/'+filename
+                file=open(html_doc,'r')
+                soup=BeautifulSoup(file,'html.parser')
+                try:
+                    jsonpart= soup.pre.contents # type: ignore
+                    data = json.loads(jsonpart[0]) # type: ignore
+                    for entry in data['content']['payload']:
+                        title =  entry['target']['name'].strip()
+                        description = entry['description'].strip()
+                        list_div.append({"title" : title, "description" : description})
+                except:
+                    pass
+                file.close()
+        except:
+            print("Failed during : " + filename)
+            pass
+    print(list_div)
+    return list_div
