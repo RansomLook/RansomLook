@@ -1,4 +1,5 @@
 import os
+import json
 from bs4 import BeautifulSoup
 from typing import Dict, List
 
@@ -17,6 +18,16 @@ def main() -> List[Dict[str, str]] :
                     description = div.find("div", {"class": "card-body"}).text.strip()
                     link = 'detail?id='+div['data-id']
                     list_div.append({"title" : title, "description" : description, "link": link, "slug": filename})
+                try:
+                    jsonpart= soup.pre.contents # type: ignore
+                    data = json.loads(jsonpart[0]) # type: ignore
+                    for entry in data["data"]:
+                        title =  entry['name']
+                        description = entry['description'].strip()
+                        list_div.append({"title" : title, "description" : description, "link": "/company/?id="+entry["id"], "slug": filename})
+                except:
+                    pass
+
                 file.close()
         except:
             print("Failed during : " + filename)
