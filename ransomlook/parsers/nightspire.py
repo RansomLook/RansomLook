@@ -20,6 +20,18 @@ def main() -> List[Dict[str, str]] :
 
                 except:
                     list_div.append({'title' : title, 'description': description})
+            divs_name=soup.find_all('div', {"class": "team-card"})
+
+            for div in divs_name:
+                title = div.find('a',{"class": "team-name"}).text.strip()
+                description = ""
+                try:
+                    link = div.find('button')['onclick'].split('"')[1]
+                    list_div.append({'title' : title, 'description': description, 'link': link, 'slug': filename})
+
+                except:
+                    list_div.append({'title' : title, 'description': description})
+
             file.close()
     print(list_div)
     return list_div
