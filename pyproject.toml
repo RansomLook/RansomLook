@@ -74,7 +74,7 @@ pylacus = "^1.16.1"
 [tool.poetry.group.dev.dependencies]
 mypy = "^1.17.1"
 types-redis = "^4.6.0.20241004"
-pylint = "^3.3.8"
+pylint = "^4.0.4"
 
 
 [build-system]
