@@ -30,6 +30,11 @@ def main() -> list[dict[str, str]]:
                     description = div.find_all("div")[1].text.strip()
                     link = div.find("a")["href"]
                     list_div.append({"title": title, "description": description, "link": link, "slug": filename})
+                divs_name = soup.find_all("div", {"class": "p-5 rounded-xl border border-gray-600 bg-gray-800 shadow-sm hover:shadow-md hover:border-purple-500 transition-all flex flex-col h-full"})
+                for div in divs_name:
+                    title = div.find("div", {"class": "font-semibold text-lg text-gray-100 min-w-0 truncate"}).text.strip()
+                    link = div.find("a")["href"]
+                    list_div.append({"title": title, "description": "", "link": link, "slug": filename})
                 file.close()
 
         except Exception:
