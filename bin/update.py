@@ -17,7 +17,7 @@ from ransomlook.default.logging import get_logger
 logger = get_logger("update")
 
 # Current version of RansomLook
-CURRENT_VERSION = "2.0.0"
+CURRENT_VERSION = "2.0.0-dev"
 
 # File used to track the installed version
 VERSION_FILE = ".version"
@@ -81,9 +81,11 @@ def set_installed_version(version: str) -> None:
 
 
 def parse_version(version: str) -> tuple[int, ...]:
-    """Parse a version string into a comparable tuple."""
-    parts = version.replace("-dev", "").split(".")
-    return tuple(int(p) for p in parts)
+    """Parse a version string into a comparable tuple.
+    Handles: 2.0.0, 2.0.0-dev, 2.0.0.dev0, 1.7.0, etc."""
+    import re
+    nums = re.findall(r"(\d+)", version.split("-")[0].split(".dev")[0])
+    return tuple(int(n) for n in nums) if nums else (0, 0, 0)
 
 
 def migrate_to_2_0(auto_yes: bool = False) -> None:
@@ -98,7 +100,10 @@ def migrate_to_2_0(auto_yes: bool = False) -> None:
     - Telegram directories cleaned up
     - redis dependency replaced by valkey
     """
-    from valkey import Valkey
+    try:
+        from valkey import Valkey
+    except ImportError:
+        from redis import Redis as Valkey  # type: ignore[no-redef]
 
     logger.info("=" * 60)
     logger.info("  Migration to RansomLook 2.0")
@@ -215,7 +220,18 @@ def run_migrations(auto_yes: bool = False) -> None:
     installed_tuple = parse_version(installed)
 
     if installed_tuple < (2, 0, 0):
-        migrate_to_2_0(auto_yes)
+        # Check actual installed package version
+        try:
+            from importlib.metadata import version
+            pkg_version = version("ransomlook")
+            pkg_tuple = parse_version(pkg_version) if pkg_version else (0, 0, 0)
+        except Exception:
+            pkg_tuple = (0, 0, 0)
+
+        if pkg_tuple >= (2, 0, 0):
+            logger.info("Already on version %s. Skipping migration, creating .version file.", pkg_version)
+        else:
+            migrate_to_2_0(auto_yes)
 
     set_installed_version(CURRENT_VERSION)
 

@@ -9,8 +9,12 @@ from abc import ABC
 from datetime import datetime, timedelta
 from subprocess import Popen
 
-from valkey import Valkey
-from valkey.exceptions import ConnectionError as ValkeyConnectionError
+try:
+    from valkey import Valkey
+    from valkey.exceptions import ConnectionError as ValkeyConnectionError
+except ImportError:
+    from redis import Redis as Valkey  # type: ignore[no-redef,assignment]
+    from redis.exceptions import ConnectionError as ValkeyConnectionError  # type: ignore[no-redef,assignment]
 
 from . import DB_TASKS
 from .config import get_socket_path
