@@ -3703,33 +3703,12 @@ description = "Python CLI and module for lacus"
 optional = false
 python-versions = ">=3.10"
 groups = ["main"]
-markers = "python_version >= \"3.14\""
 files = [
     {file = "pylacus-1.21.3-py3-none-any.whl", hash = "sha256:f436de546a42cad2266a2b8c98aa38e83038b27fa2b2dfa2c9ea4ce5800873b7"},
     {file = "pylacus-1.21.3.tar.gz", hash = "sha256:9834c9b40b8575a52eecafe244d98533b0b0982a7f3906b62645b86b79de3b42"},
 ]
 
 [package.dependencies]
-requests = ">=2.32.5"
-
-[package.extras]
-docs = ["Sphinx (>=9.1.0) ; python_version >= \"3.12\""]
-
-[[package]]
-name = "pylacus"
-version = "1.22.0"
-description = "Python CLI and module for lacus"
-optional = false
-python-versions = "<3.15,>=3.10"
-groups = ["main"]
-markers = "python_version < \"3.14\""
-files = [
-    {file = "pylacus-1.22.0-py3-none-any.whl", hash = "sha256:0e42fffef16b8ed8037e0bebb57f6e80a5199cf545301a404c7d0db59fec6bbe"},
-    {file = "pylacus-1.22.0.tar.gz", hash = "sha256:94c7d76f55cee6e2fc6f3e40a36e7ecd9742a8b7299f3f7307f54352c486c0c5"},
-]
-
-[package.dependencies]
-lookyloo-models = ">=0.1.0,<0.2.0"
 requests = ">=2.32.5"
 
 [package.extras]
@@ -5222,4 +5201,4 @@ propcache = ">=0.2.1"
 [metadata]
 lock-version = "2.1"
 python-versions = ">=3.10,<4.0"
-content-hash = "18d1b87b05a00fd614252c6fcda25ccccf3040c5edb11c955de4d747c44406ec"
+content-hash = "05692da54c6ad7f24fa408064ce33a4ab1522464639688255f0cb867b6158ed4"

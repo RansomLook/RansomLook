@@ -377,23 +377,28 @@ def screen() -> None:
         return
     redgroup = valkey.Valkey(unix_socket_path=get_socket_path("cache"), db=DB_GROUPS)
     captures = json.loads(red.get("toscan"))  # type: ignore[arg-type]
+    stdlog("Found %s captures to process" % len(captures))
     remote_lacus_url = None
     if get_config("generic", "remote_lacus"):
         remote_lacus_config = get_config("generic", "remote_lacus")
         if remote_lacus_config.get("enable"):
             remote_lacus_url = remote_lacus_config.get("url")
+            stdlog("Trying remote Lacus at %s" % remote_lacus_url)
             lacus = PyLacus(remote_lacus_url)
             try:
                 lacus.status()
+                stdlog("Remote Lacus connected")
             except Exception:
-                logger.debug("using local lacuscore")
+                stdlog("Remote Lacus unavailable, falling back to local LacusCore")
                 remote_lacus_url = None
 
     if not remote_lacus_url:
+        stdlog("Using local LacusCore with Tor proxy")
         lacus = LacusCore(redislacus, tor_proxy="socks5://127.0.0.1:9050")  # type: ignore
 
     uuids = []
     slugs = []
+    stdlog("Enqueuing captures...")
     for capture in captures:
         group = json.loads(redgroup.get(capture["group"].encode()))  # type: ignore[arg-type]
         for host in group["locations"]:
@@ -418,13 +423,16 @@ def screen() -> None:
                         uuid = lacus.enqueue(settings=settings)
                         capture.update({"uuid": uuid})
                         uuids.append(uuid)
+                        stdlog("Enqueued: %s → %s" % (capture["group"], capture["slug2"]))
             except Exception:
                 logger.debug("capture group: %s", capture["group"].encode())
                 logger.debug("capture slug: %s", capture["slug"])
 
+    stdlog("Enqueued %s captures" % len(uuids))
     if not remote_lacus_url:
+        stdlog("Running local captures (this may take a while)...")
         asyncio.run(run_captures())
-    logger.debug("uuids: %s", uuids)
+    stdlog("Waiting for %s captures to complete..." % len(uuids))
     while uuids:
         for capture in captures:
             if "uuid" in capture:
@@ -434,9 +442,8 @@ def screen() -> None:
                     continue
                 if lacus.get_capture_status(capture["uuid"]) == 1:
                     time.sleep(1)
-                    logger.debug("processing capture uuid: %s", capture["uuid"])
                     result = lacus.get_capture(capture["uuid"])
-                    logger.debug("capture status: %s", result["status"])
+                    stdlog("Capture done: %s/%s — %s [%s]" % (capture["group"], capture["title"], result.get("status", "?"), len(uuids) - 1))
                     uuids.remove(capture["uuid"])
                     del capture["uuid"]
                     if "png" in result and "html" in result:
