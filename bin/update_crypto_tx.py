@@ -53,7 +53,7 @@ BREADCRUMBS_CHAINS = {
 
 logger = get_logger("update_crypto_tx")
 
-RATE_LIMIT_DELAY = 1.0  # seconds between Breadcrumbs requests
+RATE_LIMIT_DELAY = 2.0  # seconds between Breadcrumbs requests
 SESSION = requests.Session()
 SESSION.headers.update({"User-Agent": "RansomLook/2.0 crypto-updater"})
 
@@ -100,9 +100,12 @@ def _fetch_breadcrumbs(api_key: str, chain: str, address: str, max_pages: int = 
 
         try:
             r = SESSION.post(url, json=body, headers=headers, timeout=30)
-            if r.status_code == 429:
-                logger.info("  [rate-limited] waiting 30s...")
-                time.sleep(30)
+            retries = 0
+            while r.status_code == 429 and retries < 3:
+                retries += 1
+                wait = 30 * retries
+                logger.info("  [rate-limited] waiting %ss (attempt %s/3)...", wait, retries)
+                time.sleep(wait)
                 r = SESSION.post(url, json=body, headers=headers, timeout=30)
             r.raise_for_status()
             data = r.json()
