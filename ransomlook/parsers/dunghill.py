@@ -1,33 +1,37 @@
 import os
+
 from bs4 import BeautifulSoup
-from typing import Dict, List
 
-def main() -> List[Dict[str, str]] :
-    list_div=[]
+from ransomlook.default.logging import get_logger
 
-    for filename in os.listdir('source'):
+logger = get_logger(__name__)
+
+
+def main() -> list[dict[str, str]]:
+    list_div = []
+
+    for filename in os.listdir("source"):
         try:
-            if filename.startswith(__name__.split('.')[-1]+'-'):
-                html_doc='source/'+filename
-                file=open(html_doc,'r')
-                soup=BeautifulSoup(file,'html.parser')
-                divs = soup.find_all('div',{"class": "custom-container"})
+            if filename.startswith(__name__.split(".")[-1] + "-"):
+                html_doc = "source/" + filename
+                file = open(html_doc, encoding="utf-8")
+                soup = BeautifulSoup(file, "html.parser")
+                divs = soup.find_all("div", {"class": "custom-container"})
                 for div in divs:
-                    title = div.find('div', {"class": "ibody_title"}).text.strip()
-                    description = div.find("div", {"class": "ibody_body"}).find_all('p')
+                    title = div.find("div", {"class": "ibody_title"}).text.strip()
+                    description = div.find("div", {"class": "ibody_body"}).find_all("p")
                     description = description[2].text.strip()
-                    link = div.find('div', {"class": "ibody_ft_right"}).a['href']
-                    list_div.append({"title" : title, "description" : description, 'link': link, 'slug': filename})
-                divs = soup.find_all('div',{"class": "custom-container2"})
+                    link = div.find("div", {"class": "ibody_ft_right"}).a["href"]
+                    list_div.append({"title": title, "description": description, "link": link, "slug": filename})
+                divs = soup.find_all("div", {"class": "custom-container2"})
                 for div in divs:
-                    title = div.find('strong').text.strip()
-                    description = div.find_all('p')
+                    title = div.find("strong").text.strip()
+                    description = div.find_all("p")
                     description = description[2].text.strip()
-                    link = div.find('a')['href']
-                    list_div.append({"title" : title, "description" : description, 'link': link, 'slug': filename})
+                    link = div.find("a")["href"]
+                    list_div.append({"title": title, "description": description, "link": link, "slug": filename})
                 file.close()
-        except:
-            print("Failed during : " + filename)
-            pass
-    print(list_div)
+        except Exception:
+            logger.debug("Failed during : " + filename)
+    logger.debug(list_div)
     return list_div

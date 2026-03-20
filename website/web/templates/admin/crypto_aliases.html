@@ -14,12 +14,15 @@
 <section class="metrics-section">
   <div class="container">
 
-    <div class="table-card" style="padding:12px;margin-bottom:12px;">
+    <div class="table-card pad-mb">
       <form method="post" style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;">
         <input type="hidden" name="action" value="upsert">
         <input type="text" name="alias" placeholder="Alias" required>
         <input type="text" name="canon" placeholder="Canonical slug" required>
-        <button class="btn" type="submit">Save</button>
+        <!-- Floating action buttons -->
+        <div class="edit-actions">
+          <button class="btn btn-primary" type="submit">Save</button>
+        </div>
       </form>
     </div>
 
@@ -38,8 +41,8 @@
               <tr>
                 <td class="mono">{{ row.alias }}</td>
                 <td class="mono">{{ row.canon }}</td>
-                <td style="text-align:center">
-                  <form method="post" style="display:inline">
+                <td class="text-center">
+                  <form method="post" class="d-inline">
                     <input type="hidden" name="action" value="delete">
                     <input type="hidden" name="alias" value="{{ row.alias }}">
                     <button class="btn btn-danger" type="submit">Delete</button>

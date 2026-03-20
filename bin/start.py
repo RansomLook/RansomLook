@@ -3,18 +3,22 @@
 from subprocess import Popen, run
 
 from ransomlook.default import get_homedir
+from ransomlook.default.logging import get_logger
+
+logger = get_logger("start")
 
 
 def main() -> None:
     # Just fail if the env isn't set.
     get_homedir()
-    print('Start backend (redis)...')
-    p = run(['run_backend', '--start'])
+    logger.info("Start backend (redis)...")
+    p = run(["run_backend", "--start"])
     p.check_returncode()
-    print('done.')
-    print('Start website...')
-    Popen(['start_website'])
-    print('done.')
+    logger.info("done.")
+    logger.info("Start website...")
+    Popen(["start_website"])
+    logger.info("done.")
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     main()

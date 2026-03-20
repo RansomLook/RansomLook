@@ -1,0 +1,107 @@
+{% extends "base.html" %}
+{% from 'bootstrap5/utils.html' import render_messages %}
+{% block title %}Admin · API Keys{% endblock %}
+
+{% block content %}
+{{ render_messages(container=True, dismissible=True) }}
+
+<section class="hero">
+  <div class="container">
+    <h1>API Keys</h1>
+    <p class="lead">Manage API keys for programmatic access (export, etc.).</p>
+  </div>
+</section>
+
+<section class="metrics-section">
+  <div class="container" style="max-width:900px;">
+
+    <!-- Add key -->
+    <div class="table-card mb-14">
+      <div class="card-toolbar bb">
+        <span class="fw-600">New API key</span>
+      </div>
+      <div class="p-12">
+        <form action="{{ url_for('admin_apikeys_add') }}" method="post">
+          <label class="label" for="name">Name / comment</label>
+          <input id="name" name="name" class="input" placeholder="e.g. MISP sync, partner feed, CI/CD…" required style="width:100%;box-sizing:border-box;margin-bottom:12px;">
+          <div style="display:flex;justify-content:flex-end;">
+            <button class="btn btn-primary" type="submit">Generate key</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Keys table -->
+    <div class="table-card">
+      <div class="card-toolbar bb">
+        <span class="fw-600">{{ keys | length }} key{{ 's' if keys | length != 1 }}</span>
+      </div>
+      {% if keys %}
+      <div class="table-scroll">
+        <table class="rl-table">
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Token</th>
+              <th>Created</th>
+              <th>Last used</th>
+              <th>Status</th>
+              <th style="width:140px;">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for k in keys %}
+            <tr>
+              <td class="fw-600">{{ k.name }}</td>
+              <td class="monospace" style="font-size:.82rem;">{{ k.token_short }}</td>
+              <td class="utc-time" style="font-size:.85rem;">{{ k.created_at }}</td>
+              <td class="utc-time" style="font-size:.85rem;">{{ k.last_used or '—' }}</td>
+              <td>
+                {% if k.active %}
+                  <span class="badge badge-ok">active</span>
+                {% else %}
+                  <span class="badge badge-neutral">disabled</span>
+                {% endif %}
+              </td>
+              <td>
+                <div style="display:flex;gap:6px;">
+                  <form action="{{ url_for('admin_apikeys_toggle') }}" method="post" style="margin:0;">
+                    <input type="hidden" name="token" value="{{ k.token }}">
+                    <button class="btn btn-secondary btn-sm" type="submit">
+                      {{ 'Disable' if k.active else 'Enable' }}
+                    </button>
+                  </form>
+                  <form action="{{ url_for('admin_apikeys_delete') }}" method="post" style="margin:0;"
+                        onsubmit="return confirm('Delete key « {{ k.name }} »?');">
+                    <input type="hidden" name="token" value="{{ k.token }}">
+                    <button class="btn btn-secondary btn-sm" type="submit" style="color:var(--danger,#ef4444);">Delete</button>
+                  </form>
+                </div>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+      {% else %}
+      <div class="prose pad">
+        <p>No API keys yet. Create one above.</p>
+      </div>
+      {% endif %}
+    </div>
+
+  </div>
+</section>
+
+<script>
+document.querySelectorAll('.utc-time').forEach(el => {
+  const raw = el.textContent.trim();
+  if (!raw || raw === '—') return;
+  try {
+    const d = new Date(raw);
+    if (!isNaN(d)) el.textContent = d.toLocaleString();
+  } catch(e) {}
+});
+</script>
+
+{% endblock %}

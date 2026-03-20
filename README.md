@@ -1,30 +1,33 @@
 # RansomLook
 
-RansomLook is tool to monitor Ransomware groups and markets and extract their victims.
+RansomLook is a tool to monitor Ransomware groups and markets and extract their victims.
 
 ## Features
 
 - Based on ransomwatch https://github.com/joshhighet/ransomwatch,
   - Important changes have been done:
-    - All data are stored into valkey
+    - All data are stored into Valkey
     - Scraping is multithreaded
-    - Scraping is done with PlayWright and screenshots are taken at the same time
-    - Parsers are now using BeautilfulSoup and are independant
+    - Scraping is done with Playwright and screenshots are taken at the same time
+    - Parsers are now using BeautifulSoup and are independent
     - If you create a local account, you will be able to add/edit/delete groups using the web interface
     - All website is done using Flask so no need to regenerate any MD file
     - Mail alerting for posts containing your keywords
 - Details about the groups with data from malpedia.
 - Daily notification by email.
 - Notification on RocketChat when a new post is created.
-- Telegram monitoring
 - Dataleak monitoring
-- Monitoring Cryptocurrencies, data are from: https://ransomwhe.re
+- Threat actor tracking with relations (groups, forums, peers) and wanted status
+- Monitoring Cryptocurrencies with transaction tracking via [Breadcrumbs One](https://www.breadcrumbs.app/) API
+- Ransomnotes, from ThreatLabs (@Threatlabz)
 - [MISP](https://www.misp-project.org/) integration with the support of the [MISP ransomware galaxy](https://www.misp-galaxy.org/ransomware/)
-- Ransomnotes, from ThreatLabs (@Threatlabz) 
+- Full REST API with interactive Swagger documentation at `/doc`
+
+We are proud to be trusted by [Breadcrumbs](https://www.breadcrumbs.app/) for cryptocurrency enrichment.
 
 # Install guide
 
-Note that is is *strongly* recommended to use Ubuntu 22.04.
+Note that is is *strongly* recommended to use Ubuntu 24.04.
 
 ## System dependencies
 
@@ -136,83 +139,163 @@ With the default configuration, you can access the web interface on `http://0.0.
 
 # Usage
 
-Start the tool (as usual, from the directory):
+## Service management
 
 ```bash
-poetry run start
+poetry run start           # Start backend (Valkey) + website
+poetry run stop            # Stop website + backend
+poetry run shutdown        # Graceful shutdown of all services
+poetry run start_website   # Start only the web interface (Gunicorn)
+poetry run run_backend     # Start only the Valkey backend
+poetry run update --yes    # System update, fetch deps, integrity checks
 ```
 
-You can stop it with
+With the default configuration, the web interface is available at `http://127.0.0.1:8000`.
+
+## Core pipeline
+
+These should be scheduled via cron (recommended: every 2 hours).
 
 ```bash
-poetry run stop
+# Make sure Tor is running first
+sudo systemctl enable --now tor
+
+poetry run scrape          # Scrape all group/market sites (DB 0 + 3)
+poetry run parse           # Run all parsers to extract posts from scraped data
+poetry run screen          # Take screenshots of group sites via Lacus/Playwright
 ```
 
-With the default configuration, you can access the web interface on `http://127.0.0.1:8000`.
-
-# Commands
-
-### Import data from the main instance 'https://www.ransomlook.io'
-
-This command will copy the DB of the official instance.
-```bash
-poetry run tools/import_from_instance.py
-```
-
-### Populate descriptions and profiles from malpedia
+## Data enrichment
 
 ```bash
-poetry run tools/malpedia.py
+poetry run notify          # Send email notifications for new posts
+poetry run notifyleak      # Send email notifications for new leaks
+poetry run breach          # Scrape leak-lookup.com for new data breaches (DB 4)
+poetry run cryptocur       # Sync cryptocurrency addresses from ransomwhe.re (DB 7)
+poetry run update_crypto_tx # Fetch/update transactions via Breadcrumbs One API (DB 7)
+poetry run rf              # Fetch Recorded Future channel data (DB 10)
+poetry run notes           # Import/update ransom notes from ThreatLabz repo (DB 11)
+poetry run torrent         # Fetch torrent information from ransomware groups
 ```
 
-### Add a group (we recommand to use the GUI in admin)
+## Cron setup
+
+Example crontab (`crontab -e`):
+
+```cron
+# Core pipeline: scrape → parse → screenshot (every 2 hours)
+0 */2 * * * cd /path/to/RansomLook && poetry run scrape && poetry run parse && poetry run screen
+
+# Notifications (daily morning recap)
+0 8 * * * cd /path/to/RansomLook && poetry run notify && poetry run notifyleak
+
+# Data enrichment (daily)
+0 4 * * * cd /path/to/RansomLook && poetry run breach
+0 5 * * * cd /path/to/RansomLook && poetry run cryptocur && poetry run update_crypto_tx
+0 6 * * * cd /path/to/RansomLook && poetry run rf && poetry run notes
+```
+
+## Adding groups
+
+We recommend using the admin GUI, but you can also use the CLI:
 
 ```bash
 poetry run add GROUPNAME URLTOCHECK DATABASE-NUMBER
 ```
 
-NB: if a parser exists in RansomLook/parsers/ be sure that GROUPNAME is the same of the .py file
+- `DATABASE-NUMBER`: `0` for ransomware group, `3` for market/forum
+- If a parser exists in `RansomLook/parsers/`, the group name must match the `.py` filename
 
-NB: DATABASE-NUMBER must be 0 or 3, depending if you are adding a Ransomware blog or a Market place.
+## Tools (`tools/`)
 
-### Scrape all groups
-
-```bash
-sudo systemctl status tor # check if tor is running
-sudo systemctl enable tor # active tor for next boots
-sudo systemctl start tor # start tor if not running
-poetry run scrape
-```
-
-### Parse all groups
+### Import data from a remote instance
 
 ```bash
-poetry run parse
+# Import all databases (0=Groups, 2=Posts, 3=Markets, 4=Leaks, 5=Actors, 10=RF)
+poetry run tools/import_from_instance.py --api-key "YOUR_API_KEY"
+
+# Or use an environment variable
+export RANSOMLOOK_API_KEY="YOUR_API_KEY"
+poetry run tools/import_from_instance.py
+
+# Custom instance + specific databases only
+poetry run tools/import_from_instance.py --url https://my-instance/api --api-key "KEY" --db 0 2 5
 ```
 
-### Scrape for new dataleak
+An API key is required (generate one in **Admin > API Keys** on the remote instance).
+
+### Other tools
 
 ```bash
-poetry run tools/breach.py
+poetry run tools/malpedia.py               # Enrich group metadata with Malpedia descriptions
+poetry run tools/import_groups.py          # Seed DB from data/groups.json + data/markets.json
+poetry run tools/getpreviousscreen.py      # Retrieve archived screenshots
+poetry run tools/validate_config_files.py  # Validate config/generic.json structure
+poetry run tools/3rdparty.py               # Download third-party JS/CSS (Plotly, etc.)
+poetry run tools/generate_sri.py           # Regenerate SRI hashes for static assets
 ```
 
-### Scrape and parse for Telegram messages
+### Test seed scripts
 
 ```bash
-poetry run telegram
+poetry run tools/seed_actors.py          # Populate sample threat actors for testing
+poetry run tools/seed_alert_keywords.py  # Populate sample alert keywords for testing
+poetry run tools/seed_audit_logs.py      # Populate sample audit log entries for testing
 ```
 
-It's recommanded to create a cron job to scrape and parse all groups every 2 hours.
+# API
+
+RansomLook exposes a REST API with interactive Swagger documentation available at `/doc`.
+
+### Authentication
+
+Most read endpoints are public. The **export** endpoint requires an API key passed via the `Authorization` header.
+
+API keys are managed in **Admin > API Keys** through the web interface.
+
+### Namespaces
+
+| Namespace | Base path | Description |
+|-----------|-----------|-------------|
+| **Stats** | `/api/stats`, `/api/hot`, `/api/search`, `/api/health`, `/api/compare` | Platform statistics, trending groups, cross-entity search, mirror health, side-by-side comparison |
+| **GenericAPI** | `/api/` | Groups, markets, posts, recent/last/period queries, export |
+| **Actors** | `/api/actors/` | Threat actor profiles, relations (groups, forums, peers), wanted status |
+| **Crypto** | `/api/crypto/` | Cryptocurrency groups, wallets by blockchain, transactions, stats, recent tx |
+| **Notes** | `/api/notes/` | Ransom notes by group, recent notes, note details |
+| **Leaks** | `/api/leaks/` | Data breach records |
+| **RecordedFuture** | `/api/rf/` | Recorded Future channel data |
+
+### Export
+
+Bulk database export for reimport or offline analysis:
+
+```
+GET /api/export/<db>
+Authorization: YOUR_API_KEY
+```
+
+| DB | Content |
+|----|---------|
+| 0 | Groups (ransomware group metadata and locations) |
+| 2 | Posts (victim posts across all groups) |
+| 3 | Markets (market / forum metadata and locations) |
+| 4 | Leaks (data breach records) |
+| 5 | Actors (threat actor profiles and relations) |
+| 10 | Recorded Future (RF channel data) |
+
+Private entries are automatically filtered from groups (0), markets (3) and actors (5).
 
 # License
 
-Copyright (C) 2022-2025 [Fafner \[\_KeyZee\_\]](https://github.com/FafnerKeyZee)
+Copyright (C) 2022-2026 [Fafner \[\_KeyZee\_\]](https://github.com/FafnerKeyZee)
 
-Copyright (C) 2022-2025 [Alexandre Dulaunoy](https://github.com/adulau/)
+Copyright (C) 2022-2026 [Alexandre Dulaunoy](https://github.com/adulau/)
 
-Copyright (C) 2023-2025 [Tammy Harper](https://www.linkedin.com/in/tammyharper11)
+Copyright (C) 2023-2026 [Tammy Harper](https://www.linkedin.com/in/tammyharper11)
 
-Copyright (C) 2022-2025 [CERT-AG](https://cert-ag.com/) - CERT AG
+Copyright (C) 2026 [Katya Kandratovich](https://www.linkedin.com/in/katya-k-440175b7/)
+
+Copyright (C) 2022-2026 [CERT-AG](https://cert-ag.com/) - CERT AG
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU Affero General Public License as published

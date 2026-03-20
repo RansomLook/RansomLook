@@ -11,40 +11,46 @@
   </div>
   <div class="container">
 
-<form class="row g-2" method="post" action="{{ url_for('admin_ransomnotes_open') }}" style="margin-bottom:10px;">
-  <div class="col-sm-6 col-md-4">
-    <input class="form-control" type="text" name="group" placeholder="new-group-slug (ex: antefrigus)" required style="width:100%;max-width:520px;padding:10px 12px;border-radius:10px;border:1px solid var(--border);background:#0f1623;color:var(--text)">
+    <form method="post" action="{{ url_for('admin_ransomnotes_open') }}" class="table-card admin-form p-12 mb-14" style="display:flex;gap:10px;align-items:end;flex-wrap:wrap">
+      <div>
+        <label class="label" for="new-group">Group slug</label>
+        <input id="new-group" class="input" type="text" name="group" placeholder="new-group-slug (ex: antefrigus)" required>
+      </div>
+      <button class="btn" type="submit">Open / Create</button>
+    </form>
+
   </div>
-</br>
-  <div class="col-auto">
-    <button class="btn" type="submit">Open / Create</button>
-  </div>
-</form>
-</div>
 </section>
 
-<section class="hero">
+<section class="metrics-section">
   <div class="container">
     <h1>Groups with notes</h1>
     <p class="lead">Browse ransomware note samples grouped by actor.</p>
-  </div>
-  <div class="container">
 
-    <!-- Filtre client (identique à /notes) -->
-    <div style="margin-bottom:14px;">
-      <input id="notes-filter" type="search" placeholder="Filter groups and aliases…" aria-label="Filter groups"
-             style="width:100%;max-width:520px;padding:10px 12px;border-radius:10px;border:1px solid var(--border);background:#0f1623;color:var(--text)">
+    <!-- Filters -->
+    <div class="table-card search-card pad-mb">
+      <div class="filters-wrap">
+        <div class="filters">
+          <div class="field field--search">
+            <label class="sr-only" for="notes-filter">Search</label>
+            <input id="notes-filter" class="input" type="search"
+                   aria-label="Filter groups"
+                   placeholder="Group name or alias…">
+            <button class="input-clear" type="button" aria-label="Clear search">×</button>
+          </div>
+        </div>
+        <div class="filters-meta"><span id="flt-count"></span></div>
+      </div>
     </div>
 
     <!-- Grille de groupes (identique à /notes) -->
-    <div id="groups-grid" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px;">
+    <div id="groups-grid" class="auto-grid">
       {% for entry in data %}
         {% for item in entry %}
           <!-- Seul changement: href + data-name enrichi des alias -->
-          <a class="group-chip"
+          <a class="group-chip stat-link"
              href="{{ url_for('admin_ransomnotes_group', slug=item) }}"
-             data-name="{{ item|lower }} {% for a in (aliases_by_canon.get(item, [])) %}{{ a }} {% endfor %}"
-             style="display:flex;align-items:center;justify-content:center;padding:12px 10px;border-radius:12px;border:1px solid var(--border);background:linear-gradient(180deg,#121a28 0%,#0f1623 100%);text-decoration:none;color:var(--text);font-weight:600;text-align:center;">
+             data-name="{{ item|lower }} {% for a in (aliases_by_canon.get(item, [])) %}{{ a }} {% endfor %}">
             {{ item.title() }}
           </a>
         {% endfor %}
@@ -54,19 +60,29 @@
   </div>
 </section>
 
-<!-- JS inline pour le filtre (identique à /notes) -->
 <script>
 (function(){
-  const input = document.getElementById('notes-filter');
-  const items = Array.from(document.querySelectorAll('#groups-grid .group-chip'));
+  const input    = document.getElementById('notes-filter');
+  const clearBtn = document.querySelector('.input-clear');
+  const countEl  = document.getElementById('flt-count');
+  const items    = Array.from(document.querySelectorAll('#groups-grid .group-chip'));
   if (!input) return;
-  input.addEventListener('input', function(){
-    const q = this.value.trim().toLowerCase();
+
+  function apply(){
+    const q = input.value.trim().toLowerCase();
+    let n = 0;
     items.forEach(a => {
       const match = !q || (a.dataset.name || '').includes(q);
       a.style.display = match ? '' : 'none';
+      if (match) n++;
     });
-  });
+    if (countEl) countEl.textContent = n + ' groups';
+  }
+
+  let t;
+  input.addEventListener('input', () => { clearTimeout(t); t = setTimeout(apply, 120); });
+  clearBtn?.addEventListener('click', () => { input.value = ''; apply(); input.focus(); });
+  apply();
 })();
 </script>
 

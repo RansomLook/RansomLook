@@ -1,3 +1,6 @@
+[MAIN]
+ignore-paths=.*__pycache__.*
+
 [MESSAGES CONTROL]
 
 disable=W1401,
@@ -19,4 +22,15 @@ disable=W1401,
         R1734,
         R1726,
         W0611,
-        R1710
+        R1710,
+        broad-exception-caught,
+        use-maxsplit-arg,
+        consider-using-with,
+        missing-class-docstring,
+        too-many-locals,
+        too-many-nested-blocks,
+        import-outside-toplevel,
+        wrong-import-position,
+        multiple-statements,
+        no-else-return,
+        singleton-comparison

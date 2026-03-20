@@ -19,9 +19,9 @@
   <div class="container">
 
     <!-- Controls -->
-    <form action="{{ url_for('hot') }}" method="get" class="search-card" style="padding:12px;margin-bottom:12px">
-      <label for="days" class="form-label" style="margin-right:8px">Window:</label>
-      <select id="days" name="days" class="form-select" style="max-width:200px;display:inline-block">
+    <form action="{{ url_for('hot') }}" method="get" class="search-card pad-mb">
+      <label for="days" class="label" style="margin-right:8px">Window:</label>
+      <select id="days" name="days" class="input" style="max-width:200px;display:inline-block">
         {% for d in [1,3,7,14,30,90] %}
           <option value="{{ d }}" {% if days == d %}selected{% endif %}>Last {{ d }} day{{ '' if d == 1 else 's' }}</option>
         {% endfor %}
@@ -31,7 +31,7 @@
 
     {% if rows and rows|length %}
       <div class="table-card">
-        <div class="table-responsive">
+        <div class="table-scroll">
           <table class="rl-table">
             <thead>
               <tr>
@@ -45,12 +45,12 @@
             <tbody>
               {% for row in rows %}
                 <tr>
-                  <td style="text-align:right">{{ loop.index }}</td>
+                  <td class="text-right">{{ loop.index }}</td>
                   <td><a href="/group/{{ row.group }}">{{ row.group.title() }}</a></td>
-                  <td style="text-align:right"><strong>{{ row.count }}</strong></td>
+                  <td class="text-right"><strong>{{ row.count }}</strong></td>
                   <td>{{ row.last_post or '—' }}</td>
                   <td>
-                    <a class="btn btn-small" href="/group/{{ row.group }}">Open</a>
+                    <a class="btn btn-sm" href="/group/{{ row.group }}">Open</a>
                   </td>
                 </tr>
               {% endfor %}

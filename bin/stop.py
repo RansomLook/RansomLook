@@ -2,27 +2,30 @@
 
 from subprocess import Popen, run
 
-from redis import Redis
-from redis.exceptions import ConnectionError
+from valkey import Valkey
+from valkey.exceptions import ConnectionError
 
-from ransomlook.default import get_homedir, get_socket_path
+from ransomlook.default import DB_TASKS, get_homedir, get_socket_path
+from ransomlook.default.logging import get_logger
+
+logger = get_logger("stop")
 
 
 def main() -> None:
     get_homedir()
-    p = Popen(['shutdown'])
+    p = Popen(["shutdown"])
     p.wait()
     try:
-        r = Redis(unix_socket_path=get_socket_path('cache'), db=1)
-        r.delete('shutdown')
-        print('Shutting down databases...')
-        p_backend = run(['run_backend', '--stop'])
+        r = Valkey(unix_socket_path=get_socket_path("cache"), db=DB_TASKS)
+        r.delete("shutdown")
+        logger.info("Shutting down databases...")
+        p_backend = run(["run_backend", "--stop"])
         p_backend.check_returncode()
-        print('done.')
+        logger.info("done.")
     except ConnectionError:
         # Already down, skip the stacktrace
         pass
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

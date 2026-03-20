@@ -3,6 +3,9 @@
 import time
 
 from ransomlook.default import AbstractManager
+from ransomlook.default.logging import get_logger
+
+logger = get_logger("shutdown")
 
 
 def main() -> None:
@@ -12,9 +15,9 @@ def main() -> None:
         running = AbstractManager.is_running()
         if not running:
             break
-        print(running)
+        logger.debug(running)
         time.sleep(5)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

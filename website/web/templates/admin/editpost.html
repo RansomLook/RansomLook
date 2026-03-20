@@ -44,70 +44,6 @@
   {% endif %}
 {%- endmacro %}
 
-<style>
-  /* --- Generic inputs --- */
-  .edit-wrap{max-width:1100px;margin:0 auto}
-  .label{display:block;color:var(--muted);font-size:.9rem;margin:6px 0 3px}
-  .input{width:100%;background:#0b1220;border:1px solid var(--border);border-radius:10px;padding:8px 10px;color:var(--text)}
-  .btn-sm{padding:6px 10px;font-size:.9rem}
-
-  /* Filters card */
-  .filters{display:flex;gap:10px;flex-wrap:wrap;align-items:end}
-
-  /* Collapsible card */
-  details.post{border:1px solid var(--border);border-radius:12px;background:#0f1623;margin-bottom:10px;overflow:hidden}
-  details.post[open]{box-shadow:0 0 0 1px rgba(255,255,255,.04) inset}
-  summary.post-head{list-style:none;cursor:pointer;display:flex;align-items:center;gap:10px;padding:10px 12px}
-  summary.post-head::-webkit-details-marker{display:none}
-  .dot{width:8px;height:8px;border-radius:50%;background:#3b82f6;opacity:.7}
-  .pill{font:600 12px/1 var(--font);padding:6px 10px;border-radius:999px;background:#121a29;border:1px solid var(--border);color:var(--muted)}
-  .title{flex:1 1 auto;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:var(--text)}
-  .badge-id{padding:4px 8px;border:1px solid var(--border);border-radius:8px;background:#0b1220;color:var(--muted);font-size:.8rem}
-  .chev{transform:rotate(-90deg);transition:transform .18s ease;opacity:.7}
-  details[open] .chev{transform:rotate(0deg)}
-
-  /* === FIXED: grid names that match your HTML === */
-  .post-body{padding:12px}
-  .post-grid{
-    display:grid;
-    grid-template-columns:minmax(0,1fr) 360px; /* left grows, right fixed */
-    gap:14px 18px;
-    align-items:start;
-  }
-  .post-main,.post-aside{min-width:0}      /* prevent overflow */
-  .post-main .input,
-  .post-main input,
-  .post-main textarea,
-  .post-main select{width:100%;box-sizing:border-box}
-
-  /* Preview box */
-  .preview-box{
-    background:#0b1220;
-    border:1px solid var(--border);
-    border-radius:10px;
-    height:260px;                /* adjust if you want */
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    overflow:auto;               /* no bleed */
-    color:var(--muted);
-  }
-  .preview-box img{max-width:100%;max-height:100%;height:auto;display:block}
-
-  /* Inline rows */
-  .aside-row{display:flex;gap:12px;align-items:center}
-  .spacer{flex:1}
-
-  /* 2-up fields left side (date + url) */
-  .post-main .row2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-
-  /* Responsive collapse */
-  @media (max-width: 900px){
-    .post-grid{grid-template-columns:1fr}
-    .post-aside{grid-column:1}
-    .post-main .row2{grid-template-columns:1fr}
-  }
-</style>
 
 <section class="hero">
   <div class="container">
@@ -123,7 +59,7 @@
       {{ form.hidden_tag() }}
 
       <!-- Filters -->
-      <div class="table-card" style="padding:12px;margin-bottom:12px">
+      <div class="table-card pad-mb">
         <div class="filters">
           <div>
             <label class="label" for="flt-q">Search</label>
@@ -205,7 +141,7 @@
                 {% else %} No preview {% endif %}
               </div>
 
-              <div class="aside-row" style="margin-top:10px;">
+              <div class="aside-row mt-10">
                 <div>
                   <label class="label">Upload new screen (optional)</label><br>
                   {{ f.file }}
@@ -222,7 +158,8 @@
       </details>
       {% endfor %}
 
-      <div class="toolbar" style="display:flex;justify-content:flex-end;margin-top:14px">
+      <!-- Floating action buttons -->
+      <div class="edit-actions">
         <button class="btn btn-primary" type="submit">
           {{ form.submit.label.text if form.submit and form.submit.label else 'Save changes' }}
         </button>

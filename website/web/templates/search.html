@@ -158,7 +158,7 @@
           {% for entry in cryptocurrencies %}
             <tr>
               <td>{{entry['blockchain']}}</td>
-              <td style="word-break:break-all;"><code>{{entry['address']}}</code></td>
+              <td class="break-all"><code>{{entry['address']}}</code></td>
               <td>{{entry['tx_count']}}</td>
             </tr>
           {% endfor %}

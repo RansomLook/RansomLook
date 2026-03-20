@@ -1,139 +1,158 @@
 #!/usr/bin/env python3
 import json
-import redis
 import uuid
-
 from datetime import datetime
 
-from ransomlook.default.config import get_config, get_socket_path
-from ransomlook.rocket import rocketnotify
-from ransomlook.mastodon import tootnotify
+import valkey
+
 from ransomlook.bluesky import blueskynotify
-from ransomlook.misp import mispevent
+from ransomlook.default import DB_ALERTS, DB_GROUPS, DB_POSTS, DB_TASKS
+from ransomlook.default.config import get_config, get_socket_path
+from ransomlook.default.logging import get_logger
 from ransomlook.email import alertingnotify
+from ransomlook.mastodon import tootnotify
+from ransomlook.misp import mispevent
+from ransomlook.rocket import rocketnotify
+from ransomlook.sharedutils import dbglog, errlog, stdlog
 
-from ransomlook.sharedutils import dbglog, stdlog, errlog
+logger = get_logger("posts")
 
-from typing import Dict, Optional, Union
 
-def posttemplate(victim: str, description: str, link: Optional[str], timestamp: str , magnet: Optional[str], screen: Optional[str]) -> Dict[str, Optional[str]]:
-    '''
+def posttemplate(
+    victim: str, description: str, link: str | None, timestamp: str, magnet: str | None, screen: str | None
+) -> dict[str, str | None]:
+    """
     assuming we have a new post - form the template we will use for the new entry in posts.json
-    '''
+    """
     schema = {
-        'post_title': victim,
-        'discovered': timestamp,
-        'description' : description,
-        'link' : link,
-        'magnet': magnet,
-        'screen' : screen
+        "post_title": victim,
+        "discovered": timestamp,
+        "description": description,
+        "link": link,
+        "magnet": magnet,
+        "screen": screen,
     }
-    stdlog('new post: ' + victim)
+    stdlog("new post: " + victim)
     dbglog(schema)
     return schema
 
-def appender(entry: Union[Dict[str, str|None], str], group_name: str) -> int :
-    '''
+
+def _get_red(db: int) -> valkey.Valkey:
+    """Create a Valkey connection for the given db."""
+    return valkey.Valkey(unix_socket_path=get_socket_path("cache"), db=db)
+
+
+def appender(entry: dict[str, str | None] | str, group_name: str) -> int:
+    """
     append a new post to posts.json
-    '''
-    rocketconfig = get_config('generic','rocketchat')
-    mastodonconfig = get_config('generic','mastodon')
-    blueskyconfig = get_config('generic','bluesky')
-    mispconfig = get_config('generic','misp')
-    emailconfig = get_config('generic', 'email')
-    siteurl = get_config('generic', 'siteurl')
-    if type(entry) is str :
-       post_title = entry
-       description = ''
-       link = None
-       magnet = None
-       screen = None
-    else :
-       post_title =entry['title'] # type: ignore
-       description = entry['description'] # type: ignore
-       if 'link' in entry:
-           link = entry['link'] # type: ignore
-       else:
-           link = None
-       if 'magnet' in entry:
-           magnet = entry['magnet'] # type: ignore
-       else:
-           magnet = None
-       if 'screen' in entry:
-           screen = entry['screen'] # type: ignore
-       else:
-           screen = None
+    """
+    rocketconfig = get_config("generic", "rocketchat")
+    mastodonconfig = get_config("generic", "mastodon")
+    blueskyconfig = get_config("generic", "bluesky")
+    mispconfig = get_config("generic", "misp")
+    emailconfig = get_config("generic", "email")
+    siteurl = get_config("generic", "siteurl")
+    if type(entry) is str:
+        post_title = entry
+        description = ""
+        link = None
+        magnet = None
+        screen = None
+    else:
+        post_title = entry["title"]  # type: ignore[index,assignment]
+        description = entry["description"]  # type: ignore[index,assignment]
+        if "link" in entry:
+            link = entry["link"]  # type: ignore[index]
+        else:
+            link = None
+        if "magnet" in entry:
+            magnet = entry["magnet"]  # type: ignore[index]
+        else:
+            magnet = None
+        if "screen" in entry:
+            screen = entry["screen"]  # type: ignore[index]
+        else:
+            screen = None
     if len(post_title) == 0:
-        errlog('post_title is empty')
+        errlog("post_title is empty")
         return 2
     # limit length of post_title to 90 chars
     if len(post_title) > 90:
         post_title = post_title[:90]
-    red = redis.Redis(unix_socket_path=get_socket_path('cache'), db=2)
-    red.keys()
-    posts=[]
+    red = _get_red(DB_POSTS)
+    posts = []
 
-    if group_name.encode() in red.keys():
-        posts = json.loads(red.get(group_name)) # type: ignore
+    if red.exists(group_name):
+        posts = json.loads(red.get(group_name))  # type: ignore[arg-type]
         for post in posts:
-            if post['post_title'] == post_title:
-                stdlog('post already existing')
-                print(post)
+            if post["post_title"] == post_title:
+                stdlog("post already existing")
+                logger.debug("existing post: %s", post)
                 return 1
-    newpost = posttemplate(post_title, description, link, str(entry['date']) if 'date' in entry else str(datetime.today()), magnet, screen) # type: ignore
-    stdlog('adding new post: ' + 'group: ' + group_name + ' title: ' + post_title)
+    newpost = posttemplate(
+        post_title, description, link, str(entry["date"]) if "date" in entry else str(datetime.today()), magnet, screen  # type: ignore[index]
+    )
+    stdlog("adding new post: " + "group: " + group_name + " title: " + post_title)
     posts.append(newpost)
     red.set(group_name, json.dumps(posts))
     # preparing to screen
-    if link is not None and link != '' and not screen:
-        screenred = redis.Redis(unix_socket_path=get_socket_path('cache'), db=1)
-        if 'toscan'.encode() not in screenred.keys():
-           toscan=[]
+    if link is not None and link != "" and not screen:
+        screenred = _get_red(DB_TASKS)
+        if b"toscan" not in screenred.keys():  # type: ignore[operator]
+            toscan = []
         else:
-           toscan = json.loads(screenred.get('toscan')) # type: ignore
-        toscan.append({'group': group_name, 'title': entry['title'], 'slug': entry['slug'], 'link': entry['link']}) # type: ignore
-        screenred.set('toscan', json.dumps(toscan))
+            toscan = json.loads(screenred.get("toscan"))  # type: ignore[arg-type]
+        toscan.append({"group": group_name, "title": entry["title"], "slug": entry["slug"], "link": entry["link"]})  # type: ignore[index]
+        screenred.set("toscan", json.dumps(toscan))
     # preparing to torrent
-    if magnet is not None and magnet != '':
-        torrentred = redis.Redis(unix_socket_path=get_socket_path('cache'), db=1)
-        if 'totorrent'.encode() not in torrentred.keys():
-           totorrent=[]
-        else: 
-           totorrent = json.loads(torrentred.get('totorrent')) # type: ignore
-        totorrent.append({'group': group_name, 'title': entry['title'], 'magnet': entry['magnet']}) # type: ignore
-        torrentred.set('totorrent', json.dumps(totorrent))
+    if magnet is not None and magnet != "":
+        torrentred = _get_red(DB_TASKS)
+        if b"totorrent" not in torrentred.keys():  # type: ignore[operator]
+            totorrent = []
+        else:
+            totorrent = json.loads(torrentred.get("totorrent"))  # type: ignore[arg-type]
+        totorrent.append({"group": group_name, "title": entry["title"], "magnet": entry["magnet"]})  # type: ignore[index]
+        torrentred.set("totorrent", json.dumps(totorrent))
     # Notification zone
-    red = redis.Redis(unix_socket_path=get_socket_path('cache'), db=1)
-    keywords = red.get('keywords')
+    red_task = _get_red(DB_TASKS)
+    keywords = red_task.get("keywords")
     matching = []
     if keywords is not None:
-        listkeywords = keywords.decode().splitlines()
+        listkeywords = keywords.decode().splitlines()  # type: ignore[union-attr]
         for keywordfull in listkeywords:
-             keyword=keywordfull.split('|')[0]
-             if keyword.lower() in post_title.lower() or keyword.lower() in description.lower():
-                 matching.append(keyword)
+            keyword = keywordfull.split("|")[0]
+            if keyword.lower() in post_title.lower() or keyword.lower() in description.lower():
+                matching.append(keyword)
         if matching:
             alertingnotify(emailconfig, group_name, post_title, description, matching)
-            alertdb = redis.Redis(unix_socket_path=get_socket_path('cache'), db=12)
+            alertdb = _get_red(DB_ALERTS)
             uuidkey = str(uuid.uuid4())
-            value = {'type': 'group', 'group_name': group_name, 'post_title': post_title, 'description': description, 'matching': matching}
-            alertdb.set(uuidkey,json.dumps(value))
+            value = {
+                "type": "group",
+                "group_name": group_name,
+                "post_title": post_title,
+                "description": description,
+                "matching": matching,
+            }
+            alertdb.set(uuidkey, json.dumps(value))
             alertdb.expire(uuidkey, 60 * 60 * 24)
 
-    if rocketconfig['enable'] == True:
+    if rocketconfig["enable"] == True:
         rocketnotify(rocketconfig, group_name, post_title, description)
-    if mastodonconfig['enable'] == True:
+    if mastodonconfig["enable"] == True:
         tootnotify(mastodonconfig, group_name, post_title, siteurl)
-    if blueskyconfig['enable'] == True:
+    if blueskyconfig["enable"] == True:
         blueskynotify(blueskyconfig, group_name, post_title, siteurl)
-    if mispconfig['enable'] == True:
+    if mispconfig["enable"] == True:
         try:
-            groupred = redis.Redis(unix_socket_path=get_socket_path('cache'), db=0)
-            for key in groupred.keys():
-                if key.decode() == group_name:
-                       groupinfo = json.loads(groupred.get(key)) # type: ignore
-            galaxyname = groupinfo['ransomware_galaxy_value']
-        except:
+            groupred = _get_red(DB_GROUPS)
+            raw = groupred.get(group_name)
+            if raw:
+                groupinfo = json.loads(raw)  # type: ignore[arg-type]
+                galaxyname = groupinfo.get("ransomware_galaxy_value")
+            else:
+                galaxyname = None
+        except Exception:
             galaxyname = None
         mispevent(mispconfig, group_name, post_title, description, galaxyname)
     return 0

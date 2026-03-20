@@ -4,7 +4,7 @@
 {% block content %}
 <section class="hero">
   <div class="container">
-    <h1 style="display:inline">{{ actor['name'] }}</h1>
+    <h1 class="d-inline">{{ actor['name'] }}</h1>
     {% if current_user.is_authenticated %}
       <a class="edit-link" href="/admin/editactor/{{ actor['name']|urlencode }}">Edit</a>
     {% endif %}
@@ -15,7 +15,7 @@
   <div class="container">
 
     <!-- Badges -->
-    <div class="profile-badges" style="margin-bottom:14px;">
+    <div class="profile-badges mb-14">
       {% set w = actor.get('wanted') or {} %}
       {% if (w.get('fbi',{}).get('url') or w.get('europol',{}).get('url') or w.get('interpol',{}).get('url')) %}
         <span class="badge-neutral">Wanted listing</span>
@@ -237,156 +237,6 @@
   </figure>
 </div>
 
-<style>
-/* Layout */
-.ta-grid{ display:grid; grid-template-columns:minmax(0,2.1fr) minmax(0,1fr); gap:14px; align-items:start; }
-.ta-grid > *{ min-width:0; }
-.col-main{ display:flex; flex-direction:column; gap:12px; }
-.col-side{ display:flex; flex-direction:column; gap:12px; }
 
-/* Cards */
-.table-card{ border-radius:14px; overflow:visible; }
-.card-toolbar{ display:flex; align-items:center; gap:8px; padding:10px 12px; border-bottom:1px solid var(--border); }
-.card-title{ font-weight:600; }
-.pad{ padding:10px 12px; }
-.muted{ opacity:.7; }
-.h4{ margin:0 0 6px 0; font-weight:600; }
-.tight{ margin:0; padding-left:18px; }
-
-/* Relations grid */
-.rel-grid{ display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:12px; }
-
-/* Thumbnails */
-.thumbs{ display:grid; grid-template-columns:repeat(auto-fill,minmax(120px,1fr)); gap:10px; }
-.thumbs img{ width:100%; height:90px; object-fit:cover; border-radius:10px; border:1px solid var(--border); transition:transform .15s ease; background:#0c121d; }
-.thumbs img:hover{ transform:scale(1.02); }
-.thumb-link{ display:block; }
-
-/* Lightbox */
-.ta-lightbox[hidden]{ display:none; }
-.ta-lightbox{ position:fixed; inset:0; z-index:1000; }
-.lb-backdrop{ position:absolute; inset:0; background:rgba(0,0,0,.6); }
-.lb-figure{ position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); max-width:min(92vw,1100px); max-height:90vh; padding:0; margin:0; }
-#lb-img{ max-width:100%; max-height:80vh; display:block; border-radius:12px; box-shadow:0 10px 30px rgba(0,0,0,.5); background:#0c121d; }
-#lb-cap{ text-align:center; margin-top:6px; max-width:100%; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
-
-/* Close + nav */
-.lb-close{ position:absolute; top:-10px; right:-10px; width:32px; height:32px; border-radius:50%;
-  border:1px solid var(--border); background:#0f1623; color:var(--text); cursor:pointer; }
-.lb-close:hover{ opacity:.9; }
-
-.lb-nav{ position:absolute; top:50%; transform:translateY(-50%); width:38px; height:38px; border-radius:50%;
-  border:1px solid var(--border); background:#0f1623; color:var(--text); cursor:pointer; opacity:.95;
-  display:flex; align-items:center; justify-content:center; font-size:22px; line-height:1; }
-.lb-nav:hover{ opacity:1; }
-.lb-prev{ left:-12px; }
-.lb-next{ right:-12px; }
-
-/* Counter */
-.lb-count{ position:absolute; right:0; bottom:-30px; font-size:.9rem; opacity:.8; }
-
-/* Responsive */
-@media (max-width: 900px){
-  .ta-grid{ grid-template-columns:1fr; }
-}
-@media (max-width: 600px){
-  .lb-prev{ left:0; } .lb-next{ right:0; }
-}
-
-
-/* Aliases chips */
-.alias-chips{ display:flex; flex-wrap:wrap; gap:8px; }
-.chip{
-  display:inline-flex; align-items:center; justify-content:center;
-  padding:6px 10px; border-radius:999px;
-  font-size:13px; line-height:1; border:1px solid var(--border);
-  background:var(--bg-muted, #0f1523); color:var(--text, #e5e7eb);
-}
-.chip:hover{ filter:brightness(1.1); }
-</style>
-
-<script>
-(function(){
-  const lb   = document.getElementById('ta-lightbox');
-  const img  = document.getElementById('lb-img');
-  const cap  = document.getElementById('lb-cap');
-  const cnt  = document.getElementById('lb-count');
-  const btnN = lb.querySelector('.lb-next');
-  const btnP = lb.querySelector('.lb-prev');
-
-  const thumbs = Array.from(document.querySelectorAll('.thumb-link'));
-  let idx = -1;
-
-  function srcFor(a){ return a.dataset.img || a.getAttribute('href'); }
-  function capFor(a){
-    return a.getAttribute('aria-label')
-        || (a.querySelector('img') ? a.querySelector('img').alt : '')
-        || '';
-  }
-
-  function preload(i){
-    if(!thumbs.length) return;
-    if(i < 0) i = thumbs.length - 1;
-    if(i >= thumbs.length) i = 0;
-    const pre = new Image();
-    pre.src = srcFor(thumbs[i]);
-  }
-
-  function openAt(i){
-    if(!thumbs.length) return;
-    if(i < 0) i = thumbs.length - 1;
-    if(i >= thumbs.length) i = 0;
-    idx = i;
-
-    const t = thumbs[idx];
-    img.src = srcFor(t);
-    cap.textContent = capFor(t);
-    cnt.textContent = (idx+1) + " / " + thumbs.length;
-
-    lb.hidden = false;
-    document.addEventListener('keydown', onKey);
-    preload(idx+1);
-  }
-
-  function close(){
-    lb.hidden = true;
-    img.src = ''; cap.textContent = ''; cnt.textContent = '';
-    document.removeEventListener('keydown', onKey);
-  }
-
-  function next(){ openAt(idx+1); }
-  function prev(){ openAt(idx-1); }
-
-  function onKey(e){
-    if(e.key === 'Escape') close();
-    else if(e.key === 'ArrowRight') next();
-    else if(e.key === 'ArrowLeft')  prev();
-  }
-
-  // Clicks
-  document.addEventListener('click', function(e){
-    const a = e.target.closest('a.thumb-link');
-    if(a){
-      e.preventDefault();
-      const i = thumbs.indexOf(a);
-      openAt(i >= 0 ? i : 0);
-      return;
-    }
-    if(e.target.hasAttribute('data-close')) close();
-  });
-
-  btnN.addEventListener('click', next);
-  btnP.addEventListener('click', prev);
-
-  // Touch swipe
-  let touchX = null;
-  lb.addEventListener('touchstart', e => { touchX = e.changedTouches[0].clientX; }, {passive:true});
-  lb.addEventListener('touchend',   e => {
-    if(touchX == null) return;
-    const dx = e.changedTouches[0].clientX - touchX;
-    touchX = null;
-    if(Math.abs(dx) > 30){ dx < 0 ? next() : prev(); }
-  }, {passive:true});
-})();
-</script>
+<script src="{{ url_for('static', filename='js/lightbox.js') }}" defer></script>
 {% endblock %}

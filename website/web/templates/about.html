@@ -100,12 +100,15 @@
     <h2 id="credits">{{ _('Credits & Thanks') if _ else 'Credits & Thanks' }}</h2>
     {% set maint_html = 'RansomLook is maintained by <a href="https://github.com/adulau/" target="_blank" rel="noopener">Alexandre Dulaunoy</a> and <a href="https://github.com/fafnerkeyzee" target="_blank" rel="noopener">Fafner [_KeyZee_]</a>.' %}
     <p>{{ (_(maint_html) if _ else maint_html) | safe }}</p>
-    {% set thanks_html = 'We thank <a href="https://www.linkedin.com/in/tammyharper11" target="_blank" rel="noopener">Tammy Harper</a> for her contributions to adding new groups and her regular feedback to improve the project.' %}
-    <p>{{ (_(thanks_html) if _ else thanks_html) | safe }}</p>
+    {% set thanks_tammy = 'We thank <a href="https://www.linkedin.com/in/tammyharper11" target="_blank" rel="noopener">Tammy Harper</a> for her contributions to adding new groups and her regular feedback to improve the project.' %}
+    <p>{{ (_(thanks_tammy) if _ else thanks_tammy) | safe }}</p>
+    {% set thanks_katya = 'We thank <a href="https://www.linkedin.com/in/katya-k-440175b7/" target="_blank" rel="noopener">Katya Kandratovich</a>, core team member, for her contributions and dedication to the project.' %}
+    <p>{{ (_(thanks_katya) if _ else thanks_katya) | safe }}</p>
     <p>We warmly thank <a href="https://ecrime.ch" target="_blank" rel="noopener">Ecrime.ch</a> for its feedback and sharing on the group.</p>
     <p>We sincerely thank <a href="https://onyphe.io" target="_blank" rel="noopener">Onyphe.io</a> for providing to us a CTIScan API key to hunt new servers and new groups.</p>
     <p>We also thank <a href="https://ransom-isac.com/" target="_blank" rel="noopener">Ransom-ISAC</a>. Ransom-ISAC takes a left-field, unique approach to threat intelligence by building a community-driven, vendor-neutral ecosystem focused on openness and collaboration. It connects defenders of all sizes to share actionable ransomware insights in a trusted, transparent space, strengthening global resilience through collective knowledge and shared purpose.</p>
     <p>Main members of RansomLook have an opportunity to earn a <a href="https://ransom-isac.com/lockstar-members/" target="_blank" rel="noopener">LOCKSTAR</a>. The LOCK STAR Initiative empowers researchers, cybersecurity professionals, and enthusiasts to share their knowledge and intelligence through blogs, conference presentations, and active community contributions. By creating space for open collaboration and knowledge exchange, the initiative encourages diverse voices to contribute insights, tools, and real-world experiences — strengthening collective understanding and resilience against ransomware and other evolving cyber threats.</p>
+    <p>We are proud to be trusted by <a href="https://www.breadcrumbs.app/" target="_blank" rel="noopener">Breadcrumbs</a> for cryptocurrency enrichment.</p>
     <p>{{ _("The code is based on RansomWatch.") if _ else "The code is based on RansomWatch." }}</p>
   </div>
 </section>
@@ -115,6 +118,7 @@
   <div class="container prose">
     <h2 id="sources">{{ _('External data sources') if _ else 'External data sources' }}</h2>
     <ul>
+      <li><a href="https://www.breadcrumbs.app/" target="_blank" rel="noopener">Breadcrumbs</a> for cryptocurrency transaction enrichment</li>
       <li>{{ _("Ransomwhe.re for cryptocurrency addresses") if _ else "Ransomwhe.re for cryptocurrency addresses" }}</li>
       <li>{{ _("ThreatLabz for the RansomNotes") if _ else "ThreatLabz for the RansomNotes" }}</li>
       <li>{{ _("leak-lookup for public leaks") if _ else "leak-lookup for public leaks" }}</li>

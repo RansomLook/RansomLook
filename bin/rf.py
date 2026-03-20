@@ -1,38 +1,45 @@
 import json
-import redis
-import requests
 
+import requests
+import valkey
+
+from ransomlook.default import DB_RF
 from ransomlook.default.config import get_config, get_socket_path
+from ransomlook.default.logging import get_logger
 from ransomlook.rocket import rocketnotifyrf
 
-def main() -> None :
+logger = get_logger("rf")
 
-    red = redis.Redis(unix_socket_path=get_socket_path('cache'), db=10)
+
+def main() -> None:
+
+    red = valkey.Valkey(unix_socket_path=get_socket_path("cache"), db=DB_RF)
     keys = red.keys()
 
-    rocketconfig = get_config('generic','rocketchat')
+    rocketconfig = get_config("generic", "rocketchat")
 
-    rftoken = get_config('generic','rf')
+    rftoken = get_config("generic", "rf")
 
-    header = { "x-RFToken": rftoken,
-           "Content-Type": "application/json" }
+    header = {"x-RFToken": rftoken, "Content-Type": "application/json"}
 
-    query = { "names": [""],
-          "limit": 10000}
+    query = {"names": [""], "limit": 10000}
 
-    r_details=requests.post("https://api.recordedfuture.com/identity/metadata/dump/search",headers=header,json=query)
+    r_details = requests.post(
+        "https://api.recordedfuture.com/identity/metadata/dump/search", headers=header, json=query
+    )
     temp = r_details.json()
 
-    for entry in temp['dumps']:
+    for entry in temp["dumps"]:
         next = False
-        for key in keys:
-            if entry['name'] == key.decode():
+        for key in keys:  # type: ignore[union-attr]
+            if entry["name"] == key.decode():
                 next = True
                 continue
-        if next == False :
-            red.set(entry['name'], json.dumps(entry))
-            if rocketconfig['enable'] == True:
+        if next == False:
+            red.set(entry["name"], json.dumps(entry))
+            if rocketconfig["enable"] == True:
                 rocketnotifyrf(rocketconfig, entry)
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     main()

@@ -1,29 +1,33 @@
-import os
-from bs4 import BeautifulSoup
-from typing import Dict, List
 import json
+import os
 
-def main() -> List[Dict[str, str]] :
-    list_div=[]
+from bs4 import BeautifulSoup
 
-    for filename in os.listdir('source'):
+from ransomlook.default.logging import get_logger
+
+logger = get_logger(__name__)
+
+
+def main() -> list[dict[str, str]]:
+    list_div = []
+
+    for filename in os.listdir("source"):
         try:
-            if filename.startswith(__name__.split('.')[-1]+'-'):
-                html_doc='source/'+filename
-                file=open(html_doc,'r')
-                soup=BeautifulSoup(file,'html.parser')
+            if filename.startswith(__name__.split(".")[-1] + "-"):
+                html_doc = "source/" + filename
+                file = open(html_doc, encoding="utf-8")
+                soup = BeautifulSoup(file, "html.parser")
                 try:
-                    jsonpart= soup.pre.contents # type: ignore
-                    data = json.loads(jsonpart[0]) # type: ignore
-                    for entry in data['content']['payload']:
-                        title =  entry['target']['name'].strip()
-                        description = entry['description'].strip()
-                        list_div.append({"title" : title, "description" : description})
-                except:
+                    jsonpart = soup.pre.contents  # type: ignore
+                    data = json.loads(jsonpart[0])  # type: ignore
+                    for entry in data["content"]["payload"]:
+                        title = entry["target"]["name"].strip()
+                        description = entry["description"].strip()
+                        list_div.append({"title": title, "description": description})
+                except Exception:
                     pass
                 file.close()
-        except:
-            print("Failed during : " + filename)
-            pass
-    print(list_div)
+        except Exception:
+            logger.debug("Failed during : " + filename)
+    logger.debug(list_div)
     return list_div

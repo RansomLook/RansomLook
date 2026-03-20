@@ -1,0 +1,114 @@
+{% extends "base.html" %}
+{% from 'bootstrap5/utils.html' import render_messages %}
+{% block title %}Admin · Audit log{% endblock %}
+
+{% block content %}
+
+{{ render_messages(container=True, dismissible=True) }}
+
+<section class="hero">
+  <div class="container">
+    <h1>Audit log</h1>
+    <p class="lead">{{ total }} entries (1-year retention).
+      {% if legacy_count %}<span class="muted">{{ legacy_count }} legacy entries pending migration.</span>{% endif %}
+    </p>
+  </div>
+</section>
+
+<section class="metrics-section">
+  <div class="container">
+
+    <!-- Filters -->
+    <div class="table-card" style="padding:12px; margin-bottom:16px;">
+      <form id="log-filters" onsubmit="return false" aria-label="Filters">
+        <div style="display:flex; flex-wrap:wrap; gap:12px; align-items:end;">
+
+          <div>
+            <label class="label" for="from-date">From</label>
+            <input id="from-date" type="date" class="input">
+          </div>
+          <div>
+            <label class="label" for="to-date">To</label>
+            <input id="to-date" type="date" class="input">
+          </div>
+
+          <div>
+            <label class="label" for="action-filter">Action</label>
+            <select id="action-filter" class="input">
+              <option value="">All</option>
+              {% for a in actions %}
+                <option value="{{ a }}">{{ a }}</option>
+              {% endfor %}
+            </select>
+          </div>
+
+          <div>
+            <label class="label" for="user-filter">User</label>
+            <select id="user-filter" class="input">
+              <option value="">All</option>
+              {% for u in users %}
+                <option value="{{ u }}">{{ u }}</option>
+              {% endfor %}
+            </select>
+          </div>
+
+          <div style="flex:1 1 280px; min-width:200px;">
+            <label class="label" for="log-search">Search</label>
+            <input id="log-search" class="input" type="search" placeholder="target, details…">
+          </div>
+
+          <div style="margin-left:auto; display:flex; gap:8px;">
+            <button id="export-csv" class="btn btn-secondary" type="button">Export CSV</button>
+            <button id="reset-filters" class="btn btn-secondary" type="button">Reset</button>
+          </div>
+        </div>
+      </form>
+    </div>
+
+    <!-- Table -->
+    <div class="table-card">
+      <div class="table-scroll">
+        <table class="rl-table" aria-label="Audit log">
+          <thead>
+            <tr>
+              <th style="width:170px; position:sticky; top:0;">Date (local)</th>
+              <th style="width:150px; position:sticky; top:0;">User</th>
+              <th style="width:170px; position:sticky; top:0;">Action</th>
+              <th style="width:200px; position:sticky; top:0;">Target</th>
+              <th style="position:sticky; top:0;">Details</th>
+            </tr>
+          </thead>
+          <tbody id="log-body">
+            {% for e in entries %}
+              <tr data-action="{{ e.action }}" data-user="{{ e.user }}" data-ts="{{ e.ts }}">
+                <td><time class="utc-time" datetime="{{ e.ts }}">{{ e.ts }}</time></td>
+                <td>{{ e.user }}</td>
+                <td><span class="chip">{{ e.action }}</span></td>
+                <td class="monospace">{{ e.target }}</td>
+                <td class="log-details muted">{{ e.details }}</td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Pagination -->
+    {% if total_pages > 1 %}
+    <div style="display:flex; justify-content:center; gap:8px; margin-top:16px;">
+      {% if page > 1 %}
+        <a class="btn btn-secondary btn-sm" href="{{ url_for('logs', page=page-1) }}">← Previous</a>
+      {% endif %}
+      <span class="muted" style="padding:6px 12px;">Page {{ page }} / {{ total_pages }}</span>
+      {% if page < total_pages %}
+        <a class="btn btn-secondary btn-sm" href="{{ url_for('logs', page=page+1) }}">Next →</a>
+      {% endif %}
+    </div>
+    {% endif %}
+
+  </div>
+</section>
+
+<script src="{{ url_for('static', filename='js/logs.js') }}"></script>
+
+{% endblock %}

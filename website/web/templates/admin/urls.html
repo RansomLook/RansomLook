@@ -1,0 +1,128 @@
+{% extends "base.html" %}
+{% from 'bootstrap5/utils.html' import render_messages %}
+{% block title %}Admin · URL Manager{% endblock %}
+
+{% block content %}
+{{ render_messages(container=True, dismissible=True) }}
+
+<section class="hero">
+  <div class="container">
+    <h1>URL Manager</h1>
+    <p class="lead">Add one or many URLs to an existing group or market/forum.</p>
+  </div>
+</section>
+
+<section class="metrics-section">
+  <div class="container" style="max-width:820px;">
+    <form action="" method="post" class="table-card p-16">
+
+      <!-- Database + Name -->
+      <div style="display:grid;grid-template-columns:1fr 2fr;gap:12px;margin-bottom:12px;">
+        <div>
+          <label class="label" for="database">Database</label>
+          <select id="database" name="database" class="input">
+            <option value="0">Group</option>
+            <option value="3">Market / Forum</option>
+          </select>
+        </div>
+        <div style="position:relative;">
+          <label class="label" for="name-search">Name</label>
+          <input id="name-search" class="input" placeholder="Search…" autocomplete="off">
+          <input id="name" name="name" type="hidden" required>
+          <div id="name-dropdown" class="search-dropdown" hidden>
+            <div id="name-results"></div>
+          </div>
+          <div id="name-selected" class="muted" style="font-size:.85rem;margin-top:2px;"></div>
+        </div>
+      </div>
+
+      <!-- Type + Browser -->
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:12px;">
+        <div>
+          <label class="label" for="url_type">URL type</label>
+          <select id="url_type" name="url_type" class="input">
+            <option value="dls">DLS (leak site)</option>
+            <option value="fs">File server</option>
+            <option value="chat">Chat</option>
+            <option value="admin">Admin panel</option>
+          </select>
+        </div>
+        <div>
+          <label class="label" for="browser">Browser</label>
+          <select id="browser" name="browser" class="input">
+            <option value="">Default</option>
+            <option value="chrome">Chrome</option>
+            <option value="firefox">Firefox</option>
+            <option value="webkit">WebKit</option>
+          </select>
+        </div>
+        <div style="display:flex;align-items:end;gap:12px;padding-bottom:6px;">
+          <label style="display:flex;align-items:center;gap:6px;cursor:pointer;">
+            <input type="checkbox" name="private"> Private
+          </label>
+        </div>
+      </div>
+
+      <!-- Init script (collapsed) -->
+      <details style="margin-bottom:12px;">
+        <summary class="label" style="cursor:pointer;">Init script (optional)</summary>
+        <textarea name="init_script" class="input" rows="4" placeholder="JavaScript to run before capture…" style="margin-top:6px;width:100%;"></textarea>
+      </details>
+
+      <!-- URLs -->
+      <div style="margin-bottom:12px;">
+        <label class="label" for="urls">URLs <span class="muted">(one per line — bulk supported)</span></label>
+        <textarea id="urls" name="urls" class="input" rows="6" placeholder="http://example1.onion&#10;http://example2.onion&#10;http://example3.onion" required style="width:100%;font-family:monospace;"></textarea>
+        <div style="display:flex;justify-content:space-between;margin-top:4px;">
+          <span class="muted" style="font-size:.85rem;">Group/market must exist. <a href="{{ url_for('addgroup') }}">Create a new one here</a>.</span>
+          <span class="muted" style="font-size:.85rem;" id="url-count">0 URLs</span>
+        </div>
+      </div>
+
+      <div style="display:flex;justify-content:flex-end;">
+        <button class="btn btn-primary" type="submit">Add URLs</button>
+      </div>
+    </form>
+
+    <!-- Results -->
+    {% if results %}
+    <div class="table-card mt-14">
+      <div class="card-toolbar bb">
+        <span class="fw-600">Results</span>
+      </div>
+      <div class="table-scroll">
+        <table class="rl-table">
+          <thead>
+            <tr>
+              <th style="width:60px;">Status</th>
+              <th>URL</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for r in results %}
+              <tr>
+                <td>
+                  {% if r.ok %}
+                    <span class="badge badge-ok">OK</span>
+                  {% else %}
+                    <span class="badge badge-warn">Exists</span>
+                  {% endif %}
+                </td>
+                <td class="monospace">{{ r.url }}</td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+    {% endif %}
+
+  </div>
+</section>
+
+<script type="application/json" id="urls-data">
+{{ {"groups": groups, "markets": markets} | tojson }}
+</script>
+<script src="{{ url_for('static', filename='js/urls.js') }}"></script>
+
+{% endblock %}

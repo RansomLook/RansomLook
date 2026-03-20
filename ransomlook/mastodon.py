@@ -1,28 +1,38 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
+from typing import Any
+
 from mastodon import Mastodon
 
 from .sharedutils import errlog
 
-from typing import Dict, Any
 
-def tootnotify(config: Dict[str, Any], group: str, title: str, siteurl: str) -> None :
-    '''
+def tootnotify(config: dict[str, Any], group: str, title: str, siteurl: str) -> None:
+    """
     Posting message to Mastodon
-    '''
+    """
     try:
-        m = Mastodon(access_token=config['token'], api_base_url=config['url'])
-        m.toot("New post from #" + group.title() + " : " + title.title() + "\nMore at : "+ siteurl + "/group/" + group.title().replace(" ","%20") + " #Ransomware")
-    except:
-        errlog('Can not toot :(')
+        m = Mastodon(access_token=config["token"], api_base_url=config["url"])
+        m.toot(
+            "New post from #"
+            + group.title()
+            + " : "
+            + title.title()
+            + "\nMore at : "
+            + siteurl
+            + "/group/"
+            + group.title().replace(" ", "%20")
+            + " #Ransomware"
+        )
+    except Exception:
+        errlog("Can not toot :(")
 
-def tootnotifyleak(config: Dict[str, Any], name: str) -> None :
-    '''
+
+def tootnotifyleak(config: dict[str, Any], name: str) -> None:
+    """
     Posting message to Mastodon
-    '''
+    """
     try:
-        m = Mastodon(access_token=config['token'], api_base_url=config['url'])
+        m = Mastodon(access_token=config["token"], api_base_url=config["url"])
         m.toot("New #leak detected : " + name.title())
-    except:
-        errlog('Can not toott :(')
-
+    except Exception:
+        errlog("Can not toott :(")

@@ -1,35 +1,48 @@
 #!/usr/bin/env python3
 
 import json
-from redis import Redis
+from typing import Any
 
-from flask_restx import Namespace, Resource # type: ignore
+from flask_restx import Namespace, Resource, fields  # type: ignore
+from valkey import Valkey
 
-from ransomlook.default import get_socket_path
+from ransomlook.default import DB_RF, get_socket_path
+
+api = Namespace("RecordedFutureAPI", description="Recorded Future integration API", path="/api/rf")
+
+# ── Swagger models ──────────────────────────────────────────────────────
+
+rf_leak_model = api.model(
+    "RFLeak",
+    {
+        "name": fields.String(description="Channel / leak name"),
+        "url": fields.String(description="Source URL"),
+        "type": fields.String(description="Channel type"),
+    },
+)
 
 
-from typing import List
-
-api = Namespace('RecordedFutureAPI', description='RecordedFuture Ransomlook API', path='/api/rf')
-
-@api.route('/leaks')
-@api.doc(description='Return list of leak', tags=['channels'])
-class RFLeaks(Resource): # type: ignore[misc]
-    def get(self) -> List[str]:
+@api.route("/leaks")
+@api.doc(description="Return the list of all Recorded Future channel names.")
+class RFLeaks(Resource):  # type: ignore[misc]
+    @api.response(200, "List of channel names (strings)")  # type: ignore[untyped-decorator]
+    def get(self) -> list[str]:
         leaks = []
-        red = Redis(unix_socket_path=get_socket_path('cache'), db=10)
-        for key in red.keys():
+        red = Valkey(unix_socket_path=get_socket_path("cache"), db=DB_RF)
+        for key in red.keys():  # type: ignore[union-attr]
             leaks.append(key.decode())
         return leaks
 
-@api.route('/leak/<string:name>')
-@api.doc(description='Return info about the leak', tags=['channels'])
-@api.doc(param={'name':'Name of the leak'})
-class RFLeakinfo(Resource): # type: ignore[misc]
-    def get(self, name: str): # type: ignore[no-untyped-def]
-        red = Redis(unix_socket_path=get_socket_path('cache'), db=10)
+
+@api.route("/leak/<string:name>")
+@api.doc(description="Return details for a specific Recorded Future channel.", params={"name": "Channel name"})
+class RFLeakinfo(Resource):  # type: ignore[misc]
+    @api.response(200, "Channel details", rf_leak_model)  # type: ignore[untyped-decorator]
+    @api.response(404, "Channel not found (returns {})")  # type: ignore[untyped-decorator]
+    def get(self, name: str) -> Any:
+        red = Valkey(unix_socket_path=get_socket_path("cache"), db=DB_RF)
         leak = None
         leak = red.get(name.encode())
-        if leak :
-            return json.loads(leak)
+        if leak:
+            return json.loads(leak)  # type: ignore[arg-type]
         return {}

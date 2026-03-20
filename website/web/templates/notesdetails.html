@@ -51,53 +51,6 @@
   </div>
 </section>
 
-<!-- JS inline: copy to clipboard -->
-<script>
-(function(){
-  function copyText(txt){
-    if (navigator.clipboard && navigator.clipboard.writeText) {
-      return navigator.clipboard.writeText(txt);
-    }
-    // fallback
-    const ta = document.createElement('textarea');
-    ta.value = txt;
-    ta.style.position = 'fixed';
-    ta.style.opacity = '0';
-    document.body.appendChild(ta);
-    ta.select();
-    try { document.execCommand('copy'); } catch(e){}
-    document.body.removeChild(ta);
-    return Promise.resolve();
-  }
-
-  document.addEventListener('click', function(e){
-    const btn = e.target.closest('[data-copy]');
-    if (!btn) return;
-    const pre = btn.closest('tr')?.querySelector('[data-note]');
-    if (!pre) return;
-
-    const txt = pre.textContent || '';
-    copyText(txt).then(()=>{
-      const orig = btn.textContent;
-      btn.textContent = 'Copied!';
-      setTimeout(()=>{ btn.textContent = orig; }, 1200);
-    });
-  });
-})();
-</script>
-
-<style>
-/* Rendu propre du bloc note */
-.note-body{
-  margin:0;
-  padding:12px;
-  white-space:pre-wrap;      /* wrap conservant les retours à la ligne */
-  word-break:break-word;     /* évite dépassement horizontal */
-  background:#0f1623;
-  border:1px solid var(--border);
-  border-radius:10px;
-  line-height:1.45;
-}
-</style>
+<script src="{{ url_for('static', filename='js/notesdetails.js') }}" defer></script>
 
 {% endblock %}

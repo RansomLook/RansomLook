@@ -16,7 +16,7 @@
   <div class="container">
 
     <!-- Type switch (no URL hash) -->
-    <div class="table-card" style="padding:12px; margin-bottom:14px;">
+    <div class="table-card p-12 mb-14">
       <div class="type-toggle" role="tablist" aria-label="Choose type to edit">
         <input type="radio" name="type" id="t-groups" checked>
         <label for="t-groups" class="btn btn-secondary">Groups</label>
@@ -26,22 +26,22 @@
       </div>
 
       <!-- Shared search box -->
-      <div style="margin-top:10px;">
+      <div class="mt-10">
         <label class="label" for="picker-search">Search</label>
         <input id="picker-search" class="input" type="search" placeholder="Filter options…">
       </div>
     </div>
 
     <!-- GROUPS form -->
-    <form id="form-groups" action="" method="post" novalidate class="table-card admin-form" style="padding:16px;">
+    <form id="form-groups" action="" method="post" novalidate class="table-card admin-form p-16">
       {{ form.hidden_tag() }}
       <div class="picker-row">
         <div>
           <label class="label" for="{{ form.group.id }}">{{ form.group.label }}</label>
-          {{ form.group(class="input", style="width:100%;") }}
-          {% for error in form.group.errors %}<div style="color:#ff9aa2;margin-top:4px">[{{ error }}]</div>{% endfor %}
+          {{ form.group(class="input w-full") }}
+          {% for error in form.group.errors %}<div class="field-error">[{{ error }}]</div>{% endfor %}
         </div>
-        <div style="align-self:end;">
+        <div class="self-end">
           {{ form.submit(class="btn btn-primary") }}
         </div>
       </div>
@@ -53,10 +53,10 @@
       <div class="picker-row">
         <div>
           <label class="label" for="{{ formMarkets.group.id }}">{{ formMarkets.group.label }}</label>
-          {{ formMarkets.group(class="input", style="width:100%;") }}
-          {% for error in formMarkets.group.errors %}<div style="color:#ff9aa2;margin-top:4px">[{{ error }}]</div>{% endfor %}
+          {{ formMarkets.group(class="input w-full") }}
+          {% for error in formMarkets.group.errors %}<div class="field-error">[{{ error }}]</div>{% endfor %}
         </div>
-        <div style="align-self:end;">
+        <div class="self-end">
           {{ formMarkets.submit(class="btn btn-primary") }}
         </div>
       </div>
@@ -65,60 +65,6 @@
   </div>
 </section>
 
-<style>
-/* small admin helpers to keep UI tidy */
-.label{ display:block; color:var(--muted); font-size:.9rem; margin-bottom:4px }
-.input{ background:#0f1623; color:var(--text); border:1px solid var(--border); border-radius:10px; padding:8px 10px; width:100% }
-.type-toggle{ display:flex; gap:8px; align-items:center; }
-.type-toggle input{ display:none; }
-.type-toggle label{ cursor:pointer; }
-.type-toggle input:checked + label{ box-shadow: inset 0 -2px 0 0 var(--pri); }
-.picker-row{ display:grid; grid-template-columns: 1fr auto; gap:12px; align-items:end; }
-@media (max-width: 640px){ .picker-row{ grid-template-columns: 1fr; } }
-</style>
 
-<script>
-document.addEventListener('DOMContentLoaded', () => {
-  const rGroups   = document.getElementById('t-groups');
-  const rMarkets  = document.getElementById('t-markets');
-  const fGroups   = document.getElementById('form-groups');
-  const fMarkets  = document.getElementById('form-markets');
-  const searchBox = document.getElementById('picker-search');
-
-  // Toggle without changing URL
-  function applyToggle(){
-    const gOn = rGroups.checked;
-    fGroups.style.display  = gOn ? '' : 'none';
-    fMarkets.style.display = gOn ? 'none' : '';
-    // reset search filter on switch
-    searchBox.value = '';
-    filterSelect('');
-  }
-  rGroups.addEventListener('change', applyToggle);
-  rMarkets.addEventListener('change', applyToggle);
-  applyToggle();
-
-  // Filter options in the visible select
-  function filterSelect(q){
-    q = (q || '').toLowerCase().trim();
-    const select = (fGroups.style.display !== 'none')
-      ? fGroups.querySelector('select')
-      : fMarkets.querySelector('select');
-    if (!select) return;
-
-    // Show all then hide non‑matching (works with long lists)
-    for (const opt of select.options){
-      const txt = (opt.textContent || '').toLowerCase();
-      opt.hidden = q && !txt.includes(q);
-    }
-
-    // Keep a visible option selected if current one is hidden
-    if (select.selectedOptions.length && select.selectedOptions[0].hidden){
-      const firstVisible = [...select.options].find(o => !o.hidden);
-      if (firstVisible) firstVisible.selected = true;
-    }
-  }
-  searchBox.addEventListener('input', e => filterSelect(e.target.value));
-});
-</script>
+<script src="{{ url_for('static', filename='js/picker.js') }}"></script>
 {% endblock %}

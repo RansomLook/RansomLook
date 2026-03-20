@@ -14,20 +14,29 @@
 <section class="metrics-section">
   <div class="container">
 
-    <!-- Filtre client -->
-    <div style="margin-bottom:14px;">
-      <input id="crypto-filter" type="search" placeholder="Filter groups…" aria-label="Filter groups"
-             style="width:100%;max-width:520px;padding:10px 12px;border-radius:10px;border:1px solid var(--border);background:#0f1623;color:var(--text)">
+    <!-- Filters -->
+    <div class="table-card search-card pad-mb">
+      <div class="filters-wrap">
+        <div class="filters">
+          <div class="field field--search">
+            <label class="sr-only" for="crypto-filter">Search</label>
+            <input id="crypto-filter" class="input" type="search"
+                   aria-label="Filter groups"
+                   placeholder="Group name or alias…">
+            <button class="input-clear" type="button" aria-label="Clear search">×</button>
+          </div>
+        </div>
+        <div class="filters-meta"><span id="flt-count"></span></div>
+      </div>
     </div>
 
     <!-- Grille de groupes -->
-    <div id="groups-grid" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px;">
+    <div id="groups-grid" class="auto-grid">
       {% for name in data %}
          {% for item in name %}
-          <a class="group-chip"
+          <a class="group-chip stat-link"
              href="/crypto/{{ item }}"
-             data-name="{{ item|lower }}{% if aliases and aliases.get(item) %} {{ aliases[item]|join(' ') }}{% endif %}"
-             style="display:flex;align-items:center;justify-content:center;padding:12px 10px;border-radius:12px;border:1px solid var(--border);background:linear-gradient(180deg,#121a28 0%,#0f1623 100%);text-decoration:none;color:var(--text);font-weight:600;text-align:center;">
+             data-name="{{ item|lower }}{% if aliases and aliases.get(item) %} {{ aliases[item]|join(' ') }}{% endif %}">
              {{ item|title }} 
           </a>
          {% endfor %}
@@ -37,22 +46,7 @@
   </div>
 </section>
 
-<!-- JS inline pour le filtre -->
-<script>
-(function(){
-  const input = document.getElementById('crypto-filter');
-  const items = Array.from(document.querySelectorAll('#groups-grid .group-chip'));
-  if (!input) return;
-  input.addEventListener('input', function(){
-    const q = this.value.trim().toLowerCase();
-    items.forEach(a => {
-      // On cherche dans 'data-tokens' (nom + alias), avec fallback sur 'data-name'
-      const tokens = ((a.dataset.tokens || a.dataset.name || '') + '').toLowerCase();
-      const match = !q || tokens.includes(q);
-      a.style.display = match ? '' : 'none';
-    });
-  });
-})();
-</script>
+<script type="application/json" id="chips-config">{"inputId":"crypto-filter","gridId":"groups-grid","label":"groups"}</script>
+<script src="{{ url_for('static', filename='js/chips-filter.js') }}" defer></script>
 
 {% endblock %}

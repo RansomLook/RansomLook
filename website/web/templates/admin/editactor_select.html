@@ -13,16 +13,40 @@
 
 <section class="metrics-section">
   <div class="container">
-    <form action="" method="post" novalidate class="table-card admin-form" style="padding:16px;">
+    <div class="table-card p-12 mb-14">
+      <label class="label" for="picker-search">Search</label>
+      <input id="picker-search" class="input" type="search" placeholder="Filter actors…">
+    </div>
+
+    <form action="" method="post" novalidate class="table-card admin-form p-16">
       {{ form.hidden_tag() }}
       <div class="picker-row">
-        <div style="flex:1;">
+        <div>
           <label class="label" for="{{ form.actor.id }}">{{ form.actor.label }}</label>
-          {{ form.actor(class="input", style="width:100%") }}
+          {{ form.actor(class="input w-full") }}
         </div>
-        <div style="align-self:end;">{{ form.submit(class="btn btn-primary") }}</div>
+        <div class="self-end">{{ form.submit(class="btn btn-primary") }}</div>
       </div>
     </form>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  const searchBox = document.getElementById('picker-search');
+  const select = document.querySelector('form select');
+  if (!searchBox || !select) return;
+
+  searchBox.addEventListener('input', () => {
+    const q = searchBox.value.toLowerCase().trim();
+    for (const opt of select.options){
+      opt.hidden = q && !(opt.textContent || '').toLowerCase().includes(q);
+    }
+    if (select.selectedOptions.length && select.selectedOptions[0].hidden){
+      const first = [...select.options].find(o => !o.hidden);
+      if (first) first.selected = true;
+    }
+  });
+});
+</script>
   </div>
 </section>
 {% endblock %}

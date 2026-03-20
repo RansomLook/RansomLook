@@ -14,7 +14,7 @@
 <section class="metrics-section">
   <div class="container">
 
-    <div class="table-card" style="padding:12px;margin-bottom:12px;">
+    <div class="table-card pad-mb">
       <a class="btn" href="{{ url_for('admin_crypto_new', group=group) }}">Add address</a>
       <a class="btn" href="{{ url_for('admin_crypto') }}">Back to groups</a>
     </div>
@@ -44,10 +44,10 @@
                   <td class="mono">{{ chain }}</td>
                   <td class="mono" style="word-break:break-all;"><code>{{ w.address }}</code></td>
                   <td>{{ w.source or 'unknown' }}</td>
-                  <td style="text-align:right">{{ w.tx_count or (w.transactions|length) }}</td>
-                  <td style="text-align:center">
+                  <td class="text-right">{{ w.tx_count or (w.transactions|length) }}</td>
+                  <td class="text-center">
                     <a class="btn" href="{{ url_for('admin_crypto_edit_addr', group=group, chain=chain, addr=w.address) }}">Edit</a>
-                    <form method="post" action="{{ url_for('admin_crypto_edit_addr', group=group, chain=chain, addr=w.address) }}" style="display:inline" onsubmit="return confirm('Delete this address?');">
+                    <form method="post" action="{{ url_for('admin_crypto_edit_addr', group=group, chain=chain, addr=w.address) }}" class="d-inline" onsubmit="return confirm('Delete this address?');">
                       <input type="hidden" name="action" value="delete">
                       <button class="btn btn-danger" type="submit">Delete</button>
                     </form>

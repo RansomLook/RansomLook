@@ -1,11 +1,15 @@
 #!/usr/bin/env python3
 from ransomlook import ransomlook
+from ransomlook.default.logging import get_logger
+
+logger = get_logger("torrent")
+
 
 def main() -> None:
-    print("Starting torrent")
+    logger.info("Starting torrent")
     ransomlook.gettorrentinfo()
-    print("Stopping torrent")
+    logger.info("Stopping torrent")
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     main()
-

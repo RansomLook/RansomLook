@@ -1,36 +1,47 @@
-import os
 import json
+import os
+
 from bs4 import BeautifulSoup
-from typing import Dict, List
 
-def main() -> List[Dict[str, str]] :
-    list_div=[]
+from ransomlook.default.logging import get_logger
 
-    for filename in os.listdir('source'):
+logger = get_logger(__name__)
+
+
+def main() -> list[dict[str, str]]:
+    list_div = []
+
+    for filename in os.listdir("source"):
         try:
-            if filename.startswith(__name__.split('.')[-1]+'-'):
-                html_doc='source/'+filename
-                file=open(html_doc,'r')
-                soup=BeautifulSoup(file,'html.parser')
-                divs_name=soup.find_all('div', {"class": "card"})
+            if filename.startswith(__name__.split(".")[-1] + "-"):
+                html_doc = "source/" + filename
+                file = open(html_doc, encoding="utf-8")
+                soup = BeautifulSoup(file, "html.parser")
+                divs_name = soup.find_all("div", {"class": "card"})
                 for div in divs_name:
-                    title = div.find('h3', {"class":"card-title"}).text
+                    title = div.find("h3", {"class": "card-title"}).text
                     description = div.find("div", {"class": "card-body"}).text.strip()
-                    link = 'detail?id='+div['data-id']
-                    list_div.append({"title" : title, "description" : description, "link": link, "slug": filename})
+                    link = "detail?id=" + div["data-id"]
+                    list_div.append({"title": title, "description": description, "link": link, "slug": filename})
                 try:
-                    jsonpart= soup.pre.contents # type: ignore
-                    data = json.loads(jsonpart[0]) # type: ignore
+                    jsonpart = soup.pre.contents  # type: ignore
+                    data = json.loads(jsonpart[0])  # type: ignore
                     for entry in data["data"]:
-                        title =  entry['name']
-                        description = entry['description'].strip()
-                        list_div.append({"title" : title, "description" : description, "link": "/company/?id="+entry["id"], "slug": filename})
-                except:
+                        title = entry["name"]
+                        description = entry["description"].strip()
+                        list_div.append(
+                            {
+                                "title": title,
+                                "description": description,
+                                "link": "/company/?id=" + entry["id"],
+                                "slug": filename,
+                            }
+                        )
+                except Exception:
                     pass
 
                 file.close()
-        except:
-            print("Failed during : " + filename)
-            pass
-    print(list_div)
+        except Exception:
+            logger.debug("Failed during : " + filename)
+    logger.debug(list_div)
     return list_div

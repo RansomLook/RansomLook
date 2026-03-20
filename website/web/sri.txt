@@ -1,7 +1,23 @@
 {
   "static": {
-    "main.css": "Y6hY6KL9sHC1KnPhrFmGruseQW4iEolBBhc68y363ZPhzRVlF/GnJpJuMhCYE96XVgxvAc1STiyQXRpaVCBrgg==",
-    "main.js": "XuopJqLSyyDyAfrLDD7BIl4JgP2t53tPRYSOufljt3I0q6sigMDPS41P/H8wxATWYJFGHXBWgfgxZuy7c2tdqw==",
-    "plotly.min.js": "7i9wEYbrbsYuFcCvlOk0icJsijxfLfpUsOwh9J7S9baGIZKseOh8L/YMxM1v/PD9/J6PYxKcqmIYIsSQrZ5S7Q=="
+    "alerts.js": "qfF6yyl5bXlu1fNCDJCOj/7m92WBGL2Ns/SgU93GUlGyBGUtIhwo7arvBFsgjAgN7W29zwDMntcvAtJY6+iKGA==",
+    "chips-filter.js": "m84VJP4Nvte/dxmHHWLulyr3k+HK5d1BnQoJTRP4KHYvmPbmzQvfrOnSuSxB4sbn1XpEw1jMKp+TWLsMHHJa3A==",
+    "compare.js": "oFbRx0ygqCspgZTsA4R71G/f+2OSqd3nEpAOgPAa+qKz7Ab5Ibiz8I1k35mV2URngZML7GGh4JGdOdPt1mJwRg==",
+    "config.js": "JuzNmf/ix5UYGd+6scfsWZI2rGITXV15OlscFt7AysEq/z+t6K/lYwysPsUKlIGe6xhzWtEurrHZd+mwh7WLoQ==",
+    "crypto.js": "JoC0vDSLyg12A5A9yJG58VItzrPwnGb6BfW0Akb1TzCPXelTp9PmfazkUpDytpChq4wxOHiFuRjASVerJkFpFg==",
+    "group.js": "NgP1iYhkLpMPIb9KEjk0QGBPzligZBk6tHh8qtW+ANopgSey5AOtUKR4AxVF5NB6zZjywPgrxMR3GvDIBZPaUA==",
+    "groups.js": "B6uiez+LTGkgALPbs2DGHsgR03HjOQWT5FGzivtWuV1QDSwdDV7BSQREVSzjth2KtCWZkTBC/7Ckaa1+vbkVZw==",
+    "leaks.js": "eZGTWBXQ7phFuDzc62PBdEWNx3JxIlvN7WKzS5hYm1+uWnQKAgwAevFYeEVh7F7Dmh4e47/nU2efeFy1dUQZzg==",
+    "lightbox.js": "Tz7s5lWd3BoNADF5Sk0qGaoc8LLVVxpNg3x4I8JqerxlZRxuxRnPPcyzpy6rnrejmLS8+qXdgDofo7CVxhTe7A==",
+    "logs.js": "vIfpGlpVjsaoIK5/EsjcdzdddVldL2u/PKxlpw+AdbmFIFicrv5xz6MskW5VkISWLoncJlqPQrdlFWcRqWzZog==",
+    "main.css": "PBOjJhb+aZtElAmWxgZry/NMD6luVCqaeZJ3GGkw2Y1ovNcKpG3u6jGpjYBC1bJfdoX8K/p6FbNXpb8vOU/G7Q==",
+    "main.js": "WsRGP4WAyBrzmjDEVSBFkEerP9NJQVrUZeLQItCnwcMQA2EUXvnPrYyzjZS3XR/70lN9R1Rom2V0FK2GB16Qng==",
+    "notesdetails.js": "D12SeqNFNXDIzXYdN1qu0Uz8lA9MubYk3kq/d7XuGLPxoeXIOvDwIG39EU8RrOAfUd6cOpFLO43azYCClzyyyA==",
+    "picker.js": "gWwYmdIOh5I4+H+Ia/h4nP+pJ5DSQzGm6eS7xgH9eZJaIZ1QrVXSRi5c33OA/8udIUGk0Qsn4dd8ToW+oV39Vw==",
+    "plotly.min.js": "7i9wEYbrbsYuFcCvlOk0icJsijxfLfpUsOwh9J7S9baGIZKseOh8L/YMxM1v/PD9/J6PYxKcqmIYIsSQrZ5S7Q==",
+    "rf.js": "eVZ2VUm+fro8TNO01rhv2KiJ6LA0O3Nn4xtBxjSrtPvZy10QbZZlQp2nkrtd3TVjIKS9YYNxE9XdyQTduigWGQ==",
+    "stats.js": "UsixtNSqYl7XKMBE6o2ebNXFCAeL0nWngpfbFaij4ycGdhFhrhl+OjVW6KWQ4beQ8m8TXbmobrfd/FyQ11KQfw==",
+    "tokens.js": "2giqxYmzYn/O4pX1/TubY3/6Pa464njRxhgsHd+f1haqsysKzv6LD58UfAaLMxFjZuysrX4BRy7jg3dPbA5I7A==",
+    "urls.js": "TZj6tLbVXW0UFwSFsyIMCxFFGoPuizyCdferB0Eqk1YLlnMSMSYp/84+/BasPE377ZKImGwpfbsyV72dFzbJ+g=="
   }
 }

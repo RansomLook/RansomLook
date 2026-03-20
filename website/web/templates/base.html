@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="{{ g.locale|default('en') }}">
+<html lang="{{ g.locale|default('en') }}" class="{{ request.cookies.get('theme', 'dark') }}">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -10,49 +10,6 @@
   <link rel="alternate" type="application/rss+xml" title="RansomLook — Recent posts" href="/rss.xml">
 </head>
 <body>
-<script>
-document.addEventListener("DOMContentLoaded", function () {
-  const toggle   = document.querySelector(".nav-toggle");
-  const navLinks = document.querySelector(".nav-links");
-  const langBtn  = document.querySelector(".lang-btn");
-  const langMenu = document.querySelector(".lang-menu");
-
-  if (toggle && navLinks) {
-    const openNav  = () => { navLinks.classList.add("active"); document.body.classList.add("menu-open"); toggle.setAttribute("aria-expanded","true"); };
-    const closeNav = () => { navLinks.classList.remove("active"); document.body.classList.remove("menu-open"); toggle.setAttribute("aria-expanded","false"); };
-
-    toggle.addEventListener("click", (e) => {
-      e.stopPropagation();
-      navLinks.classList.contains("active") ? closeNav() : openNav();
-    });
-
-    // Fermer au clic en dehors
-    document.addEventListener("click", (e) => {
-      if (navLinks.classList.contains("active") && !navLinks.contains(e.target) && e.target !== toggle) {
-        closeNav();
-      }
-    });
-  }
-
-  // Dropdown langue (pas d'ESC)
-  if (langBtn && langMenu) {
-    const closeLang = () => { langMenu.classList.remove("open"); langBtn.setAttribute("aria-expanded","false"); };
-
-    langBtn.addEventListener("click", (e) => {
-      e.stopPropagation();
-      const open = !langMenu.classList.contains("open");
-      langMenu.classList.toggle("open", open);
-      langBtn.setAttribute("aria-expanded", open ? "true" : "false");
-    });
-
-    document.addEventListener("click", (e) => {
-      if (langMenu.classList.contains("open") && !langMenu.contains(e.target) && e.target !== langBtn) {
-        closeLang();
-      }
-    });
-  }
-});
-</script>
   <header class="site-header">
   <div class="container header-inner">
     <!-- Brand (left) -->
@@ -136,6 +93,16 @@ document.addEventListener("DOMContentLoaded", function () {
       </button>
 </li>
 
+  <li><button class="icon-btn theme-toggle" title="Toggle dark/light mode" aria-label="Toggle theme">
+        <svg class="icon-sun" width="20" height="20" viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M12 18a6 6 0 1 1 0-12 6 6 0 0 1 0 12Zm0-2a4 4 0 1 0 0-8 4 4 0 0 0 0 8ZM11 1h2v3h-2V1Zm0 19h2v3h-2v-3ZM3.515 4.929l1.414-1.414L7.05 5.636 5.636 7.05 3.515 4.93ZM16.95 18.364l1.414-1.414 2.121 2.121-1.414 1.414-2.121-2.121Zm2.121-14.85 1.414 1.415-2.121 2.121-1.414-1.414 2.121-2.121ZM5.636 16.95l1.414 1.414-2.121 2.121-1.414-1.414 2.121-2.121ZM23 11v2h-3v-2h3ZM4 11v2H1v-2h3Z"/>
+        </svg>
+        <svg class="icon-moon" width="20" height="20" viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M10 6a8 8 0 0 0 11.955 6.956C21.474 18.03 17.2 22 12 22 6.477 22 2 17.523 2 12c0-5.2 3.97-9.474 9.044-9.955A7.963 7.963 0 0 0 10 6Zm-6 6a8 8 0 0 0 8 8 8.006 8.006 0 0 0 6.957-4.045c-.316.03-.636.045-.957.045-5.523 0-10-4.477-10-10 0-.321.015-.641.045-.957A8.006 8.006 0 0 0 4 12Z"/>
+        </svg>
+      </button>
+</li>
+
 </ul>
     </nav>
 
@@ -175,75 +142,7 @@ document.addEventListener("DOMContentLoaded", function () {
   </div>
 </div>
 
-<style>
-.visually-hidden{position:absolute!important;width:1px;height:1px;margin:-1px;padding:0;overflow:hidden;clip:rect(0 0 0 0);border:0}
-.rl-modal[hidden]{display:none}
-.rl-modal{position:fixed; inset:0; z-index:1400; display:grid; place-items:center;}
-.rl-modal__backdrop{position:absolute; inset:0; background:rgba(0,0,0,.55); backdrop-filter:saturate(120%) blur(2px);}
-.rl-modal__panel{position:relative; width:min(600px,92vw); background:var(--card); border:1px solid var(--border); border-radius:16px; padding:20px; box-shadow:0 18px 50px rgba(0,0,0,.45); animation:rl-pop .16s ease-out;}
-@keyframes rl-pop{from{transform:scale(.98);opacity:0}to{transform:scale(1);opacity:1}}
-.rl-modal__title{margin:0 0 12px; font-size:18px; font-weight:700; color:var(--text);}
-.rl-modal__close{position:absolute; top:10px; right:10px; background:transparent; border:1px solid var(--border); color:var(--text); width:34px; height:34px; border-radius:10px; cursor:pointer;}
-.rl-modal__close:hover{background:#182232}
-.icon-btn{display:inline-flex; align-items:center; justify-content:center; width:36px; height:36px; border-radius:10px; background:#1a2537; border:1px solid var(--border); color:var(--text); cursor:pointer;}
-.icon-btn:hover{background:#22324c}
-.header-search{margin-left:8px}
-.rl-search-form{display:flex; gap:10px; align-items:center; margin-top:6px;}
-.rl-search-input{flex:1; background:#101827; color:var(--text); border:1px solid var(--border); border-radius:12px; padding:12px 14px; font-size:16px; line-height:1.2;}
-.rl-search-input::placeholder{color:var(--muted)}
-@media (max-width:480px){.rl-search-form{flex-direction:column; align-items:stretch}.rl-modal__close{top:8px; right:8px}}
 
-/* --- Navbar 'More' dropdown --- */
-/* Ensure 'More' shows as active without staying open */
-.nav-links .more summary.active { background:#1a2537; border-color:var(--border); }
-
-.nav-links .more details{position:relative}
-.nav-links .more summary{list-style:none; cursor:pointer; padding:8px 12px; border-radius:10px; border:1px solid var(--border); background:#151e2d}
-.nav-links .more summary::-webkit-details-marker{display:none}
-.nav-links .more[open] summary{background:#1a2537}
-.nav-links .more .more-menu{position:absolute; top:calc(100% + 8px); left:0; min-width:220px; background:var(--card); border:1px solid var(--border); border-radius:12px; padding:6px; box-shadow:0 12px 40px rgba(0,0,0,.35); z-index:1200}
-.nav-links .more .more-menu li{margin:0}
-.nav-links .more .more-menu a{display:block; padding:8px 10px; border-radius:8px}
-.nav-links .more .more-menu a:hover{background:#22324c}
-@media (max-width: 880px){
-  .nav-links{gap:8px}
-}
-</style>
-
-<script>
-document.addEventListener("DOMContentLoaded", function () {
-  const openBtns  = document.querySelectorAll(".search-open");
-  const modal     = document.getElementById("searchModal");
-  const closers   = modal ? modal.querySelectorAll("[data-close]") : [];
-  const input     = modal ? modal.querySelector(".rl-search-input") : null;
-
-  function openModal(){
-    if(!modal) return;
-    modal.hidden = false;
-    document.body.style.overflow = "hidden";
-    openBtns.forEach(b => b.setAttribute("aria-expanded", "true"));
-    setTimeout(()=> input && input.focus(), 0);
-  }
-  function closeModal(){
-    if(!modal) return;
-    modal.hidden = true;
-    document.body.style.overflow = "";
-    openBtns.forEach(b => b.setAttribute("aria-expanded", "false"));
-  }
-
-  openBtns.forEach(b => b.addEventListener("click", openModal));
-  closers.forEach(el => el.addEventListener("click", closeModal));
-  modal?.addEventListener("keydown", (e)=>{ if(e.key === "Escape") closeModal(); });
-  modal?.addEventListener("click", (e)=>{ if(e.target.classList.contains("rl-modal__backdrop")) closeModal(); });
-  document.addEventListener("keydown", (e)=>{
-    const isMac = navigator.platform.toUpperCase().includes("MAC");
-    if((isMac && e.metaKey && e.key.toLowerCase()==="k") || (!isMac && e.ctrlKey && e.key.toLowerCase()==="k")){
-      e.preventDefault();
-      if(modal?.hidden) openModal(); else closeModal();
-    }
-  });
-});
-</script>
 
 </body>
 </html>

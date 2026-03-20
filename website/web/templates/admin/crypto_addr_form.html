@@ -5,48 +5,263 @@
 {{ render_messages(container=True, dismissible=True) }}
 
 <section class="hero">
-  <div class="container">
-    <h1>{{ mode|title }} address — {{ group }}</h1>
-    <p class="lead">Fill the fields; transactions are a JSON array (full objects). Each transaction should have a <code>source</code>.</p>
+  <div class="container" style="display:flex;align-items:center;gap:12px;flex-wrap:wrap">
+    <h1 class="m-0">{{ mode|title }} address — {{ group }}</h1>
+    <a href="{{ url_for('admin_crypto_group', group=group) }}" class="btn btn-secondary" style="margin-left:auto">Back</a>
   </div>
 </section>
 
 <section class="metrics-section">
   <div class="container">
-    <form method="post">
-      <div class="table-card" style="padding:12px;display:grid;gap:12px;">
-        <label>
-          <div>Blockchain</div>
-          <input type="text" name="blockchain" value="{{ doc.blockchain or blockchain or '' }}" required>
-        </label>
+    <form method="post" id="main-form">
 
-        <label>
-          <div>Address</div>
-          <input type="text" name="address" value="{{ doc.address or address or '' }}" {{ 'readonly' if mode=='edit' else 'required' }}>
-        </label>
+      <!-- ===== Card: Wallet info ===== -->
+      <div class="table-card admin-card">
+        <div class="card-toolbar"><span>Wallet details</span></div>
+        <div class="form-grid">
+          <label>Blockchain</label>
+          <div>
+            {% set cur_chain = doc.blockchain or blockchain or '' %}
+            <select name="blockchain" class="input" required>
+              <option value="" disabled {{ 'selected' if not cur_chain }}>Select a blockchain</option>
+              <option value="bitcoin" {{ 'selected' if cur_chain == 'bitcoin' }}>Bitcoin</option>
+              <option value="ethereum" {{ 'selected' if cur_chain == 'ethereum' }}>Ethereum</option>
+              <option value="litecoin" {{ 'selected' if cur_chain == 'litecoin' }}>Litecoin</option>
+              <option value="bitcoin-cash" {{ 'selected' if cur_chain == 'bitcoin-cash' }}>Bitcoin Cash</option>
+              <option value="dash" {{ 'selected' if cur_chain == 'dash' }}>Dash</option>
+              <option value="dogecoin" {{ 'selected' if cur_chain == 'dogecoin' }}>Dogecoin</option>
+              <option value="zcash" {{ 'selected' if cur_chain == 'zcash' }}>Zcash</option>
+              <option value="monero" {{ 'selected' if cur_chain == 'monero' }}>Monero</option>
+              <option value="tron" {{ 'selected' if cur_chain == 'tron' }}>Tron</option>
+              <option value="ripple" {{ 'selected' if cur_chain == 'ripple' }}>Ripple (XRP)</option>
+              {% if cur_chain and cur_chain not in ['bitcoin','ethereum','litecoin','bitcoin-cash','dash','dogecoin','zcash','monero','tron','ripple'] %}
+                <option value="{{ cur_chain }}" selected>{{ cur_chain }}</option>
+              {% endif %}
+            </select>
+          </div>
 
-        <label>
-          <div>Source <small class="muted">(e.g., ransomwhe.re, ransomlook, manual)</small></div>
-          <input type="text" name="source" value="{{ doc.source or '' }}" required>
-        </label>
+          <label>Address</label>
+          <div><input type="text" name="address" class="input" value="{{ doc.address or address or '' }}" {{ 'readonly' if mode=='edit' else 'required' }}></div>
 
-        <label>
-          <div>Label (optional)</div>
-          <input type="text" name="label" value="{{ doc.label or '' }}">
-        </label>
+          <label>Source</label>
+          <div>
+            {% set cur_src = doc.source or 'ransomlook' %}
+            <select name="source" class="input" required>
+              <option value="ransomlook" {{ 'selected' if cur_src == 'ransomlook' }}>ransomlook</option>
+              <option value="ransomwhe.re" {{ 'selected' if cur_src == 'ransomwhe.re' }}>ransomwhe.re</option>
+              <option value="manual" {{ 'selected' if cur_src == 'manual' }}>manual</option>
+            </select>
+          </div>
 
-        <label>
-          <div>Transactions (JSON array)</div>
-          <textarea name="transactions" rows="12" spellcheck="false">{{ doc.transactions | tojson(indent=2) if doc.transactions else '[]' }}</textarea>
-        </label>
-
-        <div>
-          <button class="btn" type="submit">Save</button>
-          <a class="btn" href="{{ url_for('admin_crypto_group', group=group) }}">Cancel</a>
+          <label>Label <span class="muted">(optional)</span></label>
+          <div><input type="text" name="label" class="input" value="{{ doc.label or '' }}" placeholder="e.g. main wallet, seized by FBI..."></div>
         </div>
       </div>
+
+      <!-- ===== Card: Transactions ===== -->
+      <div class="table-card admin-card">
+        <div class="card-toolbar" style="justify-content:space-between;">
+          <span>Transactions <span id="tx-count" class="muted"></span></span>
+          <button type="button" id="tx-add" class="btn btn-primary" style="padding:4px 14px;">+ Add</button>
+        </div>
+
+        <div style="overflow-x:auto;">
+          <table class="rl-table" id="tx-table" aria-label="Transactions">
+            <thead>
+              <tr>
+                <th>Hash</th>
+                <th style="width:14%">Date</th>
+                <th style="width:12%">Amount</th>
+                <th style="width:10%">Source</th>
+                <th style="width:90px"></th>
+              </tr>
+            </thead>
+            <tbody id="tx-body"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <input type="hidden" name="transactions" id="tx-hidden" value="[]">
+
     </form>
   </div>
 </section>
 
+<!-- Floating save button -->
+<div class="edit-actions">
+  <span id="unsaved-badge" class="unsaved-badge" hidden>Unsaved changes</span>
+  <button class="btn btn-primary" id="save-btn" type="submit" form="main-form">Save</button>
+</div>
+
+<!-- Transaction modal -->
+<div id="txModal" class="rl-modal" role="dialog" aria-modal="true" aria-labelledby="txModalLabel" hidden>
+  <div class="rl-modal__backdrop" data-close-tx></div>
+  <div class="rl-modal__panel" role="document" style="max-width:600px;">
+    <button class="rl-modal__close" aria-label="Close" data-close-tx>&times;</button>
+    <h2 id="txModalLabel" class="rl-modal__title">Transaction</h2>
+    <div style="display:grid;gap:10px;">
+      <label>
+        <div class="muted" style="font-size:.8rem;">Hash</div>
+        <input type="text" id="m-hash" class="input" placeholder="Transaction hash">
+      </label>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+        <label>
+          <div class="muted" style="font-size:.8rem;">From</div>
+          <input type="text" id="m-from" class="input" placeholder="Sender address">
+        </label>
+        <label>
+          <div class="muted" style="font-size:.8rem;">To</div>
+          <input type="text" id="m-to" class="input" placeholder="Receiver address">
+        </label>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+        <label>
+          <div class="muted" style="font-size:.8rem;">Amount</div>
+          <input type="number" step="any" id="m-amount" class="input" placeholder="e.g. 0.5">
+        </label>
+        <label>
+          <div class="muted" style="font-size:.8rem;">Amount USD</div>
+          <input type="number" step="0.01" id="m-amountUSD" class="input" placeholder="e.g. 15000">
+        </label>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+        <label>
+          <div class="muted" style="font-size:.8rem;">Date</div>
+          <input type="datetime-local" id="m-time" class="input">
+        </label>
+        <label>
+          <div class="muted" style="font-size:.8rem;">Block</div>
+          <input type="number" id="m-block" class="input" placeholder="Block number">
+        </label>
+      </div>
+      <label>
+        <div class="muted" style="font-size:.8rem;">Source</div>
+        <select id="m-source" class="input">
+          <option value="">(inherit from wallet)</option>
+          <option value="ransomlook">ransomlook</option>
+          <option value="ransomwhe.re">ransomwhe.re</option>
+          <option value="manual">manual</option>
+        </select>
+      </label>
+      <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:8px;">
+        <button type="button" class="btn btn-secondary" data-close-tx>Cancel</button>
+        <button type="button" class="btn btn-primary" id="m-save">Save transaction</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+(function(){
+  var txData = [];
+  var editIdx = -1;
+  var tbody = document.getElementById('tx-body');
+  var hidden = document.getElementById('tx-hidden');
+  var countEl = document.getElementById('tx-count');
+  var modal = document.getElementById('txModal');
+
+  var saveBtn = document.getElementById('save-btn');
+  var unsavedBadge = document.getElementById('unsaved-badge');
+  var dirty = false;
+  var initialState = '';
+
+  try {
+    var raw = {{ doc.transactions | tojson if doc.transactions else '[]' }};
+    if (Array.isArray(raw)) txData = raw;
+  } catch(e){}
+
+  function markDirty(){
+    if (!dirty) {
+      dirty = true;
+      saveBtn.classList.add('btn-unsaved');
+      unsavedBadge.hidden = false;
+    }
+  }
+
+  // Track changes on all form inputs too
+  document.getElementById('main-form').addEventListener('input', markDirty);
+
+  function esc(v){ return v == null ? '' : String(v).replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+  function render(){
+    tbody.innerHTML = '';
+    txData.forEach(function(tx, i){
+      var tr = document.createElement('tr');
+      var timeStr = tx.time ? String(tx.time).slice(0,16).replace('T',' ') : '';
+      tr.innerHTML =
+        '<td class="mono" style="font-size:.8rem;word-break:break-all;">'+esc(tx.hash || '')+'</td>'+
+        '<td style="font-size:.8rem;">'+esc(timeStr)+'</td>'+
+        '<td style="font-size:.8rem;">'+esc(tx.amount != null ? tx.amount : '')+'</td>'+
+        '<td style="font-size:.8rem;">'+esc(tx.source || '')+'</td>'+
+        '<td style="white-space:nowrap;">'+
+          '<button type="button" class="btn btn-secondary" style="padding:2px 8px;font-size:.75rem;" data-edit="'+i+'">Edit</button> '+
+          '<button type="button" class="btn btn-danger" style="padding:2px 8px;font-size:.75rem;" data-del="'+i+'">&times;</button>'+
+        '</td>';
+      tbody.appendChild(tr);
+    });
+    hidden.value = JSON.stringify(txData);
+    countEl.textContent = '(' + txData.length + ')';
+  }
+
+  tbody.addEventListener('click', function(e){
+    var btn = e.target.closest('[data-edit]');
+    if (btn) { openModal(parseInt(btn.dataset.edit)); return; }
+    btn = e.target.closest('[data-del]');
+    if (btn) { txData.splice(parseInt(btn.dataset.del), 1); render(); markDirty(); return; }
+  });
+
+  function openModal(idx){
+    editIdx = idx;
+    var tx = idx >= 0 ? txData[idx] : {};
+    document.getElementById('m-hash').value = tx.hash || '';
+    document.getElementById('m-from').value = tx.from || '';
+    document.getElementById('m-to').value = tx.to || '';
+    document.getElementById('m-amount').value = tx.amount != null ? tx.amount : '';
+    document.getElementById('m-amountUSD').value = tx.amountUSD != null ? tx.amountUSD : '';
+    document.getElementById('m-time').value = tx.time ? String(tx.time).slice(0,16) : '';
+    document.getElementById('m-block').value = tx.block != null ? tx.block : '';
+    document.getElementById('m-source').value = tx.source || '';
+    document.getElementById('txModalLabel').textContent = idx >= 0 ? 'Edit transaction' : 'New transaction';
+    modal.hidden = false;
+    document.getElementById('m-hash').focus();
+  }
+
+  function closeModal(){ modal.hidden = true; editIdx = -1; }
+
+  modal.querySelectorAll('[data-close-tx]').forEach(function(el){
+    el.addEventListener('click', closeModal);
+  });
+  modal.addEventListener('keydown', function(e){ if(e.key==='Escape') closeModal(); });
+
+  document.getElementById('tx-add').addEventListener('click', function(){ openModal(-1); });
+
+  document.getElementById('m-save').addEventListener('click', function(){
+    var tx = {};
+    var v;
+    v = document.getElementById('m-hash').value.trim(); if(v) tx.hash = v;
+    v = document.getElementById('m-from').value.trim(); if(v) tx.from = v;
+    v = document.getElementById('m-to').value.trim(); if(v) tx.to = v;
+    v = document.getElementById('m-amount').value; if(v !== '') tx.amount = parseFloat(v);
+    v = document.getElementById('m-amountUSD').value; if(v !== '') tx.amountUSD = parseFloat(v);
+    v = document.getElementById('m-time').value; if(v) tx.time = v;
+    v = document.getElementById('m-block').value; if(v !== '') tx.block = parseInt(v, 10);
+    v = document.getElementById('m-source').value; if(v) tx.source = v;
+
+    if (editIdx >= 0) {
+      txData[editIdx] = tx;
+    } else {
+      txData.push(tx);
+    }
+    render();
+    markDirty();
+    closeModal();
+  });
+
+  document.getElementById('main-form').addEventListener('submit', function(){
+    hidden.value = JSON.stringify(txData);
+  });
+
+  render();
+})();
+</script>
 {% endblock %}

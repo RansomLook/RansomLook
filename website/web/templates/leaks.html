@@ -16,7 +16,7 @@
   <div class="container">
     <div id="filters-top-leaks"></div>
     <!-- Filters -->
-    <div class="table-card search-card" style="padding:12px;margin-bottom:12px">
+    <div class="table-card search-card pad-mb">
       <div class="filters-wrap">
         <div class="filters">
           <div class="field field--search">
@@ -96,129 +96,6 @@
   </div>
 </div>
 
-<!-- JS INLINE (dans content, pas besoin de block scripts) -->
-<script>
-(function() {
-  const modal = document.getElementById('leak-modal');
-  const tbody = document.getElementById('leak-modal-tbody');
-  const foot = document.getElementById('leak-modal-footnote');
-
-  function escapeHtml(val){
-    if (val === null || val === undefined) return '';
-    return String(val)
-      .replace(/&/g,'&amp;')
-      .replace(/</g,'&lt;')
-      .replace(/>/g,'&gt;')
-      .replace(/"/g,'&quot;')
-      .replace(/'/g,'&#39;');
-  }
-
-  function openModal() {
-    modal.setAttribute('aria-hidden','false');
-    document.body.classList.add('modal-open');
-  }
-  function closeModal() {
-    modal.setAttribute('aria-hidden','true');
-    document.body.classList.remove('modal-open');
-    tbody.innerHTML = '';
-    foot.textContent = '';
-  }
-
-  // close handlers
-  modal.addEventListener('click', (e) => {
-    if (e.target.matches('[data-dismiss="modal"]')) {
-      e.preventDefault();
-      closeModal();
-    }
-  });
-  document.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape') closeModal();
-  });
-
-  function withJsonParam(url){
-    return url + (url.includes('?') ? '&' : '?') + 'format=json';
-  }
-
-  async function fetchLeakJSON(url) {
-    const res = await fetch(withJsonParam(url), { headers: { 'Accept': 'application/json' } });
-    if (!res.ok) throw new Error('not ok');
-    const ct = (res.headers.get('content-type') || '').toLowerCase();
-    if (!ct.includes('application/json')) throw new Error('not json');
-    return res.json();
-  }
-
-  function renderRow(group) {
-    const size = group.size ?? '';
-    const records = group.records ?? '';
-    const indexed = group.indexed ?? '';
-    let cols = group.columns ?? '';
-    if (Array.isArray(cols)) cols = cols.join(', ');
-    const tr = document.createElement('tr');
-    tr.innerHTML = `
-      <td><center>${escapeHtml(size)}</center></td>
-      <td>${escapeHtml(records)}</td>
-      <td>${escapeHtml(indexed)}</td>
-      <td style="word-break:break-all">${escapeHtml(cols)}</td>
-    `;
-    return tr;
-  }
-
-  // Event delegation (marche même si la table est rechargée)
-  document.addEventListener('click', async (e) => {
-    const a = e.target.closest('a.leak-link');
-    if (!a) return;
-
-    e.preventDefault();
-    const url = a.getAttribute('href');
-
-    try {
-      const payload = await fetchLeakJSON(url);
-      // supporte plusieurs formes: {group:{...}}, {data:{...}}, {...direct...}
-      const g = payload.group || payload.data || payload;
-      if (!g || typeof g !== 'object') throw new Error('bad payload');
-
-      tbody.innerHTML = '';
-      tbody.appendChild(renderRow(g));
-      foot.textContent = payload.name ? `Source: ${payload.name}` : '';
-
-      openModal();
-    } catch (err) {
-      // Fallback: navigation normale si pas de JSON dispo
-      window.location.href = url;
-    }
-  });
-})();
-</script>
-
-
-<script>
-document.addEventListener('DOMContentLoaded', () => {
-  const qInput = document.getElementById('flt-q');
-  const clearBtn = document.querySelector('.input-clear');
-  const table = document.querySelector('table[aria-label="Leaks"]');
-  if (!table) return;
-  const tbody = table.querySelector('tbody');
-  const rows = [...tbody.querySelectorAll('tr')];
-  const countEl = document.getElementById('flt-count');
-
-  function apply(){
-    const q = (qInput?.value || '').trim().toLowerCase();
-    let visible = 0;
-    rows.forEach(tr => {
-      const t = tr.textContent.toLowerCase();
-      const show = !q || t.includes(q);
-      tr.style.display = show ? '' : 'none';
-      if (show) visible++;
-    });
-    if (countEl) countEl.textContent = visible + ' leaks';
-  }
-
-  let t; qInput?.addEventListener('input', () => { clearTimeout(t); t=setTimeout(apply,120); });
-  clearBtn?.addEventListener('click', () => { qInput.value=''; apply(); qInput.focus(); });
-
-  apply();
-});
-</script>
-
+<script src="{{ url_for('static', filename='js/leaks.js') }}" defer></script>
 
 {% endblock %}

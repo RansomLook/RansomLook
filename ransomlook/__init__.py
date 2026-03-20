@@ -1,1 +1,1 @@
-env_global_name: str = 'RANSOMLOOK_HOME'
+env_global_name: str = "RANSOMLOOK_HOME"

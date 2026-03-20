@@ -1,0 +1,131 @@
+{% extends "base.html" %}
+{% from 'bootstrap5/utils.html' import render_messages %}
+{% block title %}Admin · Configuration{% endblock %}
+
+{% block content %}
+{{ render_messages(container=True, dismissible=True) }}
+
+<section class="hero">
+  <div class="container">
+    <h1>Configuration</h1>
+    <p class="lead">Edit <code>generic.json</code> settings.
+      {% if is_sample %}<span class="badge badge-warn">Using sample — no generic.json found, changes will create one.</span>{% endif %}
+    </p>
+  </div>
+</section>
+
+<section class="metrics-section">
+  <div class="container" style="max-width:900px;">
+    <form action="" method="post">
+
+      <!-- ═══ Object sections (auto-discovered, collapsible) ═══ -->
+      {% for sec in sections %}
+        <div class="table-card mb-14">
+          <div class="card-toolbar bb js-collapse-toggle" style="cursor:pointer;">
+            <div style="display:flex;align-items:center;gap:8px;justify-content:space-between;width:100%;">
+              <span class="fw-600">{{ sec.key }}</span>
+              <div style="display:flex;align-items:center;gap:10px;">
+                {% if sec.data.get('enable') is not none %}
+                  {% if sec.data.get('enable') %}
+                    <span class="badge badge-ok">enabled</span>
+                  {% else %}
+                    <span class="badge badge-neutral">disabled</span>
+                  {% endif %}
+                {% endif %}
+                <span class="collapse-arrow">▸</span>
+              </div>
+            </div>
+          </div>
+          <div class="collapse-body" hidden>
+            <div class="p-12">
+              {% for field, val in sec.data.items() %}
+                <div style="display:flex;align-items:center;gap:12px;margin-bottom:8px;">
+                  <label class="label" style="min-width:180px;margin:0;" for="f-{{ sec.key }}-{{ field }}">{{ field }}</label>
+                  {% if val is sameas true or val is sameas false %}
+                    <input type="hidden" name="{{ sec.key }}.{{ field }}" value="0">
+                    <input type="checkbox" id="f-{{ sec.key }}-{{ field }}"
+                           name="{{ sec.key }}.{{ field }}" value="on"
+                           {{ 'checked' if val }}>
+                  {% elif val is iterable and val is not string and val is not mapping %}
+                    <input class="input" id="f-{{ sec.key }}-{{ field }}"
+                           name="{{ sec.key }}.{{ field }}"
+                           value="{{ val | join(', ') }}"
+                           placeholder="comma-separated"
+                           style="flex:1;">
+                  {% elif val is number %}
+                    <input class="input" type="number" id="f-{{ sec.key }}-{{ field }}"
+                           name="{{ sec.key }}.{{ field }}"
+                           value="{{ val }}"
+                           style="flex:1;max-width:120px;">
+                  {% else %}
+                    {% if 'pass' in field or 'secret' in field or 'token' in field or 'apikey' in field or 'api_key' in field or 'APP_PASSWORD' in field %}
+                      <input class="input" type="password" id="f-{{ sec.key }}-{{ field }}"
+                             name="{{ sec.key }}.{{ field }}"
+                             value="{{ val }}"
+                             autocomplete="off"
+                             style="flex:1;">
+                      <button class="btn btn-secondary btn-sm js-toggle-pw" type="button" data-target="f-{{ sec.key }}-{{ field }}">Show</button>
+                    {% else %}
+                      <input class="input" type="text" id="f-{{ sec.key }}-{{ field }}"
+                             name="{{ sec.key }}.{{ field }}"
+                             value="{{ val }}"
+                             style="flex:1;">
+                    {% endif %}
+                  {% endif %}
+                </div>
+              {% endfor %}
+            </div>
+          </div>
+        </div>
+      {% endfor %}
+
+      <!-- ═══ Scalar fields (auto-discovered) ═══ -->
+      {% if scalars %}
+      <div class="table-card mb-14">
+        <div class="card-toolbar bb js-collapse-toggle" style="cursor:pointer;">
+          <div style="display:flex;align-items:center;gap:8px;justify-content:space-between;width:100%;">
+            <span class="fw-600">General</span>
+            <span class="collapse-arrow">▸</span>
+          </div>
+        </div>
+        <div class="collapse-body" hidden>
+          <div class="p-12">
+            {% for sc in scalars %}
+              <div style="display:flex;align-items:center;gap:12px;margin-bottom:8px;">
+                <label class="label" style="min-width:180px;margin:0;" for="f-{{ sc.key }}">{{ sc.key }}</label>
+                {% if sc.value is sameas true or sc.value is sameas false %}
+                  <input type="hidden" name="{{ sc.key }}" value="0">
+                  <input type="checkbox" id="f-{{ sc.key }}" name="{{ sc.key }}" value="on"
+                         {{ 'checked' if sc.value }}>
+                {% elif sc.value is number %}
+                  <input class="input" type="number" id="f-{{ sc.key }}" name="{{ sc.key }}"
+                         value="{{ sc.value }}" style="max-width:120px;">
+                {% else %}
+                  {% if 'api' in sc.key or 'key' in sc.key %}
+                    <input class="input" type="password" id="f-{{ sc.key }}" name="{{ sc.key }}"
+                           value="{{ sc.value }}" autocomplete="off" style="flex:1;">
+                    <button class="btn btn-secondary btn-sm js-toggle-pw" type="button" data-target="f-{{ sc.key }}">Show</button>
+                  {% else %}
+                    <input class="input" type="text" id="f-{{ sc.key }}" name="{{ sc.key }}"
+                           value="{{ sc.value }}" style="flex:1;">
+                  {% endif %}
+                {% endif %}
+              </div>
+            {% endfor %}
+          </div>
+        </div>
+      </div>
+      {% endif %}
+
+      <!-- Floating action buttons -->
+      <div class="edit-actions">
+        <button class="btn btn-primary" type="submit">Save configuration</button>
+      </div>
+
+    </form>
+  </div>
+</section>
+
+<script src="{{ url_for('static', filename='js/config.js') }}"></script>
+
+{% endblock %}

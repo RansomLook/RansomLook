@@ -41,8 +41,8 @@
                   <small class="muted">— aliases: {{ row.aliases|join(', ') }}</small>
                 {% endif %}
               </td>
-              <td style="text-align:right">{{ row.count }}</td>
-              <td style="text-align:center">
+              <td class="text-right">{{ row.count }}</td>
+              <td class="text-center">
                 <a class="btn" href="{{ url_for('admin_crypto_group', group=row.name) }}">Manage</a>
               </td>
             </tr>

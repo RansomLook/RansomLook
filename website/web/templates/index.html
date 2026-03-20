@@ -59,16 +59,23 @@
   </div>
 </section>
 
-<section class="metrics-section" id="post-metrics" role="region" aria-labelledby="post-metrics-title">
-  <h2 class="section-title" id="post-metrics-title">Other metrics</h2>
+<section class="metrics-section" id="intel-metrics" role="region" aria-labelledby="intel-metrics-title">
+  <h2 class="section-title" id="intel-metrics-title">Intelligence metrics</h2>
   <div class="metrics-grid">
-      {{ metric_card('Markets', (data['nbforum'] if data and 'nbforum' in data else None)) }}
-      {{ metric_card('Markets relays online', (data['forumonline'] if data and 'forumonline' in data else None), sublabel=('of %s total' % (data['nbforumlocations']) if data and 'nbforumlocations' in data else None)) }}
+      {{ metric_card('Threat Actors', (data['nbactors'] if data and 'nbactors' in data else None)) }}
+      {{ metric_card('Crypto addresses', (data['nbcryptoaddr'] if data and 'nbcryptoaddr' in data else None)) }}
+      {{ metric_card('Crypto transactions', (data['nbcryptotx'] if data and 'nbcryptotx' in data else None)) }}
+      {{ metric_card('Ransom Notes', (data['nbnotes'] if data and 'nbnotes' in data else None)) }}
+      {{ metric_card('Leaks', (data['nbleaks'] if data and 'nbleaks' in data else None)) }}
+      {{ metric_card('RF Dumps', (data['nbrf'] if data and 'nbrf' in data else None)) }}
   </div>
 </section>
 
-<section class="metrics-section" id="post-metrics" role="region" aria-labelledby="post-metrics-title">
+<section class="metrics-section" id="other-metrics" role="region" aria-labelledby="other-metrics-title">
+  <h2 class="section-title" id="other-metrics-title">Other metrics</h2>
   <div class="metrics-grid">
+      {{ metric_card('Markets', (data['nbforum'] if data and 'nbforum' in data else None)) }}
+      {{ metric_card('Markets relays online', (data['forumonline'] if data and 'forumonline' in data else None), sublabel=('of %s total' % (data['nbforumlocations']) if data and 'nbforumlocations' in data else None)) }}
       {{ metric_card('Parsers', (data['nbparsers'] if data and 'nbparsers' in data else None)) }}
   </div>
 </section>

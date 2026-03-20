@@ -35,7 +35,7 @@
   <div class="container">
     <div id="filters-top"></div>
     <!-- Filters -->
-    <div class="table-card search-card" style="padding:12px;margin-bottom:12px">
+    <div class="table-card search-card pad-mb">
       <div class="filters-wrap">
         <div class="filters">
           <div class="field field--search">
@@ -55,12 +55,12 @@
     
 
 {% if type in ["groups", "markets"] %}
-<div class="table-card" style="padding:12px;margin-bottom:12px">
+<div class="table-card pad-mb">
   <form method="get"
         action="{{ url_for('groups_csv') if type == 'groups' else url_for('markets_csv') }}"
         class="filters"
         style="display:flex;gap:12px;align-items:center;flex-wrap:wrap">
-    <label for="csv-status" class="label" style="margin:0">
+    <label for="csv-status" class="label m-0">
       Download URLs (CSV)
     </label>
     <select id="csv-status" name="status" class="input" style="padding:6px 8px">
@@ -209,219 +209,12 @@
   </figure>
 </div>
 
-<style>
-/* Lightbox: plein écran propre (mêmes classes que sur group.html) */
-.rl-modal--lightbox .rl-modal__panel{
-  background: transparent; border: none; box-shadow: none; border-radius: 0;
-  width: 100vw; height: 100vh; padding: 0;
-  display: grid; grid-template-rows: 1fr auto; align-items: center; justify-items: center;
-}
-.rl-modal__backdrop{ background: rgba(0,0,0,.75); }
-
-/* Zone image */
-.rl-modal__panel--image .img-stage{
-  width: 100%; height: 100%;
-  display: flex; align-items: center; justify-content: center; overflow: hidden;
-}
-#imgModalImg{ max-width: 96vw; max-height: 88vh; object-fit: contain; display: block; border-radius: 8px; }
-
-/* Légende */
-.img-caption{
-  width: 100%; padding: 12px 18px; text-align: center;
-  color: var(--muted); font-size: 14px; line-height: 1.4; border-top: 1px solid var(--border);
-  background: rgba(0,0,0,.25); backdrop-filter: blur(2px);
-}
-.img-caption:empty{ display:none; }
-
-/* Boutons */
-.rl-modal__close{
-  position: absolute; top: 12px; right: 12px; width: 40px; height: 40px;
-  border: 1px solid var(--border); background: rgba(0,0,0,.25); color: var(--text);
-  border-radius: 12px; cursor: pointer;
-}
-.rl-modal__close:hover{ background: rgba(255,255,255,.12); }
-
-.img-nav{
-  position: absolute; top: 50%; transform: translateY(-50%);
-  width: 56px; height: 56px; border: 1px solid var(--border);
-  background: rgba(0,0,0,.25); color: var(--text); border-radius: 14px; cursor: pointer;
-}
-.img-prev{ left: 16px; } .img-next{ right: 16px; }
-.img-nav:hover{ background: rgba(255,255,255,.12); }
-
-/* (Optionnel) pour une modale un peu plus petite, dé-commente un preset :
-
-#imgModalImg{ max-width:90vw; max-height:82vh; }
-*/
-.rl-modal--lightbox .rl-modal__panel{ width:min(92vw,1500px); height:min(90vh,94svh); }
-
-</style>
 
 
-<script>
-document.addEventListener('DOMContentLoaded', () => {
-  const qInput = document.getElementById('flt-q');
-  const clearBtn = document.querySelector('.input-clear');
-  const alphaBtns = [...document.querySelectorAll('.alpha-btn')];
-  const articles = [...document.querySelectorAll('article.profile')];
-  const countEl = document.getElementById('flt-count');
-  const topAnchor = document.getElementById('filters-top');
-
-  if (!articles.length) return;
-
-  function norm(s){ return (s||'').toLowerCase(); }
-  function initialOf(s){
-    const ch = (s||'').trim().charAt(0).toUpperCase();
-    return /[A-Z]/.test(ch) ? ch : '#';
-  }
-
-  const cache = articles.map((art) => {
-    const id = art.getAttribute('id') || '';
-    const name = (art.querySelector('.profile-title')?.textContent || '').trim();
-    const desc = (art.querySelector('.profile-desc')?.textContent || '').trim();
-    const rows = [...art.querySelectorAll('table[aria-label^="Links"] tbody tr')];
-    const titles = rows.map(r => (r.querySelector('td:nth-child(1)')?.textContent || '').trim()).join(' ');
-    const urls = rows.map(r => (r.querySelector('td:nth-child(4) a')?.getAttribute('href') || r.querySelector('td:nth-child(4)')?.textContent || '').trim()).join(' ');
-    const searchable = norm([name, desc, titles, urls].join(' '));
-    return { art, id, name, searchable, initial: initialOf(name), visible: true };
-  });
-
-  // Sticky header offset handling
-  const siteHeader = document.querySelector('.site-header');
-  function stickyOffset(){
-    return siteHeader ? (siteHeader.getBoundingClientRect().height + 8) : 0;
-  }
-
-  function jumpToTop(){
-    const top = (topAnchor?.getBoundingClientRect().top || 0) + window.pageYOffset - stickyOffset();
-    window.scrollTo({ top, behavior: 'smooth' });
-  }
-
-  function jumpToLetter(L){
-    const target = cache.find(x => x.visible && x.initial === L);
-    if (target){
-      const y = target.art.getBoundingClientRect().top + window.pageYOffset - stickyOffset();
-      window.scrollTo({ top: y, behavior: 'smooth' });
-      if (target.id) history.replaceState(null, '', '#' + encodeURIComponent(target.id));
-      target.art.classList.add('flash-border');
-      setTimeout(() => target.art.classList.remove('flash-border'), 900);
-    }
-  }
-
-  function renderAlpha(){
-    const available = new Set(cache.filter(x => x.visible).map(x => x.initial));
-    alphaBtns.forEach(btn => {
-      const L = btn.dataset.letter;
-      btn.disabled = !available.has(L);
-    });
-  }
-
-  function updateCount(){
-    const groupsVisible = cache.filter(x => x.visible).length;
-    const el = countEl;
-    if (el) el.textContent = `${groupsVisible} groups visible`;
-  }
-
-  function applyFilter(){
-    const q = norm(qInput?.value || '');
-    cache.forEach(obj => {
-      const match = !q || obj.searchable.includes(q);
-      obj.visible = match;
-      obj.art.style.display = match ? '' : 'none';
-    });
-    renderAlpha();
-    updateCount();
-  }
-
-  alphaBtns.forEach(btn => {
-    btn.addEventListener('click', () => {
-      alphaBtns.forEach(b => b.classList.toggle('is-active', b === btn));
-      jumpToLetter(btn.dataset.letter);
-    });
-  });
-
-  clearBtn?.addEventListener('click', () => { qInput.value=''; applyFilter(); qInput.focus(); });
-  let t; qInput?.addEventListener('input', () => { clearTimeout(t); t=setTimeout(applyFilter,120); });
-
-  // Also intercept anchor-list clicks (sommaire) for offset scroll
-  document.querySelectorAll('.anchor-list a').forEach(a => {
-    a.addEventListener('click', (e) => {
-      const href = a.getAttribute('href') || '';
-      if (!href.startsWith('#')) return;
-      e.preventDefault();
-      const id = decodeURIComponent(href.slice(1));
-      const el = document.getElementById(id);
-      if (el){
-        const y = el.getBoundingClientRect().top + window.pageYOffset - stickyOffset();
-        window.scrollTo({ top: y, behavior: 'smooth' });
-        history.replaceState(null, '', href);
-        el.classList.add('flash-border');
-        setTimeout(() => el.classList.remove('flash-border'), 900);
-      }
-    });
-  });
-
-  // Scroll-to-top button
-  const topBtn = document.createElement('button');
-  topBtn.className = 'scroll-top'; topBtn.type = 'button'; topBtn.setAttribute('aria-label','Back to top');
-  topBtn.innerHTML = '↑';
-  document.body.appendChild(topBtn);
-  topBtn.addEventListener('click', jumpToTop);
-  const onScroll = () => { const v = window.pageYOffset > 140; topBtn.classList.toggle('is-visible', v); };
-  window.addEventListener('scroll', onScroll, { passive:true }); onScroll();
-
-  // Initial
-  
-  /* ==== LIGHTBOX images (same behavior as group.html) ==== */
-  (function(){
-    const links = Array.from(document.querySelectorAll('a.open-shot'));
-    if (!links.length) return;
-
-    const modal   = document.getElementById('imgModal');
-    const img     = document.getElementById('imgModalImg');
-    const caption = document.getElementById('imgModalCaption');
-    const closeEls = modal.querySelectorAll('[data-close], .rl-modal__backdrop');
-    const prevBtn = modal.querySelector('.img-prev');
-    const nextBtn = modal.querySelector('.img-next');
-    let index = 0;
-
-    function openAt(i){
-      index = (i + links.length) % links.length;
-      const a = links[index];
-      img.src = a.getAttribute('href');
-      img.alt = (a.querySelector('img') && a.querySelector('img').alt) || a.getAttribute('data-caption') || '';
-      caption.textContent = a.getAttribute('data-caption') || img.alt || '';
-      modal.hidden = false;
-      document.body.style.overflow = 'hidden';
-      modal.setAttribute('tabindex','-1');
-      modal.focus();
-    }
-    function closeModal(){
-      modal.hidden = true;
-      document.body.style.overflow = '';
-      img.src = '';
-    }
-    function next(){ openAt(index + 1); }
-    function prev(){ openAt(index - 1); }
-
-    links.forEach((a, i) => a.addEventListener('click', (e) => { 
-      // Respecte Ctrl/Cmd/Middle click
-      if (e.metaKey || e.ctrlKey || e.shiftKey || e.button === 1) return;
-      e.preventDefault();
-      openAt(i); 
-    }));
-    closeEls.forEach(el => el.addEventListener('click', closeModal));
-    if (nextBtn) nextBtn.addEventListener('click', next);
-    if (prevBtn) prevBtn.addEventListener('click', prev);
-    modal.addEventListener('keydown', (e) => { 
-      if (e.key === 'Escape') closeModal();
-      if (e.key === 'ArrowRight') next();
-      if (e.key === 'ArrowLeft') prev();
-    });
-  })();
-applyFilter();
-});
-</script>
-
+<script
+  src="{{ url_for('static', filename='js/groups.js') }}"
+  integrity="{{ get_sri('static','groups.js') }}"
+  crossorigin="anonymous"
+  defer></script>
 
 {% endblock %}
