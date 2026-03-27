@@ -140,7 +140,7 @@ async def run_captures() -> None:
     await asyncio.gather(*captures)  # wait for all tasks to complete
 
 
-def scraper(base: int) -> None:
+def scraper(base: int, only_names: list[str] | None = None) -> None:
     """main scraping function"""
     red = valkey.Valkey(unix_socket_path=get_socket_path("cache"), db=base)
     # Health DB connection
@@ -166,9 +166,13 @@ def scraper(base: int) -> None:
     if not remote_lacus_url:
         lacus = LacusCore(redislacus, tor_proxy="socks5://127.0.0.1:9050")  # type: ignore
 
+    only_set = {n.lower() for n in only_names} if only_names else None
     for key in red.keys():  # type: ignore[union-attr]
+        name = key.decode()
+        if only_set and name.lower() not in only_set:
+            continue
         group = json.loads(red.get(key))  # type: ignore[arg-type]
-        group["name"] = key.decode()
+        group["name"] = name
         groups.append(group)
     for group in groups:
         stdlog("ransomloook: " + "working on " + group["name"])

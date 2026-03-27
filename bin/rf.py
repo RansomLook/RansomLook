@@ -1,4 +1,6 @@
+import argparse
 import json
+import logging
 
 import requests
 import valkey
@@ -12,6 +14,15 @@ logger = get_logger("rf")
 
 
 def main() -> None:
+    parser = argparse.ArgumentParser(description="Fetch data from Recorded Future API")
+    parser.add_argument("--log-level", choices=["DEBUG", "INFO", "WARNING", "ERROR"], default=None, help="Override log level")
+    args = parser.parse_args()
+
+    if args.log_level:
+        level = getattr(logging, args.log_level)
+        logging.getLogger().setLevel(level)
+        for handler in logging.getLogger().handlers:
+            handler.setLevel(level)
 
     red = valkey.Valkey(unix_socket_path=get_socket_path("cache"), db=DB_RF)
     keys = red.keys()

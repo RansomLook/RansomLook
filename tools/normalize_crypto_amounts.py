@@ -2,8 +2,8 @@
 """
 One-shot script: normalize all Bitcoin transaction amounts from satoshis to BTC in DB=7.
 
-Only converts transactions with source='ransomwhe.re' (always in satoshis).
-Breadcrumbs/ransomlook transactions are already in BTC and are NOT touched.
+Both ransomwhe.re and Breadcrumbs return amounts in satoshis for Bitcoin.
+This script converts any Bitcoin tx amount > 1 to BTC (divide by 100_000_000).
 
 Usage:
     python3 tools/normalize_crypto_amounts.py --dry-run   # preview
@@ -43,10 +43,6 @@ def main() -> int:
         total_addrs += 1
         changed = False
         for tx in doc.get("transactions", []):
-            src = tx.get("source", "")
-            # Only convert ransomwhe.re amounts (always in satoshis)
-            if src != "ransomwhe.re":
-                continue
             a = tx.get("amount")
             if a is None:
                 continue
@@ -54,8 +50,8 @@ def main() -> int:
                 a = float(a)
             except (ValueError, TypeError):
                 continue
-            # ransomwhe.re amounts are integers in satoshis (typically > 1000)
-            if a > 1:
+            # All Bitcoin amounts in DB are in satoshis — always convert
+            if True:
                 tx["amount"] = a / SATOSHI_DIVISOR
                 changed = True
                 fixed_txs += 1
@@ -66,11 +62,11 @@ def main() -> int:
                 red.set(key, json.dumps(doc, ensure_ascii=False))
 
     print(f"Scanned {total_addrs} bitcoin addresses")
-    print(f"Fixed {fixed_txs} transactions (ransomwhe.re source) across {fixed_addrs} addresses")
+    print(f"Fixed {fixed_txs} transactions across {fixed_addrs} addresses")
     if args.dry_run:
         print("(dry-run — no changes written)")
     else:
-        print("Done — all ransomwhe.re amounts normalized to BTC")
+        print("Done — all amounts normalized to BTC")
     return 0
 
 

@@ -20,6 +20,7 @@ Usage:
 
 import argparse
 import json
+import logging
 import time
 from datetime import datetime, timezone
 from typing import Any
@@ -242,7 +243,14 @@ def main() -> int:
     parser.add_argument("--risk", action="store_true", help="Also fetch risk scores from Breadcrumbs")
     parser.add_argument("--stale-days", type=int, default=0, help="Only process addresses not updated in N days (0=all)")
     parser.add_argument("--max-pages", type=int, default=0, help="Max API pages per address (0=all, each page ~50 tx)")
+    parser.add_argument("--log-level", choices=["DEBUG", "INFO", "WARNING", "ERROR"], default=None, help="Override log level")
     args = parser.parse_args()
+
+    if args.log_level:
+        level = getattr(logging, args.log_level)
+        logging.getLogger().setLevel(level)
+        for handler in logging.getLogger().handlers:
+            handler.setLevel(level)
 
     # Load Breadcrumbs API key from config
     bc_conf = get_config("generic", "breadcrumbs", quiet=True)

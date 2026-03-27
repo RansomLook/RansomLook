@@ -13,8 +13,10 @@ ENV:
 Requires: redis (Valkey-compatible), git CLI available in PATH
 """
 
+import argparse
 import hashlib
 import json
+import logging
 import os
 import subprocess
 import sys
@@ -275,6 +277,16 @@ def run_import() -> None:
 
 
 def main() -> None:
+    parser = argparse.ArgumentParser(description="Import ransom notes from ThreatLabz repo")
+    parser.add_argument("--log-level", choices=["DEBUG", "INFO", "WARNING", "ERROR"], default=None, help="Override log level")
+    args = parser.parse_args()
+
+    if args.log_level:
+        level = getattr(logging, args.log_level)
+        logging.getLogger().setLevel(level)
+        for handler in logging.getLogger().handlers:
+            handler.setLevel(level)
+
     try:
         run_import()
     except subprocess.CalledProcessError as e:

@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
+import argparse
 import json
+import logging
 from collections import defaultdict
 from datetime import datetime, timezone
 from typing import Any
@@ -108,6 +110,16 @@ def _merge_transactions(old_list: list[Any], new_list: list[Any], new_source: st
 
 
 def main() -> int:
+    parser = argparse.ArgumentParser(description="Import crypto addresses from ransomwhe.re")
+    parser.add_argument("--log-level", choices=["DEBUG", "INFO", "WARNING", "ERROR"], default=None, help="Override log level")
+    args = parser.parse_args()
+
+    if args.log_level:
+        level = getattr(logging, args.log_level)
+        logging.getLogger().setLevel(level)
+        for handler in logging.getLogger().handlers:
+            handler.setLevel(level)
+
     logger.info("Importing crypto addresses from ransomwhe.re (DB=7 only)")
     try:
         r = requests.get(API, timeout=90)

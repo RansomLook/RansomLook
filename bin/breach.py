@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
+import argparse
 import json
+import logging
 
 import requests
 import valkey
@@ -14,6 +16,15 @@ logger = get_logger("breach")
 
 
 def main() -> None:
+    parser = argparse.ArgumentParser(description="Check for new data breaches")
+    parser.add_argument("--log-level", choices=["DEBUG", "INFO", "WARNING", "ERROR"], default=None, help="Override log level")
+    args = parser.parse_args()
+
+    if args.log_level:
+        level = getattr(logging, args.log_level)
+        logging.getLogger().setLevel(level)
+        for handler in logging.getLogger().handlers:
+            handler.setLevel(level)
     url = "https://leak-lookup.com/breaches/stats"
     source = "https://leak-lookup.com/breaches"
 

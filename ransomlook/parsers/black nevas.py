@@ -18,12 +18,13 @@ def main() -> list[dict[str, str]]:
                 file = open(html_doc, encoding="utf-8")
                 soup = BeautifulSoup(file, "html.parser")
                 if "-publication" not in filename:
-                    divs_name = soup.find_all("div", {"class": "p-4"})
+                    divs_name = soup.find_all("div", {"class": "col-4"})
                     for div in divs_name:
                         try:
-                            title = div.find("h2").text.strip()
-                            description = div.find("p").text.strip()
-                            list_div.append({"title": title, "description": description})
+                            title = div.find("p", {"class": "css-1jxwgxh"}).text.strip()
+                            description = ""
+                            link = div.find("a")["href"]
+                            list_div.append({"title": title, "description": description, "link": link, "slug": filename})
                         except Exception:
                             continue
                 else:
