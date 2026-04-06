@@ -233,6 +233,9 @@ poetry run tools/getpreviousscreen.py      # Retrieve archived screenshots
 poetry run tools/validate_config_files.py  # Validate config/generic.json structure
 poetry run tools/3rdparty.py               # Download third-party JS/CSS (Plotly, etc.)
 poetry run tools/generate_sri.py           # Regenerate SRI hashes for static assets
+python3 tools/crypto_export.py             # Export crypto addresses to CSV
+python3 tools/crypto_export.py --chain bitcoin -o btc.csv  # Bitcoin only
+python3 tools/cryptostats.py               # Display per-group crypto address/tx counts
 ```
 
 ### Test seed scripts
