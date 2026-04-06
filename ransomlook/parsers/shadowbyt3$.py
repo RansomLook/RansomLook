@@ -16,12 +16,9 @@ def main() -> list[dict[str, str]]:
                 html_doc = "source/" + filename
                 file = open(html_doc, encoding="utf-8")
                 soup = BeautifulSoup(file, "html.parser")
-                divs_name = soup.find_all("tr")
+                divs_name = soup.find_all("div", {"class":"card"})
                 for div in divs_name:
-                    tds = div.find_all("td")
-                    if tds == []:
-                        continue
-                    title = tds[0].text.strip()
+                    title = div.find('h3').text.strip()
                     description = ""
                     list_div.append({"title": title, "description": description})
                 file.close()

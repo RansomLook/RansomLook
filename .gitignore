@@ -83,6 +83,7 @@ venv/
 ENV/
 env.bak/
 venv.bak/
+.version
 
 # IDE
 .idea/
