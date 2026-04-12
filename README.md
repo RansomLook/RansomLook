@@ -22,8 +22,7 @@ RansomLook is a tool to monitor Ransomware groups and markets and extract their 
 - Ransomnotes, from ThreatLabs (@Threatlabz)
 - [MISP](https://www.misp-project.org/) integration with the support of the [MISP ransomware galaxy](https://www.misp-galaxy.org/ransomware/)
 - Full REST API with interactive Swagger documentation at `/doc`
-
-We are proud to be trusted by [Breadcrumbs](https://www.breadcrumbs.app/) for cryptocurrency enrichment.
+- Cryptocurrency enrichment with [Breadcrumbs](https://www.breadcrumbs.app/)], an API key is requiered.
 
 # Install guide
 
