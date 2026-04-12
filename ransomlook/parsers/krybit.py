@@ -2,8 +2,6 @@ import os
 
 from bs4 import BeautifulSoup
 
-from ransomlook.default.logging import get_logger
-
 def main() -> list[dict[str, str]]:
     list_div = []
 
