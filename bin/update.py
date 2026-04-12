@@ -17,7 +17,7 @@ from ransomlook.default.logging import get_logger
 logger = get_logger("update")
 
 # Current version of RansomLook
-CURRENT_VERSION = "2.0.0-dev"
+CURRENT_VERSION = "2.0.0"
 
 # File used to track the installed version
 VERSION_FILE = ".version"
@@ -103,7 +103,7 @@ def migrate_to_2_0(auto_yes: bool = False) -> None:
     try:
         from valkey import Valkey
     except ImportError:
-        from redis import Redis as Valkey  # type: ignore[no-redef]
+        from redis import Redis as Valkey  # type: ignore[assignment]
 
     logger.info("=" * 60)
     logger.info("  Migration to RansomLook 2.0")

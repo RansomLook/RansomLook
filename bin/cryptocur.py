@@ -173,7 +173,7 @@ def main() -> int:
         try:
             item["last_tx_time"] = max(
                 [str(t.get("time")) for t in item["transactions"] if isinstance(t, dict) and t.get("time") is not None]
-            )  # type: ignore[type-var]
+            )
         except ValueError:
             item["last_tx_time"] = None
 

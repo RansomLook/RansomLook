@@ -203,7 +203,7 @@ def fetch_transactions(api_key: str, chain: str, address: str, max_pages: int = 
 # ---------------------------------------------------------------------------
 def merge_transactions(
     existing: list[dict[str, Any]], new_txs: list[dict[str, Any]]
-) -> tuple[list[dict[str, Any]], int]:
+) -> tuple[list[dict[str, Any]], int, int]:
     # One entry per tx hash. Enrich existing with new fields.
     existing_by_key: dict[str, dict[str, Any]] = {}
     for tx in existing:

@@ -3004,7 +3004,7 @@ def admin_crypto_new(group):  # type: ignore[no-untyped-def]
             "tx_count": len(txs),
             "last_tx_time": max(
                 [str(t.get("time")) for t in txs if isinstance(t, dict) and t.get("time") is not None], default=None
-            ),  # type: ignore[type-var]
+            ),
             "created_at": now,
             "updated_at": now,
         }
@@ -3083,7 +3083,7 @@ def admin_crypto_edit_addr(group, chain, addr):  # type: ignore[no-untyped-def]
                 "tx_count": len(txs),
                 "last_tx_time": max(
                     [str(t.get("time")) for t in txs if isinstance(t, dict) and t.get("time") is not None], default=None
-                ),  # type: ignore[type-var]
+                ),
                 "updated_at": now,
                 "created_at": created_at,
                 "group": canon,

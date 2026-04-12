@@ -16,7 +16,7 @@ writer.writerow(header)
 red = redis.Redis(unix_socket_path=get_socket_path("cache"), db=2)
 
 postnum: dict[bytes, dict[str, int]] = {}
-for key in red.keys():
+for key in red.keys(): # type: ignore[union-attr]
     postnum[key] = {}
     posts = json.loads(red.get(key))  # type: ignore
     for post in posts:
