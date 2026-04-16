@@ -1,0 +1,42 @@
+import os
+from bs4 import BeautifulSoup
+from ransomlook.default.logging import get_logger
+
+logger = get_logger(__name__)
+
+def main() -> list[dict[str, str]]:
+    list_div = []
+
+    for filename in os.listdir("source"):
+        try:
+            if filename.startswith(__name__.split(".")[-1] + "-"):
+                html_doc = "source/" + filename
+                with open(html_doc, encoding="utf-8") as file:
+                    soup = BeautifulSoup(file, "html.parser")
+
+                sections = soup.find_all("section", class_="landing-shell--portal")
+                for section in sections:
+                    # Title (victim name)
+                    h2 = section.find("h2", class_="landing-portal-frame__name")
+                    title = h2.get_text(strip=True) if h2 else ""
+                    if not title:
+                        continue
+
+                    # Description
+                    desc_el = section.find("p", class_="landing-desc")
+                    description = desc_el.get_text(strip=True) if desc_el else ""
+
+                    link_el = section.find("a", class_="btn-landing")
+                    link = link_el.get("href", "") if link_el else ""
+
+                    entry = {"title": title, "description": description}
+                    if link:
+                        entry["link"] = link
+                        entry["slug"] = filename
+                    list_div.append(entry)
+
+        except Exception:
+            logger.debug("Failed during: " + filename)
+
+    logger.debug(list_div)
+    return list_div
