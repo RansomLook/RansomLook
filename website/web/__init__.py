@@ -1233,6 +1233,184 @@ def browse():  # type: ignore[no-untyped-def]
     )
 
 
+@app.route("/urls")
+def urls():  # type: ignore[no-untyped-def]
+    red_g = Valkey(unix_socket_path=get_socket_path("cache"), db=DB_GROUPS)
+    red_m = Valkey(unix_socket_path=get_socket_path("cache"), db=DB_MARKETS)
+    try:
+        red_health: Valkey | None = Valkey(unix_socket_path=get_socket_path("cache"), db=DB_HEALTH)
+    except Exception:
+        red_health = None
+    is_public = not current_user.is_authenticated
+
+    rows: list[dict[str, Any]] = []
+
+    def _ingest(red: Valkey, type_label: str) -> None:
+        for key in red.keys():  # type: ignore[union-attr]
+            try:
+                entry = json.loads(red.get(key))  # type: ignore[arg-type]
+            except Exception:
+                continue
+            entry_private = bool(entry.get("private"))
+            if is_public and entry_private:
+                continue
+            entry_name = key.decode()
+            for location in entry.get("locations") or []:
+                loc_private = bool(location.get("private"))
+                if is_public and loc_private:
+                    continue
+                slug = location.get("slug") or ""
+                available = location.get("available")
+                lastscrape = location.get("lastscrape") or ""
+                health: list[int] | None = None
+                uptime30: int | None = None
+                if red_health is not None:
+                    try:
+                        hraw = red_health.get(f"health:{entry_name}:{slug}")
+                        if hraw:
+                            series = json.loads(hraw)  # type: ignore[arg-type]
+                            if isinstance(series, list) and series:
+                                series = series[-30:]
+                                health = [1 if (x in (1, True, "1", "up", "active")) else 0 for x in series]
+                                uptime30 = round(100 * sum(health) / len(health))
+                    except Exception:
+                        pass
+                rows.append(
+                    {
+                        "entry_name": entry_name,
+                        "entry_type": type_label,
+                        "entry_private": entry_private,
+                        "slug": slug,
+                        "title": location.get("title") or "",
+                        "private": loc_private,
+                        "available": available,
+                        "lastscrape": lastscrape,
+                        "uptime30": uptime30,
+                        "health": health,
+                    }
+                )
+
+    _ingest(red_g, "group")
+    _ingest(red_m, "market")
+
+    rows.sort(key=lambda r: (r["entry_name"].lower(), r["slug"].lower()))
+
+    counts = {
+        "all": len(rows),
+        "group": sum(1 for r in rows if r["entry_type"] == "group"),
+        "market": sum(1 for r in rows if r["entry_type"] == "market"),
+        "online": sum(1 for r in rows if r["available"] is True),
+        "offline": sum(1 for r in rows if r["available"] is not True),
+    }
+
+    active_type = (request.args.get("type") or "all").lower()
+    if active_type not in ("all", "group", "market"):
+        active_type = "all"
+    active_status = (request.args.get("status") or "all").lower()
+    if active_status not in ("all", "online", "offline"):
+        active_status = "all"
+    query = (request.args.get("q") or "").strip()
+
+    return render_template(
+        "urls.html",
+        rows=rows,
+        counts=counts,
+        active_type=active_type,
+        active_status=active_status,
+        query=query,
+    )
+
+
+@app.route("/urls.csv")
+def urls_csv():  # type: ignore[no-untyped-def]
+    active_type = (request.args.get("type") or "all").lower()
+    if active_type not in ("all", "group", "market"):
+        active_type = "all"
+    active_status = (request.args.get("status") or "all").lower()
+    if active_status not in ("all", "online", "offline"):
+        active_status = "all"
+    q = (request.args.get("q") or "").strip().lower()
+
+    red_g = Valkey(unix_socket_path=get_socket_path("cache"), db=DB_GROUPS)
+    red_m = Valkey(unix_socket_path=get_socket_path("cache"), db=DB_MARKETS)
+    try:
+        red_health: Valkey | None = Valkey(unix_socket_path=get_socket_path("cache"), db=DB_HEALTH)
+    except Exception:
+        red_health = None
+    is_public = not current_user.is_authenticated
+
+    out_rows: list[list[str]] = []
+
+    def _ingest(red: Valkey, type_label: str) -> None:
+        if active_type != "all" and active_type != type_label:
+            return
+        for key in red.keys():  # type: ignore[union-attr]
+            try:
+                entry = json.loads(red.get(key))  # type: ignore[arg-type]
+            except Exception:
+                continue
+            if is_public and entry.get("private"):
+                continue
+            entry_name = key.decode()
+            for loc in entry.get("locations") or []:
+                if is_public and loc.get("private"):
+                    continue
+                slug = loc.get("slug") or ""
+                available = loc.get("available") is True
+                if active_status == "online" and not available:
+                    continue
+                if active_status == "offline" and available:
+                    continue
+                if q and q not in entry_name.lower() and q not in slug.lower():
+                    continue
+
+                uptime30 = ""
+                if red_health is not None:
+                    try:
+                        hraw = red_health.get(f"health:{entry_name}:{slug}")
+                        if hraw:
+                            series = json.loads(hraw)  # type: ignore[arg-type]
+                            if isinstance(series, list) and series:
+                                series = series[-30:]
+                                ups = sum(1 for x in series if x in (1, True, "1", "up", "active"))
+                                uptime30 = str(round(100 * ups / len(series)))
+                    except Exception:
+                        pass
+
+                date_str = str(loc.get("lastscrape", "")).split(" ")[0] if loc.get("lastscrape") else ""
+                row = [
+                    entry_name,
+                    type_label,
+                    slug,
+                    "online" if available else "offline",
+                    date_str,
+                    uptime30,
+                ]
+                if current_user.is_authenticated:
+                    row.append("yes" if bool(entry.get("private")) else "no")
+                    row.append("yes" if bool(loc.get("private")) else "no")
+                row.append(loc.get("title", "") or "")
+                out_rows.append(row)
+
+    _ingest(red_g, "group")
+    _ingest(red_m, "market")
+
+    out_rows.sort(key=lambda r: (_norm_for_sort(r[0]), _norm_for_sort(r[2])))
+
+    sio = StringIO()
+    writer = csv.writer(sio)
+    headers = ["Name", "Type", "URL", "Status", "LastScrape", "Uptime30"]
+    if current_user.is_authenticated:
+        headers += ["EntryPrivate", "UrlPrivate"]
+    headers += ["PageTitle"]
+    writer.writerow(headers)
+    writer.writerows(out_rows)
+
+    resp = Response(sio.getvalue(), mimetype="text/csv; charset=utf-8")
+    resp.headers["Content-Disposition"] = "attachment; filename=urls.csv"
+    return resp
+
+
 @app.route("/group/<name>")
 def group(name: str):  # type: ignore[no-untyped-def]
     red = Valkey(unix_socket_path=get_socket_path("cache"), db=DB_GROUPS)

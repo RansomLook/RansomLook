@@ -1,0 +1,185 @@
+{% extends "base.html" %}
+
+{% block title %}RansomLook — URLs{% endblock %}
+
+{% macro spark_svg(series) -%}
+  {%- set n = series|length -%}
+  {%- set bw = 4 -%}
+  {%- set gap = 1 -%}
+  {%- set w = n * (bw + gap) - gap -%}
+  <svg class="url-spark" viewBox="0 0 {{ w }} 24" width="{{ w }}" height="24"
+       preserveAspectRatio="none" aria-hidden="true">
+    {%- for v in series -%}
+      {%- set x = loop.index0 * (bw + gap) -%}
+      <rect x="{{ x }}" y="2" width="{{ bw }}" height="20"
+            fill="{{ '#10b981' if v else '#ef4444' }}" rx="1" ry="1"></rect>
+    {%- endfor -%}
+  </svg>
+{%- endmacro %}
+
+{% block content %}
+
+<style>
+  .rl-table--urls{ table-layout:fixed; min-width:820px; }
+  .rl-table--urls .url-cell{
+    word-break:break-all; overflow-wrap:anywhere;
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    font-size:.9rem; line-height:1.35;
+  }
+  .url-spark{ display:block; max-width:100%; }
+</style>
+
+<section class="hero">
+  <div class="container">
+    <h1>URLs</h1>
+    <p class="lead">
+      {{ _('All tracked mirrors across groups and markets, with live status and 30-day health.') if _
+         else 'All tracked mirrors across groups and markets, with live status and 30-day health.' }}
+    </p>
+  </div>
+</section>
+
+<section class="metrics-section">
+  <div class="container">
+
+    <div class="browse-filters pad-mb">
+
+      <div class="bf-row bf-row--search">
+        <div class="field field--search bf-search">
+          <label class="sr-only" for="urls-q">Search</label>
+          <input id="urls-q" class="input" type="search"
+                 autocomplete="off" spellcheck="false"
+                 aria-label="Search by group, market or URL"
+                 placeholder="Group, market or URL substring… (Ctrl/Cmd+K)"
+                 value="{{ query }}">
+          <button class="input-clear" type="button" aria-label="Clear search">×</button>
+        </div>
+      </div>
+
+      <div class="bf-row bf-row--filters">
+        <nav class="browse-tabs" role="tablist" aria-label="Entity type">
+          <button class="tab-btn" role="tab" data-type="all"    aria-selected="{{ 'true' if active_type == 'all' else 'false' }}">
+            All <span class="tab-count">{{ counts['all'] }}</span>
+          </button>
+          <button class="tab-btn" role="tab" data-type="group"  aria-selected="{{ 'true' if active_type == 'group' else 'false' }}">
+            Groups <span class="tab-count">{{ counts['group'] }}</span>
+          </button>
+          <button class="tab-btn" role="tab" data-type="market" aria-selected="{{ 'true' if active_type == 'market' else 'false' }}">
+            Markets <span class="tab-count">{{ counts['market'] }}</span>
+          </button>
+        </nav>
+
+        <nav class="browse-tabs" role="tablist" aria-label="Availability">
+          <button class="tab-btn" role="tab" data-status="all"     aria-selected="{{ 'true' if active_status == 'all' else 'false' }}">
+            All
+          </button>
+          <button class="tab-btn" role="tab" data-status="online"  aria-selected="{{ 'true' if active_status == 'online' else 'false' }}">
+            Online <span class="tab-count">{{ counts['online'] }}</span>
+          </button>
+          <button class="tab-btn" role="tab" data-status="offline" aria-selected="{{ 'true' if active_status == 'offline' else 'false' }}">
+            Offline <span class="tab-count">{{ counts['offline'] }}</span>
+          </button>
+        </nav>
+
+        <a id="urls-csv" class="btn btn-secondary btn-sm" href="{{ url_for('urls_csv') }}"
+           style="margin-left:auto" title="Download current view as CSV">Download CSV</a>
+      </div>
+
+      <div class="bf-row">
+        <div class="filters-meta"><span id="urls-count"></span></div>
+      </div>
+    </div>
+
+    <div class="table-card">
+      <div class="table-scroll">
+        <table class="rl-table rl-table--urls" id="urls-table" aria-label="URLs">
+          <thead>
+            <tr>
+              <th style="width:18%">{{ _('Group / Market') if _ else 'Group / Market' }}</th>
+              <th>URL</th>
+              <th style="width:8%"><center>Status</center></th>
+              <th style="width:11%"><center>Last scrape</center></th>
+              <th style="width:9%"><center>Uptime 30d</center></th>
+              <th style="width:14%"><center>Health</center></th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for r in rows %}
+              {% set status_key = 'online' if r['available'] is true else 'offline' %}
+              <tr class="url-row"
+                  data-type="{{ r['entry_type'] }}"
+                  data-status="{{ status_key }}"
+                  data-name="{{ r['entry_name']|lower }}"
+                  data-slug="{{ r['slug']|lower }}">
+                <td>
+                  {% if r['entry_type'] == 'group' %}
+                    <a class="{% if r['entry_private'] %}link-private{% endif %}"
+                       href="/group/{{ r['entry_name']|urlencode }}">{{ r['entry_name']|title }}</a>
+                  {% else %}
+                    <a class="{% if r['entry_private'] %}link-private{% endif %}"
+                       href="/market/{{ r['entry_name']|urlencode }}">{{ r['entry_name']|title }}</a>
+                  {% endif %}
+                  <span class="card-type-chip card-type-chip--{{ r['entry_type'] }}" style="margin-left:6px">{{ r['entry_type'] }}</span>
+                  {% if r['entry_private'] %}<span class="badge-private" style="margin-left:6px">private</span>{% endif %}
+                </td>
+                <td class="url-cell {% if r['private'] %}is-private{% endif %}">
+                  {{ r['slug'] }}
+                  {% if r['private'] %}<span class="badge-private" style="margin-left:6px">private</span>{% endif %}
+                </td>
+                <td>
+                  <center>
+                  {% if r['available'] is true %}
+                    <span class="badge-status badge-up">Up</span>
+                  {% elif r['available'] is false %}
+                    <span class="badge-status badge-down">Down</span>
+                  {% else %}
+                    <span class="badge-status badge-unknown">?</span>
+                  {% endif %}
+                  </center>
+                </td>
+                <td>
+                  <center>
+                  {% if r['lastscrape'] and r['lastscrape'] != 'Never' %}
+                    <time datetime="{{ r['lastscrape'] }}">{{ r['lastscrape'].split(' ')[0] }}</time>
+                  {% else %}
+                    <span class="muted">—</span>
+                  {% endif %}
+                  </center>
+                </td>
+                <td>
+                  <center>
+                  {% if r['uptime30'] is not none %}{{ r['uptime30'] }}%{% else %}<span class="muted">—</span>{% endif %}
+                  </center>
+                </td>
+                <td>
+                  {% if r['health'] %}
+                    {{ spark_svg(r['health']) }}
+                  {% else %}
+                    <center class="muted">—</center>
+                  {% endif %}
+                </td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <p id="urls-empty" class="prose" style="display:none;color:var(--muted);text-align:center;padding:32px 0">
+      {{ _('No matches.') if _ else 'No matches.' }}
+    </p>
+
+  </div>
+</section>
+
+<script type="application/json" id="urls-bootstrap">
+{ "activeType": "{{ active_type }}", "activeStatus": "{{ active_status }}", "query": {{ query|tojson }} }
+</script>
+
+<script
+  src="{{ url_for('static', filename='js/urls-list.js') }}"
+  integrity="{{ get_sri('static','urls-list.js') }}"
+  crossorigin="anonymous"
+  defer></script>
+
+{% endblock %}
