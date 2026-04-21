@@ -25,6 +25,7 @@ from ransomlook.default import get_homedir
 
 THUMB_SIZE = (280, 180)
 SRC_EXTS = {".png", ".jpg", ".jpeg", ".webp"}
+SKIP_DIRS = {"thumbs", "old", "logo"}
 
 
 def _thumb_path_for(src: Path, screenshots_root: Path) -> Path:
@@ -57,9 +58,10 @@ def _make_thumb(src_str: str, thumb_str: str) -> tuple[str, bool, str]:
 
 
 def _iter_sources(screenshots_root: Path):
-    thumbs_root = screenshots_root / "thumbs"
     for root, dirs, files in os.walk(screenshots_root):
-        dirs[:] = [d for d in dirs if Path(root, d) != thumbs_root]
+        # Only honour top-level skip dirs: source/screenshots/<skip>/...
+        if Path(root) == screenshots_root:
+            dirs[:] = [d for d in dirs if d not in SKIP_DIRS]
         for f in files:
             p = Path(root, f)
             if p.suffix.lower() in SRC_EXTS:
