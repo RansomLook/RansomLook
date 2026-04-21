@@ -7,6 +7,9 @@ import redis
 
 from ransomlook.default import get_socket_path
 
+from collections.abc import Iterable
+from typing import cast
+
 f = open("stats.csv", "w")
 header = ["Group", "01", "02", "03", "04", "05", "06", "07", "08", "09", "10", "11", "12"]
 writer = csv.writer(f)
@@ -16,7 +19,7 @@ writer.writerow(header)
 red = redis.Redis(unix_socket_path=get_socket_path("cache"), db=2)
 
 postnum: dict[bytes, dict[str, int]] = {}
-for key in red.keys():
+for key in cast(Iterable[bytes], red.keys()):
     postnum[key] = {}
     posts = json.loads(red.get(key))  # type: ignore
     for post in posts:
