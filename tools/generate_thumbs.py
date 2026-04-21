@@ -16,6 +16,7 @@ import argparse
 import os
 import sys
 import time
+from collections.abc import Iterator
 from concurrent.futures import ProcessPoolExecutor, as_completed
 from pathlib import Path
 
@@ -57,7 +58,7 @@ def _make_thumb(src_str: str, thumb_str: str) -> tuple[str, bool, str]:
         return (src_str, False, str(e))
 
 
-def _iter_sources(screenshots_root: Path):
+def _iter_sources(screenshots_root: Path) -> Iterator[Path]:
     for root, dirs, files in os.walk(screenshots_root):
         # Only honour top-level skip dirs: source/screenshots/<skip>/...
         if Path(root) == screenshots_root:

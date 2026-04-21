@@ -40,7 +40,7 @@ from flask import (
     send_from_directory,
     url_for,
 )
-from flask_babel import Babel
+from flask_babel import Babel # type: ignore[import-untyped]
 from flask_babel import get_locale as _babel_get_locale
 from flask_bootstrap import Bootstrap5  # type: ignore
 from flask_login import current_user
@@ -646,8 +646,8 @@ def og_image():  # type: ignore[no-untyped-def]
     d = ImageDraw.Draw(img)
 
     # Soft radial-ish accent (horizontal band) for a touch of depth
-    d.rectangle([(0, H - 3), (W, H)], fill=accent)                   # hairline accent at bottom
-    d.rectangle([(0, 0), (W, 3)], fill=panel)                        # subtle top line
+    d.rectangle(((0, H - 3), (W, H)), fill=accent)                   # hairline accent at bottom
+    d.rectangle(((0, 0), (W, 3)), fill=panel)                        # subtle top line
 
     # Centered logo — large enough to be the visual anchor
     logo_path = os.path.join(str(get_homedir()), "website", "web", "static", "img", "icon-512.png")
