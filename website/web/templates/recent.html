@@ -7,7 +7,28 @@
 <section class="hero">
   <div class="container">
     <h1>Recent posts</h1>
-    <p class="lead"><em>Last {{ data|length }} posts</em></p>
+    <p class="lead">
+      <em>
+        Last {{ window_days }} day{{ '' if window_days == 1 else 's' }} —
+        {{ data|length }} post{{ '' if data|length == 1 else 's' }}
+        {% if capped %}
+          (showing most recent {{ row_cap }} of {{ total_in_window }} — older entries trimmed)
+        {% endif %}
+      </em>
+    </p>
+
+    <form method="get" class="recent-window" style="display:inline-flex;gap:6px;align-items:center;margin-top:6px">
+      <label for="recent-window-sel" class="sr-only">Time window</label>
+      <span style="color:var(--muted);font-size:.9rem">Window:</span>
+      {% for d in allowed_windows %}
+        <a class="tab-btn"
+           href="?window={{ d }}"
+           aria-selected="{{ 'true' if d == window_days else 'false' }}"
+           style="padding:6px 12px;border-radius:8px;border:1px solid var(--border);font-size:.85rem;text-decoration:none">
+          {{ d }} day{{ '' if d == 1 else 's' }}
+        </a>
+      {% endfor %}
+    </form>
 
     {# Sparkline: posts per hour, last 24h #}
     {% set maxv = (activity|max) if activity|length else 0 %}

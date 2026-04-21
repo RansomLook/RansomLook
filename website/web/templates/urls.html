@@ -74,9 +74,11 @@
             All
           </button>
           <button class="tab-btn" role="tab" data-status="online"  aria-selected="{{ 'true' if active_status == 'online' else 'false' }}">
+            <span class="dot dot-healthy" aria-hidden="true"></span>
             Online <span class="tab-count">{{ counts['online'] }}</span>
           </button>
           <button class="tab-btn" role="tab" data-status="offline" aria-selected="{{ 'true' if active_status == 'offline' else 'false' }}">
+            <span class="dot dot-offline" aria-hidden="true"></span>
             Offline <span class="tab-count">{{ counts['offline'] }}</span>
           </button>
         </nav>

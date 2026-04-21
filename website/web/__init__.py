@@ -885,6 +885,15 @@ def home():  # type: ignore[no-untyped-def]
 
 @app.route("/recent")
 def recent():  # type: ignore[no-untyped-def]
+    allowed_windows = (1, 3, 7, 30)
+    try:
+        window_days = int(request.args.get("window", "3"))
+    except (TypeError, ValueError):
+        window_days = 3
+    if window_days not in allowed_windows:
+        window_days = 3
+    row_cap = 2000
+
     posts = []
     red = Valkey(unix_socket_path=get_socket_path("cache"), db=DB_POSTS)
     for key in red.keys():  # type: ignore[union-attr]
@@ -893,7 +902,26 @@ def recent():  # type: ignore[no-untyped-def]
             entry["group_name"] = key.decode()
             posts.append(entry)
     sorted_posts = sorted(posts, key=lambda x: x["discovered"], reverse=True)
-    recentposts = sorted_posts[:100]
+
+    now = dt.now(timezone.utc)
+    window_seconds = window_days * 86400
+    windowed: list[dict[str, Any]] = []
+    for p in sorted_posts:
+        ts_str = p.get("discovered") or ""
+        try:
+            ts = parser.parse(ts_str)
+            if ts.tzinfo is None:
+                ts = ts.replace(tzinfo=timezone.utc)
+        except Exception:
+            continue
+        if (now - ts).total_seconds() <= window_seconds:
+            windowed.append(p)
+        else:
+            break  # sorted desc, further entries are older
+
+    total_in_window = len(windowed)
+    capped = total_in_window > row_cap
+    recentposts = windowed[:row_cap]
 
     # Unique group names for the filter dropdown (preserving display order)
     seen = set()
@@ -905,10 +933,9 @@ def recent():  # type: ignore[no-untyped-def]
             groups.append(g)
     groups.sort(key=str.lower)
 
-    # Hourly activity (last 24h) for the sparkline
-    now = dt.now(timezone.utc)
+    # Hourly activity (last 24h) for the sparkline — always on full dataset
     buckets = [0] * 24
-    for p in sorted_posts:  # scan all, not just 100 — 24h window may hold more or fewer
+    for p in sorted_posts:
         ts_str = p.get("discovered") or ""
         try:
             ts = parser.parse(ts_str)
@@ -922,7 +949,17 @@ def recent():  # type: ignore[no-untyped-def]
             if 0 <= idx < 24:
                 buckets[idx] += 1
 
-    return render_template("recent.html", data=recentposts, groups=groups, activity=buckets)
+    return render_template(
+        "recent.html",
+        data=recentposts,
+        groups=groups,
+        activity=buckets,
+        window_days=window_days,
+        allowed_windows=allowed_windows,
+        total_in_window=total_in_window,
+        row_cap=row_cap,
+        capped=capped,
+    )
 
 
 # ---- Hot / Trending (Derniers X jours) ----
