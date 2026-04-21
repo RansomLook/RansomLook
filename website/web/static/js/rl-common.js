@@ -31,8 +31,17 @@
     const now = Date.now();
     for (const $t of document.querySelectorAll(selector + '[data-ts]')) {
       const raw = $t.dataset.ts;
-      const iso = raw.includes('T') ? raw : raw.replace(' ', 'T') + 'Z';
-      const d = new Date(iso);
+      // Scraper writes naive-local timestamps (e.g. "2026-04-21 14:12:34[.567]").
+      // Parse components explicitly so the browser treats them as LOCAL time,
+      // matching the server's wall clock. Values already carrying a 'Z' or a
+      // numeric offset are left to Date() to parse.
+      let d;
+      if (/[Zz]$|[+-]\d{2}:?\d{2}$/.test(raw)) {
+        d = new Date(raw);
+      } else {
+        const m = raw.match(/^(\d{4})-(\d{2})-(\d{2})[ T](\d{2}):(\d{2}):(\d{2})/);
+        d = m ? new Date(+m[1], +m[2]-1, +m[3], +m[4], +m[5], +m[6]) : new Date(raw);
+      }
       if (isNaN(d)) continue;
       const ms = now - d.getTime();
       const sameDay = new Date(now).toDateString() === d.toDateString();
