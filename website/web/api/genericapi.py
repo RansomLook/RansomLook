@@ -13,6 +13,7 @@ from valkey import Valkey
 from ransomlook.default import (
     DB_ACTORS,
     DB_GROUPS,
+    DB_HEALTH,
     DB_LEAKS,
     DB_MARKETS,
     DB_POSTS,
@@ -327,6 +328,7 @@ _EXPORT_DBS = {
     str(DB_MARKETS): "Markets — market / forum metadata and locations",
     str(DB_LEAKS): "Leaks — data breach records",
     str(DB_ACTORS): "Actors — threat actor profiles and relations",
+    str(DB_HEALTH): "Health — mirror uptime series (30-day daily)",
     str(DB_RF): "Recorded Future — RF channel data",
 }
 

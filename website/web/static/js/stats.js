@@ -282,6 +282,127 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   /* ====================================================================
+   *  Color palette — uses shared RL.PALETTE / RL.colorFor from rl-common.js
+   * ==================================================================== */
+  const PALETTE = RL.PALETTE;
+  function paletteIndex(s) {
+    let h = 0;
+    for (let i = 0; i < s.length; i++) h = (h * 31 + s.charCodeAt(i)) >>> 0;
+    return h % PALETTE.length;
+  }
+  const hexToRgba = (hex, a) => {
+    const n = parseInt(hex.slice(1), 16);
+    return `rgba(${(n >> 16) & 255},${(n >> 8) & 255},${n & 255},${a})`;
+  };
+
+  /* Build a "visible set" color map where every shown group has a
+     distinct palette colour, even when their hashes collide.
+     Each call returns a Map<groupName, hex>. */
+  let _visibleColors = new Map();
+  function assignVisibleColors(groups) {
+    const map = new Map();
+    const used = new Set();
+    for (const g of groups) {
+      let i = paletteIndex(g);
+      let tries = 0;
+      while (used.has(i) && tries < PALETTE.length) {
+        i = (i + 1) % PALETTE.length;
+        tries++;
+      }
+      used.add(i);
+      map.set(g, PALETTE[i]);
+    }
+    _visibleColors = map;
+    return map;
+  }
+  const colorFor      = (g) => _visibleColors.get(g) || PALETTE[paletteIndex(g)];
+  const colorForAlpha = (g, a) => hexToRgba(colorFor(g), a);
+
+  /* ====================================================================
+   *  Summary + movers
+   * ==================================================================== */
+  const $kpi = (name) => document.querySelector(`[data-kpi="${name}"]`);
+  const $movers = document.getElementById('movers-list');
+
+  function computeSummary() {
+    const total = state.filtered.length;
+    const counts = new Map();
+    for (const r of state.filtered) counts.set(r.g, (counts.get(r.g) || 0) + 1);
+    const activeGroups = counts.size;
+
+    let topGroup = null, topCount = 0;
+    for (const [g, c] of counts) if (c > topCount) { topGroup = g; topCount = c; }
+    const topShare = total > 0 ? ((topCount / total) * 100).toFixed(1) : '0';
+
+    // Split-half trend (2nd half vs 1st half of the current window)
+    const sorted = [...state.filtered].sort((a, b) => a.ts - b.ts);
+    const mid = Math.floor(sorted.length / 2);
+    const first  = sorted.slice(0, mid);
+    const second = sorted.slice(mid);
+    const firstN = first.length, secondN = second.length;
+    const trendPct = firstN > 0 ? ((secondN - firstN) / firstN) * 100 : null;
+
+    // Per-group movers
+    const firstG = new Map(), secondG = new Map();
+    for (const r of first)  firstG.set(r.g,  (firstG.get(r.g)  || 0) + 1);
+    for (const r of second) secondG.set(r.g, (secondG.get(r.g) || 0) + 1);
+    const all = new Set([...firstG.keys(), ...secondG.keys()]);
+    const movers = [];
+    for (const g of all) {
+      const p = firstG.get(g) || 0;
+      const c = secondG.get(g) || 0;
+      const raw = c - p;
+      const pct = p > 0 ? (raw / p) * 100 : null;
+      movers.push({ g, p, c, raw, pct, isNew: p === 0 && c > 0, isGone: c === 0 && p > 0 });
+    }
+    movers.sort((a, b) => Math.abs(b.raw) - Math.abs(a.raw));
+    return { total, activeGroups, topGroup, topCount, topShare, trendPct, movers };
+  }
+
+  function renderSummary() {
+    const s = computeSummary();
+    $kpi('posts').textContent  = s.total.toLocaleString();
+    $kpi('groups').textContent = s.activeGroups;
+    $kpi('top').textContent    = s.topGroup ? s.topGroup.replace(/\b\w/g, c => c.toUpperCase()) : '—';
+    $kpi('top_sub').textContent= s.topGroup ? `${s.topCount} posts · ${s.topShare}%` : '';
+
+    const $trend = $kpi('trend');
+    if ($trend) {
+      if (s.trendPct === null) {
+        $trend.textContent = '—';
+        $trend.className = 'movers-trend delta-flat';
+      } else {
+        const v = Math.round(s.trendPct * 10) / 10;
+        $trend.textContent = (v > 0 ? '▲ +' : v < 0 ? '▼ ' : '= ') + v + '%';
+        $trend.className = 'movers-trend ' + (v > 0 ? 'delta-up-strong' : v < 0 ? 'delta-down-strong' : 'delta-flat');
+      }
+    }
+
+    // Movers list — top 5 by |raw|
+    if ($movers) {
+      $movers.innerHTML = '';
+      const top = s.movers.slice(0, 5);
+      if (top.length === 0) {
+        $movers.innerHTML = '<li class="muted">No data</li>';
+      } else {
+        for (const m of top) {
+          const li = document.createElement('li');
+          const tag = m.isNew ? '<span class="delta-badge delta-new">NEW</span>'
+                   : m.isGone ? '<span class="delta-badge delta-down-strong">GONE</span>'
+                   : (m.raw > 0 ? '<span class="delta-badge delta-up-strong">▲ +' + m.raw + '</span>'
+                              : m.raw < 0 ? '<span class="delta-badge delta-down-strong">▼ ' + m.raw + '</span>'
+                                          : '<span class="delta-badge delta-flat">= 0</span>');
+          li.innerHTML = `
+            <span class="mover-dot" style="background:${colorFor(m.g)}"></span>
+            <span class="mover-name" title="${m.g}">${m.g.replace(/\b\w/g, c => c.toUpperCase())}</span>
+            ${tag}`;
+          $movers.appendChild(li);
+        }
+      }
+    }
+  }
+
+  /* ====================================================================
    *  Chart rendering
    * ==================================================================== */
   const plotOpts = { displayModeBar: false, responsive: true };
@@ -294,30 +415,24 @@ document.addEventListener('DOMContentLoaded', () => {
     const topN   = +$topn.value || 0;
     const top    = topN > 0 ? counts.slice(0, topN).map(d => d.group) : counts.map(d => d.group);
 
+    // Assign distinct palette colours to every visible group (hash-first with
+    // collision fallback) so the N visible series are guaranteed unique.
+    assignVisibleColors(top);
+
+    renderSummary();
     updateStatus(counts, topN);
 
-    // --- Bar ---
+    // --- Bar (per-bar colors, consistent with dots across the site) ---
     const barData = topN > 0 ? counts.slice(0, topN) : counts;
     Plotly.react('chart-bar', [{
       type: 'bar',
       x: barData.map(d => d.group),
       y: barData.map(d => d.count),
+      marker: { color: barData.map(d => colorFor(d.group)) },
       hovertemplate: '%{x}: %{y} posts<extra></extra>'
     }], baseLayout({
       margin: { l:60, r:10, t:10, b:80 },
       xaxis: { tickangle:-35, automargin:true }
-    }), plotOpts);
-
-    // --- Pie ---
-    const pieData = topN > 0 ? counts.slice(0, topN) : counts;
-    Plotly.react('chart-pie', [{
-      type: 'pie',
-      labels: pieData.map(d => d.group),
-      values: pieData.map(d => d.count),
-      textinfo: 'label+percent',
-      hovertemplate: '%{label}: %{value} posts<extra></extra>'
-    }], baseLayout({
-      margin: { l:10, r:10, t:10, b:10 }
     }), plotOpts);
 
     // --- Stacked area ---
@@ -327,6 +442,8 @@ document.addEventListener('DOMContentLoaded', () => {
       return {
         type: 'scatter', mode: 'lines', name: g,
         x: agg.keys, y: row, stackgroup: 'one',
+        line:      { color: colorFor(g), width: 1 },
+        fillcolor: colorForAlpha(g, 0.55),
         hovertemplate: $bucket.value + ': %{x}<br>' + valLabel() + ': %{y}<extra>' + g + '</extra>'
       };
     });
@@ -336,49 +453,19 @@ document.addEventListener('DOMContentLoaded', () => {
       xaxis: { tickangle:-20, automargin:true }
     }), plotOpts);
 
-    // --- Heatmap ---
-    const hmY = [...top].reverse();
-    const hmZ = hmY.map(g => {
-      const idx = agg.groups.indexOf(g);
-      return idx >= 0 ? agg.matrix[idx] : [];
-    });
-    Plotly.react('chart-heatmap', [{
-      type: 'heatmap',
-      x: agg.keys, y: hmY, z: hmZ,
-      colorscale: 'Portland',
-      hovertemplate: $bucket.value + ': %{x}<br>Group: %{y}<br>' + valLabel() + ': %{z}<extra></extra>'
-    }], baseLayout({
-      margin: { l:90, r:10, t:10, b:40 },
-      yaxis: { automargin:true }
-    }), plotOpts);
-
     // --- Scatter timeline ---
     const scatterTraces = top.map(g => {
       const pts = state.filtered.filter(x => x.g === g).sort((a, b) => a.ts - b.ts);
       return {
         type: 'scatter', mode: 'markers', name: g,
         x: pts.map(p => p.ts), y: pts.map(() => g),
+        marker: { color: colorFor(g), size: 8 },
         hovertemplate: '%{x|%Y-%m-%d %H:%M:%S}<extra>' + g + '</extra>'
       };
     });
     Plotly.react('chart-scatter', scatterTraces, baseLayout({
       margin: { l:80, r:10, t:10, b:40 },
       yaxis: { type:'category', automargin:true }
-    }), plotOpts);
-
-    // --- Sparklines ---
-    const sparkTraces = top.map(g => {
-      const idx = agg.groups.indexOf(g);
-      const row = idx >= 0 ? agg.matrix[idx] : [];
-      return {
-        type: 'scatter', mode: 'lines', name: g,
-        x: agg.keys, y: row,
-        hovertemplate: '%{x}<br>' + g + ': %{y}<extra></extra>'
-      };
-    });
-    Plotly.react('chart-sparks', sparkTraces, baseLayout({
-      margin: { l:60, r:10, t:10, b:50 },
-      xaxis: { tickangle:-20, automargin:true }
     }), plotOpts);
   }
 

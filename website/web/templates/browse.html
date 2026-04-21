@@ -1,0 +1,163 @@
+{% extends "base.html" %}
+
+{% block title %}RansomLook — Browse{% endblock %}
+
+{% macro health_badge(up, total) -%}
+  {% set ratio = (up / total) if total else 0 %}
+  {% if up == 0 %}
+    <span class="badge-status badge-down" title="All mirrors offline">{{ up }}/{{ total }}</span>
+  {% elif ratio >= 0.5 %}
+    <span class="badge-status badge-up" title="{{ (ratio*100)|round|int }}% mirrors up">{{ up }}/{{ total }}</span>
+  {% else %}
+    <span class="badge-status badge-degraded" title="{{ (ratio*100)|round|int }}% mirrors up — degraded">{{ up }}/{{ total }}</span>
+  {% endif %}
+{%- endmacro %}
+
+{% macro type_url(t, name) -%}
+  {%- if t == 'group' -%}/group/{{ name|urlencode }}
+  {%- elif t == 'market' -%}/market/{{ name|urlencode }}
+  {%- elif t == 'actor' -%}/actor/{{ name|urlencode }}
+  {%- endif -%}
+{%- endmacro %}
+
+{% block content %}
+<section class="hero">
+  <div class="container">
+    <h1>Browse</h1>
+    <p class="lead">{{ _('Groups, markets/forums and threat actors in one place.') if _ else 'Groups, markets/forums and threat actors in one place.' }}</p>
+  </div>
+</section>
+
+<section class="metrics-section">
+  <div class="container">
+
+    <div class="browse-filters pad-mb">
+      <div class="bf-row bf-row--search">
+        <div class="field field--search bf-search">
+          <label class="sr-only" for="browse-q">Search</label>
+          <input id="browse-q" class="input" type="search"
+                 autocomplete="off" spellcheck="false"
+                 aria-label="Search across groups, markets and actors"
+                 placeholder="Search name or alias… (Ctrl/Cmd+K)"
+                 value="{{ query }}">
+          <button class="input-clear" type="button" aria-label="Clear search">×</button>
+        </div>
+      </div>
+
+      <div class="bf-row bf-row--filters">
+        <nav class="browse-tabs" role="tablist" aria-label="Entity type">
+          <button class="tab-btn" role="tab" data-tab="all"    aria-selected="{{ 'true' if active_tab == 'all' else 'false' }}">
+            All <span class="tab-count">{{ counts['all'] }}</span>
+          </button>
+          <button class="tab-btn" role="tab" data-tab="group"  aria-selected="{{ 'true' if active_tab == 'group' else 'false' }}">
+            Groups <span class="tab-count">{{ counts['group'] }}</span>
+          </button>
+          <button class="tab-btn" role="tab" data-tab="market" aria-selected="{{ 'true' if active_tab == 'market' else 'false' }}">
+            Markets <span class="tab-count">{{ counts['market'] }}</span>
+          </button>
+          <button class="tab-btn" role="tab" data-tab="actor"  aria-selected="{{ 'true' if active_tab == 'actor' else 'false' }}">
+            Actors <span class="tab-count">{{ counts['actor'] }}</span>
+          </button>
+        </nav>
+
+        <div class="health-chips" aria-label="Filter by health"{% if active_tab == 'actor' %} hidden{% endif %}>
+          <button class="health-chip" type="button" data-health="healthy"  title="At least 50% of mirrors up" aria-pressed="false">
+            <span class="dot dot-healthy"></span> Healthy
+          </button>
+          <button class="health-chip" type="button" data-health="degraded" title="Fewer than 50% of mirrors up" aria-pressed="false">
+            <span class="dot dot-degraded"></span> Degraded
+          </button>
+          <button class="health-chip" type="button" data-health="offline"  title="No mirror up" aria-pressed="false">
+            <span class="dot dot-offline"></span> Offline
+          </button>
+        </div>
+      </div>
+
+      <div class="bf-row bf-row--alpha">
+        <div class="alpha-bar" aria-label="Alphabet filter">
+          {% for l in 'ABCDEFGHIJKLMNOPQRSTUVWXYZ' %}
+            <button class="alpha-btn" type="button" data-letter="{{ l }}">{{ l }}</button>
+          {% endfor %}
+          <button class="alpha-btn" type="button" data-letter="0-9" title="Names starting with a digit">0–9</button>
+          <button class="alpha-btn" type="button" data-letter="#" title="Other / symbols">#</button>
+          <button class="alpha-btn alpha-clear" type="button" data-letter="">All</button>
+        </div>
+        <div class="filters-meta"><span id="browse-count"></span></div>
+      </div>
+    </div>
+
+    <div id="browse-grid" class="card-grid">
+      {% for it in items %}
+        {% set first = it['name'][:1]|upper %}
+        {% if first|length == 1 and first.isalpha() %}
+          {% set letter = first %}
+        {% elif first|length == 1 and first.isdigit() %}
+          {% set letter = '0-9' %}
+        {% else %}
+          {% set letter = '#' %}
+        {% endif %}
+        {% set health = '' %}
+        {% if it['type'] in ('group','market') %}
+          {% if it['up'] == 0 %}{% set health = 'offline' %}
+          {% elif it['total'] and (it['up'] / it['total']) >= 0.5 %}{% set health = 'healthy' %}
+          {% else %}{% set health = 'degraded' %}
+          {% endif %}
+        {% endif %}
+        <a class="item-card card-type-{{ it['type'] }}"
+           href="{{ type_url(it['type'], it['name']) }}"
+           data-type="{{ it['type'] }}"
+           data-name="{{ it['name']|lower }}"
+           data-aliases="{{ it['aliases']|map('lower')|join(' ') }}"
+           data-letter="{{ letter }}"
+           data-health="{{ health }}">
+          {% set initial = it['name'][:1]|upper %}
+          <div class="card-logo" aria-hidden="true" data-initial="{{ initial }}">
+            {% if it['logo'] %}
+              <img src="{{ it['logo'] }}" alt="" loading="lazy" decoding="async">
+            {% else %}
+              <div class="card-logo-placeholder">{{ initial }}</div>
+            {% endif %}
+          </div>
+          <div class="card-body">
+            <div class="card-head">
+              <h3 class="card-title">{{ it['name']|title }}</h3>
+              <span class="card-type-chip card-type-chip--{{ it['type'] }}">{{ it['type'] }}</span>
+            </div>
+
+            <div class="card-badges">
+              {% if it['type'] in ('group','market') %}
+                {{ health_badge(it['up'], it['total']) }}
+                {% if it['parser_enabled'] %}<span class="badge-neutral" title="Parser enabled">parser</span>{% endif %}
+              {% else %}
+                {% if it['has_wanted'] %}<span class="badge-status badge-down" title="Wanted listing (FBI/Europol/Interpol)">wanted</span>{% endif %}
+                {% if it['aliases']|length > 0 %}<span class="badge-neutral" title="Known aliases">{{ it['aliases']|length }} alias{{ '' if it['aliases']|length == 1 else 'es' }}</span>{% endif %}
+              {% endif %}
+              {% if it['private'] %}<span class="badge-private">private</span>{% endif %}
+            </div>
+
+            {% if it['meta'] %}
+              <p class="card-meta">{{ it['meta'] }}</p>
+            {% endif %}
+          </div>
+        </a>
+      {% endfor %}
+    </div>
+
+    <p id="browse-empty" class="prose" style="display:none;color:var(--muted);text-align:center;padding:32px 0">
+      {{ _('No matches.') if _ else 'No matches.' }}
+    </p>
+
+  </div>
+</section>
+
+<script
+  src="{{ url_for('static', filename='js/browse.js') }}"
+  integrity="{{ get_sri('static','browse.js') }}"
+  crossorigin="anonymous"
+  defer></script>
+
+<script type="application/json" id="browse-bootstrap">
+{ "activeTab": "{{ active_tab }}", "query": {{ query|tojson }} }
+</script>
+
+{% endblock %}

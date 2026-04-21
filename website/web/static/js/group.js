@@ -8,11 +8,18 @@ document.addEventListener('DOMContentLoaded', () => {
     if (!series || !series.length) { el.textContent = '\u2014'; return; }
 
     const x = series.map((v, i) => i);
-    const data = [{ x, y: series, mode: 'lines', hoverinfo: 'skip', line: { width: 2 }, connectgaps: true }];
+    const colors = series.map(v => v ? '#10b981' : '#ef4444');  // green=up, red=down
+    const data = [{
+      x, y: series.map(() => 1),  // all bars same height, color encodes status
+      type: 'bar',
+      marker: { color: colors },
+      hoverinfo: 'skip',
+    }];
     const layout = {
-      margin: { l:2, r:2, t:0, b:0 }, height: 28, width: 120,
+      margin: { l:2, r:2, t:2, b:2 }, height: 28, width: Math.max(series.length * 6, 40),
       paper_bgcolor: 'rgba(0,0,0,0)', plot_bgcolor: 'rgba(0,0,0,0)',
-      xaxis: { visible: false }, yaxis: { visible: false, range: [0, 1] }
+      xaxis: { visible: false }, yaxis: { visible: false, range: [0, 1.2] },
+      bargap: 0.15,
     };
     if (window.Plotly) Plotly.newPlot(el, data, layout, { displayModeBar: false, staticPlot: true });
     else el.textContent = '\u2014';

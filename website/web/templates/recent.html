@@ -4,37 +4,90 @@
 
 {% block content %}
 
-<!-- Hero -->
 <section class="hero">
   <div class="container">
     <h1>Recent posts</h1>
-    <p class="lead"><em>Last 100 posts</em></p>
+    <p class="lead"><em>Last {{ data|length }} posts</em></p>
+
+    {# Sparkline: posts per hour, last 24h #}
+    {% set maxv = (activity|max) if activity|length else 0 %}
+    {% set total24 = activity|sum %}
+    <div class="spark-band" aria-label="Posts per hour, last 24 hours">
+      <div class="activity-head">
+        <span class="live-dot" aria-hidden="true"></span>
+        <span class="activity-label">Activity · last 24h</span>
+        <span class="spark-total">{{ total24 }} post{{ '' if total24 == 1 else 's' }}</span>
+      </div>
+      <svg class="hero-spark" viewBox="0 0 300 48" preserveAspectRatio="none" aria-hidden="true">
+        <defs><linearGradient id="hero-spark-grad" x1="0" x2="0" y1="0" y2="1"><stop offset="0%" stop-color="currentColor" stop-opacity=".55"/><stop offset="100%" stop-color="currentColor" stop-opacity="0"/></linearGradient></defs>
+        {% set n = activity|length %}
+        {% set bw = ((300 - (n - 1) * 1.5) / n)|round(3) %}
+        {% for v in activity %}
+          {% set h = ((v / maxv) * 42)|round(2) if maxv else 0 %}
+          {% set x = loop.index0 * (bw + 1.5) %}
+          {% set y = 45 - h %}
+          <rect x="{{ x }}" y="{{ y }}" width="{{ bw }}" height="{{ h if h > 0 else 1.2 }}" rx="1">
+            <title>{{ 23 - loop.index0 }}h ago · {{ v }} post{{ '' if v == 1 else 's' }}</title>
+          </rect>
+        {% endfor %}
+      </svg>
+      <div class="spark-axis">
+        <span>-24h</span>
+        <span>-12h</span>
+        <span>now</span>
+      </div>
+    </div>
   </div>
 </section>
 
-<!-- Tableau recent -->
 <section class="metrics-section">
   <div class="container">
+
+    {# Filters #}
+    <div class="recent-filters pad-mb">
+      <div class="field field--search recent-search">
+        <label class="sr-only" for="recent-q">Search</label>
+        <input id="recent-q" class="input" type="search"
+               autocomplete="off" spellcheck="false"
+               aria-label="Filter posts by title or group"
+               placeholder="Filter by title or group…">
+        <button class="input-clear" type="button" aria-label="Clear">×</button>
+      </div>
+      <select id="recent-group" class="input recent-group" aria-label="Filter by group">
+        <option value="">All groups ({{ groups|length }})</option>
+        {% for g in groups %}
+          <option value="{{ g|lower }}">{{ g|title }}</option>
+        {% endfor %}
+      </select>
+      <span id="recent-count" class="recent-count"></span>
+    </div>
+
     {% if data and data|length %}
       <div class="table-card">
         <div class="table-scroll">
-          <table class="rl-table" aria-label="Recent posts">
+          <table class="rl-table rl-table--recent" aria-label="Recent posts">
             <thead>
               <tr>
-                <th style="width:10%">Date</th>
+                <th style="width:18%">Date</th>
                 <th>Title</th>
-                <th style="width:16%">Group</th>
+                <th style="width:22%">Group</th>
               </tr>
             </thead>
-            <tbody>
+            <tbody id="recent-rows">
               {% for entry in data %}
-                <tr>
-                  <td>
-                    <time datetime="{{ entry['discovered'] }}">{{ entry['discovered'].split(' ')[0] }}</time>
+                {% set gname = entry['group_name']|lower %}
+                <tr data-group="{{ gname }}" data-title="{{ entry['post_title']|lower }}">
+                  <td class="recent-date">
+                    <time datetime="{{ entry['discovered'] }}" data-ts="{{ entry['discovered'] }}">
+                      {{ entry['discovered'] }}
+                    </time>
                   </td>
-                  <td>{{ entry['post_title'] }}</td>
+                  <td class="recent-title">{{ entry['post_title'] }}</td>
                   <td>
-                    <a href="/group/{{ entry['group_name'] }}">{{ entry['group_name'] }}</a>
+                    <a class="recent-group-link" href="/group/{{ entry['group_name']|urlencode }}">
+                      <span class="group-dot" data-group-dot="{{ gname }}" aria-hidden="true"></span>
+                      <span>{{ entry['group_name']|title }}</span>
+                    </a>
                   </td>
                 </tr>
               {% endfor %}
@@ -42,10 +95,20 @@
           </table>
         </div>
       </div>
+      <p id="recent-empty" class="prose" style="display:none;color:var(--muted);text-align:center;padding:18px 0">
+        No matches.
+      </p>
     {% else %}
       <p class="prose" style="color:var(--muted)">No recent items found.</p>
     {% endif %}
+
   </div>
 </section>
+
+<script
+  src="{{ url_for('static', filename='js/recent.js') }}"
+  integrity="{{ get_sri('static','recent.js') }}"
+  crossorigin="anonymous"
+  defer></script>
 
 {% endblock %}

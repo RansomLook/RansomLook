@@ -6,8 +6,17 @@
 
 <section class="hero">
   <div class="container">
-    <h1>{{ group_name|title }}</h1>
-    <p class="lead">Original ransom notes collected for this group.</p>
+    <h1>
+      <span class="group-dot" style="background:{{ group_name|lower|palette_color }}" aria-hidden="true"></span>
+      {{ group_name|title }}
+    </h1>
+    <p class="lead">
+      Original ransom notes collected for this group.
+      {% if data %}<strong>{{ data|length }}</strong> note{{ '' if data|length == 1 else 's' }} available.{% endif %}
+    </p>
+    <div class="cta-row">
+      <a class="btn btn-secondary" href="/group/{{ group_name|urlencode }}">View group</a>
+    </div>
   </div>
 </section>
 

@@ -5,129 +5,148 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>{% block title %}RansomLook — {{ _('Real‑time ransomware intelligence (open data)') if _ else 'Real‑time ransomware intelligence (open data)' }}{% endblock %}</title>
   <meta name="description" content="{{ _('Open, searchable ransomware group intelligence with live stats, posts and an API.') if _ else 'Open, searchable ransomware group intelligence with live stats, posts and an API.' }}">
+
+  {# Favicons #}
+  <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='favicon.ico') }}">
+  <link rel="icon" type="image/png" sizes="16x16"  href="{{ url_for('static', filename='img/favicon-16.png') }}">
+  <link rel="icon" type="image/png" sizes="32x32"  href="{{ url_for('static', filename='img/favicon-32.png') }}">
+  <link rel="icon" type="image/png" sizes="192x192" href="{{ url_for('static', filename='img/icon-192.png') }}">
+  <link rel="apple-touch-icon" sizes="180x180" href="{{ url_for('static', filename='img/apple-touch-icon.png') }}">
+
+  {# Open Graph / Twitter preview — image is regenerated every 30 min with live stats #}
+  <meta property="og:title" content="{{ self.title() }}">
+  <meta property="og:description" content="Open ransomware intelligence — groups, markets, actors, crypto, stats.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="{{ request.url }}">
+  <meta property="og:image" content="{{ url_for('og_image', _external=True) }}">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:image" content="{{ url_for('og_image', _external=True) }}">
+
   <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}" integrity="{{get_sri('static', 'main.css')}}">
   <script defer src="{{ url_for('static', filename='js/main.js') }}" integrity="{{get_sri('static', 'main.js')}}"></script>
+  <script defer src="{{ url_for('static', filename='js/rl-common.js') }}" integrity="{{get_sri('static', 'rl-common.js')}}"></script>
   <link rel="alternate" type="application/rss+xml" title="RansomLook — Recent posts" href="/rss.xml">
 </head>
 <body>
-  <header class="site-header">
-  <div class="container header-inner">
-    <!-- Brand (left) -->
-    <a class="brand" href="/" aria-label="RansomLook home">
-      <img src="{{ url_for('static', filename='ransomlook.svg') }}" alt="RansomLook logo" width="28" height="28">
-      {% set site_name = 'RansomLook' %}
-      <span class="brand-name" data-name="{{ site_name }}">{{ site_name }}</span>
-   </a>
+{%- macro nav_link(href, label, icon, match=None, title=None) -%}
+  {%- set m = match or href -%}
+  <li><a href="{{ href }}" title="{{ title or label }}"{% if request.path == m or (m != '/' and request.path.startswith(m)) %} aria-current="page" class="active"{% endif %}>
+    <span class="nav-icon" aria-hidden="true">{{ icon|safe }}</span>
+    <span class="nav-label">{{ label }}</span>
+  </a></li>
+{%- endmacro -%}
 
-    <!-- Primary nav (center) -->
-    <nav class="nav-main" aria-label="Primary">
-      
-      <!-- Search button (always visible near burger) -->
-      <button class="nav-toggle" aria-label="Toggle navigation">☰</button>
-      <ul class="nav-links">
-  <li>
-    <a href="/recent" {% if request.path.startswith('/recent') %}aria-current="page" class="active"{% endif %}>{{ _('Recent') if _ else 'Recent' }}</a>
-  </li>
-  <li>
-    <a href="/groups" {% if request.path.startswith('/groups') %}aria-current="page" class="active"{% endif %}>{{ _('Groups') if _ else 'Groups' }}</a>
-  </li>
-  <li>
-    <a href="/markets" {% if request.path.startswith('/markets') %}aria-current="page" class="active"{% endif %}>{{ _('Markets/Forums') if _ else 'Markets/Forums' }}</a>
-  </li>
-  <li>
-    <a href="/hot" title="Trending" {% if request.path.startswith('/hot') %}aria-current="page" class="active"{% endif %}>Trending</a>
-  <li>
-    <a href="/actors" title="Actors" {% if request.path.startswith('/actors') %}aria-current="page" class="active"{% endif %}>Actors</a>
-  </li>
+{%- set ic_recent   = '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>' -%}
+{%- set ic_browse   = '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>' -%}
+{%- set ic_trending = '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 17 9 11 13 15 21 7"/><polyline points="14 7 21 7 21 14"/></svg>' -%}
+{%- set ic_stats    = '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="20" x2="4" y2="10"/><line x1="10" y1="20" x2="10" y2="4"/><line x1="16" y1="20" x2="16" y2="14"/><line x1="21" y1="20" x2="3" y2="20"/></svg>' -%}
+{%- set ic_crypto   = '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M9 8h5a2.5 2.5 0 0 1 0 5H9m0 0h6a2.5 2.5 0 0 1 0 5H9m0-10v12M11 5v2M11 17v2"/></svg>' -%}
+{%- set ic_leaks    = '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3s6 7 6 12a6 6 0 0 1-12 0c0-5 6-12 6-12z"/></svg>' -%}
+{%- set ic_notes    = '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/><polyline points="14 3 14 9 20 9"/><line x1="8" y1="13" x2="16" y2="13"/><line x1="8" y1="17" x2="13" y2="17"/></svg>' -%}
+{%- set ic_rf       = '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="4"/><path d="M5 8v11a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8"/><line x1="10" y1="13" x2="14" y2="13"/></svg>' -%}
+{%- set ic_docs     = '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5a2 2 0 0 1 2-2h9l5 5v13a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2z"/><polyline points="15 3 15 8 20 8"/></svg>' -%}
+{%- set ic_glossary = '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5a2 2 0 0 1 2-2h13v16H6a2 2 0 0 0-2 2z"/><line x1="8" y1="8" x2="15" y2="8"/><line x1="8" y1="12" x2="15" y2="12"/></svg>' -%}
+{%- set ic_about    = '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><line x1="12" y1="11" x2="12" y2="16"/><circle cx="12" cy="8" r="1" fill="currentColor"/></svg>' -%}
 
-  {% set more_active = request.path.startswith('/crypto') or request.path.startswith('/leaks') or request.path.startswith('/notes') or request.path.startswith('/stats') or request.path.startswith('/doc') or request.path.startswith('/about') or request.path == '/RF' %}
-  <li class="more">
-    <details>
-      <summary aria-haspopup="menu" aria-expanded="false" {% if more_active %}class=\"active\" aria-current=\"page\"{% endif %}>More</summary>
-      <ul class="more-menu" role="menu">
-        <li role="none">
-          <a role="menuitem" href="/crypto" title="Cryptocurrencies" {% if request.path.startswith('/crypto') %}aria-current="page" class="active"{% endif %}>Cryptocurrencies</a>
-        </li>
-        <li role="none">
-          <a role="menuitem" href="/leaks" title="Leaks" {% if request.path.startswith('/leaks') %}aria-current="page" class="active"{% endif %}>Leaks</a>
-        </li>
-        <li role="none">
-          <a role="menuitem" href="/notes" title="Notes" {% if request.path.startswith('/notes') %}aria-current="page" class="active"{% endif %}>Ransomware Notes</a>
-        </li>
-        <li role="none">
-          <a role="menuitem" href="/stats" {% if request.path.startswith('/stats') %}aria-current="page" class="active"{% endif %}>{{ _('Stats') if _ else 'Stats' }}</a>
-        </li>
-        {% if activatedRF %}
-        <li role="none">
-          <a role="menuitem" href="{{ url_for('rf') }}" title="RF Dumps" {% if request.path == '/RF' %}aria-current="page" class="active"{% endif %}>RF Dumps</a>
-        </li>
-        {% endif %}
-        <li role="none">
-          <a role="menuitem" href="/doc/" {% if request.path.startswith('/doc') %}aria-current="page" class="active"{% endif %}>{{ _('Docs') if _ else 'Docs' }}</a>
-        </li>
-        <li role="none">
-          <a role="menuitem" href="/glossary" {% if request.path.startswith('/glossary') %}aria-current="page" class="active"{% endif %}>{{ _('Glossary') if _ else 'Glossary' }}</a>
-        </li>
-        <li role="none">
-          <a role="menuitem" href="/about" {% if request.path.startswith('/about') %}aria-current="page" class="active"{% endif %}>{{ _('About') if _ else 'About' }}</a>
-        </li>
-      </ul>
-    </details>
-  </li>
+<div class="app-shell">
+  <div class="sidebar-backdrop" data-close-drawer hidden></div>
 
-  {% if current_user.is_authenticated %}
-    <li class="nav-login">
-      <a href="/admin" {% if request.path.startswith('/admin') %}aria-current="page" class="active"{% endif %}>Admin</a>
-    </li>
-  {% else %}
-    <li class="nav-login">
-      <a href="/login" {% if request.path.startswith('/login') %}aria-current="page" class="active"{% endif %}>Login</a>
-    </li>
-  {% endif %}
-
-  <li><button class="icon-btn search-open header-search" data-open="searchModal" title="Search (Ctrl/Cmd+K)">
-        <svg width="20" height="20" viewBox="0 0 24 24" aria-hidden="true">
-          <path d="M10.5 3a7.5 7.5 0 0 1 5.916 12.163l4.21 4.21-1.414 1.414-4.21-4.21A7.5 7.5 0 1 1 10.5 3Zm0 2a5.5 5.5 0 1 0 0 11 5.5 5.5 0 0 0 0-11Z" />
-        </svg>
-        <span class="visually-hidden">Search</span>
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-head">
+      <a class="brand sidebar-brand" href="/" aria-label="RansomLook home">
+        <img src="{{ url_for('static', filename='ransomlook.svg') }}" alt="" width="26" height="26">
+        <span class="brand-name nav-label">RansomLook</span>
+      </a>
+      <button class="sidebar-collapse" type="button" aria-label="Collapse sidebar" title="Collapse / expand">
+        <svg class="ic-collapse" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 6 9 12 15 18"/></svg>
       </button>
-</li>
+    </div>
 
-  <li><button class="icon-btn theme-toggle" title="Toggle dark/light mode" aria-label="Toggle theme">
-        <svg class="icon-sun" width="20" height="20" viewBox="0 0 24 24" aria-hidden="true">
-          <path d="M12 18a6 6 0 1 1 0-12 6 6 0 0 1 0 12Zm0-2a4 4 0 1 0 0-8 4 4 0 0 0 0 8ZM11 1h2v3h-2V1Zm0 19h2v3h-2v-3ZM3.515 4.929l1.414-1.414L7.05 5.636 5.636 7.05 3.515 4.93ZM16.95 18.364l1.414-1.414 2.121 2.121-1.414 1.414-2.121-2.121Zm2.121-14.85 1.414 1.415-2.121 2.121-1.414-1.414 2.121-2.121ZM5.636 16.95l1.414 1.414-2.121 2.121-1.414-1.414 2.121-2.121ZM23 11v2h-3v-2h3ZM4 11v2H1v-2h3Z"/>
-        </svg>
-        <svg class="icon-moon" width="20" height="20" viewBox="0 0 24 24" aria-hidden="true">
-          <path d="M10 6a8 8 0 0 0 11.955 6.956C21.474 18.03 17.2 22 12 22 6.477 22 2 17.523 2 12c0-5.2 3.97-9.474 9.044-9.955A7.963 7.963 0 0 0 10 6Zm-6 6a8 8 0 0 0 8 8 8.006 8.006 0 0 0 6.957-4.045c-.316.03-.636.045-.957.045-5.523 0-10-4.477-10-10 0-.321.015-.641.045-.957A8.006 8.006 0 0 0 4 12Z"/>
-        </svg>
-      </button>
-</li>
+    <nav class="side-nav" aria-label="Primary">
+      <div class="nav-group">
+        <h3 class="nav-group-title">{{ _('Data') if _ else 'Data' }}</h3>
+        <ul>
+          {{ nav_link('/recent',  _('Recent')  if _ else 'Recent', ic_recent) }}
+          {{ nav_link('/browse',  _('Browse')  if _ else 'Browse', ic_browse) }}
+          {{ nav_link('/hot',     'Trending',                      ic_trending, match='/hot') }}
+          {{ nav_link('/stats',   _('Stats')   if _ else 'Stats',  ic_stats) }}
+        </ul>
+      </div>
 
-</ul>
+      <div class="nav-group">
+        <h3 class="nav-group-title">Intel</h3>
+        <ul>
+          {{ nav_link('/crypto', 'Crypto', ic_crypto, title='Cryptocurrencies') }}
+          {{ nav_link('/leaks',  'Leaks',  ic_leaks) }}
+          {{ nav_link('/notes',  'Notes',  ic_notes,  title='Ransomware Notes') }}
+          {% if activatedRF %}
+          {{ nav_link(url_for('rf'), 'RF Dumps', ic_rf, match='/RF') }}
+          {% endif %}
+        </ul>
+      </div>
+
+      <div class="nav-group">
+        <h3 class="nav-group-title">Info</h3>
+        <ul>
+          {{ nav_link('/doc/',     'API',                               ic_docs, match='/doc', title='API documentation (Swagger)') }}
+          {{ nav_link('/glossary', _('Glossary') if _ else 'Glossary', ic_glossary) }}
+          {{ nav_link('/about',    _('About')    if _ else 'About',    ic_about) }}
+        </ul>
+      </div>
     </nav>
 
+    <footer class="sidebar-footer">
+      <a href="https://social.circl.lu/@Ransomlook" target="_blank" rel="noopener" title="Mastodon"><span class="nav-label">Mastodon</span></a>
+      <a href="https://bsky.app/profile/ransomlook.bsky.social" target="_blank" rel="noopener" title="BlueSky"><span class="nav-label">BlueSky</span></a>
+      <a href="https://github.com/RansomLook/RansomLook" target="_blank" rel="noopener" title="GitHub"><span class="nav-label">GitHub</span></a>
+    </footer>
+  </aside>
+
+  <div class="app-main">
+    <header class="topbar">
+      <button class="nav-toggle" aria-label="Open navigation" aria-controls="sidebar" aria-expanded="false">☰</button>
+
+      <div class="topbar-spacer"></div>
+
+      <div class="topbar-actions">
+        {% if current_user.is_authenticated %}
+          <a class="nav-login-btn" href="/admin"{% if request.path.startswith('/admin') %} aria-current="page" class="active"{% endif %}>Admin</a>
+        {% else %}
+          <a class="nav-login-btn" href="/login"{% if request.path.startswith('/login') %} aria-current="page" class="active"{% endif %}>Login</a>
+        {% endif %}
+
+        <button class="icon-btn search-open header-search" data-open="searchModal" title="Search (Ctrl/Cmd+K)">
+          <svg width="20" height="20" viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M10.5 3a7.5 7.5 0 0 1 5.916 12.163l4.21 4.21-1.414 1.414-4.21-4.21A7.5 7.5 0 1 1 10.5 3Zm0 2a5.5 5.5 0 1 0 0 11 5.5 5.5 0 0 0 0-11Z" />
+          </svg>
+          <span class="visually-hidden">Search</span>
+        </button>
+
+        <button class="icon-btn theme-toggle" title="Toggle dark/light mode" aria-label="Toggle theme">
+          <svg class="icon-sun" width="20" height="20" viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M12 18a6 6 0 1 1 0-12 6 6 0 0 1 0 12Zm0-2a4 4 0 1 0 0-8 4 4 0 0 0 0 8ZM11 1h2v3h-2V1Zm0 19h2v3h-2v-3ZM3.515 4.929l1.414-1.414L7.05 5.636 5.636 7.05 3.515 4.93ZM16.95 18.364l1.414-1.414 2.121 2.121-1.414 1.414-2.121-2.121Zm2.121-14.85 1.414 1.415-2.121 2.121-1.414-1.414 2.121-2.121ZM5.636 16.95l1.414 1.414-2.121 2.121-1.414-1.414 2.121-2.121ZM23 11v2h-3v-2h3ZM4 11v2H1v-2h3Z"/>
+          </svg>
+          <svg class="icon-moon" width="20" height="20" viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M10 6a8 8 0 0 0 11.955 6.956C21.474 18.03 17.2 22 12 22 6.477 22 2 17.523 2 12c0-5.2 3.97-9.474 9.044-9.955A7.963 7.963 0 0 0 10 6Zm-6 6a8 8 0 0 0 8 8 8.006 8.006 0 0 0 6.957-4.045c-.316.03-.636.045-.957.045-5.523 0-10-4.477-10-10 0-.321.015-.641.045-.957A8.006 8.006 0 0 0 4 12Z"/>
+          </svg>
+        </button>
+      </div>
+    </header>
+
+    <main id="content">{% block content %}{% endblock %}</main>
+
+    <footer class="site-footer">
+      <div class="container footer-grid">
+        <div>
+          RansomLook © 2022-{{ now().year }} — Contribute on
+          <a href="https://github.com/RansomLook/RansomLook" target="_blank">GitHub</a>
+        </div>
+      </div>
+    </footer>
   </div>
-</header>
-
-
-  <main id="content">{% block content %}{% endblock %}</main>
-
-<footer class="site-footer">
-  <div class="container footer-grid">
-    <div>
-      Follow us on 
-      <a href="https://social.circl.lu/@Ransomlook" target="_blank">Mastodon</a> &amp; 
-      <a href="https://bsky.app/profile/ransomlook.bsky.social" target="_blank">BlueSky</a>
-      – Contact us on
-      <a href="https://www.linkedin.com/company/ransomlook/" target="_blank">LinkedIn</a>
-      – Contribute on 
-      <a href="https://github.com/RansomLook/RansomLook" target="_blank">GitHub</a>
-    </div>
-    <div>
-      RansomLook © 2022-{{ now().year }}
-    </div>
-  </div>
-</footer>
+</div>
 
 <!-- Overlay / Modal de recherche -->
 <div id="searchModal" class="rl-modal" role="dialog" aria-modal="true" aria-labelledby="searchLabel" hidden>

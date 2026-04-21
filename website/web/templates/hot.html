@@ -1,16 +1,84 @@
-
 {% extends "base.html" %}
 
 {% block title %}RansomLook — Trending (last {{ days }} days){% endblock %}
+
+{% macro delta_badge(pct, raw, is_new) -%}
+  {%- if is_new -%}
+    <span class="delta-badge delta-new" title="First seen in current window">NEW</span>
+  {%- elif pct is none -%}
+    <span class="delta-badge delta-flat" title="No activity in previous window">—</span>
+  {%- elif pct >= 50 -%}
+    <span class="delta-badge delta-up-strong" title="{{ raw }} vs previous {{ days }}d">▲ +{{ pct }}%</span>
+  {%- elif pct > 0 -%}
+    <span class="delta-badge delta-up" title="{{ raw }} vs previous {{ days }}d">▲ +{{ pct }}%</span>
+  {%- elif pct <= -50 -%}
+    <span class="delta-badge delta-down-strong" title="{{ raw }} vs previous {{ days }}d">▼ {{ pct }}%</span>
+  {%- elif pct < 0 -%}
+    <span class="delta-badge delta-down" title="{{ raw }} vs previous {{ days }}d">▼ {{ pct }}%</span>
+  {%- else -%}
+    <span class="delta-badge delta-flat" title="Stable vs previous {{ days }}d">= 0%</span>
+  {%- endif -%}
+{%- endmacro %}
+
+{% macro sparkbar(values, width=80, height=24) -%}
+  {%- set vmax = values|max if values|length else 0 -%}
+  {%- set n = values|length -%}
+  {%- set bw = ((width - (n - 1) * 1) / n)|round(2) if n else 0 -%}
+  <svg class="row-spark" viewBox="0 0 {{ width }} {{ height }}" preserveAspectRatio="none" aria-hidden="true">
+    {% for v in values %}
+      {% set h = ((v / vmax) * (height - 2))|round(2) if vmax else 0 %}
+      {% set x = loop.index0 * (bw + 1) %}
+      {% set y = (height - 1) - h %}
+      <rect x="{{ x }}" y="{{ y }}" width="{{ bw }}" height="{{ h if h > 0 else 1.5 }}" rx="1" />
+    {% endfor %}
+  </svg>
+{%- endmacro %}
 
 {% block content %}
 <section class="hero">
   <div class="container">
     <h1>Trending</h1>
-    <p class="lead">Top groups by post volume in the last
-      <strong>{{ days }}</strong> day{{ '' if days == 1 else 's' }}.
-      {% if total_posts %}<span style="opacity:.8">Total posts: {{ total_posts }}</span>{% endif %}
+    <p class="lead">
+      Groups actively posting in the last <strong>{{ days }}</strong> day{{ '' if days == 1 else 's' }}
+      {% if total_posts %}· <strong>{{ total_posts }}</strong> posts{% endif %}
+      {% if global_delta_pct is not none %}
+        · vs prev {{ days }}d:
+        {% if global_delta_pct > 0 %}<span class="delta-up"><strong>+{{ global_delta_pct }}%</strong></span>
+        {% elif global_delta_pct < 0 %}<span class="delta-down"><strong>{{ global_delta_pct }}%</strong></span>
+        {% else %}<span class="muted"><strong>flat</strong></span>
+        {% endif %}
+      {% endif %}
     </p>
+
+    {# Global activity sparkline — daily buckets over the window #}
+    {% if global_daily and days > 1 %}
+      {% set gmax = global_daily|max %}
+      <div class="spark-band" aria-label="Global posts per day">
+        <div class="activity-head">
+          <span class="live-dot" aria-hidden="true"></span>
+          <span class="activity-label">Activity · last {{ days }} days</span>
+          <span class="spark-total">{{ total_posts }} posts</span>
+        </div>
+        <svg class="hero-spark" viewBox="0 0 300 48" preserveAspectRatio="none" aria-hidden="true">
+          <defs><linearGradient id="hero-spark-grad" x1="0" x2="0" y1="0" y2="1"><stop offset="0%" stop-color="currentColor" stop-opacity=".55"/><stop offset="100%" stop-color="currentColor" stop-opacity="0"/></linearGradient></defs>
+          {% set n = global_daily|length %}
+          {% set bw = ((300 - (n - 1) * 1.5) / n)|round(3) %}
+          {% for v in global_daily %}
+            {% set h = ((v / gmax) * 42)|round(2) if gmax else 0 %}
+            {% set x = loop.index0 * (bw + 1.5) %}
+            {% set y = 45 - h %}
+            <rect x="{{ x }}" y="{{ y }}" width="{{ bw }}" height="{{ h if h > 0 else 1.2 }}" rx="1">
+              <title>{{ n - loop.index }}d ago · {{ v }} post{{ '' if v == 1 else 's' }}</title>
+            </rect>
+          {% endfor %}
+        </svg>
+        <div class="spark-axis">
+          <span>-{{ days }}d</span>
+          <span>-{{ (days/2)|int }}d</span>
+          <span>today</span>
+        </div>
+      </div>
+    {% endif %}
   </div>
 </section>
 
@@ -18,39 +86,75 @@
 <section class="metrics-section">
   <div class="container">
 
-    <!-- Controls -->
-    <form action="{{ url_for('hot') }}" method="get" class="search-card pad-mb">
-      <label for="days" class="label" style="margin-right:8px">Window:</label>
-      <select id="days" name="days" class="input" style="max-width:200px;display:inline-block">
-        {% for d in [1,3,7,14,30,90] %}
-          <option value="{{ d }}" {% if days == d %}selected{% endif %}>Last {{ d }} day{{ '' if d == 1 else 's' }}</option>
-        {% endfor %}
-      </select>
-      <button class="btn" type="submit" style="margin-left:8px">Apply</button>
-    </form>
+    {# Controls: window + sort + search #}
+    <div class="recent-filters pad-mb">
+      <form method="get" action="{{ url_for('hot') }}" class="hot-form">
+        <label class="sr-only" for="days">Window</label>
+        <select id="days" name="days" class="input">
+          {% for d in [1,3,7,14,30,90] %}
+            <option value="{{ d }}" {% if days == d %}selected{% endif %}>Last {{ d }}d</option>
+          {% endfor %}
+        </select>
+        <label class="sr-only" for="sort">Sort</label>
+        <select id="sort" name="sort" class="input">
+          <option value="delta"  {% if sort_key == 'delta' %}selected{% endif %}>Trending (Δ%)</option>
+          <option value="volume" {% if sort_key == 'volume' %}selected{% endif %}>Volume</option>
+          <option value="new"    {% if sort_key == 'new' %}selected{% endif %}>New entrants</option>
+        </select>
+        <button type="submit" class="btn btn-secondary">Apply</button>
+        <a class="btn btn-secondary"
+           href="{{ url_for('hot', days=days, sort=sort_key) }}&export=csv"
+           title="Download as CSV"
+           download>Export CSV</a>
+      </form>
+
+      <div class="field field--search hot-search">
+        <label class="sr-only" for="hot-q">Filter</label>
+        <input id="hot-q" class="input" type="search"
+               autocomplete="off" spellcheck="false"
+               placeholder="Filter group name…">
+        <button class="input-clear" type="button" aria-label="Clear">×</button>
+      </div>
+      <span id="hot-count" class="recent-count"></span>
+    </div>
 
     {% if rows and rows|length %}
       <div class="table-card">
         <div class="table-scroll">
-          <table class="rl-table">
+          <table class="rl-table rl-table--hot" aria-label="Trending groups">
             <thead>
               <tr>
-                <th style="width:64px;text-align:right">#</th>
+                <th style="width:44px;text-align:center">#</th>
                 <th>Group</th>
-                <th style="width:140px;text-align:right">Posts</th>
-                <th style="width:200px">Last post</th>
-                <th style="width:120px">Actions</th>
+                <th style="width:80px;text-align:right">Posts</th>
+                <th style="width:110px;text-align:right">Δ {{ days }}d</th>
+                <th style="width:110px">Trend</th>
+                <th style="width:170px">Last post</th>
               </tr>
             </thead>
-            <tbody>
+            <tbody id="hot-rows">
               {% for row in rows %}
-                <tr>
-                  <td class="text-right">{{ loop.index }}</td>
-                  <td><a href="/group/{{ row.group }}">{{ row.group.title() }}</a></td>
-                  <td class="text-right"><strong>{{ row.count }}</strong></td>
-                  <td>{{ row.last_post or '—' }}</td>
+                {% set gslug = row.group|lower %}
+                <tr data-group="{{ gslug }}" data-title="{{ gslug }}">
+                  <td class="text-right hot-rank">
+                    {% if loop.index == 1 %}<span class="medal medal-gold">1</span>
+                    {% elif loop.index == 2 %}<span class="medal medal-silver">2</span>
+                    {% elif loop.index == 3 %}<span class="medal medal-bronze">3</span>
+                    {% else %}{{ loop.index }}{% endif %}
+                  </td>
                   <td>
-                    <a class="btn btn-sm" href="/group/{{ row.group }}">Open</a>
+                    <a class="recent-group-link" href="/group/{{ row.group|urlencode }}">
+                      <span class="group-dot" data-group-dot="{{ gslug }}" aria-hidden="true"></span>
+                      <span>{{ row.group|title }}</span>
+                    </a>
+                  </td>
+                  <td class="text-right"><strong>{{ row.count }}</strong></td>
+                  <td class="text-right">{{ delta_badge(row.delta_pct, row.delta_raw, row.is_new) }}</td>
+                  <td>{{ sparkbar(row.sparkline) }}</td>
+                  <td class="recent-date">
+                    {% if row.last_post %}
+                      <time datetime="{{ row.last_post }}" data-ts="{{ row.last_post }}">{{ row.last_post }}</time>
+                    {% else %}<span class="muted">—</span>{% endif %}
                   </td>
                 </tr>
               {% endfor %}
@@ -58,11 +162,21 @@
           </table>
         </div>
       </div>
+      <p id="hot-empty" class="prose" style="display:none;color:var(--muted);text-align:center;padding:18px 0">
+        No matches.
+      </p>
     {% else %}
       <p class="prose" style="color:var(--muted)">No data for the selected window.</p>
     {% endif %}
+
   </div>
 </section>
 </div>
+
+<script
+  src="{{ url_for('static', filename='js/hot.js') }}"
+  integrity="{{ get_sri('static','hot.js') }}"
+  crossorigin="anonymous"
+  defer></script>
 
 {% endblock %}

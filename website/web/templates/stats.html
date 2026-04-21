@@ -97,6 +97,22 @@
       </form>
     </div>
 
+    <!-- Summary + Top movers -->
+    <div class="stats-summary pad-mb">
+      <div class="stats-summary-kpis" id="stats-kpis">
+        <div class="kpi"><span class="kpi-label">Posts</span><span class="kpi-value" data-kpi="posts">—</span></div>
+        <div class="kpi"><span class="kpi-label">Active groups</span><span class="kpi-value" data-kpi="groups">—</span></div>
+        <div class="kpi"><span class="kpi-label">Top group</span><span class="kpi-value" data-kpi="top">—</span><span class="kpi-sub" data-kpi="top_sub"></span></div>
+      </div>
+      <aside class="stats-movers">
+        <div class="movers-head">
+          <h3>Top movers</h3>
+          <span class="movers-trend" data-kpi="trend" title="Posts in second half of window vs first half">—</span>
+        </div>
+        <ul id="movers-list"><li class="muted">—</li></ul>
+      </aside>
+    </div>
+
     <!-- Status bar -->
     <div id="stats-status" class="stats-status"></div>
 
@@ -115,17 +131,6 @@
 
       <div class="table-card">
         <div class="card-toolbar">
-          <span>Share (pie)</span>
-          <div class="card-toolbar-actions">
-            <button data-expand class="btn btn-secondary btn-sm" type="button" title="Enlarge chart">&#x26F6;</button>
-            <button data-dl="chart-pie" class="btn btn-secondary btn-sm" type="button">PNG</button>
-          </div>
-        </div>
-        <div id="chart-pie" class="chart-h"></div>
-      </div>
-
-      <div class="table-card">
-        <div class="card-toolbar">
           <span>Stacked area</span>
           <div class="card-toolbar-actions">
             <button data-expand class="btn btn-secondary btn-sm" type="button" title="Enlarge chart">&#x26F6;</button>
@@ -137,17 +142,6 @@
 
       <div class="table-card">
         <div class="card-toolbar">
-          <span>Heatmap</span>
-          <div class="card-toolbar-actions">
-            <button data-expand class="btn btn-secondary btn-sm" type="button" title="Enlarge chart">&#x26F6;</button>
-            <button data-dl="chart-heatmap" class="btn btn-secondary btn-sm" type="button">PNG</button>
-          </div>
-        </div>
-        <div id="chart-heatmap" class="chart-h"></div>
-      </div>
-
-      <div class="table-card">
-        <div class="card-toolbar">
           <span>Timeline (scatter)</span>
           <div class="card-toolbar-actions">
             <button data-expand class="btn btn-secondary btn-sm" type="button" title="Enlarge chart">&#x26F6;</button>
@@ -155,17 +149,6 @@
           </div>
         </div>
         <div id="chart-scatter" class="chart-h"></div>
-      </div>
-
-      <div class="table-card">
-        <div class="card-toolbar">
-          <span>Sparklines</span>
-          <div class="card-toolbar-actions">
-            <button data-expand class="btn btn-secondary btn-sm" type="button" title="Enlarge chart">&#x26F6;</button>
-            <button data-dl="chart-sparks" class="btn btn-secondary btn-sm" type="button">PNG</button>
-          </div>
-        </div>
-        <div id="chart-sparks" class="chart-h"></div>
       </div>
     </div>
 

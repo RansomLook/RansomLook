@@ -12,6 +12,7 @@ source/*.html
 source/*.png
 source/logo/**/*.svg
 source/logo/**/*.png
+source/logo/**/**
 source/**/*.html
 source/**/*.torrent
 source/screenshots/*

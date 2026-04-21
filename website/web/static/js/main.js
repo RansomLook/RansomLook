@@ -22,20 +22,52 @@ document.addEventListener('DOMContentLoaded', () => {
   /* ====================================================================
    *  Nav toggle (burger menu)
    * ==================================================================== */
-  const toggle   = document.querySelector('.nav-toggle');
-  const navLinks = document.querySelector('.nav-links');
+  /* Sidebar collapse (desktop only, persisted) */
+  const shell    = document.querySelector('.app-shell');
+  const collapse = document.querySelector('.sidebar-collapse');
+  if (shell && collapse) {
+    try {
+      if (localStorage.getItem('rl.sidebar.collapsed') === '1') shell.classList.add('is-collapsed');
+    } catch (e) { /* noop */ }
+    collapse.addEventListener('click', () => {
+      const now = shell.classList.toggle('is-collapsed');
+      try { localStorage.setItem('rl.sidebar.collapsed', now ? '1' : '0'); } catch (e) {}
+      collapse.setAttribute('aria-label', now ? 'Expand sidebar' : 'Collapse sidebar');
+    });
+  }
 
-  if (toggle && navLinks) {
-    const openNav  = () => { navLinks.classList.add('active'); document.body.classList.add('menu-open'); toggle.setAttribute('aria-expanded','true'); };
-    const closeNav = () => { navLinks.classList.remove('active'); document.body.classList.remove('menu-open'); toggle.setAttribute('aria-expanded','false'); };
+  const toggle   = document.querySelector('.nav-toggle');
+  const sidebar  = document.getElementById('sidebar');
+  const backdrop = document.querySelector('.sidebar-backdrop');
+
+  if (toggle && sidebar) {
+    const openNav = () => {
+      sidebar.classList.add('is-open');
+      if (backdrop) { backdrop.hidden = false; requestAnimationFrame(() => backdrop.classList.add('is-open')); }
+      document.body.classList.add('menu-open');
+      toggle.setAttribute('aria-expanded', 'true');
+    };
+    const closeNav = () => {
+      sidebar.classList.remove('is-open');
+      if (backdrop) { backdrop.classList.remove('is-open'); setTimeout(() => { backdrop.hidden = true; }, 200); }
+      document.body.classList.remove('menu-open');
+      toggle.setAttribute('aria-expanded', 'false');
+    };
 
     toggle.addEventListener('click', e => {
       e.stopPropagation();
-      navLinks.classList.contains('active') ? closeNav() : openNav();
+      sidebar.classList.contains('is-open') ? closeNav() : openNav();
     });
 
-    document.addEventListener('click', e => {
-      if (navLinks.classList.contains('active') && !navLinks.contains(e.target) && e.target !== toggle) closeNav();
+    backdrop?.addEventListener('click', closeNav);
+
+    // Close drawer when clicking a nav link (mobile UX)
+    sidebar.addEventListener('click', e => {
+      if (e.target.closest('.side-nav a') && sidebar.classList.contains('is-open')) closeNav();
+    });
+
+    document.addEventListener('keydown', e => {
+      if (e.key === 'Escape' && sidebar.classList.contains('is-open')) closeNav();
     });
   }
 

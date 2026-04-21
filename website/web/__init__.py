@@ -42,7 +42,7 @@ from flask import (
 from flask_bootstrap import Bootstrap5  # type: ignore
 from flask_login import current_user
 from flask_restx import Api  # type: ignore
-from PIL import Image
+from PIL import Image, ImageDraw, ImageFont
 from PIL.PngImagePlugin import PngInfo
 from valkey import Valkey
 from werkzeug.exceptions import HTTPException
@@ -514,20 +514,132 @@ def inject_global_vars() -> dict[str, bool]:
 
 
 # Getting the error
-# @app.errorhandler(Exception)
-def handle_error(e):  # type: ignore[no-untyped-def]
-    code = 500
-    if isinstance(e, HTTPException):
-        return render_template("40x.html", error=e.name, message=e.description), code
+@app.errorhandler(HTTPException)
+def handle_http_error(e):  # type: ignore[no-untyped-def]
+    return render_template(
+        "40x.html",
+        code=e.code or 500,
+        error=e.name,
+        message=e.description,
+    ), e.code or 500
+
+
+@app.errorhandler(500)
+def handle_500(e):  # type: ignore[no-untyped-def]
     app.logger.error(e)
+    return render_template("500_generic.html", e=e), 500
+
+
+@app.errorhandler(Exception)
+def handle_generic_error(e):  # type: ignore[no-untyped-def]
+    # Let HTTPException fall through to its specific handler
+    if isinstance(e, HTTPException):
+        return handle_http_error(e)
+    app.logger.exception(e)
     return render_template("500_generic.html", e=e), 500
 
 
 @app.route("/favicon.ico")
 def favicon():  # type: ignore[no-untyped-def]
     return send_from_directory(
-        os.path.join(get_homedir(), "website/web/static"), "ransomlook.svg", mimetype="image/svg+xml"
+        os.path.join(get_homedir(), "website/web/static"), "favicon.ico",
+        mimetype="image/vnd.microsoft.icon", max_age=604800,
     )
+
+
+# ─── Open Graph image ───────────────────────────────────────────────────────
+_OG_CACHE: dict[str, Any] = {"bytes": None, "ts": 0.0}
+_OG_TTL_SECONDS = 86400  # 24h — content is static now, long TTL is safe
+
+
+def _load_font(size: int, bold: bool = False) -> Any:
+    """Return a truetype font at `size`, falling back to PIL default if absent."""
+    paths = [
+        "/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf" if bold
+        else "/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf",
+        "/usr/share/fonts/truetype/liberation/LiberationSans-Bold.ttf" if bold
+        else "/usr/share/fonts/truetype/liberation/LiberationSans-Regular.ttf",
+    ]
+    for p in paths:
+        try:
+            return ImageFont.truetype(p, size=size)
+        except Exception:
+            continue
+    return ImageFont.load_default()
+
+
+def _text_w(draw: Any, s: str, font: Any) -> int:
+    """Measure text width, compatible with Pillow ≥10."""
+    try:
+        l, _, r, _ = draw.textbbox((0, 0), s, font=font)
+        return r - l
+    except Exception:
+        return len(s) * (font.size // 2 if hasattr(font, "size") else 8)
+
+
+@app.route("/og-image.png")
+def og_image():  # type: ignore[no-untyped-def]
+    now = time.time()
+    if _OG_CACHE["bytes"] and (now - _OG_CACHE["ts"]) < _OG_TTL_SECONDS:
+        return Response(_OG_CACHE["bytes"], mimetype="image/png",
+                        headers={"Cache-Control": f"public, max-age={_OG_TTL_SECONDS}"})
+
+    W, H = 1200, 630
+    bg     = (15, 17, 23)
+    text   = (229, 231, 235)
+    muted  = (156, 163, 175)
+    accent = (106, 160, 255)
+    panel  = (18, 26, 40)
+
+    img = Image.new("RGB", (W, H), bg)
+    d = ImageDraw.Draw(img)
+
+    # Soft radial-ish accent (horizontal band) for a touch of depth
+    d.rectangle([(0, H - 3), (W, H)], fill=accent)                   # hairline accent at bottom
+    d.rectangle([(0, 0), (W, 3)], fill=panel)                        # subtle top line
+
+    # Centered logo — large enough to be the visual anchor
+    logo_path = os.path.join(str(get_homedir()), "website", "web", "static", "img", "icon-512.png")
+    logo_size = 240
+    cx = W // 2
+    try:
+        logo = Image.open(logo_path).convert("RGBA").resize((logo_size, logo_size), Image.LANCZOS)
+        img.paste(logo, (cx - logo_size // 2, 70), logo)
+    except Exception:
+        d.ellipse([(cx - 80, 100), (cx + 80, 260)], fill=accent)
+
+    # Brand title (centered)
+    f_brand = _load_font(76, bold=True)
+    brand = "RansomLook"
+    bw = _text_w(d, brand, f_brand)
+    d.text((cx - bw // 2, 340), brand, fill=text, font=f_brand)
+
+    # Divider under the brand
+    d.line([(cx - 70, 440), (cx + 70, 440)], fill=accent, width=2)
+
+    # Tagline (centered)
+    f_tag = _load_font(28)
+    tag = "Open ransomware intelligence"
+    tw = _text_w(d, tag, f_tag)
+    d.text((cx - tw // 2, 460), tag, fill=muted, font=f_tag)
+
+    # URL footer (centered)
+    f_url = _load_font(24, bold=True)
+    url_txt = "ransomlook.io"
+    uw = _text_w(d, url_txt, f_url)
+    d.text((cx - uw // 2, 550), url_txt, fill=accent, font=f_url)
+
+    # Encode PNG
+    from io import BytesIO
+    buf = BytesIO()
+    img.save(buf, format="PNG", optimize=True)
+    png = buf.getvalue()
+
+    _OG_CACHE["bytes"] = png
+    _OG_CACHE["ts"] = now
+
+    return Response(png, mimetype="image/png",
+                    headers={"Cache-Control": f"public, max-age={_OG_TTL_SECONDS}"})
 
 
 ldap_config = get_config("generic", "ldap")
@@ -604,6 +716,27 @@ def get_sri(directory: str, filename: str) -> str:
 app.jinja_env.globals.update(get_sri=get_sri)
 
 
+# ── Shared 20-colour palette (mirrors website/web/static/js/*.js) ─────
+_RL_PALETTE = [
+    "#60a5fa", "#ef4444", "#10b981", "#f59e0b", "#a855f7",
+    "#ec4899", "#22d3ee", "#84cc16", "#f97316", "#14b8a6",
+    "#e11d48", "#6366f1", "#65a30d", "#d946ef", "#eab308",
+    "#0ea5e9", "#be123c", "#7c3aed", "#059669", "#c2410c",
+]
+
+
+def palette_color(name: str) -> str:
+    if not name:
+        return _RL_PALETTE[0]
+    h = 0
+    for ch in name:
+        h = (h * 31 + ord(ch)) & 0xFFFFFFFF
+    return _RL_PALETTE[h % len(_RL_PALETTE)]
+
+
+app.jinja_env.filters["palette_color"] = palette_color
+
+
 def suffix(d: int) -> str:
     return "th" if 11 <= d <= 13 else {1: "st", 2: "nd", 3: "rd"}.get(d % 10, "th")
 
@@ -615,46 +748,139 @@ def custom_strftime(fmt, t) -> str:  # type: ignore
 @app.route("/")
 def home():  # type: ignore[no-untyped-def]
     date = custom_strftime("%B {S}, %Y", dt.now()).lower()
-    data = {}
-    data["nbgroups"] = groupcount(0)
-    data["nblocations"] = hostcount(0)
-    data["nbdls"] = hostcountdls(0)
-    data["nbfs"] = hostcountfs(0)
-    data["nbchat"] = hostcountchat(0)
-    data["nbadmin"] = hostcountadmin(0)
-    data["online"] = onlinecount(0)
-    data["nbforum"] = groupcount(3)
-    data["nbforumlocations"] = hostcount(3)
-    data["forumonline"] = onlinecount(3)
-    data["24h"] = postslast24h()
-    data["monthlypost"] = mounthlypostcount()
-    data["month"] = currentmonthstr()  # type: ignore
-    data["90d"] = postssince(90)
-    data["yearlypost"] = poststhisyear()
-    data["year"] = dt.now().year
-    data["nbposts"] = postcount()
-    data["nbparsers"] = parsercount()
-    data["nbactors"] = actorcount()
+
+    # ── Coverage / totals (as before, for the "Coverage" strip) ──────────
+    data: dict[str, Any] = {}
+    data["nbgroups"]     = groupcount(0)
+    data["nbforum"]      = groupcount(3)
+    data["nbactors"]     = actorcount()
     crypto = cryptostats()
     data["nbcryptoaddr"] = crypto["addresses"]
-    data["nbcryptotx"] = crypto["transactions"]
-    data["nbnotes"] = notecount()
-    data["nbleaks"] = leakcount()
-    data["nbrf"] = rfcount()
-    alertposts = defaultdict(list)
+    data["nbnotes"]      = notecount()
+    data["nbleaks"]      = leakcount()
+    data["nbposts"]      = postcount()
+    data["year"]         = dt.now().year
+
+    # ── Insights: posts 7d vs prev 7d, sparkline 30d, movers, latest ─────
+    now = dt.now()
+    win_7d_start  = now - timedelta(days=7)
+    prev_7d_start = now - timedelta(days=14)
+    win_30d_start = now - timedelta(days=30)
+
+    red_posts = Valkey(unix_socket_path=get_socket_path("cache"), db=DB_POSTS)
+
+    def _parse_ts(s: str) -> Optional[dt]:
+        for fmt in ("%Y-%m-%d %H:%M:%S.%f", "%Y-%m-%d %H:%M:%S"):
+            try:
+                return dt.strptime(s, fmt)
+            except Exception:
+                pass
+        return None
+
+    sparkline_30d: list[int] = [0] * 30
+    posts_7d_cur = 0
+    posts_7d_prev = 0
+    group_counts_7d: dict[str, int] = {}
+    group_counts_prev: dict[str, int] = {}
+    all_recent: list[dict[str, Any]] = []
+
+    for key in red_posts.keys():  # type: ignore[union-attr]
+        try:
+            entries = json.loads(red_posts.get(key))  # type: ignore[arg-type]
+        except Exception:
+            continue
+        gname = key.decode() if isinstance(key, (bytes, bytearray)) else str(key)
+        for entry in entries:
+            ts_str = entry.get("discovered") or ""
+            ts = _parse_ts(ts_str)
+            if not ts:
+                continue
+            # 30-day sparkline
+            if ts >= win_30d_start:
+                days_ago = (now - ts).days
+                idx = 29 - days_ago
+                if 0 <= idx < 30:
+                    sparkline_30d[idx] += 1
+            # 7-day window
+            if ts >= win_7d_start:
+                posts_7d_cur += 1
+                group_counts_7d[gname] = group_counts_7d.get(gname, 0) + 1
+                all_recent.append({"group": gname, "title": entry.get("post_title", ""), "ts": ts_str})
+            elif ts >= prev_7d_start:
+                posts_7d_prev += 1
+                group_counts_prev[gname] = group_counts_prev.get(gname, 0) + 1
+
+    # Deltas
+    def _pct(cur: int, prev: int) -> Optional[float]:
+        return round((cur - prev) / prev * 100.0, 1) if prev > 0 else None
+
+    posts_delta_pct  = _pct(posts_7d_cur, posts_7d_prev)
+    groups_7d_n      = len(group_counts_7d)
+    groups_prev_n    = len(group_counts_prev)
+    groups_delta_pct = _pct(groups_7d_n, groups_prev_n)
+
+    # New groups this week (active now, absent from previous)
+    new_groups_n = sum(1 for g in group_counts_7d if g not in group_counts_prev)
+
+    # Top group this week
+    top_group: Optional[str] = None
+    top_group_count = 0
+    top_group_share = 0.0
+    if group_counts_7d:
+        top_group, top_group_count = max(group_counts_7d.items(), key=lambda kv: kv[1])
+        top_group_share = round(top_group_count / posts_7d_cur * 100.0, 1) if posts_7d_cur else 0.0
+
+    # Movers — top 5 by absolute delta
+    movers: list[dict[str, Any]] = []
+    for g in set(group_counts_7d) | set(group_counts_prev):
+        c = group_counts_7d.get(g, 0)
+        p = group_counts_prev.get(g, 0)
+        if c == 0:
+            continue
+        movers.append({
+            "group": g,
+            "cur": c,
+            "prev": p,
+            "raw": c - p,
+            "pct": _pct(c, p),
+            "is_new": p == 0,
+        })
+    movers.sort(key=lambda m: abs(m["raw"]), reverse=True)
+    movers = movers[:5]
+
+    # Latest 5 posts overall
+    all_recent.sort(key=lambda p: p["ts"], reverse=True)
+    latest = all_recent[:5]
+
+    # Legacy alert-on-dashboard block (preserved)
+    alertposts: dict[str, list[Any]] = defaultdict(list)
     alert = get_config("generic", "alertondashboard")
     if alert is True:
-        red = Valkey(unix_socket_path=get_socket_path("cache"), db=DB_ALERTS)
-        groups = red.keys()
-        for entry in groups:  # type: ignore[union-attr]
-            post = json.loads(red.get(entry))  # type: ignore[arg-type]
+        red_alerts = Valkey(unix_socket_path=get_socket_path("cache"), db=DB_ALERTS)
+        for entry in red_alerts.keys():  # type: ignore[union-attr]
+            post = json.loads(red_alerts.get(entry))  # type: ignore[arg-type]
             alertposts[post["type"]].append(post)
+
     logos = get_config("generic", "logos")
     paths = list(logos.keys())
     weights = list(logos.values())
     logo = random.choices(paths, weights=weights, k=1)[0]
 
-    return render_template("index.html", date=date, data=data, alert=alert, posts=alertposts, logo=logo)
+    return render_template(
+        "index.html",
+        date=date, data=data, alert=alert, posts=alertposts, logo=logo,
+        posts_7d=posts_7d_cur,
+        posts_delta_pct=posts_delta_pct,
+        groups_7d=groups_7d_n,
+        groups_delta_pct=groups_delta_pct,
+        new_groups_n=new_groups_n,
+        top_group=top_group,
+        top_group_count=top_group_count,
+        top_group_share=top_group_share,
+        sparkline_30d=sparkline_30d,
+        movers=movers,
+        latest=latest,
+    )
 
 
 @app.route("/recent")
@@ -667,12 +893,36 @@ def recent():  # type: ignore[no-untyped-def]
             entry["group_name"] = key.decode()
             posts.append(entry)
     sorted_posts = sorted(posts, key=lambda x: x["discovered"], reverse=True)
-    recentposts = []
-    for post in sorted_posts:
-        recentposts.append(post)
-        if len(recentposts) == 100:
-            break
-    return render_template("recent.html", data=recentposts)
+    recentposts = sorted_posts[:100]
+
+    # Unique group names for the filter dropdown (preserving display order)
+    seen = set()
+    groups = []
+    for p in recentposts:
+        g = p.get("group_name", "")
+        if g and g not in seen:
+            seen.add(g)
+            groups.append(g)
+    groups.sort(key=str.lower)
+
+    # Hourly activity (last 24h) for the sparkline
+    now = dt.now(timezone.utc)
+    buckets = [0] * 24
+    for p in sorted_posts:  # scan all, not just 100 — 24h window may hold more or fewer
+        ts_str = p.get("discovered") or ""
+        try:
+            ts = parser.parse(ts_str)
+            if ts.tzinfo is None:
+                ts = ts.replace(tzinfo=timezone.utc)
+        except Exception:
+            continue
+        delta = (now - ts).total_seconds()
+        if 0 <= delta < 86400:
+            idx = 23 - int(delta // 3600)
+            if 0 <= idx < 24:
+                buckets[idx] += 1
+
+    return render_template("recent.html", data=recentposts, groups=groups, activity=buckets)
 
 
 # ---- Hot / Trending (Derniers X jours) ----
@@ -682,57 +932,129 @@ def hot():  # type: ignore[no-untyped-def]
         number = int(request.args.get("days", "7"))
     except Exception:
         number = 7
-    if number < 1:
-        number = 1
-    if number > 365:
-        number = 365
+    number = max(1, min(number, 365))
 
-    posts = []
+    sort_key = (request.args.get("sort") or "delta").lower()
+    if sort_key not in ("volume", "delta", "new"):
+        sort_key = "delta"
+
+    now = dt.now()
+    window_start = now - timedelta(days=number)
+    prev_start = now - timedelta(days=2 * number)
+
     red = Valkey(unix_socket_path=get_socket_path("cache"), db=DB_POSTS)
-    actualdate = dt.now() + timedelta(days=-number)
+
+    # Per-group aggregates
+    groups: dict[str, dict[str, Any]] = {}
+    # Global daily bucket (oldest → newest, length = number)
+    global_daily = [0] * number
+
+    def _parse(s: str) -> Optional[dt]:
+        for fmt in ("%Y-%m-%d %H:%M:%S.%f", "%Y-%m-%d %H:%M:%S"):
+            try:
+                return dt.strptime(s, fmt)
+            except Exception:
+                pass
+        return None
 
     for key in red.keys():  # type: ignore[union-attr]
         try:
             entries = json.loads(red.get(key))  # type: ignore[arg-type]
         except Exception:
             continue
+        gname = key.decode() if isinstance(key, (bytes, bytearray)) else str(key)
+        g = gname.lower()
+
         for entry in entries:
-            # parse date
-            dt_obj = None
-            for fmt in ("%Y-%m-%d %H:%M:%S.%f", "%Y-%m-%d %H:%M:%S"):
-                try:
-                    dt_obj = dt.strptime(entry.get("discovered", ""), fmt)
-                    break
-                except Exception:
-                    pass
-            if not dt_obj:
+            ts = _parse(entry.get("discovered", ""))
+            if not ts:
                 continue
-            if dt_obj > actualdate:
-                e = dict(entry)
-                e["group_name"] = key.decode() if isinstance(key, (bytes, bytearray)) else str(key)
-                posts.append(e)
+            if ts >= window_start:
+                rec = groups.setdefault(g, {
+                    "group": gname, "count": 0, "prev_count": 0,
+                    "sparkline": [0] * number,
+                    "last_post": None,
+                })
+                rec["count"] += 1
+                dp = entry.get("discovered")
+                if dp and (rec["last_post"] is None or dp > rec["last_post"]):
+                    rec["last_post"] = dp
+                # Day index: 0 = oldest, number-1 = today
+                days_ago = (now - ts).days
+                idx = number - 1 - days_ago
+                if 0 <= idx < number:
+                    rec["sparkline"][idx] += 1
+                    global_daily[idx] += 1
+            elif ts >= prev_start:
+                rec = groups.setdefault(g, {
+                    "group": gname, "count": 0, "prev_count": 0,
+                    "sparkline": [0] * number,
+                    "last_post": None,
+                })
+                rec["prev_count"] += 1
 
-    by_group = {}
-    for p in posts:
-        g = p.get("group_name", "").lower()
-        if g not in by_group:
-            by_group[g] = {"group": g, "count": 0, "last_post": None}
-        by_group[g]["count"] += 1
-        dp = p.get("discovered")
-        if dp:
-            by_group[g]["last_post"] = max(by_group[g]["last_post"], dp) if by_group[g]["last_post"] else dp
+    rows = []
+    for g, rec in groups.items():
+        prev = rec["prev_count"]
+        cur = rec["count"]
+        if cur == 0:
+            continue  # only show groups active in current window
+        is_new = prev == 0
+        delta_raw = cur - prev
+        delta_pct = None if is_new else round(((cur - prev) / prev) * 100.0, 1)
+        rec["is_new"] = is_new
+        rec["delta_raw"] = delta_raw
+        rec["delta_pct"] = delta_pct
+        rec["sparkline_max"] = max(rec["sparkline"]) if rec["sparkline"] else 0
+        rows.append(rec)
 
-    rows = sorted(by_group.values(), key=lambda x: (x["count"], x["last_post"] or ""), reverse=True)
+    if sort_key == "volume":
+        rows.sort(key=lambda r: (r["count"], r["last_post"] or ""), reverse=True)
+    elif sort_key == "new":
+        rows.sort(key=lambda r: (1 if r["is_new"] else 0, r["count"]), reverse=True)
+    else:  # delta (default) — rank by absolute increase so volume matters
+        rows.sort(
+            key=lambda r: (
+                r["delta_raw"],                                    # absolute Δ (Qilin +11 beats newbie +1)
+                r["delta_pct"] if r["delta_pct"] is not None else 0,
+                r["count"],
+            ),
+            reverse=True,
+        )
 
-    # Total
-    total_posts = len(posts)
+    total_posts = sum(r["count"] for r in rows)
+    total_prev = sum(r["prev_count"] for r in rows)
+    global_delta_pct: Optional[float] = None
+    if total_prev > 0:
+        global_delta_pct = round(((total_posts - total_prev) / total_prev) * 100.0, 1)
+
+    if (request.args.get("export") or "").lower() == "csv":
+        buf = StringIO()
+        w = csv.writer(buf)
+        w.writerow(["rank", "group", "count", "prev_count", "delta_pct", "is_new", "last_post"])
+        for i, r in enumerate(rows, start=1):
+            w.writerow([
+                i, r["group"], r["count"], r["prev_count"],
+                "" if r["delta_pct"] is None else r["delta_pct"],
+                "1" if r["is_new"] else "0",
+                r["last_post"] or "",
+            ])
+        fname = f"ransomlook-trending-{number}d-{window_start.strftime('%Y%m%d')}.csv"
+        return Response(
+            buf.getvalue(), mimetype="text/csv",
+            headers={"Content-Disposition": f'attachment; filename="{fname}"'},
+        )
 
     return render_template(
         "hot.html",
         days=number,
         rows=rows,
         total_posts=total_posts,
-        from_date=actualdate.strftime("%Y-%m-%d"),
+        total_prev=total_prev,
+        global_delta_pct=global_delta_pct,
+        global_daily=global_daily,
+        sort_key=sort_key,
+        from_date=window_start.strftime("%Y-%m-%d"),
     )
 
 
@@ -793,26 +1115,122 @@ def about():  # type: ignore[no-untyped-def]
     return render_template("about.html", logo=logo)
 
 
-@app.route("/groups")
-def groups():  # type: ignore[no-untyped-def]
-    red = Valkey(unix_socket_path=get_socket_path("cache"), db=DB_GROUPS)
+def _first_logo(database: str, name: str) -> Optional[str]:
+    """Return URL path to the first logo file for an entity, or None."""
+    root = os.path.normpath(os.path.join(str(get_homedir()), "source", "logo", database))
+    target = os.path.normpath(os.path.join(root, name))
+    if not (target == root or target.startswith(root + os.sep)):
+        return None
+    if not os.path.isdir(target):
+        return None
+    try:
+        files = sorted(f for f in os.listdir(target) if os.path.isfile(os.path.join(target, f)))
+    except OSError:
+        return None
+    if not files:
+        return None
+    return f"/logo/{database}/{quote(name)}/{quote(files[0])}"
 
-    groups = []
-    for key in red.keys():  # type: ignore[union-attr]
-        entry = json.loads(red.get(key))  # type: ignore[arg-type]
-        if not current_user.is_authenticated and "private" in entry and entry["private"] is True:
-            continue
-        entry["name"] = key.decode()
-        groups.append(entry)
-    groups.sort(key=lambda x: x["name"].lower())
-    for group in groups:
-        for location in group["locations"]:
-            screenfile = "/screenshots/" + group["name"] + "-" + createfile(location["slug"]) + ".png"
-            if os.path.exists(str(get_homedir()) + "/source" + screenfile):
-                location["screen"] = screenfile
+
+@app.route("/browse")
+def browse():  # type: ignore[no-untyped-def]
+    red_g = Valkey(unix_socket_path=get_socket_path("cache"), db=DB_GROUPS)
+    red_m = Valkey(unix_socket_path=get_socket_path("cache"), db=DB_MARKETS)
+    red_a = Valkey(unix_socket_path=get_socket_path("cache"), db=DB_ACTORS)
+    is_public = not current_user.is_authenticated
+
     modules = glob.glob(join(dirname(str(get_homedir()) + "/ransomlook/parsers/"), "*.py"))
-    parserlist = [basename(f)[:-3].split(".")[0] for f in modules if isfile(f) and not f.endswith("__init__.py")]
-    return render_template("groups.html", data=groups, parser=parserlist, type="groups")
+    parserlist = set(
+        basename(f)[:-3].split(".")[0]
+        for f in modules
+        if isfile(f) and not f.endswith("__init__.py")
+    )
+
+    items = []
+
+    def _ingest_host(red: Valkey, type_label: str, logo_db: str) -> None:
+        for key in red.keys():  # type: ignore[union-attr]
+            try:
+                entry = json.loads(red.get(key))  # type: ignore[arg-type]
+            except Exception:
+                continue
+            if is_public and entry.get("private"):
+                continue
+            name = key.decode()
+            locations = entry.get("locations") or []
+            up = sum(1 for loc in locations if loc.get("available") is True)
+            total = len(locations)
+            items.append(
+                {
+                    "type": type_label,
+                    "name": name,
+                    "meta": entry.get("meta") or "",
+                    "aliases": [],
+                    "up": up,
+                    "total": total,
+                    "private": bool(entry.get("private")),
+                    "parser_enabled": name.lower() in parserlist,
+                    "has_wanted": False,
+                    "logo": _first_logo(logo_db, name),
+                }
+            )
+
+    _ingest_host(red_g, "group", "group")
+    _ingest_host(red_m, "market", "market")
+
+    for key in red_a.keys():  # type: ignore[union-attr]
+        try:
+            entry = json.loads(red_a.get(key))  # type: ignore[arg-type]
+        except Exception:
+            continue
+        if is_public and entry.get("private"):
+            continue
+        name = entry.get("name") or key.decode()
+        aliases_raw = entry.get("aliases") or entry.get("alias") or []
+        if isinstance(aliases_raw, str):
+            aliases = [a.strip() for a in re.split(r"[,|]", aliases_raw) if a.strip()]
+        else:
+            aliases = [str(a).strip() for a in aliases_raw if str(a).strip()]
+        has_wanted = any(
+            bool((entry.get("wanted") or {}).get(k, {}).get("url"))
+            for k in ("fbi", "europol", "interpol")
+        )
+        items.append(
+            {
+                "type": "actor",
+                "name": name,
+                "meta": entry.get("bio") or "",
+                "aliases": aliases,
+                "up": 0,
+                "total": 0,
+                "private": bool(entry.get("private")),
+                "parser_enabled": False,
+                "has_wanted": has_wanted,
+                "logo": _first_logo("actor", name),
+            }
+        )
+
+    items.sort(key=lambda x: x["name"].lower())
+
+    counts = {
+        "all": len(items),
+        "group": sum(1 for i in items if i["type"] == "group"),
+        "market": sum(1 for i in items if i["type"] == "market"),
+        "actor": sum(1 for i in items if i["type"] == "actor"),
+    }
+
+    active_tab = (request.args.get("tab") or "all").lower()
+    if active_tab not in ("all", "group", "market", "actor"):
+        active_tab = "all"
+    query = (request.args.get("q") or "").strip()
+
+    return render_template(
+        "browse.html",
+        items=items,
+        counts=counts,
+        active_tab=active_tab,
+        query=query,
+    )
 
 
 @app.route("/group/<name>")
@@ -960,6 +1378,39 @@ def group(name: str):  # type: ignore[no-untyped-def]
             _canon = _canon_raw.decode() if _canon_raw else (alias_basis or "").strip() or "Unknwn"  # type: ignore[union-attr]
             crypto_link = url_for("cryptodetail", name=_canon)
 
+            # ── Sparkline posts/day, last 30d (for hero) ──────────
+            now_dt = dt.now()
+            sparkline_30d = [0] * 30
+            for p in sorted_posts:
+                ts = None
+                for fmt in ("%Y-%m-%d %H:%M:%S.%f", "%Y-%m-%d %H:%M:%S"):
+                    try:
+                        ts = dt.strptime(p.get("discovered", ""), fmt)
+                        break
+                    except Exception:
+                        pass
+                if not ts:
+                    continue
+                delta_days = (now_dt - ts).days
+                idx = 29 - delta_days
+                if 0 <= idx < 30:
+                    sparkline_30d[idx] += 1
+
+            # Quick stats for hero
+            total_posts = len(sorted_posts)
+            posts_7d_count = sum(sparkline_30d[-7:])
+            posts_30d_count = sum(sparkline_30d)
+            mirrors_total = len(group["locations"])
+            mirrors_up = sum(1 for loc in group["locations"] if loc.get("available") is True)
+            # average uptime (30d) across mirrors that have a health series
+            uptimes = [loc["uptime30"] for loc in group["locations"] if "uptime30" in loc]
+            avg_uptime = round(sum(uptimes) / len(uptimes)) if uptimes else None
+            # First / last seen (from posts)
+            first_seen = sorted_posts[-1]["discovered"] if sorted_posts else None
+            last_seen = sorted_posts[0]["discovered"] if sorted_posts else None
+            if last_seen:
+                last_seen = last_seen[:16]  # "YYYY-MM-DD HH:MM"
+
             return render_template(
                 "group.html",
                 group=group,
@@ -971,31 +1422,18 @@ def group(name: str):  # type: ignore[no-untyped-def]
                 note_previews=note_previews,
                 note_count=note_count,
                 crypto_link=crypto_link,
+                sparkline_30d=sparkline_30d,
+                total_posts=total_posts,
+                posts_7d_count=posts_7d_count,
+                posts_30d_count=posts_30d_count,
+                mirrors_total=mirrors_total,
+                mirrors_up=mirrors_up,
+                avg_uptime=avg_uptime,
+                first_seen=first_seen,
+                last_seen=last_seen,
             )
 
     return redirect(url_for("home"))
-
-
-@app.route("/markets")
-def markets():  # type: ignore[no-untyped-def]
-    red = Valkey(unix_socket_path=get_socket_path("cache"), db=DB_MARKETS)
-
-    groups = []
-    for key in red.keys():  # type: ignore[union-attr]
-        entry = json.loads(red.get(key))  # type: ignore[arg-type]
-        if not current_user.is_authenticated and "private" in entry and entry["private"] is True:
-            continue
-        entry["name"] = key.decode()
-        groups.append(entry)
-    groups.sort(key=lambda x: x["name"].lower())
-    for group in groups:
-        for location in group["locations"]:
-            screenfile = "/screenshots/" + group["name"] + "-" + createfile(location["slug"]) + ".png"
-            if os.path.exists(str(get_homedir()) + "/source" + screenfile):
-                location["screen"] = screenfile
-    modules = glob.glob(join(dirname(str(get_homedir()) + "/ransomlook/parsers/"), "*.py"))
-    parserlist = [basename(f)[:-3].split(".")[0] for f in modules if isfile(f) and not f.endswith("__init__.py")]
-    return render_template("groups.html", data=groups, parser=parserlist, type="markets")
 
 
 @app.route("/market/<name>")
@@ -1054,31 +1492,6 @@ def market(name: str):  # type: ignore[no-untyped-def]
                 crypto_link=crypto_link,
             )
     return redirect(url_for("home"))
-
-
-@app.route("/actors")
-def actors():  # type: ignore[no-untyped-def]
-    red_ta = Valkey(unix_socket_path=get_socket_path("cache"), db=DB_ACTORS)
-    is_public = not current_user.is_authenticated
-
-    data = []
-    for key in red_ta.keys():  # type: ignore[union-attr]
-        try:
-            entry = json.loads(red_ta.get(key))  # type: ignore[arg-type]
-        except Exception:
-            continue
-        if is_public and entry.get("private"):
-            continue
-
-        entry["name"] = entry.get("name") or key.decode()
-        entry["aliases"] = entry.get("aliases") or []
-        entry["has_wanted"] = any(
-            bool(entry.get("wanted", {}).get(k, {}).get("url")) for k in ("fbi", "europol", "interpol")
-        )
-        data.append(entry)
-
-    data.sort(key=lambda x: x["name"].lower())
-    return render_template("actors.html", data=data)
 
 
 @app.route("/actor/<name>")
@@ -1558,6 +1971,54 @@ def screenshots(file: str) -> Any:
     resp = send_from_directory(base, file, mimetype=mime_type, max_age=0, conditional=True)
     resp.headers["Cache-Control"] = "public, no-cache"
     return resp
+
+
+_THUMB_SIZE = (280, 180)
+
+
+@app.route("/screenshots/thumb/<path:file>")
+def screenshot_thumb(file: str) -> Any:
+    """Serve a small JPEG thumbnail of a screenshot. Generated on first request, cached on disk."""
+    base = os.path.normpath(os.path.join(str(get_homedir()), "source", "screenshots"))
+    src = os.path.normpath(os.path.join(base, file))
+    if not src.startswith(base + os.sep):
+        abort(403)
+    if not os.path.isfile(src):
+        abort(404)
+
+    thumb_dir = os.path.join(base, "thumbs")
+    thumb_name = os.path.splitext(os.path.basename(file))[0] + ".jpg"
+    # Preserve subdirectory structure (for /screenshots/group/file.png)
+    sub = os.path.dirname(file)
+    if sub:
+        thumb_dir = os.path.join(thumb_dir, sub)
+    thumb_path = os.path.join(thumb_dir, thumb_name)
+
+    # Regenerate thumb if source is newer (screenshots are refreshed at each scrape)
+    stale = (
+        not os.path.isfile(thumb_path)
+        or os.path.getmtime(src) > os.path.getmtime(thumb_path)
+    )
+    if stale:
+        try:
+            os.makedirs(thumb_dir, exist_ok=True)
+            img = Image.open(src)
+            img.thumbnail(_THUMB_SIZE, Image.LANCZOS)
+            img = img.convert("RGB")  # JPEG doesn't support RGBA
+            img.save(thumb_path, "JPEG", quality=75, optimize=True)
+        except Exception as e:
+            app.logger.warning(f"Thumb generation failed for {file}: {e}")
+            # Fallback: serve the original
+            mime_type = get_mime_type(src)  # type: ignore[no-untyped-call]
+            return send_from_directory(base, file, mimetype=mime_type)
+
+    return send_from_directory(
+        os.path.dirname(thumb_path),
+        os.path.basename(thumb_path),
+        mimetype="image/jpeg",
+        max_age=604800,  # 1 week cache
+        conditional=True,
+    )
 
 
 @app.route("/screenshots/<group>/<file>")
@@ -3526,6 +3987,11 @@ api.add_namespace(crypto_api)
 api.add_namespace(notes_api)
 api.add_namespace(leaks_api)
 api.add_namespace(rf_api)
+
+
+@api.documentation
+def custom_doc():  # type: ignore[no-untyped-def]
+    return render_template("swagger.html", specs_url=api.specs_url)
 
 
 @app.route("/groups.csv")

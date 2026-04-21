@@ -1,11 +1,18 @@
-
 {% extends "base.html" %}
 
-{% block title %}{{error}}{% endblock %}
+{% block title %}{{ code|default(404) }} · RansomLook{% endblock %}
 
 {% block content %}
-    <article id="main" class="markdown-section">
-	<center><h1>{{message}}</h1>
-                <img src='{{ url_for('static', filename='ransomlook.svg') }}'></center>
-    </article>
+<section class="err-page">
+  <div class="container err-inner">
+    <div class="err-code">{{ code|default(404) }}</div>
+    <h1 class="err-title">{{ error|default('Page not found') }}</h1>
+    <p class="err-msg">{{ message|default('The page you’re looking for doesn’t exist or was moved.') }}</p>
+    <div class="err-ctas">
+      <a class="btn-hero btn-hero--primary" href="/">Home</a>
+      <a class="btn-hero btn-hero--ghost"   href="/browse">Browse</a>
+      <a class="btn-hero btn-hero--ghost"   href="/recent">Recent posts</a>
+    </div>
+  </div>
+</section>
 {% endblock %}

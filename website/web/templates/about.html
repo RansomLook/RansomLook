@@ -7,12 +7,16 @@
 <!-- Hero -->
 <section class="hero">
   <div class="container">
-      <center><img src="{{ url_for('static', filename=logo) }}" alt="RansomLook logo" width="400"></center>
-    <h1>{{ _('About RansomLook') if _ else 'About RansomLook' }}</h1>
-    <p class="lead">
-      {{ _("Open-source project providing real‑time ransomware intelligence: tracked groups, posts, mirrors, forums, and more.") 
-         if _ else "Open‑source project providing real‑time ransomware intelligence: tracked groups, posts, mirrors, forums, and more." }}
-    </p>
+    <div class="about-hero-split">
+      <img class="about-hero-logo" src="{{ url_for('static', filename=logo) }}" alt="RansomLook logo">
+      <div>
+        <h1>{{ _('About RansomLook') if _ else 'About RansomLook' }}</h1>
+        <p class="lead">
+          {{ _("Open-source project providing real‑time ransomware intelligence: tracked groups, posts, mirrors, forums, and more.")
+             if _ else "Open‑source project providing real‑time ransomware intelligence: tracked groups, posts, mirrors, forums, and more." }}
+        </p>
+      </div>
+    </div>
   </div>
 </section>
 

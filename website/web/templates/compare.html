@@ -123,49 +123,52 @@
     {% endif %}
 
     {% if a and b %}
-      <!-- Result cards -->
-      <div class="compare-result-grid">
-        <div class="table-card p-16">
-          <h3 style="margin:0 0 8px">{{ a.name }}</h3>
-          <ul class="metric-list">
-            <li><span>Posts 7d</span><b>{{ a.posts7 }}</b></li>
-            <li><span>Posts 30d</span><b>{{ a.posts30 }}</b></li>
-            <li><span>Posts 365d</span><b>{{ a.posts365 }}</b></li>
-            <li><span>Mirrors up</span><b>{{ a.mirrors_up }}/{{ a.mirrors_total }}</b></li>
-            <li><span>Uptime 30d</span>
-              <b>
-                {% if a.uptime30 is not none %}
-                  {{ a.uptime30 }}%
-                {% else %}
-                  {{ ((a.mirrors_up * 100) / (a.mirrors_total or 1))|round(0) }}%
-                {% endif %}
-              </b>
-            </li>
-            <li><span>Captcha</span><b>{{ 'Yes' if a.captcha else 'No' }}</b></li>
-            <li><span>RaaS</span><b>{{ 'Yes' if a.raas else 'No' }}</b></li>
-          </ul>
-        </div>
+      {# ── Helper: highlight the "winner" on numeric metrics ── #}
+      {%- macro cmp_val(va, vb, label, fmt='d') -%}
+        <li>
+          <span class="cmp-label">{{ label }}</span>
+          <span class="cmp-val {% if va > vb %}cmp-win{% elif va < vb %}cmp-lose{% endif %}">
+            {% if fmt == 'pct' %}{{ va }}%{% elif fmt == 'ratio' %}{{ va }}{% else %}{{ va }}{% endif %}
+          </span>
+          <span class="cmp-val {% if vb > va %}cmp-win{% elif vb < va %}cmp-lose{% endif %}">
+            {% if fmt == 'pct' %}{{ vb }}%{% elif fmt == 'ratio' %}{{ vb }}{% else %}{{ vb }}{% endif %}
+          </span>
+        </li>
+      {%- endmacro -%}
 
-        <div class="table-card p-16">
-          <h3 style="margin:0 0 8px">{{ b.name }}</h3>
-          <ul class="metric-list">
-            <li><span>Posts 7d</span><b>{{ b.posts7 }}</b></li>
-            <li><span>Posts 30d</span><b>{{ b.posts30 }}</b></li>
-            <li><span>Posts 365d</span><b>{{ b.posts365 }}</b></li>
-            <li><span>Mirrors up</span><b>{{ b.mirrors_up }}/{{ b.mirrors_total }}</b></li>
-            <li><span>Uptime 30d</span>
-              <b>
-                {% if b.uptime30 is not none %}
-                  {{ b.uptime30 }}%
-                {% else %}
-                  {{ ((b.mirrors_up * 100) / (b.mirrors_total or 1))|round(0) }}%
-                {% endif %}
-              </b>
-            </li>
-            <li><span>Captcha</span><b>{{ 'Yes' if b.captcha else 'No' }}</b></li>
-            <li><span>RaaS</span><b>{{ 'Yes' if b.raas else 'No' }}</b></li>
-          </ul>
+      {% set a_up = a.uptime30 if a.uptime30 is not none else ((a.mirrors_up * 100) / (a.mirrors_total or 1))|round(0)|int %}
+      {% set b_up = b.uptime30 if b.uptime30 is not none else ((b.mirrors_up * 100) / (b.mirrors_total or 1))|round(0)|int %}
+
+      <!-- Result: side-by-side comparison table -->
+      <div class="table-card compare-table-card">
+        <div class="compare-header">
+          <span class="cmp-label"></span>
+          <span class="cmp-name">
+            <span class="group-dot" style="background:{{ a.name|lower|palette_color }}" aria-hidden="true"></span>
+            <a href="/{{ 'group' if kind == 'group' else 'market' }}/{{ a.name|urlencode }}">{{ a.name|title }}</a>
+          </span>
+          <span class="cmp-name">
+            <span class="group-dot" style="background:{{ b.name|lower|palette_color }}" aria-hidden="true"></span>
+            <a href="/{{ 'group' if kind == 'group' else 'market' }}/{{ b.name|urlencode }}">{{ b.name|title }}</a>
+          </span>
         </div>
+        <ul class="compare-rows">
+          {{ cmp_val(a.posts7, b.posts7, 'Posts 7d') }}
+          {{ cmp_val(a.posts30, b.posts30, 'Posts 30d') }}
+          {{ cmp_val(a.posts365, b.posts365, 'Posts 365d') }}
+          {{ cmp_val(a.mirrors_up ~ '/' ~ a.mirrors_total, b.mirrors_up ~ '/' ~ b.mirrors_total, 'Mirrors up', 'ratio') }}
+          {{ cmp_val(a_up, b_up, 'Uptime 30d', 'pct') }}
+          <li>
+            <span class="cmp-label">Captcha</span>
+            <span class="cmp-val">{{ 'Yes' if a.captcha else 'No' }}</span>
+            <span class="cmp-val">{{ 'Yes' if b.captcha else 'No' }}</span>
+          </li>
+          <li>
+            <span class="cmp-label">RaaS</span>
+            <span class="cmp-val">{{ 'Yes' if a.raas else 'No' }}</span>
+            <span class="cmp-val">{{ 'Yes' if b.raas else 'No' }}</span>
+          </li>
+        </ul>
       </div>
 
       <!-- Charts -->

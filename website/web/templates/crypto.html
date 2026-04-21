@@ -37,7 +37,7 @@
           <a class="group-chip stat-link"
              href="/crypto/{{ item }}"
              data-name="{{ item|lower }}{% if aliases and aliases.get(item) %} {{ aliases[item]|join(' ') }}{% endif %}">
-             {{ item|title }} 
+             {{ item|title }}
           </a>
          {% endfor %}
       {% endfor %}

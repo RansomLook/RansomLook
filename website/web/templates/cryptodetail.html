@@ -6,15 +6,29 @@
 
 <section class="hero" data-crypto-group="{{ group }}">
   <div class="container">
-    <h1>{{ group|title }}</h1>
+    <h1>
+      <span class="group-dot" style="background:{{ group|lower|palette_color }}" aria-hidden="true"></span>
+      {{ group|title }}
+    </h1>
     <p class="lead">
       Observed wallets and transactions for this group.
       {% if aliases and aliases|length %}
-        <span class="muted">Aliases: {{ aliases|join(', ') }}</span>
+        <br><span class="muted">Aliases: {{ aliases|join(', ') }}</span>
       {% endif %}
     </p>
+
+    {% set total_wallets = by_chain.values()|map('length')|sum %}
+    {% set total_chains = by_chain|length %}
+    {% if total_wallets > 0 %}
+      <div class="week-grid" style="max-width:480px;margin:14px auto 18px">
+        <div class="g-kpi"><span class="g-kpi__value">{{ total_wallets }}</span><span class="g-kpi__label">wallets</span></div>
+        <div class="g-kpi"><span class="g-kpi__value">{{ total_chains }}</span><span class="g-kpi__label">chain{{ 's' if total_chains != 1 }}</span></div>
+      </div>
+    {% endif %}
+
     <div class="cta-row">
       <button class="btn btn-secondary" onclick="exportGroupCSV()" title="Export all transactions for this group">Export all CSV</button>
+      <a class="btn btn-secondary" href="/group/{{ group|urlencode }}">View group</a>
     </div>
   </div>
 </section>

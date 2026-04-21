@@ -63,22 +63,29 @@
   var d;
   try { d = JSON.parse(dataEl.textContent); } catch(e){ return; }
 
+  /* Palette — shared from rl-common.js */
+  var colorFor = RL.colorFor;
+  var isDark = document.documentElement.classList.contains('dark');
+  var textC = isDark ? '#e5e7eb' : '#1f2937';
+  var colA = colorFor(d.a.name.toLowerCase());
+  var colB = colorFor(d.b.name.toLowerCase());
+
   function bars(){
     if (!window.Plotly) return;
     Plotly.newPlot('posts-bars', [
-      { name: d.a.name, y: [d.a.posts7, d.a.posts30, d.a.posts365], x: ['7d','30d','365d'], type:'bar' },
-      { name: d.b.name, y: [d.b.posts7, d.b.posts30, d.b.posts365], x: ['7d','30d','365d'], type:'bar' }
+      { name: d.a.name, y: [d.a.posts7, d.a.posts30, d.a.posts365], x: ['7d','30d','365d'], type:'bar', marker:{color:colA} },
+      { name: d.b.name, y: [d.b.posts7, d.b.posts30, d.b.posts365], x: ['7d','30d','365d'], type:'bar', marker:{color:colB} }
     ], { barmode:'group', paper_bgcolor:'rgba(0,0,0,0)', plot_bgcolor:'rgba(0,0,0,0)',
-         font:{color:'#e5e7eb'}, margin:{l:48,r:18,t:18,b:48} }, {displayModeBar:false});
+         font:{color:textC}, margin:{l:48,r:18,t:18,b:48} }, {displayModeBar:false});
   }
   function gauges(){
     if (!window.Plotly) return;
     Plotly.newPlot('mirrors-gauges', [
       { type:'indicator', mode:'gauge+number', value:d.a.uptime,
-        gauge:{axis:{range:[0,100]}}, domain:{x:[0,0.48],y:[0,1]}, title:{text:d.a.name+' UP %'} },
+        gauge:{axis:{range:[0,100]}, bar:{color:colA}}, domain:{x:[0,0.48],y:[0,1]}, title:{text:d.a.name+' UP %'}, number:{font:{color:textC}} },
       { type:'indicator', mode:'gauge+number', value:d.b.uptime,
-        gauge:{axis:{range:[0,100]}}, domain:{x:[0.52,1],y:[0,1]}, title:{text:d.b.name+' UP %'} }
-    ], { paper_bgcolor:'rgba(0,0,0,0)', font:{color:'#e5e7eb'}, margin:{l:40,r:40,t:24,b:16} }, {displayModeBar:false});
+        gauge:{axis:{range:[0,100]}, bar:{color:colB}}, domain:{x:[0.52,1],y:[0,1]}, title:{text:d.b.name+' UP %'}, number:{font:{color:textC}} }
+    ], { paper_bgcolor:'rgba(0,0,0,0)', font:{color:textC}, margin:{l:40,r:40,t:24,b:16} }, {displayModeBar:false});
   }
 
   if (document.readyState === 'complete'){ bars(); gauges(); }

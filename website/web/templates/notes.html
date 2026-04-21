@@ -34,7 +34,6 @@
     <div id="groups-grid" class="auto-grid">
       {% for entry in data %}
         {% for item in entry %}
-          <!-- Seul changement: href + data-name enrichi des alias -->
           <a class="group-chip stat-link"
              href="{{ url_for('notesdetails',name=item) }}"
              data-name="{{ item|lower }} {% for a in (aliases_by_canon.get(item, [])) %}{{ a }} {% endfor %}">

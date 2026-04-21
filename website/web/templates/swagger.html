@@ -1,0 +1,306 @@
+<!doctype html>
+<html lang="en" class="{{ request.cookies.get('theme', 'dark') }}">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>RansomLook — API Documentation</title>
+  <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='favicon.ico') }}">
+  <link rel="stylesheet" href="https://unpkg.com/swagger-ui-dist@5/swagger-ui.css">
+  <style>
+    /* ── Dark theme overrides for Swagger UI ────────────────────── */
+    :root {
+      --rl-bg:      #0f1117;
+      --rl-fg:      #1a1d24;
+      --rl-card:    #121a28;
+      --rl-border:  #2d333b;
+      --rl-text:    #e5e7eb;
+      --rl-muted:   #9ca3af;
+      --rl-pri:     #6aa0ff;
+    }
+
+    html.dark body {
+      background: var(--rl-bg);
+      color: var(--rl-text);
+    }
+    html.dark .swagger-ui {
+      color: var(--rl-text);
+    }
+    html.dark .swagger-ui .topbar { display: none; }
+    html.dark .swagger-ui .info .title { color: var(--rl-text); }
+    html.dark .swagger-ui .info .description p,
+    html.dark .swagger-ui .info li,
+    html.dark .swagger-ui .info a { color: var(--rl-muted); }
+    html.dark .swagger-ui .info a { color: var(--rl-pri); }
+
+    html.dark .swagger-ui .scheme-container {
+      background: var(--rl-fg);
+      border-bottom: 1px solid var(--rl-border);
+      box-shadow: none;
+    }
+    html.dark .swagger-ui .scheme-container .schemes > label { color: var(--rl-muted); }
+
+    html.dark .swagger-ui .opblock-tag {
+      color: var(--rl-text);
+      border-bottom-color: var(--rl-border);
+    }
+    html.dark .swagger-ui .opblock-tag:hover { background: rgba(255,255,255,.03); }
+    html.dark .swagger-ui .opblock-tag small { color: var(--rl-muted); }
+
+    html.dark .swagger-ui .opblock {
+      border-color: var(--rl-border);
+      background: var(--rl-fg);
+      box-shadow: none;
+    }
+    html.dark .swagger-ui .opblock .opblock-summary {
+      border-bottom-color: var(--rl-border);
+    }
+    html.dark .swagger-ui .opblock .opblock-summary-description { color: var(--rl-muted); }
+    html.dark .swagger-ui .opblock .opblock-summary-path { color: var(--rl-text); }
+    html.dark .swagger-ui .opblock .opblock-summary-path__deprecated { color: var(--rl-muted); }
+
+    html.dark .swagger-ui .opblock.opblock-get { border-color: #2563eb44; background: #1e3a5f22; }
+    html.dark .swagger-ui .opblock.opblock-get .opblock-summary { border-bottom-color: #2563eb33; }
+    html.dark .swagger-ui .opblock.opblock-post { border-color: #16a34a44; background: #14532d22; }
+    html.dark .swagger-ui .opblock.opblock-put { border-color: #d9770644; background: #78350f22; }
+    html.dark .swagger-ui .opblock.opblock-delete { border-color: #dc262644; background: #7f1d1d22; }
+
+    html.dark .swagger-ui .opblock-body pre,
+    html.dark .swagger-ui .opblock-body .highlight-code {
+      background: var(--rl-bg); color: var(--rl-text);
+    }
+    html.dark .swagger-ui .opblock-section-header {
+      background: var(--rl-fg);
+      border-bottom: 1px solid var(--rl-border);
+    }
+    html.dark .swagger-ui .opblock-section-header h4 { color: var(--rl-text); }
+
+    html.dark .swagger-ui table thead tr th,
+    html.dark .swagger-ui table thead tr td { color: var(--rl-muted); border-bottom-color: var(--rl-border); }
+    html.dark .swagger-ui table tbody tr td { color: var(--rl-text); border-bottom-color: var(--rl-border); }
+    html.dark .swagger-ui .parameter__name { color: var(--rl-text); }
+    html.dark .swagger-ui .parameter__type { color: var(--rl-muted); }
+
+    html.dark .swagger-ui .model-box,
+    html.dark .swagger-ui section.models {
+      border-color: var(--rl-border);
+    }
+    html.dark .swagger-ui section.models h4 { color: var(--rl-text); }
+    html.dark .swagger-ui .model { color: var(--rl-text); }
+    html.dark .swagger-ui .model-title { color: var(--rl-text); }
+    html.dark .swagger-ui section.models.is-open h4 { border-bottom-color: var(--rl-border); }
+
+    html.dark .swagger-ui .response-col_status { color: var(--rl-text); }
+    html.dark .swagger-ui .response-col_description { color: var(--rl-muted); }
+
+    html.dark .swagger-ui input[type=text],
+    html.dark .swagger-ui textarea,
+    html.dark .swagger-ui select {
+      background: var(--rl-bg); color: var(--rl-text);
+      border: 1px solid var(--rl-border);
+    }
+
+    html.dark .swagger-ui .btn {
+      color: var(--rl-text);
+      border-color: var(--rl-border);
+    }
+    html.dark .swagger-ui .btn.authorize { color: var(--rl-pri); border-color: var(--rl-pri); }
+
+    html.dark .swagger-ui .dialog-ux .modal-ux {
+      background: var(--rl-fg); border: 1px solid var(--rl-border);
+    }
+    html.dark .swagger-ui .dialog-ux .modal-ux-header h3 { color: var(--rl-text); }
+    html.dark .swagger-ui .dialog-ux .modal-ux-content p { color: var(--rl-muted); }
+
+    /* ── Branding bar ────────────────────────────────────────────── */
+    .rl-doc-bar {
+      display: flex; align-items: center; gap: 12px;
+      padding: 14px 20px;
+      border-bottom: 1px solid var(--rl-border);
+    }
+    html.dark .rl-doc-bar { background: var(--rl-fg); }
+    html.light .rl-doc-bar { background: #f8f9fa; border-bottom: 1px solid #d1d5db; }
+    .rl-doc-bar img { width: 28px; height: 28px; }
+    .rl-doc-bar a { color: var(--rl-text); text-decoration: none; font-weight: 700; font-size: 15px; }
+    html.light .rl-doc-bar a { color: #1f2937; }
+    .rl-doc-bar .back { color: var(--rl-muted); font-size: 13px; text-decoration: none; margin-left: auto; }
+    html.light .rl-doc-bar .back { color: #6b7280; }
+
+    /* ── Light mode: keep Swagger defaults, just add the branding bar ── */
+    html.light .swagger-ui .topbar { display: none; }
+
+    /* Limit width for readability */
+    .swagger-ui .wrapper { max-width: 1200px; }
+
+    /* ── Python examples panel ───────────────────────────────── */
+    .rl-examples {
+      max-width: 1200px; margin: 0 auto;
+      padding: 0 20px 40px;
+    }
+    .rl-examples__title {
+      cursor: pointer;
+      font-size: 20px; font-weight: 700;
+      padding: 18px 0;
+      list-style: none;
+    }
+    .rl-examples__title::marker { display: none; }
+    .rl-examples__title::before { content: "▸ "; }
+    .rl-examples[open] > .rl-examples__title::before { content: "▾ "; }
+    html.dark .rl-examples__title { color: #e5e7eb; }
+    html.light .rl-examples__title { color: #1f2937; }
+
+    .rl-examples__grid {
+      display: grid; grid-template-columns: repeat(auto-fill, minmax(420px, 1fr));
+      gap: 14px;
+    }
+    .rl-example {
+      border-radius: 10px; overflow: hidden;
+    }
+    html.dark .rl-example { background: #1a1d24; border: 1px solid #2d333b; }
+    html.light .rl-example { background: #f8f9fa; border: 1px solid #d1d5db; }
+
+    .rl-example h4 {
+      margin: 0; padding: 10px 14px;
+      font-size: 13px; font-weight: 600;
+    }
+    html.dark .rl-example h4 { color: #9ec3ff; border-bottom: 1px solid #2d333b; }
+    html.light .rl-example h4 { color: #2563eb; border-bottom: 1px solid #d1d5db; }
+
+    .rl-example pre {
+      margin: 0; padding: 12px 14px;
+      font-size: 12.5px; line-height: 1.55;
+      overflow-x: auto;
+      font-family: ui-monospace, "SF Mono", "JetBrains Mono", Menlo, Consolas, monospace;
+    }
+    html.dark .rl-example pre { background: #0f1117; color: #e5e7eb; }
+    html.light .rl-example pre { background: #ffffff; color: #1f2937; }
+    .rl-example code { font-family: inherit; }
+
+    @media (max-width: 540px) {
+      .rl-examples__grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="rl-doc-bar">
+    <img src="{{ url_for('static', filename='ransomlook.svg') }}" alt="">
+    <a href="/">RansomLook</a>
+    <a class="back" href="/">&larr; Back to site</a>
+  </div>
+
+  <div id="swagger-ui"></div>
+
+  <details class="rl-examples" open>
+    <summary class="rl-examples__title">Python 3 examples (requests)</summary>
+    <div class="rl-examples__grid">
+
+      <div class="rl-example">
+        <h4>List recent posts (last 7 days)</h4>
+<pre><code class="language-python">import requests
+
+API = "https://www.ransomlook.io/api"
+HEADERS = {"Authorization": "YOUR_API_KEY"}
+
+resp = requests.get(f"{API}/posts", params={"days": 7}, headers=HEADERS)
+for post in resp.json():
+    print(post["group_name"], "—", post["post_title"])
+</code></pre>
+      </div>
+
+      <div class="rl-example">
+        <h4>Get a specific group's details</h4>
+<pre><code class="language-python">import requests
+
+API = "https://www.ransomlook.io/api"
+HEADERS = {"Authorization": "YOUR_API_KEY"}
+
+resp = requests.get(f"{API}/group/lockbit", headers=HEADERS)
+group = resp.json()
+print(f"Group: {group[0]['name']}")
+for loc in group[0].get("locations", []):
+    status = "UP" if loc.get("available") else "DOWN"
+    print(f"  {status} — {loc['slug']}")
+</code></pre>
+      </div>
+
+      <div class="rl-example">
+        <h4>Search across all posts</h4>
+<pre><code class="language-python">import requests
+
+API = "https://www.ransomlook.io/api"
+HEADERS = {"Authorization": "YOUR_API_KEY"}
+
+resp = requests.get(f"{API}/search", params={"query": "acme"}, headers=HEADERS)
+for hit in resp.json():
+    print(hit["group_name"], "—", hit["post_title"], "—", hit["discovered"])
+</code></pre>
+      </div>
+
+      <div class="rl-example">
+        <h4>Export full database (requires API key)</h4>
+<pre><code class="language-python">import requests, json
+
+API = "https://www.ransomlook.io/api"
+HEADERS = {"Authorization": "YOUR_API_KEY"}
+
+# DB 0 = Groups, 2 = Posts, 3 = Markets, 4 = Leaks, 5 = Actors
+for db_num in [0, 2, 3, 5]:
+    resp = requests.get(f"{API}/export/{db_num}", headers=HEADERS)
+    if resp.status_code == 200:
+        data = resp.json()
+        print(f"DB {db_num}: {len(data)} entries")
+        with open(f"ransomlook_db{db_num}.json", "w") as f:
+            json.dump(data, f)
+</code></pre>
+      </div>
+
+      <div class="rl-example">
+        <h4>Get threat actor profile</h4>
+<pre><code class="language-python">import requests
+
+API = "https://www.ransomlook.io/api"
+HEADERS = {"Authorization": "YOUR_API_KEY"}
+
+resp = requests.get(f"{API}/actor/bassterlord", headers=HEADERS)
+actor = resp.json()
+print(f"Actor: {actor.get('name')}")
+print(f"Aliases: {', '.join(actor.get('aliases', []))}")
+for g in actor.get("relations", {}).get("groups", []):
+    print(f"  → Group: {g}")
+</code></pre>
+      </div>
+
+      <div class="rl-example">
+        <h4>Crypto addresses for a group</h4>
+<pre><code class="language-python">import requests
+
+API = "https://www.ransomlook.io/api"
+HEADERS = {"Authorization": "YOUR_API_KEY"}
+
+resp = requests.get(f"{API}/crypto/lockbit", headers=HEADERS)
+data = resp.json()
+for chain, addrs in data.get("by_chain", {}).items():
+    for a in addrs:
+        print(f"  [{chain}] {a['address']} — tx: {a.get('tx_count', 0)}")
+</code></pre>
+      </div>
+
+    </div>
+  </details>
+
+  <script src="https://unpkg.com/swagger-ui-dist@5/swagger-ui-bundle.js"></script>
+  <script>
+    SwaggerUIBundle({
+      url: "{{ specs_url }}",
+      dom_id: '#swagger-ui',
+      presets: [
+        SwaggerUIBundle.presets.apis,
+        SwaggerUIBundle.SwaggerUIStandalonePreset,
+      ],
+      layout: 'BaseLayout',
+      deepLinking: true,
+      defaultModelsExpandDepth: -1,
+    });
+  </script>
+</body>
+</html>

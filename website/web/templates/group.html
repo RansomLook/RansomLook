@@ -1,18 +1,92 @@
 {% extends "base.html" %}
-{% block title %}{{ group['name'] }} details{% endblock %}
+{% block title %}{{ group['name']|title }} · RansomLook{% endblock %}
 
 {% block content %}
 
-<!-- ===== HERO ===== -->
-<section class="hero">
-  <div class="container">
-    <h1 class="d-inline">{{ group['name'].title() }}</h1>
-    {% if current_user.is_authenticated %}
-      <a class="edit-link" href="/admin/edit/{{ group['db'] }}/{{ group['name']|urlencode }}">Edit group</a>
-    {% endif %}
-      <a class="btn" href="{{ url_for('compare') }}">Compare</a>
-  </div>
+{# ===== HERO — group identity + quick stats + sparkline ===== #}
+<section class="group-hero">
+  <div class="group-hero__bg" aria-hidden="true"></div>
+  <div class="container group-hero__inner">
 
+    <div class="group-hero__head">
+      {% if logo and logo|length %}
+        <div class="group-hero__logo">
+          <img src="{{ logo[0] }}" alt="{{ group['name'] }} logo" loading="eager" decoding="async">
+        </div>
+      {% else %}
+        <div class="group-hero__logo group-hero__logo--placeholder"
+             style="background:linear-gradient(135deg, {{ group['name']|lower|palette_color }}, {{ group['name']|lower|palette_color }}cc)">
+          <span>{{ group['name'][:1]|upper }}</span>
+        </div>
+      {% endif %}
+
+      <div class="group-hero__ident">
+        <h1 class="group-hero__title">
+          <span class="group-dot" style="background:{{ group['name']|lower|palette_color }}" aria-hidden="true"></span>
+          {{ group['name']|title }}
+        </h1>
+        <div class="profile-badges">
+          {% if mirrors_total == 0 %}
+            <span class="badge-neutral" title="No mirrors registered">no mirrors</span>
+          {% elif mirrors_up == 0 %}
+            <span class="badge-status badge-down" title="All mirrors offline">{{ mirrors_up }}/{{ mirrors_total }} offline</span>
+          {% elif (mirrors_up / mirrors_total) >= 0.5 %}
+            <span class="badge-status badge-up">{{ mirrors_up }}/{{ mirrors_total }} up</span>
+          {% else %}
+            <span class="badge-status badge-degraded">{{ mirrors_up }}/{{ mirrors_total }} degraded</span>
+          {% endif %}
+          {% if group['name'].lower() in parser %}<span class="badge-neutral">parser</span>{% endif %}
+          {% if group.get('raas') %}<span class="badge-neutral">RaaS</span>{% endif %}
+          {% if group.get('captcha') %}<span class="badge-neutral">captcha</span>{% endif %}
+          {% if group.get('private') %}<span class="badge-private">private</span>{% endif %}
+        </div>
+      </div>
+
+      <div class="group-hero__actions">
+        {% if current_user.is_authenticated %}
+          <a class="btn-hero btn-hero--ghost btn-sm" href="/admin/edit/{{ group['db'] }}/{{ group['name']|urlencode }}">Edit</a>
+        {% endif %}
+        <a class="btn-hero btn-hero--ghost btn-sm" href="{{ url_for('compare') }}">Compare</a>
+        {% if crypto_link %}<a class="btn-hero btn-hero--ghost btn-sm" href="{{ crypto_link }}" title="View crypto">Crypto</a>{% endif %}
+      </div>
+    </div>
+
+    <div class="group-hero__kpis">
+      <div class="g-kpi"><span class="g-kpi__value">{{ total_posts }}</span><span class="g-kpi__label">posts (all time)</span></div>
+      <div class="g-kpi"><span class="g-kpi__value">{{ posts_30d_count }}</span><span class="g-kpi__label">last 30 days</span></div>
+      <div class="g-kpi"><span class="g-kpi__value">{{ posts_7d_count }}</span><span class="g-kpi__label">last 7 days</span></div>
+      <div class="g-kpi">
+        <span class="g-kpi__value">{% if avg_uptime is not none %}{{ avg_uptime }}%{% else %}—{% endif %}</span>
+        <span class="g-kpi__label">avg uptime 30d</span>
+      </div>
+    </div>
+
+    {% if posts_30d_count > 0 %}
+      {% set gmax = sparkline_30d|max %}
+      <div class="spark-band">
+        <div class="activity-head">
+          <span class="live-dot" aria-hidden="true"></span>
+          <span class="activity-label">Activity · last 30 days</span>
+          {% if first_seen or last_seen %}
+            <span class="activity-meta">
+              {% if last_seen %}last post <time datetime="{{ last_seen }}" data-ts="{{ last_seen }}">{{ last_seen }}</time>{% endif %}
+            </span>
+          {% endif %}
+        </div>
+        <svg class="hero-spark" viewBox="0 0 300 48" preserveAspectRatio="none" aria-hidden="true">
+          <defs><linearGradient id="hero-spark-grad" x1="0" x2="0" y1="0" y2="1"><stop offset="0%" stop-color="currentColor" stop-opacity=".55"/><stop offset="100%" stop-color="currentColor" stop-opacity="0"/></linearGradient></defs>
+          {% set n = sparkline_30d|length %}
+          {% set bw = ((300 - (n - 1) * 1.5) / n)|round(3) %}
+          {% for v in sparkline_30d %}
+            {% set h = ((v / gmax) * 42)|round(2) if gmax else 0 %}
+            {% set x = loop.index0 * (bw + 1.5) %}
+            {% set y = 45 - h %}
+            <rect x="{{ x }}" y="{{ y }}" width="{{ bw }}" height="{{ h if h > 0 else 1.2 }}" rx="1" />
+          {% endfor %}
+        </svg>
+      </div>
+    {% endif %}
+  </div>
 </section>
 
 <section class="metrics-section">
@@ -401,12 +475,18 @@
                   <td class="thumb-cell">
                     {% if location.get('screen') %}
                       <a href="{{ location['screen'] }}" class="open-shot" data-caption="{{ location['slug'] }}">
-                        <img class="thumb" src="{{ location['screen'] }}" alt="Screen">
+                        <img class="thumb" src="/screenshots/thumb/{{ location['screen'][13:] }}" alt="Screen" loading="lazy" decoding="async">
                       </a>
                     {% endif %}
                   </td>
                   <td class="uptime-cell"><center>{% if location.get('uptime30') is not none %}{{ location['uptime30'] }}%{% else %}—{% endif %}</center></td>
-                  <td><div class="spark" data-health="{{ location.get('health')|tojson if location.get('health') is not none else '' }}"></div></td>
+                  <td>
+                    {% if location.get('health') %}
+                      <div class="spark" data-health="{{ location['health']|tojson }}"></div>
+                    {% else %}
+                      <center class="muted">—</center>
+                    {% endif %}
+                  </td>
                 </tr>
               {% endfor %}
             </tbody>
@@ -450,12 +530,18 @@
                   <td class="thumb-cell">
                     {% if location.get('screen') %}
                       <a href="{{ location['screen'] }}" class="open-shot" data-caption="{{ location['slug'] }}">
-                        <img class="thumb" src="{{ location['screen'] }}" alt="Screen">
+                        <img class="thumb" src="/screenshots/thumb/{{ location['screen'][13:] }}" alt="Screen" loading="lazy" decoding="async">
                       </a>
                     {% endif %}
                   </td>
                   <td class="uptime-cell"><center>{% if location.get('uptime30') is not none %}{{ location['uptime30'] }}%{% else %}—{% endif %}</center></td>
-                  <td><div class="spark" data-health="{{ location.get('health')|tojson if location.get('health') is not none else '' }}"></div></td>
+                  <td>
+                    {% if location.get('health') %}
+                      <div class="spark" data-health="{{ location['health']|tojson }}"></div>
+                    {% else %}
+                      <center class="muted">—</center>
+                    {% endif %}
+                  </td>
                 </tr>
               {% endfor %}
             </tbody>
@@ -499,12 +585,18 @@
                   <td class="thumb-cell">
                     {% if location.get('screen') %}
                       <a href="{{ location['screen'] }}" class="open-shot" data-caption="{{ location['slug'] }}">
-                        <img class="thumb" src="{{ location['screen'] }}" alt="Screen">
+                        <img class="thumb" src="/screenshots/thumb/{{ location['screen'][13:] }}" alt="Screen" loading="lazy" decoding="async">
                       </a>
                     {% endif %}
                   </td>
                   <td class="uptime-cell"><center>{% if location.get('uptime30') is not none %}{{ location['uptime30'] }}%{% else %}—{% endif %}</center></td>
-                  <td><div class="spark" data-health="{{ location.get('health')|tojson if location.get('health') is not none else '' }}"></div></td>
+                  <td>
+                    {% if location.get('health') %}
+                      <div class="spark" data-health="{{ location['health']|tojson }}"></div>
+                    {% else %}
+                      <center class="muted">—</center>
+                    {% endif %}
+                  </td>
                 </tr>
               {% endfor %}
             </tbody>
@@ -548,12 +640,18 @@
                   <td class="thumb-cell">
                     {% if location.get('screen') %}
                       <a href="{{ location['screen'] }}" class="open-shot" data-caption="{{ location['slug'] }}">
-                        <img class="thumb" src="{{ location['screen'] }}" alt="Screen">
+                        <img class="thumb" src="/screenshots/thumb/{{ location['screen'][13:] }}" alt="Screen" loading="lazy" decoding="async">
                       </a>
                     {% endif %}
                   </td>
                   <td class="uptime-cell"><center>{% if location.get('uptime30') is not none %}{{ location['uptime30'] }}%{% else %}—{% endif %}</center></td>
-                  <td><div class="spark" data-health="{{ location.get('health')|tojson if location.get('health') is not none else '' }}"></div></td>
+                  <td>
+                    {% if location.get('health') %}
+                      <div class="spark" data-health="{{ location['health']|tojson }}"></div>
+                    {% else %}
+                      <center class="muted">—</center>
+                    {% endif %}
+                  </td>
                 </tr>
               {% endfor %}
             </tbody>
@@ -629,8 +727,8 @@
                   <td class="break-all">{% if entry['description'] is not none %}{{ entry['description'] }}{% endif %}</td>
                   <td class="thumb-cell">
                     {% if entry.get('screen') %}
-                      <a href="/{{ entry['screen']|quote_plus }}" class="open-shot" data-caption="{{ entry['post_title']|default('') }}">
-                          Screen 
+                      <a href="/{{ entry['screen']|replace(' ', '%20') }}" class="open-shot" data-caption="{{ entry['post_title']|default('') }}">
+                        <img class="thumb" src="/screenshots/thumb/{{ entry['screen'][12:]|replace(' ', '%20') }}" alt="Screen" loading="lazy" decoding="async">
                       </a>
                     {% endif %}
                   </td>

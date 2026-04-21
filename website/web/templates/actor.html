@@ -1,53 +1,98 @@
 {% extends "base.html" %}
-{% block title %}{{ actor['name'] }} — Threat Actor{% endblock %}
+{% block title %}{{ actor['name'] }} — Threat Actor · RansomLook{% endblock %}
 
 {% block content %}
-<section class="hero">
-  <div class="container">
-    <h1 class="d-inline">{{ actor['name'] }}</h1>
-    {% if current_user.is_authenticated %}
-      <a class="edit-link" href="/admin/editactor/{{ actor['name']|urlencode }}">Edit</a>
+
+{# ===== HERO ===== #}
+{% set w = actor.get('wanted') or {} %}
+{% set has_wanted = w.get('fbi',{}).get('url') or w.get('europol',{}).get('url') or w.get('interpol',{}).get('url') %}
+{% set _aliases_raw = actor.get('aliases', actor.get('alias', [])) %}
+{% if _aliases_raw is string %}
+  {% set aliases = _aliases_raw.replace(',', ' ').replace('|', ' ').split() %}
+{% elif _aliases_raw %}
+  {% set aliases = _aliases_raw %}
+{% else %}
+  {% set aliases = [] %}
+{% endif %}
+
+<section class="actor-hero">
+  <div class="actor-hero__bg" aria-hidden="true"></div>
+  <div class="container actor-hero__inner">
+
+    <div class="actor-hero__head">
+      <div class="actor-hero__logo" style="background:{{ actor['name']|lower|palette_color }}">
+        <span>{{ actor['name'][:1]|upper }}</span>
+      </div>
+
+      <div class="actor-hero__ident">
+        <h1 class="actor-hero__title">
+          <span class="group-dot" style="background:{{ actor['name']|lower|palette_color }}" aria-hidden="true"></span>
+          {{ actor['name'] }}
+        </h1>
+        <div class="profile-badges">
+          {% if has_wanted %}<span class="badge-status badge-down">WANTED</span>{% endif %}
+          {% if actor.get('noactive') %}<span class="badge-noactive">Inactive</span>{% endif %}
+          {% if actor.get('private') %}<span class="badge-private">Private</span>{% endif %}
+          {% if rel_groups %}<span class="badge-neutral">{{ rel_groups|length }} group{{ '' if rel_groups|length == 1 else 's' }}</span>{% endif %}
+          {% if peers_known %}<span class="badge-neutral">{{ peers_known|length }} peer{{ '' if peers_known|length == 1 else 's' }}</span>{% endif %}
+        </div>
+      </div>
+
+      <div class="actor-hero__actions">
+        {% if current_user.is_authenticated %}
+          <a class="btn-hero btn-hero--ghost btn-sm" href="/admin/editactor/{{ actor['name']|urlencode }}">Edit</a>
+        {% endif %}
+      </div>
+    </div>
+
+    {% if aliases %}
+      <div class="actor-hero__aliases">
+        <span class="muted">AKA</span>
+        {% for a in aliases %}<span class="chip">{{ a }}</span>{% endfor %}
+      </div>
     {% endif %}
+
+    {% if has_wanted %}
+      <div class="actor-wanted-banner">
+        <span class="wanted-icon">⚠</span>
+        <div class="wanted-links">
+          {% if w.get('fbi',{}).get('url') %}<a class="wanted-link wanted-link--fbi" href="{{ w['fbi']['url'] }}" target="_blank" rel="noopener">FBI</a>{% endif %}
+          {% if w.get('europol',{}).get('url') %}<a class="wanted-link wanted-link--europol" href="{{ w['europol']['url'] }}" target="_blank" rel="noopener">Europol</a>{% endif %}
+          {% if w.get('interpol',{}).get('url') %}<a class="wanted-link wanted-link--interpol" href="{{ w['interpol']['url'] }}" target="_blank" rel="noopener">INTERPOL</a>{% endif %}
+        </div>
+      </div>
+    {% endif %}
+
   </div>
 </section>
 
+{# ===== RELATION GRAPH ===== #}
+{% set total_rels = (rel_groups|length) + (rel_groupsunk|length) + (rel_forums|length) + (rel_forumsunk|length) + (peers_known|length) + (peers_unknown|length) %}
+{% if total_rels > 0 %}
 <section class="metrics-section">
   <div class="container">
-
-    <!-- Badges -->
-    <div class="profile-badges mb-14">
-      {% set w = actor.get('wanted') or {} %}
-      {% if (w.get('fbi',{}).get('url') or w.get('europol',{}).get('url') or w.get('interpol',{}).get('url')) %}
-        <span class="badge-neutral">Wanted listing</span>
-      {% endif %}
-      {% if actor.get('noactive') %}<span class="badge-noactive">No more active</span>{% endif %}
-      {% if actor.get('private') %}<span class="badge-private">Private</span>{% endif %}
+    <div class="table-card">
+      <div class="card-toolbar"><span class="card-title">Relation graph</span></div>
+      <div id="cy-container" class="cy-container"></div>
+      <div class="cy-legend">
+        <span class="cy-legend__item"><span class="cy-legend__shape cy-legend__circle cy-legend--self"></span> This actor</span>
+        <span class="cy-legend__item"><span class="cy-legend__shape cy-legend__rect"></span> Group</span>
+        <span class="cy-legend__item"><span class="cy-legend__shape cy-legend__diamond"></span> Market / Forum</span>
+        <span class="cy-legend__item"><span class="cy-legend__shape cy-legend__circle"></span> Other actor</span>
+        <span class="cy-legend__item"><span class="cy-legend__shape cy-legend__circle cy-legend--unknown"></span> Unknown (not in DB)</span>
+      </div>
     </div>
+  </div>
+</section>
+{% endif %}
+
+<section class="metrics-section">
+  <div class="container">
 
     <!-- 2 columns -->
     <div class="ta-grid">
       <!-- Main column -->
       <div class="col-main">
-<!-- Aliases -->
-{% set _aliases_raw = actor.get('aliases', actor.get('alias', [])) %}
-{% if _aliases_raw %}
-  {% if _aliases_raw is string %}
-    {% set aliases = _aliases_raw.replace(',', ' ').replace('|', ' ').split() %}
-  {% else %}
-    {% set aliases = _aliases_raw %}
-  {% endif %}
-  <div class="table-card">
-    <div class="card-toolbar"><span class="card-title">Aliases <span class="muted">({{ aliases|length }})</span></span></div>
-    <div class="prose pad">
-      <div class="alias-chips" role="list">
-        {% for a in aliases %}
-          {% set alias = a|string %}
-          <span class="chip" role="listitem" title="{{ alias }}">{{ alias }}</span>
-        {% endfor %}
-      </div>
-    </div>
-  </div>
-{% endif %}
 
         <!-- Description -->
         <div class="table-card">
@@ -78,7 +123,7 @@
           </div>
         </div>
 
-        <!-- Relations -->
+        <!-- Relations (text fallback / detail) -->
         <div class="table-card">
           <div class="card-toolbar"><span class="card-title">Relations</span></div>
           <div class="prose pad">
@@ -88,49 +133,39 @@
                 {% if rel_groups or rel_groupsunk %}
                   <ul class="tight">
                     {% for g in rel_groups %}
-                      <li><a href="/group/{{ g|urlencode }}">{{ g|title }}</a></li>
+                      <li><span class="group-dot" style="background:{{ g|lower|palette_color }}" aria-hidden="true"></span> <a href="/group/{{ g|urlencode }}">{{ g|title }}</a></li>
                     {% endfor %}
                     {% for g in rel_groupsunk %}
-                      <li class="muted">{{ g|title }}</a></li>
+                      <li class="muted">{{ g|title }}</li>
                     {% endfor %}
                   </ul>
-                {% else %}
-                  <p class="muted">No known group links.</p>
-                {% endif %}
+                {% else %}<p class="muted">No known group links.</p>{% endif %}
               </div>
-
               <div>
                 <h4 class="h4">Forums / Markets <span class="muted">({{ rel_forums|length }})</span></h4>
                 {% if rel_forums or rel_forumsunk %}
                   <ul class="tight">
                     {% for f in rel_forums %}
-                      <li><a href="/market/{{ f|urlencode }}">{{ f|title }}</a></li>
+                      <li><span class="group-dot" style="background:{{ f|lower|palette_color }}" aria-hidden="true"></span> <a href="/market/{{ f|urlencode }}">{{ f|title }}</a></li>
                     {% endfor %}
                     {% for f in rel_forumsunk %}
-                      <li class="muted">{{ f|title }}</a></li>
+                      <li class="muted">{{ f|title }}</li>
                     {% endfor %}
                   </ul>
-                {% else %}
-                  <p class="muted">No known forum links.</p>
-                {% endif %}
+                {% else %}<p class="muted">No known forum links.</p>{% endif %}
               </div>
-
               <div>
-                <h4 class="h4">Other actors
-                  <span class="muted">({{ (peers_known|length) + (peers_unknown|length) }})</span>
-                </h4>
+                <h4 class="h4">Other actors <span class="muted">({{ (peers_known|length) + (peers_unknown|length) }})</span></h4>
                 {% if peers_known or peers_unknown %}
                   <ul class="tight">
                     {% for pname in peers_known %}
-                      <li><a href="/actor/{{ pname|urlencode }}">{{ pname }}</a></li>
+                      <li><span class="group-dot" style="background:{{ pname|lower|palette_color }}" aria-hidden="true"></span> <a href="/actor/{{ pname|urlencode }}">{{ pname }}</a></li>
                     {% endfor %}
                     {% for pname in peers_unknown %}
                       <li class="muted">{{ pname }}</li>
                     {% endfor %}
                   </ul>
-                {% else %}
-                  <p class="muted">No peers documented.</p>
-                {% endif %}
+                {% else %}<p class="muted">No peers documented.</p>{% endif %}
               </div>
             </div>
           </div>
@@ -159,7 +194,6 @@
 
       <!-- Side column -->
       <aside class="col-side">
-
         <!-- Identity -->
         <div class="table-card">
           <div class="card-toolbar"><span class="card-title">Personal information</span></div>
@@ -193,11 +227,8 @@
                 {% for k, vals in c.items() %}
                   {% for v in vals %}
                     <li><strong>{{ k|title }}:</strong>
-                      {% if (v|string).startswith('http') %}
-                        <a href="{{ v }}" target="_blank" rel="noopener">{{ v }}</a>
-                      {% else %}
-                        {{ v }}
-                      {% endif %}
+                      {% if (v|string).startswith('http') %}<a href="{{ v }}" target="_blank" rel="noopener">{{ v }}</a>
+                      {% else %}{{ v }}{% endif %}
                     </li>
                   {% endfor %}
                 {% endfor %}
@@ -205,20 +236,6 @@
             {% endif %}
           </div>
         </div>
-
-        <!-- Wanted -->
-        <div class="table-card">
-          <div class="card-toolbar"><span class="card-title">Wanted listings</span></div>
-          <div class="prose pad">
-            {% set w = actor.get('wanted') or {} %}
-            <ul class="tight">
-              <li><strong>FBI:</strong> {% if w.get('fbi',{}).get('url') %}<a href="{{ w['fbi']['url'] }}" target="_blank" rel="noopener">View</a>{% else %}<span class="muted">—</span>{% endif %}</li>
-              <li><strong>Europol:</strong> {% if w.get('europol',{}).get('url') %}<a href="{{ w['europol']['url'] }}" target="_blank" rel="noopener">View</a>{% else %}<span class="muted">—</span>{% endif %}</li>
-              <li><strong>INTERPOL:</strong> {% if w.get('interpol',{}).get('url') %}<a href="{{ w['interpol']['url'] }}" target="_blank" rel="noopener">View</a>{% else %}<span class="muted">—</span>{% endif %}</li>
-            </ul>
-          </div>
-        </div>
-
       </aside>
     </div>
   </div>
@@ -237,6 +254,30 @@
   </figure>
 </div>
 
+{# Graph data for cytoscape #}
+{% if total_rels > 0 %}
+<script type="application/json" id="graph-data">
+{
+  "center":      {{ actor['name']|tojson }},
+  "groups":      {{ rel_groups|tojson }},
+  "groups_unk":  {{ rel_groupsunk|tojson }},
+  "forums":      {{ rel_forums|tojson }},
+  "forums_unk":  {{ rel_forumsunk|tojson }},
+  "peers":       {{ peers_known|tojson }},
+  "peers_unk":   {{ peers_unknown|tojson }}
+}
+</script>
+<script
+  src="{{ url_for('static', filename='js/cytoscape.min.js') }}"
+  integrity="{{ get_sri('static','cytoscape.min.js') }}"
+  crossorigin="anonymous"
+  defer></script>
+<script
+  src="{{ url_for('static', filename='js/actor-graph.js') }}"
+  integrity="{{ get_sri('static','actor-graph.js') }}"
+  crossorigin="anonymous"
+  defer></script>
+{% endif %}
 
 <script src="{{ url_for('static', filename='js/lightbox.js') }}" defer></script>
 {% endblock %}
