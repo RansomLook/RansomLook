@@ -59,6 +59,16 @@
         "enable": false,
         "api_key": ""
     },
+    "torrent_health": {
+        "scan_retention_days": 30,
+        "dead_threshold_days": 90,
+        "ip_cache_ttl_days": 7,
+        "scan_duration_seconds": 45,
+        "batch_size": 10,
+        "alive_interval_hours": 6,
+        "dead_interval_hours": 24,
+        "frozen_interval_days": 7
+    },
     "users": {},
     "malpedia": "",
     "rf": "",
@@ -92,7 +102,8 @@
         "bluesky": "BlueSky notification configuration",
         "siteurl": "Url of your domain",
         "keepall": "Store all DLS main page on screenshots/old, be carefull of the size of your storage",
-        "remote_lacus": "By default, lookyloo will do the capture locally. Enabling this feature means you have a dedicated Lacus instance somewhere"
+        "remote_lacus": "By default, lookyloo will do the capture locally. Enabling this feature means you have a dedicated Lacus instance somewhere",
+        "torrent_health": "BitTorrent swarm health tracker. scan_retention_days / dead_threshold_days / ip_cache_ttl_days: set to 0 to keep forever. scan_duration_seconds / batch_size / *_interval_*: worker scheduling."
     }
 
 }

@@ -40,8 +40,8 @@ from flask import (
     send_from_directory,
     url_for,
 )
-from flask_babel import Babel # type: ignore[import-untyped]
-from flask_babel import get_locale as _babel_get_locale
+from flask_babel import Babel  # type: ignore[import-untyped]
+from flask_babel import get_locale as _babel_get_locale  # type: ignore[import-untyped]
 from flask_bootstrap import Bootstrap5  # type: ignore
 from flask_login import current_user
 from flask_restx import Api  # type: ignore
@@ -66,6 +66,7 @@ from ransomlook.default import (
     DB_POSTS,
     DB_RF,
     DB_TASKS,
+    DB_TORRENT_HEALTH,
     get_socket_path,
 )
 from ransomlook.default.config import get_config, get_homedir
@@ -2463,6 +2464,215 @@ def require_api_key(f: Any) -> Any:
         restx_abort(401, "Valid API key required. Pass it via the Authorization header.")
 
     return decorated
+
+
+# ─── Torrent swarm health (API + admin UI) ──────────────────────────────
+
+
+def _audit_torrent(action: str, infohash: str) -> None:
+    """Record who accessed what, for LEA traceability."""
+    who = (
+        current_user.id
+        if current_user.is_authenticated
+        else (check_api_key() or "anonymous")
+    )
+    try:
+        audit_log("torrent_" + action, who, infohash)
+    except Exception:
+        pass
+
+
+def _torrent_rate_limit_ok(infohash: str, ttl_seconds: int = 60) -> bool:
+    """Return True if a refresh is allowed right now for this caller+infohash."""
+    who = (
+        f"user:{current_user.id}"
+        if current_user.is_authenticated
+        else f"token:{check_api_key() or 'anon'}"
+    )
+    key = f"ratelimit:torrent-refresh:{who}:{infohash}"
+    r = Valkey(unix_socket_path=get_socket_path("cache"), db=DB_TASKS)
+    # SET NX with TTL → True if we were first to set
+    return bool(r.set(key, "1", ex=ttl_seconds, nx=True))
+
+
+@app.route("/api/torrent/health")
+@require_api_key
+def api_torrent_health_list():  # type: ignore[no-untyped-def]
+    """Paginated list of tracked infohashes with their last known state."""
+    from ransomlook import torrent_health as th
+
+    try:
+        page = max(1, int(request.args.get("page", "1")))
+    except ValueError:
+        page = 1
+    try:
+        per_page = min(200, max(1, int(request.args.get("per_page", "50"))))
+    except ValueError:
+        per_page = 50
+
+    alive_only = request.args.get("alive") == "1"
+    query = (request.args.get("q") or "").strip().lower()
+
+    rows = []
+    for ih in th.list_infohashes():
+        meta = th.get_meta(ih)
+        if not meta:
+            continue
+        if alive_only and int(meta.get("last_peers_count") or 0) == 0:
+            continue
+        if query:
+            hay = " ".join([
+                ih.lower(),
+                (meta.get("name") or "").lower(),
+                " ".join(meta.get("groups") or []).lower(),
+            ])
+            if query not in hay:
+                continue
+        rows.append(meta)
+
+    rows.sort(key=lambda r: (-int(r.get("last_peers_count") or 0), r.get("name") or ""))
+    total = len(rows)
+    start = (page - 1) * per_page
+    return jsonify(
+        {
+            "total": total,
+            "page": page,
+            "per_page": per_page,
+            "results": rows[start:start + per_page],
+        }
+    )
+
+
+@app.route("/api/torrent/health/<infohash>")
+@require_api_key
+def api_torrent_health_detail(infohash: str):  # type: ignore[no-untyped-def]
+    from ransomlook import torrent_health as th
+
+    meta = th.get_meta(infohash)
+    if not meta:
+        return jsonify({"error": "unknown infohash"}), 404
+    try:
+        limit = min(200, max(1, int(request.args.get("history", "50"))))
+    except ValueError:
+        limit = 50
+    history = th.get_history(infohash, limit=limit)
+    _audit_torrent("read_detail", infohash)
+    return jsonify({"meta": meta, "history": history})
+
+
+@app.route("/api/torrent/refresh/<infohash>", methods=["POST"])
+@require_api_key
+def api_torrent_refresh(infohash: str):  # type: ignore[no-untyped-def]
+    """Kick a refresh asynchronously and return 202 immediately.
+
+    The scan runs in a background thread so the gunicorn worker is not
+    blocked for the 30–45 s it takes. Closing the browser does not abort
+    the scan. Results are persisted in Valkey and visible on the next
+    page load.
+
+    Pass ``?wait=1`` to block until the scan completes (max 90 s, useful
+    for scripted LEA workflows).
+    """
+    from ransomlook import torrent_health as th
+
+    infohash = infohash.lower().strip()
+    if not infohash or len(infohash) not in (40, 64):
+        return jsonify({"error": "invalid infohash"}), 400
+    if not _torrent_rate_limit_ok(infohash, ttl_seconds=60):
+        return jsonify({"error": "rate limited (1 refresh/min per caller+infohash)"}), 429
+
+    _audit_torrent("refresh", infohash)
+
+    # Atomic "running" guard so two concurrent refreshes don't double-scan.
+    lock_key = f"ratelimit:torrent-running:{infohash}"
+    lock_r = Valkey(unix_socket_path=get_socket_path("cache"), db=DB_TASKS)
+    if not lock_r.set(lock_key, "1", ex=180, nx=True):
+        return jsonify({"error": "a scan is already running for this infohash"}), 409
+
+    def _worker() -> None:
+        try:
+            th.run_once(only=[infohash], scan_duration=30)
+        except Exception:
+            app.logger.exception("background torrent refresh failed")
+        finally:
+            try:
+                lock_r.delete(lock_key)
+            except Exception:
+                pass
+
+    import threading
+    thread = threading.Thread(target=_worker, name=f"torrent-refresh-{infohash[:12]}", daemon=True)
+    thread.start()
+
+    # Synchronous mode for scripted callers (LEA export workflows).
+    if request.args.get("wait") == "1":
+        thread.join(timeout=90)
+        meta = th.get_meta(infohash)
+        history = th.get_history(infohash, limit=1)
+        return jsonify({
+            "status": "done" if not thread.is_alive() else "running",
+            "meta": meta,
+            "latest": history[0] if history else None,
+        })
+
+    return jsonify({"status": "queued", "infohash": infohash}), 202
+
+
+@app.route("/api/enrich/ip/<ip>")
+@require_api_key
+def api_enrich_ip(ip: str):  # type: ignore[no-untyped-def]
+    from ransomlook import ipenrich as ie
+
+    force = request.args.get("force") == "1"
+    data = ie.enrich(ip, force=force)
+    return jsonify(data)
+
+
+@app.route("/api/enrich/ip/bulk", methods=["POST"])
+@require_api_key
+def api_enrich_ip_bulk():  # type: ignore[no-untyped-def]
+    from ransomlook import ipenrich as ie
+
+    payload = request.get_json(silent=True) or {}
+    ips = payload.get("ips") or []
+    if not isinstance(ips, list):
+        return jsonify({"error": "ips must be a list"}), 400
+    ips = [str(x) for x in ips][:200]  # hard cap per request
+    force = bool(payload.get("force"))
+    return jsonify(ie.bulk_enrich(ips, force=force))
+
+
+@app.route("/admin/torrent-health")
+@flask_login.login_required
+def admin_torrent_health():  # type: ignore[no-untyped-def]
+    from ransomlook import torrent_health as th
+
+    rows = []
+    for ih in th.list_infohashes():
+        meta = th.get_meta(ih)
+        if meta:
+            rows.append(meta)
+    rows.sort(key=lambda r: (-int(r.get("last_peers_count") or 0), r.get("name") or ""))
+    return render_template("admin/torrent_health.html", rows=rows)
+
+
+@app.route("/admin/torrent-health/<infohash>")
+@flask_login.login_required
+def admin_torrent_health_detail(infohash: str):  # type: ignore[no-untyped-def]
+    from ransomlook import torrent_health as th
+
+    meta = th.get_meta(infohash)
+    if not meta:
+        flash("Unknown infohash", "error")
+        return redirect(url_for("admin_torrent_health"))
+    history = th.get_history(infohash, limit=180)
+    _audit_torrent("read_detail_ui", infohash)
+    return render_template(
+        "admin/torrent_health_detail.html",
+        meta=meta,
+        history=history,
+        latest=history[0] if history else None,
+    )
 
 
 # Admin Zone

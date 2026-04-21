@@ -1,0 +1,281 @@
+{% extends "base.html" %}
+{% from 'bootstrap5/utils.html' import render_messages %}
+{% block title %}{{ _('Admin · Torrent · %(ih)s…', ih=meta.infohash[:12]) }}{% endblock %}
+
+{% block content %}
+{{ render_messages(container=True, dismissible=True) }}
+
+<section class="hero">
+  <div class="container">
+    <h1>{{ meta.name or _('(unknown)') }}</h1>
+    <p class="lead mono" style="word-break:break-all">{{ meta.infohash }}</p>
+    <div class="cta-row">
+      <a class="btn btn-secondary" href="{{ url_for('admin_torrent_health') }}">← {{ _('Back') }}</a>
+      <button class="btn btn-primary th-refresh" data-ih="{{ meta.infohash }}">{{ _('Refresh now') }}</button>
+    </div>
+  </div>
+</section>
+
+<section class="metrics-section">
+  <div class="container">
+
+    <!-- KPIs -->
+    <div class="week-grid pad-mb">
+      <div class="week-kpi">
+        <div class="week-kpi__value">{{ meta.last_peers_count or 0 }}</div>
+        <div class="week-kpi__label">{{ _('peers (last scan)') }}</div>
+      </div>
+      <div class="week-kpi">
+        <div class="week-kpi__value">{{ meta.last_seeders or 0 }} / {{ meta.last_leechers or 0 }}</div>
+        <div class="week-kpi__label">{{ _('seed / leech') }}</div>
+      </div>
+      <div class="week-kpi">
+        <div class="week-kpi__value">
+          {% if meta.size_bytes %}{{ (meta.size_bytes / 1024 / 1024 / 1024) | round(2) }} GB{% else %}—{% endif %}
+        </div>
+        <div class="week-kpi__label">{{ _('size') }}</div>
+      </div>
+      <div class="week-kpi">
+        <div class="week-kpi__value">
+          {% if meta.last_seen_alive %}
+            <time datetime="{{ meta.last_seen_alive }}" data-ts="{{ meta.last_seen_alive }}">{{ meta.last_seen_alive.split('T')[0] }}</time>
+          {% else %}{{ _('never') }}{% endif %}
+        </div>
+        <div class="week-kpi__label">{{ _('last seen alive') }}</div>
+      </div>
+    </div>
+
+    <!-- Associated groups + magnets -->
+    <div class="table-card p-12 mb-14">
+      <strong>{{ _('Groups:') }}</strong>
+      {% for g in meta.groups or [] %}
+        <a href="/group/{{ g|urlencode }}">{{ g }}</a>{% if not loop.last %}, {% endif %}
+      {% endfor %}
+      {% if not meta.groups %}<span class="muted">—</span>{% endif %}
+      <br>
+      <strong>{{ _('Magnets:') }}</strong>
+      <ul class="tight" style="margin:6px 0">
+        {% for m in meta.magnets or [] %}<li class="mono" style="word-break:break-all">{{ m }}</li>{% endfor %}
+      </ul>
+      <strong>{{ _('Known since:') }}</strong> {{ meta.first_seen or '—' }}<br>
+      <strong>{{ _('Last scan:') }}</strong> {{ meta.last_scan or '—' }}
+    </div>
+
+    <!-- History sparkline (inline svg) -->
+    {% if meta.sparkline %}
+    <div class="table-card p-12 mb-14">
+      <div class="card-toolbar bb"><span class="fw-600">{{ _('Peers over time (last 30 days)') }}</span></div>
+      {% set values = meta.sparkline | map(attribute='peers_count') | list %}
+      {% set vmax = (values | max) if values else 0 %}
+      <svg viewBox="0 0 600 80" preserveAspectRatio="none" style="width:100%;height:80px">
+        {% set n = values | length %}
+        {% set bw = ((600 - (n - 1) * 1.5) / n) | round(3) %}
+        {% for v in values %}
+          {% set h = ((v / vmax) * 72) | round(2) if vmax else 0 %}
+          {% set x = loop.index0 * (bw + 1.5) %}
+          {% set y = 75 - h %}
+          <rect x="{{ x }}" y="{{ y }}" width="{{ bw }}" height="{{ h if h > 0 else 1.2 }}" fill="#10b981" rx="1" />
+        {% endfor %}
+      </svg>
+    </div>
+    {% endif %}
+
+    <!-- Last sample of peers -->
+    {% if latest and latest.peers %}
+    <div class="table-card">
+      <div class="card-toolbar bb">
+        <span class="fw-600">{{ _('Peer sample — %(ts)s', ts=latest.ts) }}</span>
+        <span class="muted">{{ ngettext('%(n)s peer · enrichment via CIRCL IP ASN History', '%(n)s peers · enrichment via CIRCL IP ASN History', latest.peers|length, n=latest.peers|length) }}</span>
+      </div>
+      <div class="table-scroll">
+        <table class="rl-table th-peers" aria-label="{{ _('Peers') }}">
+          <thead>
+            <tr>
+              <th style="width:13%">{{ _('IP') }}</th>
+              <th style="width:6%"><center>{{ _('Port') }}</center></th>
+              <th style="width:7%"><center>{{ _('Progress') }}</center></th>
+              <th style="width:14%">{{ _('Client') }}</th>
+              <th style="width:10%">{{ _('ASN') }}</th>
+              <th style="width:18%">{{ _('Org') }}</th>
+              <th style="width:5%"><center>{{ _('CC') }}</center></th>
+              <th style="width:15%">{{ _('PTR') }}</th>
+              <th>{{ _('Flags') }}</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for p in latest.peers %}
+            <tr data-ip="{{ p.ip }}">
+              <td class="mono">{{ p.ip }}</td>
+              <td><center>{{ p.port }}</center></td>
+              <td><center>{{ p.progress }}%</center></td>
+              <td>{{ p.client }}</td>
+              <td class="enrich-asn"><span class="muted">…</span></td>
+              <td class="enrich-org"><span class="muted">…</span></td>
+              <td class="enrich-cc"><center><span class="muted">…</span></center></td>
+              <td class="enrich-ptr mono" style="font-size:.8rem"><span class="muted">…</span></td>
+              <td><code>{{ p.flags }}</code></td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+    {% else %}
+    <p class="muted">{{ _('No peers observed on the last scan.') }}</p>
+    {% endif %}
+
+    <!-- Full history — expand a row to see that scan's peer sample -->
+    {% if history %}
+    <details class="section-block" style="margin-top:16px" data-accordion open>
+      <summary class="section-summary">
+        <span>{{ _('All scans (click a row to show its peer sample)') }}</span><span class="count">{{ history | length }}</span>
+      </summary>
+      <div class="table-card">
+        <div class="table-scroll">
+          <table class="rl-table" aria-label="{{ _('History') }}" id="th-history">
+            <thead>
+              <tr>
+                <th style="width:30px"></th>
+                <th>{{ _('Timestamp') }}</th>
+                <th><center>{{ _('Seeders') }}</center></th>
+                <th><center>{{ _('Leechers') }}</center></th>
+                <th><center>{{ _('Peers') }}</center></th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for h in history %}
+              <tr class="th-hist-row" data-peers='{{ h.peers|tojson }}' data-ts="{{ h.ts }}" style="cursor:pointer">
+                <td><center>{% if h.peers %}<span class="th-caret" aria-hidden="true">▸</span>{% else %}<span class="muted">·</span>{% endif %}</center></td>
+                <td><time datetime="{{ h.ts }}">{{ h.ts }}</time></td>
+                <td><center>{{ h.seeders }}</center></td>
+                <td><center>{{ h.leechers }}</center></td>
+                <td><center>{{ h.peers_count }}</center></td>
+              </tr>
+              <tr class="th-hist-peers" hidden>
+                <td colspan="5"><div class="th-hist-peers-body"></div></td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </details>
+    {% endif %}
+
+<script>
+(() => {
+  function renderPeers(peers) {
+    if (!peers || !peers.length) return '<p class="muted" style="padding:8px">No peers in this scan.</p>';
+    const rows = peers.map(p => `
+      <tr data-ip="${p.ip}">
+        <td class="mono">${p.ip}</td>
+        <td><center>${p.port}</center></td>
+        <td><center>${p.progress}%</center></td>
+        <td>${p.client ? p.client.replace(/</g,'&lt;') : ''}</td>
+        <td class="enrich-asn"><span class="muted">…</span></td>
+        <td class="enrich-org"><span class="muted">…</span></td>
+        <td class="enrich-cc"><center><span class="muted">…</span></center></td>
+        <td class="enrich-ptr mono" style="font-size:.8rem"><span class="muted">…</span></td>
+        <td><code>${p.flags || '-'}</code></td>
+      </tr>`).join('');
+    return `
+      <div class="table-scroll"><table class="rl-table th-peers" style="margin:8px 0">
+        <thead><tr>
+          <th style="width:13%">IP</th><th style="width:6%"><center>Port</center></th>
+          <th style="width:7%"><center>Progress</center></th><th style="width:14%">Client</th>
+          <th style="width:10%">ASN</th><th style="width:18%">Org</th>
+          <th style="width:5%"><center>CC</center></th><th style="width:15%">PTR</th>
+          <th>Flags</th>
+        </tr></thead>
+        <tbody>${rows}</tbody>
+      </table></div>`;
+  }
+
+  async function enrichTable(table) {
+    if (!table) return;
+    const rows = [...table.querySelectorAll('tr[data-ip]')].filter(r => !r.dataset.enriched);
+    const ips = [...new Set(rows.map(r => r.dataset.ip).filter(ip => ip && ip !== '?'))];
+    if (!ips.length) return;
+    rows.forEach(r => { r.dataset.enriched = '1'; });
+    try {
+      const resp = await fetch('/api/enrich/ip/bulk', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({ips}),
+      });
+      if (!resp.ok) return;
+      const data = await resp.json();
+      rows.forEach(r => {
+        const info = data[r.dataset.ip];
+        if (!info) return;
+        const fmt = v => v ? String(v).replace(/</g,'&lt;') : '<span class="muted">—</span>';
+        const asn = r.querySelector('.enrich-asn'); if (asn) asn.innerHTML = fmt(info.asn ? 'AS' + info.asn : '');
+        const org = r.querySelector('.enrich-org'); if (org) org.innerHTML = fmt(info.asn_org);
+        const cc  = r.querySelector('.enrich-cc');  if (cc)  cc.innerHTML = `<center>${fmt(info.country)}</center>`;
+        const ptr = r.querySelector('.enrich-ptr'); if (ptr) ptr.innerHTML = fmt(info.ptr);
+      });
+    } catch (e) { /* offline or error; leave placeholders */ }
+  }
+
+  // Enrich the main peer table on page load
+  document.querySelectorAll('.th-peers').forEach(enrichTable);
+
+  // Enrich expanded history tables on click
+  document.querySelectorAll('#th-history .th-hist-row').forEach(row => {
+    row.addEventListener('click', () => {
+      const next = row.nextElementSibling;
+      if (!next || !next.classList.contains('th-hist-peers')) return;
+      const body = next.querySelector('.th-hist-peers-body');
+      const caret = row.querySelector('.th-caret');
+      if (next.hidden) {
+        if (!body.dataset.loaded) {
+          try {
+            const peers = JSON.parse(row.dataset.peers || '[]');
+            body.innerHTML = renderPeers(peers);
+            body.dataset.loaded = '1';
+            // Enrich the freshly rendered table
+            body.querySelectorAll('.th-peers').forEach(enrichTable);
+          } catch (e) { body.innerHTML = '<p class="muted">Parse error</p>'; }
+        }
+        next.hidden = false;
+        if (caret) caret.textContent = '▾';
+      } else {
+        next.hidden = true;
+        if (caret) caret.textContent = '▸';
+      }
+    });
+  });
+})();
+</script>
+
+  </div>
+</section>
+
+<script>
+document.querySelector('.th-refresh')?.addEventListener('click', async (ev) => {
+  const btn = ev.currentTarget;
+  const ih = btn.dataset.ih;
+  btn.disabled = true;
+  const prev = btn.textContent;
+  btn.textContent = 'Queuing…';
+  try {
+    const resp = await fetch(`/api/torrent/refresh/${ih}`, { method: 'POST' });
+    if (resp.status === 202) {
+      btn.textContent = 'Scanning (≈45s) — page will reload';
+      setTimeout(() => location.reload(), 45000);
+    } else if (resp.ok) {
+      btn.textContent = 'Done — reload';
+      setTimeout(() => location.reload(), 800);
+    } else {
+      const msg = (await resp.json().catch(() => ({}))).error || resp.status;
+      btn.textContent = 'Err: ' + msg;
+      setTimeout(() => { btn.textContent = prev; btn.disabled = false; }, 3000);
+    }
+  } catch (e) {
+    btn.textContent = 'Err';
+    setTimeout(() => { btn.textContent = prev; btn.disabled = false; }, 2000);
+  }
+});
+</script>
+
+{% endblock %}

@@ -1,0 +1,156 @@
+{% extends "base.html" %}
+{% from 'bootstrap5/utils.html' import render_messages %}
+{% block title %}{{ _('Admin · Torrent Health') }}{% endblock %}
+
+{% block content %}
+{{ render_messages(container=True, dismissible=True) }}
+
+<section class="hero">
+  <div class="container">
+    <h1>{{ _('Torrent swarm health') }}</h1>
+    <p class="lead">
+      {{ _('Peer counts, seeders/leechers and peer samples for every magnet referenced by a tracked post. Scans are driven by the cron worker (poetry run torrent-health); use Refresh to force a live rescan for a specific swarm.') }}
+    </p>
+  </div>
+</section>
+
+<section class="metrics-section">
+  <div class="container">
+
+    <div class="table-card search-card pad-mb">
+      <div class="filters-wrap" style="display:flex;flex-wrap:wrap;gap:12px;align-items:center;padding:10px">
+        <div class="field field--search" style="flex:1 1 280px;min-width:220px">
+          <input id="th-q" class="input" type="search"
+                 placeholder="{{ _('Infohash, name or group…') }}" aria-label="{{ _('Search torrents') }}">
+          <button class="input-clear" type="button" aria-label="{{ _('Clear') }}">×</button>
+        </div>
+        <label style="display:inline-flex;align-items:center;gap:6px">
+          <input id="th-alive" type="checkbox"> <span class="muted">{{ _('alive only (peers > 0)') }}</span>
+        </label>
+        <span id="th-count" class="muted"></span>
+      </div>
+    </div>
+
+    <div class="table-card">
+      <div class="table-scroll">
+        <table class="rl-table" id="th-table" aria-label="{{ _('Torrent swarms') }}">
+          <thead>
+            <tr>
+              <th style="width:22%">{{ _('Name') }}</th>
+              <th style="width:16%">{{ _('Groups') }}</th>
+              <th style="width:22%">{{ _('Infohash') }}</th>
+              <th style="width:8%"><center>{{ _('Peers') }}</center></th>
+              <th style="width:8%"><center>{{ _('Seed / Leech') }}</center></th>
+              <th style="width:10%"><center>{{ _('Last scan') }}</center></th>
+              <th style="width:14%"><center>{{ _('Actions') }}</center></th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for r in rows %}
+            <tr class="th-row"
+                data-ih="{{ r.infohash }}"
+                data-name="{{ (r.name or '')|lower }}"
+                data-groups="{{ (r.groups|join(' '))|lower }}"
+                data-peers="{{ r.last_peers_count or 0 }}">
+              <td>{{ r.name or _('(unknown)') }}</td>
+              <td>
+                {% for g in r.groups or [] %}
+                  <a href="/group/{{ g|urlencode }}">{{ g }}</a>{% if not loop.last %},{% endif %}
+                {% endfor %}
+              </td>
+              <td>
+                <a class="mono" href="{{ url_for('admin_torrent_health_detail', infohash=r.infohash) }}">
+                  {{ r.infohash[:12] }}…{{ r.infohash[-6:] }}
+                </a>
+              </td>
+              <td><center>
+                {% set peers = r.last_peers_count or 0 %}
+                {% if peers == 0 %}
+                  <span class="badge-status badge-down">0</span>
+                {% elif peers < 5 %}
+                  <span class="badge-status badge-degraded">{{ peers }}</span>
+                {% else %}
+                  <span class="badge-status badge-up">{{ peers }}</span>
+                {% endif %}
+              </center></td>
+              <td><center>{{ r.last_seeders or 0 }} / {{ r.last_leechers or 0 }}</center></td>
+              <td><center>
+                {% if r.last_scan %}
+                  <time datetime="{{ r.last_scan }}" data-ts="{{ r.last_scan }}">{{ r.last_scan.split('T')[0] }}</time>
+                {% else %}<span class="muted">{{ _('never') }}</span>{% endif %}
+              </center></td>
+              <td><center>
+                <a class="btn btn-secondary btn-sm"
+                   href="{{ url_for('admin_torrent_health_detail', infohash=r.infohash) }}">{{ _('Detail') }}</a>
+                <button class="btn btn-primary btn-sm th-refresh" data-ih="{{ r.infohash }}">{{ _('Refresh') }}</button>
+              </center></td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    {% if not rows %}
+      <p class="prose" style="color:var(--muted);text-align:center;padding:32px 0">
+        {{ _('No torrent swarms scanned yet. Run poetry run torrent-health to populate.') }}
+      </p>
+    {% endif %}
+
+  </div>
+</section>
+
+<script>
+(() => {
+  const $q = document.getElementById('th-q');
+  const $alive = document.getElementById('th-alive');
+  const $rows = document.querySelectorAll('#th-table .th-row');
+  const $count = document.getElementById('th-count');
+  const $clear = document.querySelector('#th-q ~ .input-clear');
+
+  function apply() {
+    const q = ($q.value || '').toLowerCase().trim();
+    const aliveOnly = $alive.checked;
+    let shown = 0;
+    $rows.forEach(row => {
+      const okQ = !q || row.dataset.ih.includes(q) || row.dataset.name.includes(q) || row.dataset.groups.includes(q);
+      const okAlive = !aliveOnly || parseInt(row.dataset.peers, 10) > 0;
+      const v = okQ && okAlive;
+      row.hidden = !v;
+      if (v) shown++;
+    });
+    $count.textContent = shown + ' swarm' + (shown === 1 ? '' : 's');
+  }
+  $q.addEventListener('input', apply);
+  $alive.addEventListener('change', apply);
+  $clear?.addEventListener('click', () => { $q.value = ''; apply(); $q.focus(); });
+  apply();
+
+  document.querySelectorAll('.th-refresh').forEach(btn => btn.addEventListener('click', async () => {
+    const ih = btn.dataset.ih;
+    btn.disabled = true;
+    const prev = btn.textContent;
+    btn.textContent = 'Queuing…';
+    try {
+      const resp = await fetch(`/api/torrent/refresh/${ih}`, { method: 'POST' });
+      if (resp.status === 202) {
+        // Scan queued; runs in background. Give it ~45s then reload the page.
+        btn.textContent = 'Scanning (45s)…';
+        setTimeout(() => location.reload(), 45000);
+      } else if (resp.ok) {
+        btn.textContent = 'Done — reload';
+        setTimeout(() => location.reload(), 800);
+      } else {
+        const msg = (await resp.json().catch(() => ({}))).error || resp.status;
+        btn.textContent = 'Err: ' + msg;
+        setTimeout(() => { btn.textContent = prev; btn.disabled = false; }, 3000);
+      }
+    } catch (e) {
+      btn.textContent = 'Err';
+      setTimeout(() => { btn.textContent = prev; btn.disabled = false; }, 2000);
+    }
+  }));
+})();
+</script>
+
+{% endblock %}

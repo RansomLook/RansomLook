@@ -167,13 +167,26 @@ def scraper(base: int, only_names: list[str] | None = None) -> None:
         lacus = LacusCore(redislacus, tor_proxy="socks5://127.0.0.1:9050")  # type: ignore
 
     only_set = {n.lower() for n in only_names} if only_names else None
+    all_names: list[str] = []
     for key in red.keys():  # type: ignore[union-attr]
         name = key.decode()
+        all_names.append(name)
         if only_set and name.lower() not in only_set:
             continue
         group = json.loads(red.get(key))  # type: ignore[arg-type]
         group["name"] = name
         groups.append(group)
+    if only_set and not groups:
+        tokens = {tok for s in only_set for tok in s.split() if tok}
+        near = sorted({n for n in all_names if any(tok in n.lower() for tok in tokens)})
+        hint = ", ".join(near) if near else "(no similar name found)"
+        logger.warning(
+            "No matching %s in DB %d for %s. Closest names: %s",
+            "market(s)" if base == 3 else "group(s)",
+            base,
+            sorted(only_set),
+            hint,
+        )
     for group in groups:
         stdlog("ransomloook: " + "working on " + group["name"])
         # iterate each location/mirror/relay

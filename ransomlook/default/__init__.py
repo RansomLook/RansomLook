@@ -17,6 +17,7 @@ DB_CRYPTO = 7  # Cryptocurrency wallets and transactions
 DB_RF = 10  # Recorded Future channel data
 DB_NOTES = 11  # Ransom notes
 DB_ALERTS = 12  # Alert keywords and matches
+DB_TORRENT_HEALTH = 13  # BitTorrent swarm health + peer samples
 DB_LACUS = 15  # Lacus capture queue
 
 from .abstractmanager import AbstractManager  # noqa
@@ -41,5 +42,6 @@ __all__ = [
     "DB_RF",
     "DB_NOTES",
     "DB_ALERTS",
+    "DB_TORRENT_HEALTH",
     "DB_LACUS",
 ]
