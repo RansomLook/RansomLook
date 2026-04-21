@@ -1,19 +1,18 @@
 {% extends "base.html" %}
 
-{% block title %}500 · Internal Server Error{% endblock %}
+{% block title %}500 · {{ _('Internal Server Error') }}{% endblock %}
 
 {% block content %}
 <section class="err-page">
   <div class="container err-inner">
     <div class="err-code err-code--danger">500</div>
-    <h1 class="err-title">Something went wrong</h1>
+    <h1 class="err-title">{{ _('Something went wrong') }}</h1>
     <p class="err-msg">
-      An internal error occurred. The team has been notified.
-      You can try again in a moment or head back to the homepage.
+      {{ _('An internal error occurred. The team has been notified. You can try again in a moment or head back to the homepage.') }}
     </p>
     <div class="err-ctas">
-      <a class="btn-hero btn-hero--primary" href="/">Home</a>
-      <a class="btn-hero btn-hero--ghost"   href="javascript:location.reload()">Retry</a>
+      <a class="btn-hero btn-hero--primary" href="/">{{ _('Home') }}</a>
+      <a class="btn-hero btn-hero--ghost"   href="javascript:location.reload()">{{ _('Retry') }}</a>
     </div>
   </div>
 </section>

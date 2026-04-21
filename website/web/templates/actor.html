@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% block title %}{{ actor['name'] }} — Threat Actor · RansomLook{% endblock %}
+{% block title %}{{ actor['name'] }} — {{ _('Threat Actor') }} · RansomLook{% endblock %}
 
 {% block content %}
 
@@ -30,24 +30,24 @@
           {{ actor['name'] }}
         </h1>
         <div class="profile-badges">
-          {% if has_wanted %}<span class="badge-status badge-down">WANTED</span>{% endif %}
-          {% if actor.get('noactive') %}<span class="badge-noactive">Inactive</span>{% endif %}
-          {% if actor.get('private') %}<span class="badge-private">Private</span>{% endif %}
-          {% if rel_groups %}<span class="badge-neutral">{{ rel_groups|length }} group{{ '' if rel_groups|length == 1 else 's' }}</span>{% endif %}
-          {% if peers_known %}<span class="badge-neutral">{{ peers_known|length }} peer{{ '' if peers_known|length == 1 else 's' }}</span>{% endif %}
+          {% if has_wanted %}<span class="badge-status badge-down">{{ _('WANTED') }}</span>{% endif %}
+          {% if actor.get('noactive') %}<span class="badge-noactive">{{ _('Inactive') }}</span>{% endif %}
+          {% if actor.get('private') %}<span class="badge-private">{{ _('Private') }}</span>{% endif %}
+          {% if rel_groups %}<span class="badge-neutral">{{ ngettext('%(n)s group', '%(n)s groups', rel_groups|length, n=rel_groups|length) }}</span>{% endif %}
+          {% if peers_known %}<span class="badge-neutral">{{ ngettext('%(n)s peer', '%(n)s peers', peers_known|length, n=peers_known|length) }}</span>{% endif %}
         </div>
       </div>
 
       <div class="actor-hero__actions">
         {% if current_user.is_authenticated %}
-          <a class="btn-hero btn-hero--ghost btn-sm" href="/admin/editactor/{{ actor['name']|urlencode }}">Edit</a>
+          <a class="btn-hero btn-hero--ghost btn-sm" href="/admin/editactor/{{ actor['name']|urlencode }}">{{ _('Edit') }}</a>
         {% endif %}
       </div>
     </div>
 
     {% if aliases %}
       <div class="actor-hero__aliases">
-        <span class="muted">AKA</span>
+        <span class="muted">{{ _('AKA') }}</span>
         {% for a in aliases %}<span class="chip">{{ a }}</span>{% endfor %}
       </div>
     {% endif %}
@@ -72,14 +72,14 @@
 <section class="metrics-section">
   <div class="container">
     <div class="table-card">
-      <div class="card-toolbar"><span class="card-title">Relation graph</span></div>
+      <div class="card-toolbar"><span class="card-title">{{ _('Relation graph') }}</span></div>
       <div id="cy-container" class="cy-container"></div>
       <div class="cy-legend">
-        <span class="cy-legend__item"><span class="cy-legend__shape cy-legend__circle cy-legend--self"></span> This actor</span>
-        <span class="cy-legend__item"><span class="cy-legend__shape cy-legend__rect"></span> Group</span>
-        <span class="cy-legend__item"><span class="cy-legend__shape cy-legend__diamond"></span> Market / Forum</span>
-        <span class="cy-legend__item"><span class="cy-legend__shape cy-legend__circle"></span> Other actor</span>
-        <span class="cy-legend__item"><span class="cy-legend__shape cy-legend__circle cy-legend--unknown"></span> Unknown (not in DB)</span>
+        <span class="cy-legend__item"><span class="cy-legend__shape cy-legend__circle cy-legend--self"></span> {{ _('This actor') }}</span>
+        <span class="cy-legend__item"><span class="cy-legend__shape cy-legend__rect"></span> {{ _('Group') }}</span>
+        <span class="cy-legend__item"><span class="cy-legend__shape cy-legend__diamond"></span> {{ _('Market / Forum') }}</span>
+        <span class="cy-legend__item"><span class="cy-legend__shape cy-legend__circle"></span> {{ _('Other actor') }}</span>
+        <span class="cy-legend__item"><span class="cy-legend__shape cy-legend__circle cy-legend--unknown"></span> {{ _('Unknown (not in DB)') }}</span>
       </div>
     </div>
   </div>
@@ -96,19 +96,19 @@
 
         <!-- Description -->
         <div class="table-card">
-          <div class="card-toolbar"><span class="card-title">General description</span></div>
+          <div class="card-toolbar"><span class="card-title">{{ _('General description') }}</span></div>
           <div class="prose pad">
-            <p style="white-space:pre-wrap">{{ actor.get('bio','No description available.') }}</p>
+            <p style="white-space:pre-wrap">{{ actor.get('bio') or _('No description available.') }}</p>
           </div>
         </div>
 
         <!-- Sources -->
         <div class="table-card">
-          <div class="card-toolbar"><span class="card-title">Documentation / Sources</span></div>
+          <div class="card-toolbar"><span class="card-title">{{ _('Documentation / Sources') }}</span></div>
           <div class="prose pad">
             {% set src = actor.get('sources') or [] %}
             {% if not src %}
-              <p class="muted">No public sources.</p>
+              <p class="muted">{{ _('No public sources.') }}</p>
             {% else %}
               <ul class="tight">
                 {% for s in src %}
@@ -125,11 +125,11 @@
 
         <!-- Relations (text fallback / detail) -->
         <div class="table-card">
-          <div class="card-toolbar"><span class="card-title">Relations</span></div>
+          <div class="card-toolbar"><span class="card-title">{{ _('Relations') }}</span></div>
           <div class="prose pad">
             <div class="rel-grid">
               <div>
-                <h4 class="h4">Groups <span class="muted">({{ rel_groups|length }})</span></h4>
+                <h4 class="h4">{{ _('Groups') }} <span class="muted">({{ rel_groups|length }})</span></h4>
                 {% if rel_groups or rel_groupsunk %}
                   <ul class="tight">
                     {% for g in rel_groups %}
@@ -139,10 +139,10 @@
                       <li class="muted">{{ g|title }}</li>
                     {% endfor %}
                   </ul>
-                {% else %}<p class="muted">No known group links.</p>{% endif %}
+                {% else %}<p class="muted">{{ _('No known group links.') }}</p>{% endif %}
               </div>
               <div>
-                <h4 class="h4">Forums / Markets <span class="muted">({{ rel_forums|length }})</span></h4>
+                <h4 class="h4">{{ _('Forums / Markets') }} <span class="muted">({{ rel_forums|length }})</span></h4>
                 {% if rel_forums or rel_forumsunk %}
                   <ul class="tight">
                     {% for f in rel_forums %}
@@ -152,10 +152,10 @@
                       <li class="muted">{{ f|title }}</li>
                     {% endfor %}
                   </ul>
-                {% else %}<p class="muted">No known forum links.</p>{% endif %}
+                {% else %}<p class="muted">{{ _('No known forum links.') }}</p>{% endif %}
               </div>
               <div>
-                <h4 class="h4">Other actors <span class="muted">({{ (peers_known|length) + (peers_unknown|length) }})</span></h4>
+                <h4 class="h4">{{ _('Other actors') }} <span class="muted">({{ (peers_known|length) + (peers_unknown|length) }})</span></h4>
                 {% if peers_known or peers_unknown %}
                   <ul class="tight">
                     {% for pname in peers_known %}
@@ -165,7 +165,7 @@
                       <li class="muted">{{ pname }}</li>
                     {% endfor %}
                   </ul>
-                {% else %}<p class="muted">No peers documented.</p>{% endif %}
+                {% else %}<p class="muted">{{ _('No peers documented.') }}</p>{% endif %}
               </div>
             </div>
           </div>
@@ -174,7 +174,7 @@
         <!-- Images gallery -->
         {% if images and images|length > 0 %}
         <div class="table-card">
-          <div class="card-toolbar"><span class="card-title">Images / Documents</span></div>
+          <div class="card-toolbar"><span class="card-title">{{ _('Images / Documents') }}</span></div>
           <div class="prose pad">
             <div class="thumbs">
               {% for img in images %}
@@ -196,16 +196,16 @@
       <aside class="col-side">
         <!-- Identity -->
         <div class="table-card">
-          <div class="card-toolbar"><span class="card-title">Personal information</span></div>
+          <div class="card-toolbar"><span class="card-title">{{ _('Personal information') }}</span></div>
           <div class="prose pad">
             {% set idt = actor.get('identity') or {} %}
             <ul class="tight">
-              {% if idt.get('first_name') %}<li><strong>First name:</strong> {{ idt['first_name'] }}</li>{% endif %}
-              {% if idt.get('last_name') %}<li><strong>Last name:</strong> {{ idt['last_name'] }}</li>{% endif %}
-              {% if idt.get('age') %}<li><strong>Age:</strong> {{ idt['age'] }}</li>{% endif %}
-              {% if idt.get('dob') %}<li><strong>DOB:</strong> {{ idt['dob'] }}</li>{% endif %}
-              {% if idt.get('nationality') %}<li><strong>Nationality:</strong> {{ idt['nationality'] }}</li>{% endif %}
-              {% if idt.get('location') %}<li><strong>Location:</strong> {{ idt['location'] }}</li>{% endif %}
+              {% if idt.get('first_name') %}<li><strong>{{ _('First name') }}:</strong> {{ idt['first_name'] }}</li>{% endif %}
+              {% if idt.get('last_name') %}<li><strong>{{ _('Last name') }}:</strong> {{ idt['last_name'] }}</li>{% endif %}
+              {% if idt.get('age') %}<li><strong>{{ _('Age') }}:</strong> {{ idt['age'] }}</li>{% endif %}
+              {% if idt.get('dob') %}<li><strong>{{ _('DOB') }}:</strong> {{ idt['dob'] }}</li>{% endif %}
+              {% if idt.get('nationality') %}<li><strong>{{ _('Nationality') }}:</strong> {{ idt['nationality'] }}</li>{% endif %}
+              {% if idt.get('location') %}<li><strong>{{ _('Location') }}:</strong> {{ idt['location'] }}</li>{% endif %}
               {% if idt.get('notes') %}<li><em>{{ idt['notes'] }}</em></li>{% endif %}
             </ul>
           </div>
@@ -213,7 +213,7 @@
 
         <!-- Contacts -->
         <div class="table-card">
-          <div class="card-toolbar"><span class="card-title">Contacts / Social</span></div>
+          <div class="card-toolbar"><span class="card-title">{{ _('Contacts / Social') }}</span></div>
           <div class="prose pad">
             {% set c = actor.get('contacts') or {} %}
             {% set ns = namespace(has=False) %}
@@ -221,7 +221,7 @@
               {% if vals and vals|length > 0 %}{% set ns.has = True %}{% endif %}
             {% endfor %}
             {% if not ns.has %}
-              <p class="muted">No contacts listed.</p>
+              <p class="muted">{{ _('No contacts listed.') }}</p>
             {% else %}
               <ul class="tight">
                 {% for k, vals in c.items() %}

@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %}RansomLook — Search{% endblock %}
+{% block title %}RansomLook — {{ _('Search') }}{% endblock %}
 
 {% block content %}
 <section class="content-section">
@@ -8,14 +8,14 @@
 
     {# ===== Groups ===== #}
     {% if groups %}
-    <h2 class="section-title">Groups</h2>
+    <h2 class="section-title">{{ _('Groups') }}</h2>
     <article class="section-block">
       <div class="table-card"><div class="table-scroll">
-        <table class="rl-table" aria-label="Groups">
+        <table class="rl-table" aria-label="{{ _('Groups') }}">
           <thead>
             <tr>
-              <th style="width:10%">Group</th>
-              <th>Description</th>
+              <th style="width:10%">{{ _('Group') }}</th>
+              <th>{{ _('Description') }}</th>
             </tr>
           </thead>
           <tbody>
@@ -33,14 +33,14 @@
 
     {# ===== Markets ===== #}
     {% if markets %}
-    <h2 class="section-title">Markets</h2>
+    <h2 class="section-title">{{ _('Markets') }}</h2>
     <article class="section-block">
       <div class="table-card"><div class="table-scroll">
-        <table class="rl-table" aria-label="Markets">
+        <table class="rl-table" aria-label="{{ _('Markets') }}">
           <thead>
             <tr>
-              <th style="width:15%">Group</th>
-              <th>Description</th>
+              <th style="width:15%">{{ _('Group') }}</th>
+              <th>{{ _('Description') }}</th>
             </tr>
           </thead>
           <tbody>
@@ -58,14 +58,14 @@
 
     {# ===== Leaks ===== #}
     {% if leaks %}
-    <h2 class="section-title">Leaks</h2>
+    <h2 class="section-title">{{ _('Leaks') }}</h2>
     <article class="section-block">
       <div class="table-card"><div class="table-scroll">
-        <table class="rl-table" aria-label="Leaks">
+        <table class="rl-table" aria-label="{{ _('Leaks') }}">
           <thead>
             <tr>
-              <th style="width:15%">Leak</th>
-              <th>Description</th>
+              <th style="width:15%">{{ _('Leak') }}</th>
+              <th>{{ _('Description') }}</th>
             </tr>
           </thead>
           <tbody>
@@ -83,15 +83,15 @@
 
     {# ===== Posts ===== #}
     {% if posts %}
-    <h2 class="section-title">Posts</h2>
+    <h2 class="section-title">{{ _('Posts') }}</h2>
     <article class="section-block">
       <div class="table-card"><div class="table-scroll">
-        <table class="rl-table" aria-label="Posts">
+        <table class="rl-table" aria-label="{{ _('Posts') }}">
           <thead>
             <tr>
-              <th style="width:15%">Group</th>
-              <th>Title</th>
-              <th style="width:10%">Date</th>
+              <th style="width:15%">{{ _('Group') }}</th>
+              <th>{{ _('Title') }}</th>
+              <th style="width:10%">{{ _('Date') }}</th>
             </tr>
           </thead>
           <tbody>
@@ -115,14 +115,14 @@
 
     {# ===== Notes ===== #}
     {% if notes %}
-    <h2 class="section-title">Notes</h2>
+    <h2 class="section-title">{{ _('Notes') }}</h2>
     <article class="section-block">
       <div class="table-card"><div class="table-scroll">
-        <table class="rl-table" aria-label="Notes">
+        <table class="rl-table" aria-label="{{ _('Notes') }}">
           <thead>
             <tr>
-              <th style="width:15%">Group</th>
-              <th>Name of Ransom note</th>
+              <th style="width:15%">{{ _('Group') }}</th>
+              <th>{{ _('Name of Ransom note') }}</th>
             </tr>
           </thead>
           <tbody>
@@ -143,15 +143,15 @@
 
     {# ===== Cryptocurrencies (remplace Channels / Messages) ===== #}
     {% if cryptocurrencies %}
-    <h2 class="section-title">Cryptocurrencies</h2>
+    <h2 class="section-title">{{ _('Cryptocurrencies') }}</h2>
     <article class="section-block">
       <div class="table-card"><div class="table-scroll">
-        <table class="rl-table" aria-label="Cryptocurrencies">
+        <table class="rl-table" aria-label="{{ _('Cryptocurrencies') }}">
           <thead>
             <tr>
-              <th style="width:15%">Blockchain</th>
-              <th>Address</th>
-              <th style="width:10%">Tx</th>
+              <th style="width:15%">{{ _('Blockchain') }}</th>
+              <th>{{ _('Address') }}</th>
+              <th style="width:10%">{{ _('Tx') }}</th>
             </tr>
           </thead>
           <tbody>
@@ -170,7 +170,7 @@
 
     {# Si vraiment rien à afficher : #}
     {% if (not groups) and (not markets) and (not leaks) and (not posts) and (not notes) and (not cryptocurrencies) %}
-      <p class="muted">No result</p>
+      <p class="muted">{{ _('No result') }}</p>
     {% endif %}
 
   </div>

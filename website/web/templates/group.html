@@ -44,20 +44,20 @@
 
       <div class="group-hero__actions">
         {% if current_user.is_authenticated %}
-          <a class="btn-hero btn-hero--ghost btn-sm" href="/admin/edit/{{ group['db'] }}/{{ group['name']|urlencode }}">Edit</a>
+          <a class="btn-hero btn-hero--ghost btn-sm" href="/admin/edit/{{ group['db'] }}/{{ group['name']|urlencode }}">{{ _('Edit') }}</a>
         {% endif %}
-        <a class="btn-hero btn-hero--ghost btn-sm" href="{{ url_for('compare') }}">Compare</a>
+        <a class="btn-hero btn-hero--ghost btn-sm" href="{{ url_for('compare') }}">{{ _('Compare') }}</a>
         {% if crypto_link %}<a class="btn-hero btn-hero--ghost btn-sm" href="{{ crypto_link }}" title="View crypto">Crypto</a>{% endif %}
       </div>
     </div>
 
     <div class="group-hero__kpis">
-      <div class="g-kpi"><span class="g-kpi__value">{{ total_posts }}</span><span class="g-kpi__label">posts (all time)</span></div>
-      <div class="g-kpi"><span class="g-kpi__value">{{ posts_30d_count }}</span><span class="g-kpi__label">last 30 days</span></div>
-      <div class="g-kpi"><span class="g-kpi__value">{{ posts_7d_count }}</span><span class="g-kpi__label">last 7 days</span></div>
+      <div class="g-kpi"><span class="g-kpi__value">{{ total_posts }}</span><span class="g-kpi__label">{{ _('posts (all time)') }}</span></div>
+      <div class="g-kpi"><span class="g-kpi__value">{{ posts_30d_count }}</span><span class="g-kpi__label">{{ _('last 30 days') }}</span></div>
+      <div class="g-kpi"><span class="g-kpi__value">{{ posts_7d_count }}</span><span class="g-kpi__label">{{ _('last 7 days') }}</span></div>
       <div class="g-kpi">
         <span class="g-kpi__value">{% if avg_uptime is not none %}{{ avg_uptime }}%{% else %}—{% endif %}</span>
-        <span class="g-kpi__label">avg uptime 30d</span>
+        <span class="g-kpi__label">{{ _('avg uptime 30d') }}</span>
       </div>
     </div>
 
@@ -66,7 +66,7 @@
       <div class="spark-band">
         <div class="activity-head">
           <span class="live-dot" aria-hidden="true"></span>
-          <span class="activity-label">Activity · last 30 days</span>
+          <span class="activity-label">{{ _('Activity · last 30 days') }}</span>
           {% if first_seen or last_seen %}
             <span class="activity-meta">
               {% if last_seen %}last post <time datetime="{{ last_seen }}" data-ts="{{ last_seen }}">{{ last_seen }}</time>{% endif %}
@@ -117,24 +117,24 @@
           action="{% if group['db'] == 0 %}{{ url_for('group_urls_csv', name=group['name']) }}{% else %}{{ url_for('market_urls_csv', name=group['name']) }}{% endif %}"
           class="filters"
           style="display:inline-flex;gap:8px;align-items:center">
-      <label for="csv-status" class="label m-0">Export URLs (CSV)</label>
+      <label for="csv-status" class="label m-0">{{ _('Export URLs (CSV)') }}</label>
       <select id="csv-status" name="status" class="input" style="padding:6px 8px">
-        <option value="all" selected>All statuses</option>
-        <option value="active">Active</option>
-        <option value="inactive">Inactive</option>
+        <option value="all" selected>{{ _('All statuses') }}</option>
+        <option value="active">{{ _('Active') }}</option>
+        <option value="inactive">{{ _('Inactive') }}</option>
       </select>
-      <button type="submit" class="btn btn-secondary btn-sm">CSV</button>
+      <button type="submit" class="btn btn-secondary btn-sm">{{ _('CSV') }}</button>
     </form>
     <!-- LEFT: Export Posts -->
     {% if posts %}
     <form method="get"
           action="{% if group['db'] == 0 %}{{ url_for('group_posts_csv', name=group['name']) }}{% else %}{{ url_for('market_posts_csv', name=group['name']) }}{% endif %}"
           class="filters" style="display:inline-flex;gap:8px;align-items:center;flex-wrap:wrap">
-      <label class="label m-0">Export Posts (CSV)</label>
-      <input type="date" name="from" aria-label="From date">
+      <label class="label m-0">{{ _('Export Posts (CSV)') }}</label>
+      <input type="date" name="from" aria-label="{{ _('From date') }}">
       <span>→</span>
-      <input type="date" name="to" aria-label="To date">
-      <button type="submit" class="btn btn-secondary btn-sm">CSV</button>
+      <input type="date" name="to" aria-label="{{ _('To date') }}">
+      <button type="submit" class="btn btn-secondary btn-sm">{{ _('CSV') }}</button>
     </form>
     {% endif %}
 
@@ -153,7 +153,7 @@
 {# ===== Description ===== #}
     {% if group['meta'] is not none %}
       <div class="profile-desc prose">
-        <h3 class="section-title" style="padding:0">Description</h3>
+        <h3 class="section-title" style="padding:0">{{ _('Description') }}</h3>
         <p>{{ group['meta']|safe }}</p>
       </div>
     {% endif %}
@@ -180,12 +180,12 @@
     {% if ext_count %}
     <details class="section-block" data-accordion>
       <summary class="section-summary">
-        <span>External Analysis</span><span class="count">{{ ext_count }}</span>
+        <span>{{ _('External Analysis') }}</span><span class="count">{{ ext_count }}</span>
       </summary>
       <div class="table-card">
         <div class="table-scroll">
-          <table class="rl-table" aria-label="External analysis">
-            <thead><tr><th>External Analysis</th></tr></thead>
+          <table class="rl-table" aria-label="{{ _('External analysis') }}">
+            <thead><tr><th>{{ _('External Analysis') }}</th></tr></thead>
             <tbody>
               {% for profile in group['profile'] %}
                 <tr><td>{{ profile }}</td></tr>
@@ -201,7 +201,7 @@
 {% if note_count is defined and note_count > 0%}
 <details class="section-block" data-accordion>
   <summary class="section-summary">
-    <span>Ransom notes</span><span class="count">{{ note_count }}</span>
+    <span>{{ _('Ransom notes') }}</span><span class="count">{{ note_count }}</span>
   </summary>
 
   <div id="ransom-notes" class="table-card p-12">
@@ -217,10 +217,10 @@
         {% endfor %}
       </ul>
       <div class="mt-2" style="display:flex;justify-content:center;">
-        <a class="btn" href="{{ url_for('notesdetails', name=group['name']) }}">View all notes</a>
+        <a class="btn" href="{{ url_for('notesdetails', name=group['name']) }}">{{ _('View all notes') }}</a>
       </div>
     {% else %}
-      <p class="muted" style="margin:8px 0 0">No note linked.</p>
+      <p class="muted" style="margin:8px 0 0">{{ _('No note linked.') }}</p>
     {% endif %}
   </div>
 </details>
@@ -231,12 +231,12 @@
     {% if hashes %}
     <details class="section-block" data-accordion>
       <summary class="section-summary">
-        <span>Known hashes</span><span class="count">{{ hashes|length }}</span>
+        <span>{{ _('Known hashes') }}</span><span class="count">{{ hashes|length }}</span>
       </summary>
       <div class="table-card">
         <div class="table-scroll">
-          <table class="rl-table" aria-label="Known hashes">
-            <thead><tr><th>Hash</th></tr></thead>
+          <table class="rl-table" aria-label="{{ _('Known hashes') }}">
+            <thead><tr><th>{{ _('Hash') }}</th></tr></thead>
             <tbody>
               {% for h in hashes %}
                 <tr><td><code>{{ h }}</code></td></tr>
@@ -253,11 +253,11 @@
     {% if jabbers %}
     <details class="section-block" data-accordion>
       <summary class="section-summary">
-        <span>Jabber</span><span class="count">{{ jabbers|length }}</span>
+        <span>{{ _('Jabber') }}</span><span class="count">{{ jabbers|length }}</span>
       </summary>
       <div class="table-card"><div class="table-scroll">
-        <table class="rl-table" aria-label="Jabber">
-          <thead><tr><th>Jabber</th></tr></thead>
+        <table class="rl-table" aria-label="{{ _('Jabber') }}">
+          <thead><tr><th>{{ _('Jabber') }}</th></tr></thead>
           <tbody>{% for j in jabbers %}<tr><td>{{ j }}</td></tr>{% endfor %}</tbody>
         </table>
       </div></div>
@@ -269,11 +269,11 @@
     {% if mails %}
     <details class="section-block" data-accordion>
       <summary class="section-summary">
-        <span>Mail</span><span class="count">{{ mails|length }}</span>
+        <span>{{ _('Mail') }}</span><span class="count">{{ mails|length }}</span>
       </summary>
       <div class="table-card"><div class="table-scroll">
-        <table class="rl-table" aria-label="Mail">
-          <thead><tr><th>Mail</th></tr></thead>
+        <table class="rl-table" aria-label="{{ _('Mail') }}">
+          <thead><tr><th>{{ _('Mail') }}</th></tr></thead>
           <tbody>{% for m in mails %}<tr><td>{{ m }}</td></tr>{% endfor %}</tbody>
         </table>
       </div></div>
@@ -285,11 +285,11 @@
     {% if pgps %}
     <details class="section-block" data-accordion>
       <summary class="section-summary">
-        <span>PGP</span><span class="count">{{ pgps|length }}</span>
+        <span>{{ _('PGP') }}</span><span class="count">{{ pgps|length }}</span>
       </summary>
       <div class="table-card"><div class="table-scroll">
-        <table class="rl-table" aria-label="PGP">
-          <thead><tr><th>PGP</th></tr></thead>
+        <table class="rl-table" aria-label="{{ _('PGP') }}">
+          <thead><tr><th>{{ _('PGP') }}</th></tr></thead>
           <tbody>{% for p in pgps %}<tr><td>{{ p }}</td></tr>{% endfor %}</tbody>
         </table>
       </div></div>
@@ -301,11 +301,11 @@
     {% if matrixes %}
     <details class="section-block" data-accordion>
       <summary class="section-summary">
-        <span>Matrix</span><span class="count">{{ matrixes|length }}</span>
+        <span>{{ _('Matrix') }}</span><span class="count">{{ matrixes|length }}</span>
       </summary>
       <div class="table-card"><div class="table-scroll">
-        <table class="rl-table" aria-label="Matrix">
-          <thead><tr><th>Matrix</th></tr></thead>
+        <table class="rl-table" aria-label="{{ _('Matrix') }}">
+          <thead><tr><th>{{ _('Matrix') }}</th></tr></thead>
           <tbody>{% for mx in matrixes %}<tr><td>{{ mx }}</td></tr>{% endfor %}</tbody>
         </table>
       </div></div>
@@ -317,11 +317,11 @@
     {% if sessions %}
     <details class="section-block" data-accordion>
       <summary class="section-summary">
-        <span>Session</span><span class="count">{{ sessions|length }}</span>
+        <span>{{ _('Session') }}</span><span class="count">{{ sessions|length }}</span>
       </summary>
       <div class="table-card"><div class="table-scroll">
-        <table class="rl-table" aria-label="Session">
-          <thead><tr><th>Session</th></tr></thead>
+        <table class="rl-table" aria-label="{{ _('Session') }}">
+          <thead><tr><th>{{ _('Session') }}</th></tr></thead>
           <tbody>{% for s in sessions %}<tr><td>{{ s }}</td></tr>{% endfor %}</tbody>
         </table>
       </div></div>
@@ -333,11 +333,11 @@
     {% if telegrams %}
     <details class="section-block" data-accordion>
       <summary class="section-summary">
-        <span>Telegram</span><span class="count">{{ telegrams|length }}</span>
+        <span>{{ _('Telegram') }}</span><span class="count">{{ telegrams|length }}</span>
       </summary>
       <div class="table-card"><div class="table-scroll">
-        <table class="rl-table" aria-label="Telegram">
-          <thead><tr><th>Telegram</th></tr></thead>
+        <table class="rl-table" aria-label="{{ _('Telegram') }}">
+          <thead><tr><th>{{ _('Telegram') }}</th></tr></thead>
           <tbody>{% for t in telegrams %}<tr><td>{{ t }}</td></tr>{% endfor %}</tbody>
         </table>
       </div></div>
@@ -349,11 +349,11 @@
     {% if toxs %}
     <details class="section-block" data-accordion>
       <summary class="section-summary">
-        <span>Tox</span><span class="count">{{ toxs|length }}</span>
+        <span>{{ _('Tox') }}</span><span class="count">{{ toxs|length }}</span>
       </summary>
       <div class="table-card"><div class="table-scroll">
-        <table class="rl-table" aria-label="Tox">
-          <thead><tr><th>Tox</th></tr></thead>
+        <table class="rl-table" aria-label="{{ _('Tox') }}">
+          <thead><tr><th>{{ _('Tox') }}</th></tr></thead>
           <tbody>{% for tx in toxs %}<tr><td>{{ tx }}</td></tr>{% endfor %}</tbody>
         </table>
       </div></div>
@@ -365,11 +365,11 @@
     {% if simplexs %}
     <details class="section-block" data-accordion>
       <summary class="section-summary">
-        <span>Simplex</span><span class="count">{{ simplexs|length }}</span>
+        <span>{{ _('Simplex') }}</span><span class="count">{{ simplexs|length }}</span>
       </summary>
       <div class="table-card"><div class="table-scroll">
-        <table class="rl-table" aria-label="Simplex">
-          <thead><tr><th>Simplex</th></tr></thead>
+        <table class="rl-table" aria-label="{{ _('Simplex') }}">
+          <thead><tr><th>{{ _('Simplex') }}</th></tr></thead>
           <tbody>{% for sx in simplexs %}<tr><td>{{ sx }}</td></tr>{% endfor %}</tbody>
         </table>
       </div></div>
@@ -381,11 +381,11 @@
     {% if maxs %}
     <details class="section-block" data-accordion>
       <summary class="section-summary">
-        <span>Max</span><span class="count">{{ maxs|length }}</span>
+        <span>{{ _('Max') }}</span><span class="count">{{ maxs|length }}</span>
       </summary>
       <div class="table-card"><div class="table-scroll">
-        <table class="rl-table" aria-label="Max">
-          <thead><tr><th>Max</th></tr></thead>
+        <table class="rl-table" aria-label="{{ _('Max') }}">
+          <thead><tr><th>{{ _('Max') }}</th></tr></thead>
           <tbody>{% for mx in maxs %}<tr><td>{{ mx }}</td></tr>{% endfor %}</tbody>
         </table>
       </div></div>
@@ -397,11 +397,11 @@
     {% if sonars %}
     <details class="section-block" data-accordion>
       <summary class="section-summary">
-        <span>Sonar</span><span class="count">{{ sonars|length }}</span>
+        <span>{{ _('Sonar') }}</span><span class="count">{{ sonars|length }}</span>
       </summary>
       <div class="table-card"><div class="table-scroll">
-        <table class="rl-table" aria-label="Sonar">
-          <thead><tr><th>Sonar</th></tr></thead>
+        <table class="rl-table" aria-label="{{ _('Sonar') }}">
+          <thead><tr><th>{{ _('Sonar') }}</th></tr></thead>
           <tbody>{% for sn in sonars %}<tr><td>{{ sn }}</td></tr>{% endfor %}</tbody>
         </table>
       </div></div>
@@ -413,11 +413,11 @@
     {% if affiliates %}
     <details class="section-block" data-accordion>
       <summary class="section-summary">
-        <span>Affiliates</span><span class="count">{{ affiliates|length }}</span>
+        <span>{{ _('Affiliates') }}</span><span class="count">{{ affiliates|length }}</span>
       </summary>
       <div class="table-card"><div class="table-scroll">
-        <table class="rl-table" aria-label="Affiliates">
-          <thead><tr><th>Affiliates</th></tr></thead>
+        <table class="rl-table" aria-label="{{ _('Affiliates') }}">
+          <thead><tr><th>{{ _('Affiliates') }}</th></tr></thead>
           <tbody>{% for a in aff_known %}<tr><td><a href="/actor/{{ a|urlencode }}">{{ a }}</a></td></tr>{% endfor %}</tbody>
           <tbody>{% for a in aff_unknown %}<tr><td>{{ a }}</td></tr>{% endfor %}</tbody>
         </table>
@@ -430,11 +430,11 @@
     {% if others %}
     <details class="section-block" data-accordion>
       <summary class="section-summary">
-        <span>Other</span><span class="count">{{ others|length }}</span>
+        <span>{{ _('Other') }}</span><span class="count">{{ others|length }}</span>
       </summary>
       <div class="table-card"><div class="table-scroll">
-        <table class="rl-table" aria-label="Other">
-          <thead><tr><th>Other</th></tr></thead>
+        <table class="rl-table" aria-label="{{ _('Other') }}">
+          <thead><tr><th>{{ _('Other') }}</th></tr></thead>
           <tbody>{% for o in others %}<tr><td>{{ o }}</td></tr>{% endfor %}</tbody>
         </table>
       </div></div>
@@ -445,14 +445,14 @@
     {% if ns.urls %}
     <details class="section-block" data-accordion>
       <summary class="section-summary">
-        <span>Urls</span><span class="count">{{ ns.urls|length }}</span>
+        <span>{{ _('Urls') }}</span><span class="count">{{ ns.urls|length }}</span>
       </summary>
       <div class="table-card">
         <div class="table-scroll">
-          <table class="rl-table" aria-label="URLs">
+          <table class="rl-table" aria-label="{{ _('URLs') }}">
             <thead>
               <tr>
-                <th>Url</th>
+                <th>{{ _('Url') }}</th>
                 <th style="width:12%"><center>Status</center></th>
                 <th style="width:12%"><center>Screen</center></th>
                 <th style="width:10%"><center>Uptime 30d</center></th>
@@ -500,14 +500,14 @@
     {% if ns.fs %}
     <details class="section-block" data-accordion>
       <summary class="section-summary">
-        <span>File servers</span><span class="count">{{ ns.fs|length }}</span>
+        <span>{{ _('File servers') }}</span><span class="count">{{ ns.fs|length }}</span>
       </summary>
       <div class="table-card">
         <div class="table-scroll">
-          <table class="rl-table" aria-label="File servers">
+          <table class="rl-table" aria-label="{{ _('File servers') }}">
             <thead>
               <tr>
-                <th>Url</th>
+                <th>{{ _('Url') }}</th>
                 <th style="width:12%"><center>Status</center></th>
                 <th style="width:12%"><center>Screen</center></th>
                 <th style="width:10%"><center>Uptime 30d</center></th>
@@ -555,14 +555,14 @@
     {% if ns.chat %}
     <details class="section-block" data-accordion>
       <summary class="section-summary">
-        <span>Chat servers</span><span class="count">{{ ns.chat|length }}</span>
+        <span>{{ _('Chat servers') }}</span><span class="count">{{ ns.chat|length }}</span>
       </summary>
       <div class="table-card">
         <div class="table-scroll">
-          <table class="rl-table" aria-label="Chat servers">
+          <table class="rl-table" aria-label="{{ _('Chat servers') }}">
             <thead>
               <tr>
-                <th>Url</th>
+                <th>{{ _('Url') }}</th>
                 <th style="width:12%"><center>Status</center></th>
                 <th style="width:12%"><center>Screen</center></th>
                 <th style="width:10%"><center>Uptime 30d</center></th>
@@ -610,14 +610,14 @@
     {% if ns.admin %}
     <details class="section-block" data-accordion>
       <summary class="section-summary">
-        <span>Admin servers</span><span class="count">{{ ns.admin|length }}</span>
+        <span>{{ _('Admin servers') }}</span><span class="count">{{ ns.admin|length }}</span>
       </summary>
       <div class="table-card">
         <div class="table-scroll">
-          <table class="rl-table" aria-label="Admin servers">
+          <table class="rl-table" aria-label="{{ _('Admin servers') }}">
             <thead>
               <tr>
-                <th>Url</th>
+                <th>{{ _('Url') }}</th>
                 <th style="width:12%"><center>Status</center></th>
                 <th style="width:12%"><center>Screen</center></th>
                 <th style="width:10%"><center>Uptime 30d</center></th>
@@ -665,22 +665,22 @@
     {% if posts and posts|length > 0 %}
     <details class="section-block" data-accordion open>
       <summary class="section-summary">
-        <span>Activity (interactive)</span>
+        <span>{{ _('Activity (interactive)') }}</span>
         <span class="count">{{ posts|length }}</span>
       </summary>
 
       <div class="table-card">
         <div class="card-toolbar" style="display:flex;justify-content:space-between;align-items:center;padding:8px 10px;border-bottom:1px solid var(--border)">
-          <span class="card-title" style="font-weight:600;opacity:.9;cursor:pointer" title="Open large view">Activity charts</span>
+          <span class="card-title" style="font-weight:600;opacity:.9;cursor:pointer" title="Open large view">{{ _('Activity charts') }}</span>
           <div style="display:flex;gap:10px;align-items:center">
-            <label for="grp-bucket" class="label m-0">Aggregation</label>
+            <label for="grp-bucket" class="label m-0">{{ _('Aggregation') }}</label>
             <select id="grp-bucket" class="input" style="padding:6px 8px">
-              <option value="day" selected>Daily</option>
-              <option value="week">Weekly</option>
+              <option value="day" selected>{{ _('Daily') }}</option>
+              <option value="week">{{ _('Weekly') }}</option>
             </select>
-            <label for="grp-roll" class="label" style="margin-left:8px;margin-bottom:0">Rolling avg.</label>
+            <label for="grp-roll" class="label" style="margin-left:8px;margin-bottom:0">{{ _('Rolling avg.') }}</label>
             <select id="grp-roll" class="input" style="padding:6px 8px">
-              <option value="0" selected>Off</option>
+              <option value="0" selected>{{ _('Off') }}</option>
               <option value="3">3</option>
               <option value="7">7</option>
               <option value="14">14</option>
@@ -705,18 +705,18 @@
     {% if posts %}
     <details class="section-block" data-accordion open>
       <summary class="section-summary">
-        <span>Posts</span><span class="count">{{ posts|length }}</span>
+        <span>{{ _('Posts') }}</span><span class="count">{{ posts|length }}</span>
       </summary>
 
       <div class="table-card">
         <div class="table-scroll">
-          <table class="rl-table" aria-label="Posts">
+          <table class="rl-table" aria-label="{{ _('Posts') }}">
             <thead>
               <tr>
-                <th style="width:12%">Date</th>
-                <th style="width:28%">Title</th>
-                <th>Description</th>
-                <th style="width:14%">Screen</th>
+                <th style="width:12%">{{ _('Date') }}</th>
+                <th style="width:28%">{{ _('Title') }}</th>
+                <th>{{ _('Description') }}</th>
+                <th style="width:14%">{{ _('Screen') }}</th>
               </tr>
             </thead>
             <tbody>
@@ -747,8 +747,8 @@
 <!-- ===== Chart enlarge modal (inchangé) ===== -->
 <div id="chart-modal" class="chart-modal" aria-hidden="true">
   <div class="chart-modal__backdrop" data-close-modal></div>
-  <div class="chart-modal__dialog" role="dialog" aria-modal="true" aria-label="Enlarged chart">
-    <button class="chart-modal__close" type="button" aria-label="Close" data-close-modal>×</button>
+  <div class="chart-modal__dialog" role="dialog" aria-modal="true" aria-label="{{ _('Enlarged chart') }}">
+    <button class="chart-modal__close" type="button" aria-label="{{ _('Close') }}" data-close-modal>×</button>
     <div id="chart-modal-plot" style="height:78vh; width:90vw;"></div>
   </div>
 </div>
@@ -757,13 +757,13 @@
 <div id="imgModal" class="rl-modal rl-modal--lightbox" role="dialog" aria-modal="true" aria-labelledby="imgModalCaption" hidden>
   <div class="rl-modal__backdrop" data-close></div>
   <figure class="rl-modal__panel rl-modal__panel--image" role="document">
-    <button class="rl-modal__close" aria-label="Close" data-close>&times;</button>
+    <button class="rl-modal__close" aria-label="{{ _('Close') }}" data-close>&times;</button>
 
-    <button class="img-nav img-prev" aria-label="Previous">‹</button>
+    <button class="img-nav img-prev" aria-label="{{ _('Previous') }}">‹</button>
 
     <div class="img-stage"><img id="imgModalImg" alt=""></div>
 
-    <button class="img-nav img-next" aria-label="Next">›</button>
+    <button class="img-nav img-next" aria-label="{{ _('Next') }}">›</button>
 
     <figcaption id="imgModalCaption" class="img-caption"></figcaption>
   </figure>
@@ -784,7 +784,7 @@
        style="position:relative;margin:auto;top:5vh;width:min(1000px,92vw);max-height:90vh;background:#fff;border-radius:12px;overflow:hidden;display:flex;flex-direction:column;">
     <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 14px;border-bottom:1px solid var(--border,#e5e7eb);background:var(--card,#f8f9fa);">
       <h5 id="noteLayerTitle" style="margin:0;font-size:16px;font-weight:600;">Note</h5>
-      <button type="button" data-close aria-label="Close"
+      <button type="button" data-close aria-label="{{ _('Close') }}"
               style="background:transparent;border:0;font-size:20px;line-height:1;cursor:pointer">&times;</button>
     </div>
     <div style="padding:12px;overflow:auto;max-height:calc(90vh - 52px);">

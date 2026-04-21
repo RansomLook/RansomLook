@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %}Cryptocurrencies — {{ group|title }}{% endblock %}
+{% block title %}{{ _('Cryptocurrencies') }} — {{ group|title }}{% endblock %}
 
 {% block content %}
 
@@ -11,9 +11,9 @@
       {{ group|title }}
     </h1>
     <p class="lead">
-      Observed wallets and transactions for this group.
+      {{ _('Observed wallets and transactions for this group.') }}
       {% if aliases and aliases|length %}
-        <br><span class="muted">Aliases: {{ aliases|join(', ') }}</span>
+        <br><span class="muted">{{ _('Aliases:') }} {{ aliases|join(', ') }}</span>
       {% endif %}
     </p>
 
@@ -21,14 +21,14 @@
     {% set total_chains = by_chain|length %}
     {% if total_wallets > 0 %}
       <div class="week-grid" style="max-width:480px;margin:14px auto 18px">
-        <div class="g-kpi"><span class="g-kpi__value">{{ total_wallets }}</span><span class="g-kpi__label">wallets</span></div>
-        <div class="g-kpi"><span class="g-kpi__value">{{ total_chains }}</span><span class="g-kpi__label">chain{{ 's' if total_chains != 1 }}</span></div>
+        <div class="g-kpi"><span class="g-kpi__value">{{ total_wallets }}</span><span class="g-kpi__label">{{ ngettext('wallet', 'wallets', total_wallets) }}</span></div>
+        <div class="g-kpi"><span class="g-kpi__value">{{ total_chains }}</span><span class="g-kpi__label">{{ ngettext('chain', 'chains', total_chains) }}</span></div>
       </div>
     {% endif %}
 
     <div class="cta-row">
-      <button class="btn btn-secondary" onclick="exportGroupCSV()" title="Export all transactions for this group">Export all CSV</button>
-      <a class="btn btn-secondary" href="/group/{{ group|urlencode }}">View group</a>
+      <button class="btn btn-secondary" onclick="exportGroupCSV()" title="{{ _('Export all transactions for this group') }}">{{ _('Export all CSV') }}</button>
+      <a class="btn btn-secondary" href="/group/{{ group|urlencode }}">{{ _('View group') }}</a>
     </div>
   </div>
 </section>
@@ -50,7 +50,7 @@
       <details class="section-block level-1" data-accordion open>
         <summary class="section-summary">
           <span class="mono">{{ chain }}</span>
-          <span class="count">{{ wallets_count }} wallet{{ 's' if wallets_count != 1 }}</span>
+          <span class="count">{{ ngettext('%(n)s wallet', '%(n)s wallets', wallets_count, n=wallets_count) }}</span>
         </summary>
 
         {# Niveau 2 : chaque wallet — directement avec ses transactions #}
@@ -64,11 +64,11 @@
               <code class="mono">{{ crypto['address'] }}</code>
               <span class="src-tag src-{{ wsrc|replace('.', '-') }}">{{ wsrc }}</span>
               {% if chain in _bc_chains %}
-                <a href="https://www.breadcrumbs.app/dashboard/address/{{ _bc_chains[chain] }}/{{ crypto['address'] }}" target="_blank" rel="noopener" class="btn btn-secondary" style="padding:1px 8px;font-size:.75rem;margin-left:4px;" title="View on Breadcrumbs">Breadcrumbs</a>
+                <a href="https://www.breadcrumbs.app/dashboard/address/{{ _bc_chains[chain] }}/{{ crypto['address'] }}" target="_blank" rel="noopener" class="btn btn-secondary" style="padding:1px 8px;font-size:.75rem;margin-left:4px;" title="{{ _('View on Breadcrumbs') }}">Breadcrumbs</a>
               {% endif %}
-              <span class="count">{{ tx_count }} tx</span>
+              <span class="count">{{ ngettext('%(n)s tx', '%(n)s txs', tx_count, n=tx_count) }}</span>
               {% if tx_count > 0 %}
-                <button class="btn btn-secondary" style="padding:1px 8px;font-size:.75rem;margin-left:4px;" onclick="event.stopPropagation();exportWalletCSV('{{ chain }}','{{ crypto['address'] }}')" title="Export CSV">CSV</button>
+                <button class="btn btn-secondary" style="padding:1px 8px;font-size:.75rem;margin-left:4px;" onclick="event.stopPropagation();exportWalletCSV('{{ chain }}','{{ crypto['address'] }}')" title="{{ _('Export CSV') }}">{{ _('CSV') }}</button>
               {% endif %}
             </summary>
 
@@ -76,34 +76,34 @@
             <div class="table-card">
               <div class="tx-filters" style="padding:8px 12px;display:flex;gap:10px;flex-wrap:wrap;align-items:end;border-bottom:1px solid var(--border);">
                 <div>
-                  <label style="font-size:.7rem;color:var(--muted);">From</label>
+                  <label style="font-size:.7rem;color:var(--muted);">{{ _('From') }}</label>
                   <input type="date" class="input filter-from" style="font-size:.75rem;padding:2px 6px;">
                 </div>
                 <div>
-                  <label style="font-size:.7rem;color:var(--muted);">To</label>
+                  <label style="font-size:.7rem;color:var(--muted);">{{ _('To') }}</label>
                   <input type="date" class="input filter-to" style="font-size:.75rem;padding:2px 6px;">
                 </div>
                 <div>
-                  <label style="font-size:.7rem;color:var(--muted);">Min amount</label>
+                  <label style="font-size:.7rem;color:var(--muted);">{{ _('Min amount') }}</label>
                   <input type="number" class="input filter-min" step="any" style="font-size:.75rem;padding:2px 6px;width:100px;">
                 </div>
                 <div>
-                  <label style="font-size:.7rem;color:var(--muted);">Max amount</label>
+                  <label style="font-size:.7rem;color:var(--muted);">{{ _('Max amount') }}</label>
                   <input type="number" class="input filter-max" step="any" style="font-size:.75rem;padding:2px 6px;width:100px;">
                 </div>
                 <div>
-                  <label style="font-size:.7rem;color:var(--muted);">Dir</label>
+                  <label style="font-size:.7rem;color:var(--muted);">{{ _('Dir') }}</label>
                   <select class="input filter-dir" style="font-size:.75rem;padding:2px 6px;">
-                    <option value="">All</option>
+                    <option value="">{{ _('All') }}</option>
                     <option value="IN">IN</option>
                     <option value="OUT">OUT</option>
                   </select>
                 </div>
-                <button class="btn btn-secondary" style="padding:2px 10px;font-size:.75rem;" onclick="applyFilters(this)">Filter</button>
-                <button class="btn btn-secondary" style="padding:2px 10px;font-size:.75rem;" onclick="clearFilters(this)">Clear</button>
+                <button class="btn btn-secondary" style="padding:2px 10px;font-size:.75rem;" onclick="applyFilters(this)">{{ _('Filter') }}</button>
+                <button class="btn btn-secondary" style="padding:2px 10px;font-size:.75rem;" onclick="clearFilters(this)">{{ _('Clear') }}</button>
               </div>
               <div class="table-scroll">
-                <table class="rl-table sortable-table" aria-label="Transactions">
+                <table class="rl-table sortable-table" aria-label="{{ _('Transactions') }}">
                   {% set _tx_explorers = {
                     'bitcoin': 'https://blockchair.com/bitcoin/transaction/',
                     'ethereum': 'https://blockchair.com/ethereum/transaction/',
@@ -120,13 +120,13 @@
                   } %}
                   <thead>
                     <tr>
-                      <th>Transaction</th>
-                      <th class="sortable" data-col="1" data-type="string" style="width:10%;text-align:center;cursor:pointer;">Date <span class="sort-arrow"></span></th>
-                      <th class="sortable" data-col="2" data-type="string" style="width:6%;text-align:center;cursor:pointer;">Dir <span class="sort-arrow"></span></th>
-                      <th>Counterpart</th>
-                      <th class="sortable" data-col="4" data-type="number" style="width:12%;text-align:right;cursor:pointer;">Amount <span class="sort-arrow"></span></th>
-                      <th class="sortable" data-col="5" data-type="number" style="width:10%;text-align:right;cursor:pointer;">USD <span class="sort-arrow"></span></th>
-                      <th style="width:8%; text-align:center">Source</th>
+                      <th>{{ _('Transaction') }}</th>
+                      <th class="sortable" data-col="1" data-type="string" style="width:10%;text-align:center;cursor:pointer;">{{ _('Date') }} <span class="sort-arrow"></span></th>
+                      <th class="sortable" data-col="2" data-type="string" style="width:6%;text-align:center;cursor:pointer;">{{ _('Dir') }} <span class="sort-arrow"></span></th>
+                      <th>{{ _('Counterpart') }}</th>
+                      <th class="sortable" data-col="4" data-type="number" style="width:12%;text-align:right;cursor:pointer;">{{ _('Amount') }} <span class="sort-arrow"></span></th>
+                      <th class="sortable" data-col="5" data-type="number" style="width:10%;text-align:right;cursor:pointer;">{{ _('USD') }} <span class="sort-arrow"></span></th>
+                      <th style="width:8%; text-align:center">{{ _('Source') }}</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -166,9 +166,9 @@
                         </td>
                         <td class="text-center">
                           {% if direction == 'out' %}
-                            <span class="dir-tag dir-out" title="Outgoing">OUT</span>
+                            <span class="dir-tag dir-out" title="{{ _('Outgoing') }}">OUT</span>
                           {% else %}
-                            <span class="dir-tag dir-in" title="Incoming">IN</span>
+                            <span class="dir-tag dir-in" title="{{ _('Incoming') }}">IN</span>
                           {% endif %}
                         </td>
                         <td class="mono" style="font-size:.75rem;">
@@ -193,13 +193,13 @@
               </div>
             </div>
             {% else %}
-              <div class="prose pad muted" style="font-size:.85rem;">No transactions recorded.</div>
+              <div class="prose pad muted" style="font-size:.85rem;">{{ _('No transactions recorded.') }}</div>
             {% endif %}
           </details>
         {% endfor %}
       </details>
     {% else %}
-      <div class="table-card p-16">No wallet found for this group.</div>
+      <div class="table-card p-16">{{ _('No wallet found for this group.') }}</div>
     {% endfor %}
 
   </div>

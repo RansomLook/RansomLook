@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %}RF Dumps{% endblock %}
+{% block title %}{{ _('RF Dumps') }}{% endblock %}
 
 {% block content %}
 
@@ -8,8 +8,8 @@
 <!-- Hero -->
 <section class="hero">
   <div class="container">
-    <h1>RF dumps</h1>
-    <p class="lead">Browse RF dumps. Click a dump to view details.</p>
+    <h1>{{ _('RF dumps') }}</h1>
+    <p class="lead">{{ _('Browse RF dumps. Click a dump to view details.') }}</p>
   </div>
 </section>
 
@@ -22,11 +22,11 @@
       <div class="filters-wrap">
         <div class="filters">
           <div class="field field--search">
-            <label class="sr-only" for="flt-q">Search RF dumps</label>
+            <label class="sr-only" for="flt-q">{{ _('Search RF dumps') }}</label>
             <input id="flt-q" class="input" type="search"
-                   aria-label="Search RF dumps by name or description"
-                   placeholder="Dump name or description…">
-            <button class="input-clear" type="button" aria-label="Clear search">×</button>
+                   aria-label="{{ _('Search RF dumps by name or description') }}"
+                   placeholder="{{ _('Dump name or description…') }}">
+            <button class="input-clear" type="button" aria-label="{{ _('Clear search') }}">×</button>
           </div>
         </div>
         <div class="filters-meta"><span id="flt-count"></span></div>
@@ -36,16 +36,16 @@
     <!-- Listing -->
     <div class="table-card">
       <div class="table-scroll">
-        <table class="rl-table" aria-label="RF dumps">
+        <table class="rl-table" aria-label="{{ _('RF dumps') }}">
           <thead>
             <tr>
               <th style="width:20%">
-                <button class="th-sort" data-sort="name" aria-sort="none" type="button">Dump <span class="ind" aria-hidden="true">↕</span></button>
+                <button class="th-sort" data-sort="name" aria-sort="none" type="button">{{ _('Dump') }} <span class="ind" aria-hidden="true">↕</span></button>
               </th>
-              <th style="width:70%">Description</th>
+              <th style="width:70%">{{ _('Description') }}</th>
               <th style="width:10%">
-                <button class="th-sort" data-sort="date" aria-sort="none" type="button" title="Sort by date">
-                  Downloaded <span class="ind" aria-hidden="true">↕</span>
+                <button class="th-sort" data-sort="date" aria-sort="none" type="button" title="{{ _('Sort by date') }}">
+                  {{ _('Downloaded') }} <span class="ind" aria-hidden="true">↕</span>
                 </button>
               </th>
             </tr>
@@ -77,23 +77,23 @@
   <div class="modal-backdrop" data-dismiss="modal"></div>
   <div class="modal-dialog" role="document">
     <header class="modal-header">
-      <h2 id="rf-modal-title">RF dump</h2>
-      <button class="modal-close" type="button" aria-label="Close" data-dismiss="modal">×</button>
+      <h2 id="rf-modal-title">{{ _('RF dump') }}</h2>
+      <button class="modal-close" type="button" aria-label="{{ _('Close') }}" data-dismiss="modal">×</button>
     </header>
     <div class="modal-body">
       <!-- Head table -->
       <div class="table-card">
         <div class="table-scroll">
-          <table class="rl-table" aria-label="RF head">
+          <table class="rl-table" aria-label="{{ _('RF head') }}">
             <thead>
               <tr>
-                <th style="width:20%">Dump</th>
-                <th style="width:60%">Source</th>
-                <th style="width:20%">Downloaded</th>
+                <th style="width:20%">{{ _('Dump') }}</th>
+                <th style="width:60%">{{ _('Source') }}</th>
+                <th style="width:20%">{{ _('Downloaded') }}</th>
               </tr>
             </thead>
             <tbody id="rf-head-tbody">
-              <tr><td colspan="3">Loading…</td></tr>
+              <tr><td colspan="3">{{ _('Loading…') }}</td></tr>
             </tbody>
           </table>
         </div>
@@ -102,13 +102,13 @@
       <!-- Extra info -->
       <div class="table-card">
         <div class="table-scroll">
-          <table class="rl-table" aria-label="RF extra">
+          <table class="rl-table" aria-label="{{ _('RF extra') }}">
             <thead>
               <tr>
-                <th style="width:15%">Size</th>
-                <th style="width:15%">Records</th>
-                <th style="width:15%">Detection</th>
-                <th style="width:55%">Columns</th>
+                <th style="width:15%">{{ _('Size') }}</th>
+                <th style="width:15%">{{ _('Records') }}</th>
+                <th style="width:15%">{{ _('Detection') }}</th>
+                <th style="width:55%">{{ _('Columns') }}</th>
               </tr>
             </thead>
             <tbody id="rf-extra-tbody">
@@ -121,11 +121,11 @@
       <!-- Breaches key/values -->
       <div class="table-card">
         <div class="table-scroll">
-          <table class="rl-table" aria-label="RF breaches">
+          <table class="rl-table" aria-label="{{ _('RF breaches') }}">
             <thead>
               <tr>
-                <th style="width:30%">Key</th>
-                <th>Value</th>
+                <th style="width:30%">{{ _('Key') }}</th>
+                <th>{{ _('Value') }}</th>
               </tr>
             </thead>
             <tbody id="rf-breaches-tbody">

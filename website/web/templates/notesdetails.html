@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %}Notes ;-){% endblock %}
+{% block title %}{{ _('Ransomware Notes') }} — {{ group_name|title }}{% endblock %}
 
 {% block content %}
 
@@ -11,11 +11,11 @@
       {{ group_name|title }}
     </h1>
     <p class="lead">
-      Original ransom notes collected for this group.
-      {% if data %}<strong>{{ data|length }}</strong> note{{ '' if data|length == 1 else 's' }} available.{% endif %}
+      {{ _('Original ransom notes collected for this group.') }}
+      {% if data %}<strong>{{ data|length }}</strong> {{ ngettext('note available.', 'notes available.', data|length) }}{% endif %}
     </p>
     <div class="cta-row">
-      <a class="btn btn-secondary" href="/group/{{ group_name|urlencode }}">View group</a>
+      <a class="btn btn-secondary" href="/group/{{ group_name|urlencode }}">{{ _('View group') }}</a>
     </div>
   </div>
 </section>
@@ -32,11 +32,11 @@
 
         <div class="table-card">
           <div class="table-scroll">
-            <table class="rl-table" aria-label="Note content">
+            <table class="rl-table" aria-label="{{ _('Note content') }}">
               <thead>
                 <tr>
-                  <th>Content</th>
-                  <th style="width:1%;white-space:nowrap;text-align:right">Action</th>
+                  <th>{{ _('Content') }}</th>
+                  <th style="width:1%;white-space:nowrap;text-align:right">{{ _('Action') }}</th>
                 </tr>
               </thead>
               <tbody>
@@ -47,7 +47,7 @@
                     </pre>
                   </td>
                   <td style="text-align:right;vertical-align:top">
-                    <button class="btn btn-secondary btn-sm" data-copy>Copy</button>
+                    <button class="btn btn-secondary btn-sm" data-copy>{{ _('Copy') }}</button>
                   </td>
                 </tr>
               </tbody>

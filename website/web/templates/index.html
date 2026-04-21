@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %}RansomLook — Open ransomware intelligence{% endblock %}
+{% block title %}RansomLook — {{ _('Open ransomware intelligence') }}{% endblock %}
 
 {%- macro delta_pill(pct, is_new=false) -%}
   {%- if is_new -%}
@@ -43,17 +43,16 @@
       <div class="home-hero__text">
         <h1 class="home-hero__title">
           <span class="hl-number">{{ '{:,}'.format(data.nbposts).replace(',', ',') }}</span>
-          <span class="hl-sub">ransomware posts.</span><br>
-          <span class="hl-muted">Tracked in the open.</span>
+          <span class="hl-sub">{{ _('ransomware posts.') }}</span><br>
+          <span class="hl-muted">{{ _('Tracked in the open.') }}</span>
         </h1>
         <p class="home-hero__lead">
-          Open-source intelligence on {{ data.nbgroups }} ransomware groups, markets and threat actors.
-          Updated live since {{ data.year - 4 }}.
+          {{ _('Open-source intelligence on %(n)s ransomware groups, markets and threat actors. Updated live since %(year)s.', n=data.nbgroups, year=data.year - 4) }}
         </p>
         <div class="home-hero__ctas">
-          <a class="btn-hero btn-hero--primary" href="/recent">Explore &rarr;</a>
-          <a class="btn-hero btn-hero--ghost"   href="/stats">Stats</a>
-          <a class="btn-hero btn-hero--ghost"   href="/doc/">API</a>
+          <a class="btn-hero btn-hero--primary" href="/recent">{{ _('Explore') }} &rarr;</a>
+          <a class="btn-hero btn-hero--ghost"   href="/stats">{{ _('Stats') }}</a>
+          <a class="btn-hero btn-hero--ghost"   href="/doc/">{{ _('API') }}</a>
         </div>
       </div>
     </div>
@@ -61,9 +60,9 @@
     <div class="spark-band">
       <div class="activity-head">
         <span class="live-dot" aria-hidden="true"></span>
-        <span class="activity-label">Activity · last 30 days</span>
+        <span class="activity-label">{{ _('Activity · last 30 days') }}</span>
         {% if posts_delta_pct is not none %}
-          <span class="activity-delta">vs prev 7d {{ delta_pill(posts_delta_pct) }}</span>
+          <span class="activity-delta">{{ _('vs prev 7d') }} {{ delta_pill(posts_delta_pct) }}</span>
         {% endif %}
       </div>
       {% set gmax = (sparkline_30d|max) if sparkline_30d|length else 0 %}
@@ -85,22 +84,22 @@
 {# ─────────────  THIS WEEK KPIs  ───────────── #}
 <section class="home-week">
   <div class="container">
-    <h2 class="section-eyebrow">This week</h2>
+    <h2 class="section-eyebrow">{{ _('This week') }}</h2>
     <div class="week-grid">
       <div class="week-kpi">
         <div class="week-kpi__value">{{ posts_7d }}</div>
-        <div class="week-kpi__label">posts · last 7 days</div>
+        <div class="week-kpi__label">{{ _('posts · last 7 days') }}</div>
         <div class="week-kpi__delta">{{ delta_pill(posts_delta_pct) }}</div>
       </div>
       <div class="week-kpi">
         <div class="week-kpi__value">{{ groups_7d }}</div>
-        <div class="week-kpi__label">active groups</div>
+        <div class="week-kpi__label">{{ _('active groups') }}</div>
         <div class="week-kpi__delta">{{ delta_pill(groups_delta_pct) }}</div>
       </div>
       <div class="week-kpi">
         <div class="week-kpi__value">{{ new_groups_n }}</div>
-        <div class="week-kpi__label">new groups this week</div>
-        <div class="week-kpi__delta">{% if new_groups_n > 0 %}<span class="delta-badge delta-new">NEW</span>{% else %}<span class="delta-badge delta-flat">none</span>{% endif %}</div>
+        <div class="week-kpi__label">{{ _('new groups this week') }}</div>
+        <div class="week-kpi__delta">{% if new_groups_n > 0 %}<span class="delta-badge delta-new">{{ _('NEW') }}</span>{% else %}<span class="delta-badge delta-flat">{{ _('none') }}</span>{% endif %}</div>
       </div>
       <div class="week-kpi">
         <div class="week-kpi__value">
@@ -109,8 +108,8 @@
             {{ top_group|title }}
           {% else %}—{% endif %}
         </div>
-        <div class="week-kpi__label">top group</div>
-        <div class="week-kpi__delta">{% if top_group %}<span class="muted">{{ top_group_count }} posts · {{ top_group_share }}%</span>{% endif %}</div>
+        <div class="week-kpi__label">{{ _('top group') }}</div>
+        <div class="week-kpi__delta">{% if top_group %}<span class="muted">{{ top_group_count }} {{ _('posts') }} · {{ top_group_share }}%</span>{% endif %}</div>
       </div>
     </div>
   </div>
@@ -122,8 +121,8 @@
 
     <div class="insight-card">
       <div class="insight-head">
-        <h3 class="section-eyebrow">Top movers</h3>
-        <span class="muted">7d vs prev 7d</span>
+        <h3 class="section-eyebrow">{{ _('Top movers') }}</h3>
+        <span class="muted">{{ _('7d vs prev 7d') }}</span>
       </div>
       {% if movers %}
         <ul class="insight-list">
@@ -131,20 +130,20 @@
             <li>
               <span class="group-dot" data-group-dot="{{ m.group|lower }}" aria-hidden="true"></span>
               <a class="insight-name" href="/group/{{ m.group|urlencode }}">{{ m.group|title }}</a>
-              <span class="insight-meta"><span class="muted">{{ m.cur }} posts</span></span>
+              <span class="insight-meta"><span class="muted">{{ m.cur }} {{ _('posts') }}</span></span>
               {{ mover_badge(m) }}
             </li>
           {% endfor %}
         </ul>
       {% else %}
-        <p class="muted">No movement this week.</p>
+        <p class="muted">{{ _('No movement this week.') }}</p>
       {% endif %}
     </div>
 
     <div class="insight-card">
       <div class="insight-head">
-        <h3 class="section-eyebrow">Latest posts</h3>
-        <a class="muted" href="/recent">see more &rarr;</a>
+        <h3 class="section-eyebrow">{{ _('Latest posts') }}</h3>
+        <a class="muted" href="/recent">{{ _('see more') }} &rarr;</a>
       </div>
       {% if latest %}
         <ul class="insight-list">
@@ -160,7 +159,7 @@
           {% endfor %}
         </ul>
       {% else %}
-        <p class="muted">No posts yet.</p>
+        <p class="muted">{{ _('No posts yet.') }}</p>
       {% endif %}
     </div>
 
@@ -171,17 +170,17 @@
 <section class="home-coverage">
   <div class="container">
     <div class="coverage-row">
-      <span><strong>{{ data.nbgroups }}</strong> groups</span>
+      <span><strong>{{ data.nbgroups }}</strong> {{ _('groups') }}</span>
       <span class="sep">·</span>
-      <span><strong>{{ data.nbforum }}</strong> markets</span>
+      <span><strong>{{ data.nbforum }}</strong> {{ _('markets') }}</span>
       <span class="sep">·</span>
-      <span><strong>{{ data.nbactors }}</strong> actors</span>
+      <span><strong>{{ data.nbactors }}</strong> {{ _('actors') }}</span>
       <span class="sep">·</span>
-      <span><strong>{{ data.nbleaks }}</strong> leaks</span>
+      <span><strong>{{ data.nbleaks }}</strong> {{ _('leaks') }}</span>
       <span class="sep">·</span>
-      <span><strong>{{ data.nbnotes }}</strong> ransom notes</span>
+      <span><strong>{{ data.nbnotes }}</strong> {{ _('ransom notes') }}</span>
       <span class="sep">·</span>
-      <span><strong>{{ data.nbcryptoaddr }}</strong> crypto addrs</span>
+      <span><strong>{{ data.nbcryptoaddr }}</strong> {{ _('crypto addrs') }}</span>
     </div>
   </div>
 </section>

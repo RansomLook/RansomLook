@@ -1,14 +1,14 @@
 {% extends "base.html" %}
 
-{% block title %}Leaks{% endblock %}
+{% block title %}{{ _('Leaks') }}{% endblock %}
 
 {% block content %}
 
 <!-- Hero -->
 <section class="hero">
   <div class="container">
-    <h1>Leaks listing</h1>
-    <p class="lead">Browse known public leaks. Click a leak to view details.</p>
+    <h1>{{ _('Leaks listing') }}</h1>
+    <p class="lead">{{ _('Browse known public leaks. Click a leak to view details.') }}</p>
   </div>
 </section>
 
@@ -20,11 +20,11 @@
       <div class="filters-wrap">
         <div class="filters">
           <div class="field field--search">
-            <label class="sr-only" for="flt-q">Search</label>
+            <label class="sr-only" for="flt-q">{{ _('Search') }}</label>
             <input id="flt-q" class="input" type="search"
-                   aria-label="Search"
-                   placeholder="Name, description, URL, page title…">
-            <button class="input-clear" type="button" aria-label="Clear search">×</button>
+                   aria-label="{{ _('Search') }}"
+                   placeholder="{{ _('Name, description, URL, page title…') }}">
+            <button class="input-clear" type="button" aria-label="{{ _('Clear search') }}">×</button>
           </div>
         </div>
         <div class="filters-meta"><span id="flt-count"></span></div>
@@ -34,12 +34,12 @@
 
     <div class="table-card">
       <div class="table-scroll">
-        <table class="rl-table" aria-label="Leaks">
+        <table class="rl-table" aria-label="{{ _('Leaks') }}">
           <thead>
             <tr>
-              <th style="width:70%">Page title</th>
-              <th style="width:20%">Entries</th>
-              <th style="width:10%">Detection</th>
+              <th style="width:70%">{{ _('Page title') }}</th>
+              <th style="width:20%">{{ _('Entries') }}</th>
+              <th style="width:10%">{{ _('Detection') }}</th>
             </tr>
           </thead>
           <tbody>
@@ -70,19 +70,19 @@
   <div class="modal-backdrop" data-dismiss="modal"></div>
   <div class="modal-dialog" role="document">
     <header class="modal-header">
-      <h2 id="leak-modal-title">Leak details</h2>
-      <button class="modal-close" type="button" aria-label="Close" data-dismiss="modal">×</button>
+      <h2 id="leak-modal-title">{{ _('Leak details') }}</h2>
+      <button class="modal-close" type="button" aria-label="{{ _('Close') }}" data-dismiss="modal">×</button>
     </header>
     <div class="modal-body">
       <div class="table-card">
         <div class="table-scroll">
-          <table class="rl-table" aria-label="Leak data">
+          <table class="rl-table" aria-label="{{ _('Leak data') }}">
             <thead>
               <tr>
-                <th style="width:10%">Size</th>
-                <th style="width:15%">Records</th>
-                <th style="width:10%">Indexed</th>
-                <th style="width:65%">Columns</th>
+                <th style="width:10%">{{ _('Size') }}</th>
+                <th style="width:15%">{{ _('Records') }}</th>
+                <th style="width:10%">{{ _('Indexed') }}</th>
+                <th style="width:65%">{{ _('Columns') }}</th>
               </tr>
             </thead>
             <tbody id="leak-modal-tbody">

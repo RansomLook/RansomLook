@@ -49,42 +49,42 @@
           <label class="sr-only" for="urls-q">Search</label>
           <input id="urls-q" class="input" type="search"
                  autocomplete="off" spellcheck="false"
-                 aria-label="Search by group, market or URL"
-                 placeholder="Group, market or URL substring… (Ctrl/Cmd+K)"
+                 aria-label="{{ _('Search by group, market or URL') }}"
+                 placeholder="{{ _('Group, market or URL substring… (Ctrl/Cmd+K)') }}"
                  value="{{ query }}">
-          <button class="input-clear" type="button" aria-label="Clear search">×</button>
+          <button class="input-clear" type="button" aria-label="{{ _('Clear search') }}">×</button>
         </div>
       </div>
 
       <div class="bf-row bf-row--filters">
-        <nav class="browse-tabs" role="tablist" aria-label="Entity type">
+        <nav class="browse-tabs" role="tablist" aria-label="{{ _('Entity type') }}">
           <button class="tab-btn" role="tab" data-type="all"    aria-selected="{{ 'true' if active_type == 'all' else 'false' }}">
-            All <span class="tab-count">{{ counts['all'] }}</span>
+            {{ _('All') }} <span class="tab-count">{{ counts['all'] }}</span>
           </button>
           <button class="tab-btn" role="tab" data-type="group"  aria-selected="{{ 'true' if active_type == 'group' else 'false' }}">
-            Groups <span class="tab-count">{{ counts['group'] }}</span>
+            {{ _('Groups') }} <span class="tab-count">{{ counts['group'] }}</span>
           </button>
           <button class="tab-btn" role="tab" data-type="market" aria-selected="{{ 'true' if active_type == 'market' else 'false' }}">
-            Markets <span class="tab-count">{{ counts['market'] }}</span>
+            {{ _('Markets') }} <span class="tab-count">{{ counts['market'] }}</span>
           </button>
         </nav>
 
-        <nav class="browse-tabs" role="tablist" aria-label="Availability">
+        <nav class="browse-tabs" role="tablist" aria-label="{{ _('Availability') }}">
           <button class="tab-btn" role="tab" data-status="all"     aria-selected="{{ 'true' if active_status == 'all' else 'false' }}">
-            All
+            {{ _('All') }}
           </button>
           <button class="tab-btn" role="tab" data-status="online"  aria-selected="{{ 'true' if active_status == 'online' else 'false' }}">
             <span class="dot dot-healthy" aria-hidden="true"></span>
-            Online <span class="tab-count">{{ counts['online'] }}</span>
+            {{ _('Online') }} <span class="tab-count">{{ counts['online'] }}</span>
           </button>
           <button class="tab-btn" role="tab" data-status="offline" aria-selected="{{ 'true' if active_status == 'offline' else 'false' }}">
             <span class="dot dot-offline" aria-hidden="true"></span>
-            Offline <span class="tab-count">{{ counts['offline'] }}</span>
+            {{ _('Offline') }} <span class="tab-count">{{ counts['offline'] }}</span>
           </button>
         </nav>
 
         <a id="urls-csv" class="btn btn-secondary btn-sm" href="{{ url_for('urls_csv') }}"
-           style="margin-left:auto" title="Download current view as CSV">Download CSV</a>
+           style="margin-left:auto" title="{{ _('Download current view as CSV') }}">{{ _('Download CSV') }}</a>
       </div>
 
       <div class="bf-row">
@@ -97,12 +97,12 @@
         <table class="rl-table rl-table--urls" id="urls-table" aria-label="URLs">
           <thead>
             <tr>
-              <th style="width:18%">{{ _('Group / Market') if _ else 'Group / Market' }}</th>
+              <th style="width:18%">{{ _('Group / Market') }}</th>
               <th>URL</th>
-              <th style="width:8%"><center>Status</center></th>
-              <th style="width:11%"><center>Last scrape</center></th>
-              <th style="width:9%"><center>Uptime 30d</center></th>
-              <th style="width:14%"><center>Health</center></th>
+              <th style="width:8%"><center>{{ _('Status') }}</center></th>
+              <th style="width:11%"><center>{{ _('Last scrape') }}</center></th>
+              <th style="width:9%"><center>{{ _('Uptime 30d') }}</center></th>
+              <th style="width:14%"><center>{{ _('Health') }}</center></th>
             </tr>
           </thead>
           <tbody>

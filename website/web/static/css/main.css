@@ -323,6 +323,12 @@ a:hover{text-decoration:underline}
 .nav-login-btn:hover{background:var(--surface-hover);text-decoration:none}
 .nav-login-btn.active,.nav-login-btn[aria-current="page"]{box-shadow:inset 0 -2px 0 0 var(--pri)}
 
+/* Language switcher (topbar) */
+.lang-switch{display:inline-flex;align-items:center;gap:2px;padding:2px;border:1px solid var(--border);border-radius:10px;background:var(--surface-btn)}
+.lang-opt{display:inline-block;padding:4px 8px;border-radius:8px;font-size:.78rem;font-weight:600;letter-spacing:.02em;color:var(--muted);text-decoration:none;line-height:1}
+.lang-opt:hover{color:var(--text);background:var(--surface-hover);text-decoration:none}
+.lang-opt.is-active{color:var(--text);background:var(--surface-active);box-shadow:inset 0 -2px 0 0 var(--pri)}
+
 /* Topbar search button — quieter than before, matches theme-toggle */
 .topbar .header-search{
   display:flex; align-items:center; justify-content:center;

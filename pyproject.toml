@@ -27,6 +27,7 @@ update_crypto_tx = "bin.update_crypto_tx:main"
 [tool.poetry.dependencies]
 python = ">=3.10,<4.0"
 Flask = "^3.1.2"
+Flask-Babel = "^4.0.0"
 Flask-Login = "^0.6.3"
 Flask-Moment = "^1.0.6"
 Flask-WTF = "^1.2.2"

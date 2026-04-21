@@ -1,12 +1,12 @@
 {% extends "base.html" %}
-{% block title %}Stats{% endblock %}
+{% block title %}{{ _('Stats') }}{% endblock %}
 
 {% block content %}
 
 <section class="hero">
   <div class="container">
-    <h1>Interactive statistics</h1>
-    <p class="lead">Explore posts by period, groups, and aggregation — fully client-side & interactive.</p>
+    <h1>{{ _('Interactive statistics') }}</h1>
+    <p class="lead">{{ _('Explore posts by period, groups, and aggregation — fully client-side & interactive.') }}</p>
   </div>
 </section>
 
@@ -15,45 +15,45 @@
 
     <!-- Controls -->
     <div class="table-card p-12 mb-14">
-      <form id="stats-controls" onsubmit="return false" aria-label="Filters">
+      <form id="stats-controls" onsubmit="return false" aria-label="{{ _('Filters') }}">
         <div class="stats-controls">
 
           <div class="ctrl-group">
             <div>
-              <label class="label" for="period">Period</label>
+              <label class="label" for="period">{{ _('Period') }}</label>
               <select id="period" class="input">
-                <option value="7">Last 7 days</option>
-                <option value="14">Last 14 days</option>
-                <option value="30" selected>Last 30 days</option>
-                <option value="90">Last 90 days</option>
-                <option value="custom">Custom…</option>
+                <option value="7">{{ _('Last 7 days') }}</option>
+                <option value="14">{{ _('Last 14 days') }}</option>
+                <option value="30" selected>{{ _('Last 30 days') }}</option>
+                <option value="90">{{ _('Last 90 days') }}</option>
+                <option value="custom">{{ _('Custom…') }}</option>
               </select>
             </div>
 
             <div id="custom-range" class="d-none" style="gap:8px;align-items:end">
               <div>
-                <label class="label" for="from">From</label>
+                <label class="label" for="from">{{ _('From') }}</label>
                 <input id="from" type="date" class="input">
               </div>
               <div>
-                <label class="label" for="to">To</label>
+                <label class="label" for="to">{{ _('To') }}</label>
                 <input id="to" type="date" class="input">
               </div>
             </div>
 
             <div>
-              <label class="label" for="bucket">Aggregation</label>
+              <label class="label" for="bucket">{{ _('Aggregation') }}</label>
               <select id="bucket" class="input">
-                <option value="hour">Hourly</option>
-                <option value="day" selected>Daily</option>
-                <option value="week">Weekly</option>
+                <option value="hour">{{ _('Hourly') }}</option>
+                <option value="day" selected>{{ _('Daily') }}</option>
+                <option value="week">{{ _('Weekly') }}</option>
               </select>
             </div>
 
             <div>
-              <label class="label" for="roll">Rolling avg.</label>
+              <label class="label" for="roll">{{ _('Rolling avg.') }}</label>
               <select id="roll" class="input">
-                <option value="0" selected>Off</option>
+                <option value="0" selected>{{ _('Off') }}</option>
                 <option value="3">3</option>
                 <option value="7">7</option>
                 <option value="14">14</option>
@@ -61,36 +61,36 @@
             </div>
 
             <div>
-              <label class="label" for="topn">Top-N groups</label>
+              <label class="label" for="topn">{{ _('Top-N groups') }}</label>
               <select id="topn" class="input">
-                <option value="0">All</option>
-                <option value="5">Top 5</option>
-                <option value="10" selected>Top 10</option>
-                <option value="20">Top 20</option>
+                <option value="0">{{ _('All') }}</option>
+                <option value="5">{{ _('Top 5') }}</option>
+                <option value="10" selected>{{ _('Top 10') }}</option>
+                <option value="20">{{ _('Top 20') }}</option>
               </select>
             </div>
 
             <div class="ctrl-check">
               <input id="normalize" type="checkbox">
-              <label for="normalize">Normalize (%)</label>
+              <label for="normalize">{{ _('Normalize (%%)') }}</label>
             </div>
           </div>
 
           <div class="ctrl-actions">
-            <button id="refresh" class="btn btn-primary" type="button" title="Reload from API">Refresh</button>
-            <button id="exportcsv" class="btn btn-secondary" type="button" title="Export filtered data to CSV">Export CSV</button>
-            <button id="shareurl" class="btn btn-secondary" type="button" title="Copy shareable URL">Share URL</button>
+            <button id="refresh" class="btn btn-primary" type="button" title="{{ _('Reload from API') }}">{{ _('Refresh') }}</button>
+            <button id="exportcsv" class="btn btn-secondary" type="button" title="{{ _('Export filtered data to CSV') }}">{{ _('Export CSV') }}</button>
+            <button id="shareurl" class="btn btn-secondary" type="button" title="{{ _('Copy shareable URL') }}">{{ _('Share URL') }}</button>
           </div>
 
         </div>
 
         <!-- Group picker (collapsible) -->
         <details class="stats-picker" id="picker-details">
-          <summary>Groups <span class="muted" id="picker-count">(loading…)</span></summary>
+          <summary>{{ _('Groups') }} <span class="muted" id="picker-count">({{ _('loading…') }})</span></summary>
           <div class="picker-bar">
-            <input id="group-search" class="input" type="search" placeholder="Search groups…">
-            <button id="select-all"  class="btn btn-secondary btn-sm" type="button">All</button>
-            <button id="select-none" class="btn btn-secondary btn-sm" type="button">None</button>
+            <input id="group-search" class="input" type="search" placeholder="{{ _('Search groups…') }}">
+            <button id="select-all"  class="btn btn-secondary btn-sm" type="button">{{ _('All') }}</button>
+            <button id="select-none" class="btn btn-secondary btn-sm" type="button">{{ _('None') }}</button>
           </div>
           <div id="group-list" class="chip-grid"></div>
         </details>
@@ -100,14 +100,14 @@
     <!-- Summary + Top movers -->
     <div class="stats-summary pad-mb">
       <div class="stats-summary-kpis" id="stats-kpis">
-        <div class="kpi"><span class="kpi-label">Posts</span><span class="kpi-value" data-kpi="posts">—</span></div>
-        <div class="kpi"><span class="kpi-label">Active groups</span><span class="kpi-value" data-kpi="groups">—</span></div>
-        <div class="kpi"><span class="kpi-label">Top group</span><span class="kpi-value" data-kpi="top">—</span><span class="kpi-sub" data-kpi="top_sub"></span></div>
+        <div class="kpi"><span class="kpi-label">{{ _('Posts') }}</span><span class="kpi-value" data-kpi="posts">—</span></div>
+        <div class="kpi"><span class="kpi-label">{{ _('Active groups') }}</span><span class="kpi-value" data-kpi="groups">—</span></div>
+        <div class="kpi"><span class="kpi-label">{{ _('Top group') }}</span><span class="kpi-value" data-kpi="top">—</span><span class="kpi-sub" data-kpi="top_sub"></span></div>
       </div>
       <aside class="stats-movers">
         <div class="movers-head">
-          <h3>Top movers</h3>
-          <span class="movers-trend" data-kpi="trend" title="Posts in second half of window vs first half">—</span>
+          <h3>{{ _('Top movers') }}</h3>
+          <span class="movers-trend" data-kpi="trend" title="{{ _('Posts in second half of window vs first half') }}">—</span>
         </div>
         <ul id="movers-list"><li class="muted">—</li></ul>
       </aside>
@@ -120,9 +120,9 @@
     <div class="stats-grid">
       <div class="table-card">
         <div class="card-toolbar">
-          <span>Top-N (bar)</span>
+          <span>{{ _('Top-N (bar)') }}</span>
           <div class="card-toolbar-actions">
-            <button data-expand class="btn btn-secondary btn-sm" type="button" title="Enlarge chart">&#x26F6;</button>
+            <button data-expand class="btn btn-secondary btn-sm" type="button" title="{{ _('Enlarge chart') }}">&#x26F6;</button>
             <button data-dl="chart-bar" class="btn btn-secondary btn-sm" type="button">PNG</button>
           </div>
         </div>
@@ -131,9 +131,9 @@
 
       <div class="table-card">
         <div class="card-toolbar">
-          <span>Stacked area</span>
+          <span>{{ _('Stacked area') }}</span>
           <div class="card-toolbar-actions">
-            <button data-expand class="btn btn-secondary btn-sm" type="button" title="Enlarge chart">&#x26F6;</button>
+            <button data-expand class="btn btn-secondary btn-sm" type="button" title="{{ _('Enlarge chart') }}">&#x26F6;</button>
             <button data-dl="chart-area" class="btn btn-secondary btn-sm" type="button">PNG</button>
           </div>
         </div>
@@ -142,9 +142,9 @@
 
       <div class="table-card">
         <div class="card-toolbar">
-          <span>Timeline (scatter)</span>
+          <span>{{ _('Timeline (scatter)') }}</span>
           <div class="card-toolbar-actions">
-            <button data-expand class="btn btn-secondary btn-sm" type="button" title="Enlarge chart">&#x26F6;</button>
+            <button data-expand class="btn btn-secondary btn-sm" type="button" title="{{ _('Enlarge chart') }}">&#x26F6;</button>
             <button data-dl="chart-scatter" class="btn btn-secondary btn-sm" type="button">PNG</button>
           </div>
         </div>
@@ -158,8 +158,8 @@
 <!-- Modal overlay for enlarged charts -->
 <div id="chart-modal" class="chart-modal" aria-hidden="true">
   <div class="chart-modal__backdrop" data-close-modal></div>
-  <div class="chart-modal__dialog" role="dialog" aria-modal="true" aria-label="Enlarged chart">
-    <button class="chart-modal__close" type="button" aria-label="Close" data-close-modal>&times;</button>
+  <div class="chart-modal__dialog" role="dialog" aria-modal="true" aria-label="{{ _('Enlarged chart') }}">
+    <button class="chart-modal__close" type="button" aria-label="{{ _('Close') }}" data-close-modal>&times;</button>
     <div id="chart-modal-plot"></div>
   </div>
 </div>

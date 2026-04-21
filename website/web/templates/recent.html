@@ -1,31 +1,31 @@
 {% extends "base.html" %}
 
-{% block title %}RansomLook — Recent posts{% endblock %}
+{% block title %}RansomLook — {{ _('Recent posts') }}{% endblock %}
 
 {% block content %}
 
 <section class="hero">
   <div class="container">
-    <h1>Recent posts</h1>
+    <h1>{{ _('Recent posts') }}</h1>
     <p class="lead">
       <em>
-        Last {{ window_days }} day{{ '' if window_days == 1 else 's' }} —
-        {{ data|length }} post{{ '' if data|length == 1 else 's' }}
+        {{ ngettext('Last %(n)s day', 'Last %(n)s days', window_days, n=window_days) }} —
+        {{ ngettext('%(n)s post', '%(n)s posts', data|length, n=data|length) }}
         {% if capped %}
-          (showing most recent {{ row_cap }} of {{ total_in_window }} — older entries trimmed)
+          ({{ _('showing most recent %(shown)s of %(total)s — older entries trimmed', shown=row_cap, total=total_in_window) }})
         {% endif %}
       </em>
     </p>
 
     <form method="get" class="recent-window" style="display:inline-flex;gap:6px;align-items:center;margin-top:6px">
-      <label for="recent-window-sel" class="sr-only">Time window</label>
-      <span style="color:var(--muted);font-size:.9rem">Window:</span>
+      <label for="recent-window-sel" class="sr-only">{{ _('Time window') }}</label>
+      <span style="color:var(--muted);font-size:.9rem">{{ _('Window:') }}</span>
       {% for d in allowed_windows %}
         <a class="tab-btn"
            href="?window={{ d }}"
            aria-selected="{{ 'true' if d == window_days else 'false' }}"
            style="padding:6px 12px;border-radius:8px;border:1px solid var(--border);font-size:.85rem;text-decoration:none">
-          {{ d }} day{{ '' if d == 1 else 's' }}
+          {{ ngettext('%(n)s day', '%(n)s days', d, n=d) }}
         </a>
       {% endfor %}
     </form>
@@ -36,8 +36,8 @@
     <div class="spark-band" aria-label="Posts per hour, last 24 hours">
       <div class="activity-head">
         <span class="live-dot" aria-hidden="true"></span>
-        <span class="activity-label">Activity · last 24h</span>
-        <span class="spark-total">{{ total24 }} post{{ '' if total24 == 1 else 's' }}</span>
+        <span class="activity-label">{{ _('Activity · last 24h') }}</span>
+        <span class="spark-total">{{ ngettext('%(n)s post', '%(n)s posts', total24, n=total24) }}</span>
       </div>
       <svg class="hero-spark" viewBox="0 0 300 48" preserveAspectRatio="none" aria-hidden="true">
         <defs><linearGradient id="hero-spark-grad" x1="0" x2="0" y1="0" y2="1"><stop offset="0%" stop-color="currentColor" stop-opacity=".55"/><stop offset="100%" stop-color="currentColor" stop-opacity="0"/></linearGradient></defs>
@@ -67,15 +67,15 @@
     {# Filters #}
     <div class="recent-filters pad-mb">
       <div class="field field--search recent-search">
-        <label class="sr-only" for="recent-q">Search</label>
+        <label class="sr-only" for="recent-q">{{ _('Search') }}</label>
         <input id="recent-q" class="input" type="search"
                autocomplete="off" spellcheck="false"
-               aria-label="Filter posts by title or group"
-               placeholder="Filter by title or group…">
-        <button class="input-clear" type="button" aria-label="Clear">×</button>
+               aria-label="{{ _('Filter posts by title or group') }}"
+               placeholder="{{ _('Filter by title or group…') }}">
+        <button class="input-clear" type="button" aria-label="{{ _('Clear') }}">×</button>
       </div>
-      <select id="recent-group" class="input recent-group" aria-label="Filter by group">
-        <option value="">All groups ({{ groups|length }})</option>
+      <select id="recent-group" class="input recent-group" aria-label="{{ _('Filter by group') }}">
+        <option value="">{{ _('All groups (%(n)s)', n=groups|length) }}</option>
         {% for g in groups %}
           <option value="{{ g|lower }}">{{ g|title }}</option>
         {% endfor %}
@@ -86,12 +86,12 @@
     {% if data and data|length %}
       <div class="table-card">
         <div class="table-scroll">
-          <table class="rl-table rl-table--recent" aria-label="Recent posts">
+          <table class="rl-table rl-table--recent" aria-label="{{ _('Recent posts') }}">
             <thead>
               <tr>
-                <th style="width:18%">Date</th>
-                <th>Title</th>
-                <th style="width:22%">Group</th>
+                <th style="width:18%">{{ _('Date') }}</th>
+                <th>{{ _('Title') }}</th>
+                <th style="width:22%">{{ _('Group') }}</th>
               </tr>
             </thead>
             <tbody id="recent-rows">
@@ -117,10 +117,10 @@
         </div>
       </div>
       <p id="recent-empty" class="prose" style="display:none;color:var(--muted);text-align:center;padding:18px 0">
-        No matches.
+        {{ _('No matches.') }}
       </p>
     {% else %}
-      <p class="prose" style="color:var(--muted)">No recent items found.</p>
+      <p class="prose" style="color:var(--muted)">{{ _('No recent items found.') }}</p>
     {% endif %}
 
   </div>

@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 {% from 'bootstrap5/utils.html' import render_messages %}
-{% block title %}Compare{% endblock %}
+{% block title %}{{ _('Compare') }}{% endblock %}
 
 {% block content %}
 {{ render_messages(container=True, dismissible=True) }}
@@ -17,8 +17,8 @@
 
 <section class="hero">
   <div class="container">
-    <h1>Compare two sources</h1>
-    <p class="lead">Pick two {{ 'groups' if kind=='group' else 'markets/forums' }} to compare (posts 7/30/365, mirrors up, 30-day uptime).</p>
+    <h1>{{ _('Compare two sources') }}</h1>
+    <p class="lead">{{ _('Pick two %(kind)s to compare (posts 7/30/365, mirrors up, 30-day uptime).', kind=_('groups') if kind=='group' else _('markets/forums')) }}</p>
   </div>
 </section>
 
@@ -27,12 +27,12 @@
 
     <!-- Type switch (same spirit as edit.html) -->
     <div class="table-card p-12 mb-14">
-      <div class="type-toggle" role="tablist" aria-label="Choose type to compare">
+      <div class="type-toggle" role="tablist" aria-label="{{ _('Choose type to compare') }}">
         <input type="radio" name="type" id="t-groups" {% if kind=='group' %}checked{% endif %}>
-        <label for="t-groups" class="btn btn-secondary">Groups</label>
+        <label for="t-groups" class="btn btn-secondary">{{ _('Groups') }}</label>
 
         <input type="radio" name="type" id="t-markets" {% if kind=='market' %}checked{% endif %}>
-        <label for="t-markets" class="btn btn-secondary">Markets / Forums</label>
+        <label for="t-markets" class="btn btn-secondary">{{ _('Markets / Forums') }}</label>
       </div>
     </div>
 
@@ -43,12 +43,12 @@
 
       <div class="compare-grid">
         <div>
-          <label class="label" for="gsearchA">Search A</label>
-          <input id="gsearchA" class="input" type="search" placeholder="Filter options for Source A…">
+          <label class="label" for="gsearchA">{{ _('Search A') }}</label>
+          <input id="gsearchA" class="input" type="search" placeholder="{{ _('Filter options for Source A…') }}">
           <div class="spacer-8"></div>
-          <label class="label" for="ga">Source A</label>
+          <label class="label" for="ga">{{ _('Source A') }}</label>
           <select id="ga" name="a" class="input w-full">
-            <option value="" disabled {% if not sel_a %}selected{% endif %}>Select a group…</option>
+            <option value="" disabled {% if not sel_a %}selected{% endif %}>{{ _('Select a group…') }}</option>
             {% for g in choices_groups %}
               <option value="{{ g }}" {% if sel_a and sel_a|lower == g|lower %}selected{% endif %}>{{ g }}</option>
             {% endfor %}
@@ -56,12 +56,12 @@
         </div>
 
         <div>
-          <label class="label" for="gsearchB">Search B</label>
-          <input id="gsearchB" class="input" type="search" placeholder="Filter options for Source B…">
+          <label class="label" for="gsearchB">{{ _('Search B') }}</label>
+          <input id="gsearchB" class="input" type="search" placeholder="{{ _('Filter options for Source B…') }}">
           <div class="spacer-8"></div>
-          <label class="label" for="gb">Source B</label>
+          <label class="label" for="gb">{{ _('Source B') }}</label>
           <select id="gb" name="b" class="input w-full">
-            <option value="" disabled {% if not sel_b %}selected{% endif %}>Select a group…</option>
+            <option value="" disabled {% if not sel_b %}selected{% endif %}>{{ _('Select a group…') }}</option>
             {% for g in choices_groups %}
               <option value="{{ g }}" {% if sel_b and sel_b|lower == g|lower %}selected{% endif %}>{{ g }}</option>
             {% endfor %}
@@ -70,9 +70,9 @@
       </div>
 
       <div class="actions-row">
-        <button type="button" id="swap-g" class="btn btn-secondary">Swap A ↔ B</button>
+        <button type="button" id="swap-g" class="btn btn-secondary">{{ _('Swap A ↔ B') }}</button>
         <div class="spacer"></div>
-        <button class="btn btn-primary" type="submit">Compare</button>
+        <button class="btn btn-primary" type="submit">{{ _('Compare') }}</button>
       </div>
     </form>
 
@@ -83,12 +83,12 @@
 
       <div class="compare-grid">
         <div>
-          <label class="label" for="msearchA">Search A</label>
-          <input id="msearchA" class="input" type="search" placeholder="Filter options for Source A…">
+          <label class="label" for="msearchA">{{ _('Search A') }}</label>
+          <input id="msearchA" class="input" type="search" placeholder="{{ _('Filter options for Source A…') }}">
           <div class="spacer-8"></div>
-          <label class="label" for="ma">Source A</label>
+          <label class="label" for="ma">{{ _('Source A') }}</label>
           <select id="ma" name="a" class="input w-full">
-            <option value="" disabled {% if not sel_a %}selected{% endif %}>Select a market/forum…</option>
+            <option value="" disabled {% if not sel_a %}selected{% endif %}>{{ _('Select a market/forum…') }}</option>
             {% for m in choices_markets %}
               <option value="{{ m }}" {% if sel_a and sel_a|lower == m|lower %}selected{% endif %}>{{ m }}</option>
             {% endfor %}
@@ -96,12 +96,12 @@
         </div>
 
         <div>
-          <label class="label" for="msearchB">Search B</label>
-          <input id="msearchB" class="input" type="search" placeholder="Filter options for Source B…">
+          <label class="label" for="msearchB">{{ _('Search B') }}</label>
+          <input id="msearchB" class="input" type="search" placeholder="{{ _('Filter options for Source B…') }}">
           <div class="spacer-8"></div>
-          <label class="label" for="mb">Source B</label>
+          <label class="label" for="mb">{{ _('Source B') }}</label>
           <select id="mb" name="b" class="input w-full">
-            <option value="" disabled {% if not sel_b %}selected{% endif %}>Select a market/forum…</option>
+            <option value="" disabled {% if not sel_b %}selected{% endif %}>{{ _('Select a market/forum…') }}</option>
             {% for m in choices_markets %}
               <option value="{{ m }}" {% if sel_b and sel_b|lower == m|lower %}selected{% endif %}>{{ m }}</option>
             {% endfor %}
@@ -110,9 +110,9 @@
       </div>
 
       <div class="actions-row">
-        <button type="button" id="swap-m" class="btn btn-secondary">Swap A ↔ B</button>
+        <button type="button" id="swap-m" class="btn btn-secondary">{{ _('Swap A ↔ B') }}</button>
         <div class="spacer"></div>
-        <button class="btn btn-primary" type="submit">Compare</button>
+        <button class="btn btn-primary" type="submit">{{ _('Compare') }}</button>
       </div>
     </form>
 
@@ -153,20 +153,20 @@
           </span>
         </div>
         <ul class="compare-rows">
-          {{ cmp_val(a.posts7, b.posts7, 'Posts 7d') }}
-          {{ cmp_val(a.posts30, b.posts30, 'Posts 30d') }}
-          {{ cmp_val(a.posts365, b.posts365, 'Posts 365d') }}
-          {{ cmp_val(a.mirrors_up ~ '/' ~ a.mirrors_total, b.mirrors_up ~ '/' ~ b.mirrors_total, 'Mirrors up', 'ratio') }}
-          {{ cmp_val(a_up, b_up, 'Uptime 30d', 'pct') }}
+          {{ cmp_val(a.posts7, b.posts7, _('Posts 7d')) }}
+          {{ cmp_val(a.posts30, b.posts30, _('Posts 30d')) }}
+          {{ cmp_val(a.posts365, b.posts365, _('Posts 365d')) }}
+          {{ cmp_val(a.mirrors_up ~ '/' ~ a.mirrors_total, b.mirrors_up ~ '/' ~ b.mirrors_total, _('Mirrors up'), 'ratio') }}
+          {{ cmp_val(a_up, b_up, _('Uptime 30d'), 'pct') }}
           <li>
-            <span class="cmp-label">Captcha</span>
-            <span class="cmp-val">{{ 'Yes' if a.captcha else 'No' }}</span>
-            <span class="cmp-val">{{ 'Yes' if b.captcha else 'No' }}</span>
+            <span class="cmp-label">{{ _('Captcha') }}</span>
+            <span class="cmp-val">{{ _('Yes') if a.captcha else _('No') }}</span>
+            <span class="cmp-val">{{ _('Yes') if b.captcha else _('No') }}</span>
           </li>
           <li>
-            <span class="cmp-label">RaaS</span>
-            <span class="cmp-val">{{ 'Yes' if a.raas else 'No' }}</span>
-            <span class="cmp-val">{{ 'Yes' if b.raas else 'No' }}</span>
+            <span class="cmp-label">{{ _('RaaS') }}</span>
+            <span class="cmp-val">{{ _('Yes') if a.raas else _('No') }}</span>
+            <span class="cmp-val">{{ _('Yes') if b.raas else _('No') }}</span>
           </li>
         </ul>
       </div>

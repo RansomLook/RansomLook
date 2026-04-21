@@ -46,11 +46,11 @@
     <h2 id="who">{{ _('Who uses RansomLook?') if _ else 'Who uses RansomLook?' }}</h2>
     <p>{{ _('RansomLook is built for, and used by:') if _ else 'RansomLook is built for, and used by:' }}</p>
     <ul>
-      <li><strong>SOC / IR teams</strong> — spotting victims in real time, correlating outbound traffic with known ransomware mirrors during incident response.</li>
-      <li><strong>CTI analysts</strong> — tracking group activity, emergence of new actors, infrastructure churn, and producing trend reports.</li>
-      <li><strong>CSIRTs / national CERTs</strong> — building situational awareness and notifying constituents when they appear in a leak post.</li>
-      <li><strong>Security researchers</strong> — studying the ransomware ecosystem over time via open data and the API.</li>
-      <li><strong>Journalists</strong> — verifying claims, confirming victim disclosures, and grounding reporting in public evidence.</li>
+      <li>{{ _('<strong>SOC / IR teams</strong> — spotting victims in real time, correlating outbound traffic with known ransomware mirrors during incident response.')|safe }}</li>
+      <li>{{ _('<strong>CTI analysts</strong> — tracking group activity, emergence of new actors, infrastructure churn, and producing trend reports.')|safe }}</li>
+      <li>{{ _('<strong>CSIRTs / national CERTs</strong> — building situational awareness and notifying constituents when they appear in a leak post.')|safe }}</li>
+      <li>{{ _('<strong>Security researchers</strong> — studying the ransomware ecosystem over time via open data and the API.')|safe }}</li>
+      <li>{{ _('<strong>Journalists</strong> — verifying claims, confirming victim disclosures, and grounding reporting in public evidence.')|safe }}</li>
     </ul>
   </div>
 </section>
@@ -58,14 +58,14 @@
 <!-- Getting started -->
 <section class="about-section">
   <div class="container prose">
-    <h2 id="getting-started">{{ _('Getting started') if _ else 'Getting started' }}</h2>
-    <p>{{ _('Start from the page that matches your use case:') if _ else 'Start from the page that matches your use case:' }}</p>
+    <h2 id="getting-started">{{ _('Getting started') }}</h2>
+    <p>{{ _('Start from the page that matches your use case:') }}</p>
     <ul>
-      <li><strong>Incident response</strong> → <a href="/recent">/recent</a> &nbsp;·&nbsp; <a href="/urls">/urls</a> (check if a URL you observed matches a tracked mirror).</li>
-      <li><strong>CTI / trend analysis</strong> → <a href="/stats">/stats</a> &nbsp;·&nbsp; <a href="/hot">/hot</a> (trending groups).</li>
-      <li><strong>Directory / lookup</strong> → <a href="/browse">/browse</a> (all groups, markets, actors).</li>
-      <li><strong>Automation / integration</strong> → <a href="/doc/">API documentation</a> &nbsp;·&nbsp; <a href="/rss.xml">RSS feed</a>.</li>
-      <li><strong>Self-hosting</strong> → <a href="https://github.com/RansomLook/RansomLook" target="_blank" rel="noopener">GitHub repository</a> (Docker compose &amp; Poetry instructions in the README).</li>
+      <li>{{ _('<strong>Incident response</strong> → <a href="/recent">/recent</a> &nbsp;·&nbsp; <a href="/urls">/urls</a> (check if a URL you observed matches a tracked mirror).')|safe }}</li>
+      <li>{{ _('<strong>CTI / trend analysis</strong> → <a href="/stats">/stats</a> &nbsp;·&nbsp; <a href="/hot">/hot</a> (trending groups).')|safe }}</li>
+      <li>{{ _('<strong>Directory / lookup</strong> → <a href="/browse">/browse</a> (all groups, markets, actors).')|safe }}</li>
+      <li>{{ _('<strong>Automation / integration</strong> → <a href="/doc/">API documentation</a> &nbsp;·&nbsp; <a href="/rss.xml">RSS feed</a>.')|safe }}</li>
+      <li>{{ _('<strong>Self-hosting</strong> → <a href="https://github.com/RansomLook/RansomLook" target="_blank" rel="noopener">GitHub repository</a> (Docker compose &amp; Poetry instructions in the README).')|safe }}</li>
     </ul>
   </div>
 </section>
@@ -73,13 +73,12 @@
 <!-- Data freshness -->
 <section class="about-section">
   <div class="container prose">
-    <h2 id="freshness">{{ _('Data freshness') if _ else 'Data freshness' }}</h2>
+    <h2 id="freshness">{{ _('Data freshness') }}</h2>
     <p>
-      RansomLook scrapes tracked DLS / forums on a continuous loop — mirror availability, post lists and screenshots are refreshed multiple times per day.
-      The <a href="/">homepage</a> shows the live <em>last 7 days</em> delta so you can judge activity at a glance; <a href="/stats">/stats</a> exposes the full aggregation controls.
+      {{ _('RansomLook scrapes tracked DLS / forums on a continuous loop — mirror availability, post lists and screenshots are refreshed multiple times per day. The <a href="/">homepage</a> shows the live <em>last 7 days</em> delta so you can judge activity at a glance; <a href="/stats">/stats</a> exposes the full aggregation controls.')|safe }}
     </p>
     <p>
-      Sources are open-by-design: we track what is publicly claimed on leak sites. Claims from operators are <strong>not</strong> independently verified against victim confirmations — always treat a post as a <em>claim</em> until corroborated elsewhere.
+      {{ _('Sources are open-by-design: we track what is publicly claimed on leak sites. Claims from operators are <strong>not</strong> independently verified against victim confirmations — always treat a post as a <em>claim</em> until corroborated elsewhere.')|safe }}
     </p>
   </div>
 </section>

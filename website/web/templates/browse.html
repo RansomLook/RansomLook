@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %}RansomLook — Browse{% endblock %}
+{% block title %}RansomLook — {{ _('Browse') }}{% endblock %}
 
 {% macro health_badge(up, total) -%}
   {% set ratio = (up / total) if total else 0 %}
@@ -23,8 +23,8 @@
 {% block content %}
 <section class="hero">
   <div class="container">
-    <h1>Browse</h1>
-    <p class="lead">{{ _('Groups, markets/forums and threat actors in one place.') if _ else 'Groups, markets/forums and threat actors in one place.' }}</p>
+    <h1>{{ _('Browse') }}</h1>
+    <p class="lead">{{ _('Groups, markets/forums and threat actors in one place.') }}</p>
   </div>
 </section>
 
@@ -34,53 +34,53 @@
     <div class="browse-filters pad-mb">
       <div class="bf-row bf-row--search">
         <div class="field field--search bf-search">
-          <label class="sr-only" for="browse-q">Search</label>
+          <label class="sr-only" for="browse-q">{{ _('Search') }}</label>
           <input id="browse-q" class="input" type="search"
                  autocomplete="off" spellcheck="false"
-                 aria-label="Search across groups, markets and actors"
-                 placeholder="Search name or alias… (Ctrl/Cmd+K)"
+                 aria-label="{{ _('Search across groups, markets and actors') }}"
+                 placeholder="{{ _('Search name or alias… (Ctrl/Cmd+K)') }}"
                  value="{{ query }}">
-          <button class="input-clear" type="button" aria-label="Clear search">×</button>
+          <button class="input-clear" type="button" aria-label="{{ _('Clear search') }}">×</button>
         </div>
       </div>
 
       <div class="bf-row bf-row--filters">
-        <nav class="browse-tabs" role="tablist" aria-label="Entity type">
+        <nav class="browse-tabs" role="tablist" aria-label="{{ _('Entity type') }}">
           <button class="tab-btn" role="tab" data-tab="all"    aria-selected="{{ 'true' if active_tab == 'all' else 'false' }}">
-            All <span class="tab-count">{{ counts['all'] }}</span>
+            {{ _('All') }} <span class="tab-count">{{ counts['all'] }}</span>
           </button>
           <button class="tab-btn" role="tab" data-tab="group"  aria-selected="{{ 'true' if active_tab == 'group' else 'false' }}">
-            Groups <span class="tab-count">{{ counts['group'] }}</span>
+            {{ _('Groups') }} <span class="tab-count">{{ counts['group'] }}</span>
           </button>
           <button class="tab-btn" role="tab" data-tab="market" aria-selected="{{ 'true' if active_tab == 'market' else 'false' }}">
-            Markets <span class="tab-count">{{ counts['market'] }}</span>
+            {{ _('Markets') }} <span class="tab-count">{{ counts['market'] }}</span>
           </button>
           <button class="tab-btn" role="tab" data-tab="actor"  aria-selected="{{ 'true' if active_tab == 'actor' else 'false' }}">
-            Actors <span class="tab-count">{{ counts['actor'] }}</span>
+            {{ _('Actors') }} <span class="tab-count">{{ counts['actor'] }}</span>
           </button>
         </nav>
 
-        <div class="health-chips" aria-label="Filter by health"{% if active_tab == 'actor' %} hidden{% endif %}>
-          <button class="health-chip" type="button" data-health="healthy"  title="At least 50% of mirrors up" aria-pressed="false">
-            <span class="dot dot-healthy"></span> Healthy
+        <div class="health-chips" aria-label="{{ _('Filter by health') }}"{% if active_tab == 'actor' %} hidden{% endif %}>
+          <button class="health-chip" type="button" data-health="healthy"  title="{{ _('At least 50%% of mirrors up') }}" aria-pressed="false">
+            <span class="dot dot-healthy"></span> {{ _('Healthy') }}
           </button>
-          <button class="health-chip" type="button" data-health="degraded" title="Fewer than 50% of mirrors up" aria-pressed="false">
-            <span class="dot dot-degraded"></span> Degraded
+          <button class="health-chip" type="button" data-health="degraded" title="{{ _('Fewer than 50%% of mirrors up') }}" aria-pressed="false">
+            <span class="dot dot-degraded"></span> {{ _('Degraded') }}
           </button>
-          <button class="health-chip" type="button" data-health="offline"  title="No mirror up" aria-pressed="false">
-            <span class="dot dot-offline"></span> Offline
+          <button class="health-chip" type="button" data-health="offline"  title="{{ _('No mirror up') }}" aria-pressed="false">
+            <span class="dot dot-offline"></span> {{ _('Offline') }}
           </button>
         </div>
       </div>
 
       <div class="bf-row bf-row--alpha">
-        <div class="alpha-bar" aria-label="Alphabet filter">
+        <div class="alpha-bar" aria-label="{{ _('Alphabet filter') }}">
           {% for l in 'ABCDEFGHIJKLMNOPQRSTUVWXYZ' %}
             <button class="alpha-btn" type="button" data-letter="{{ l }}">{{ l }}</button>
           {% endfor %}
-          <button class="alpha-btn" type="button" data-letter="0-9" title="Names starting with a digit">0–9</button>
-          <button class="alpha-btn" type="button" data-letter="#" title="Other / symbols">#</button>
-          <button class="alpha-btn alpha-clear" type="button" data-letter="">All</button>
+          <button class="alpha-btn" type="button" data-letter="0-9" title="{{ _('Names starting with a digit') }}">0–9</button>
+          <button class="alpha-btn" type="button" data-letter="#" title="{{ _('Other / symbols') }}">#</button>
+          <button class="alpha-btn alpha-clear" type="button" data-letter="">{{ _('All') }}</button>
         </div>
         <div class="filters-meta"><span id="browse-count"></span></div>
       </div>
@@ -127,12 +127,12 @@
             <div class="card-badges">
               {% if it['type'] in ('group','market') %}
                 {{ health_badge(it['up'], it['total']) }}
-                {% if it['parser_enabled'] %}<span class="badge-neutral" title="Parser enabled">parser</span>{% endif %}
+                {% if it['parser_enabled'] %}<span class="badge-neutral" title="{{ _('Parser enabled') }}">{{ _('parser') }}</span>{% endif %}
               {% else %}
-                {% if it['has_wanted'] %}<span class="badge-status badge-down" title="Wanted listing (FBI/Europol/Interpol)">wanted</span>{% endif %}
-                {% if it['aliases']|length > 0 %}<span class="badge-neutral" title="Known aliases">{{ it['aliases']|length }} alias{{ '' if it['aliases']|length == 1 else 'es' }}</span>{% endif %}
+                {% if it['has_wanted'] %}<span class="badge-status badge-down" title="{{ _('Wanted listing (FBI/Europol/Interpol)') }}">{{ _('wanted') }}</span>{% endif %}
+                {% if it['aliases']|length > 0 %}<span class="badge-neutral" title="{{ _('Known aliases') }}">{{ ngettext('%(n)s alias', '%(n)s aliases', it['aliases']|length, n=it['aliases']|length) }}</span>{% endif %}
               {% endif %}
-              {% if it['private'] %}<span class="badge-private">private</span>{% endif %}
+              {% if it['private'] %}<span class="badge-private">{{ _('private') }}</span>{% endif %}
             </div>
 
             {% if it['meta'] %}
@@ -144,7 +144,7 @@
     </div>
 
     <p id="browse-empty" class="prose" style="display:none;color:var(--muted);text-align:center;padding:32px 0">
-      {{ _('No matches.') if _ else 'No matches.' }}
+      {{ _('No matches.') }}
     </p>
 
   </div>

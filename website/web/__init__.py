@@ -32,6 +32,7 @@ from flask import (
     Response,
     abort,
     flash,
+    g,
     jsonify,
     redirect,
     render_template,
@@ -39,6 +40,8 @@ from flask import (
     send_from_directory,
     url_for,
 )
+from flask_babel import Babel
+from flask_babel import get_locale as _babel_get_locale
 from flask_bootstrap import Bootstrap5  # type: ignore
 from flask_login import current_user
 from flask_restx import Api  # type: ignore
@@ -153,6 +156,54 @@ app.config["UPLOAD_EXTENSIONS"] = [".png", ".jpg", ".svg", ".gif"]
 app.config["MAX_CONTENT_LENGTH"] = 50 * 1024 * 1024
 Bootstrap5(app)
 app.config["BOOTSTRAP_SERVE_LOCAL"] = True
+
+# ─── i18n / Flask-Babel ──────────────────────────────────────────────────
+AVAILABLE_LOCALES = ("en", "fr")
+LOCALE_COOKIE_NAME = "locale"
+app.config["BABEL_DEFAULT_LOCALE"] = "en"
+app.config["BABEL_TRANSLATION_DIRECTORIES"] = str(get_homedir() / "translations")
+
+
+def _select_locale() -> str:
+    # 1. explicit user preference via cookie (set by the topbar switcher)
+    cookie = request.cookies.get(LOCALE_COOKIE_NAME)
+    if cookie in AVAILABLE_LOCALES:
+        return cookie
+    # 2. browser Accept-Language
+    match = request.accept_languages.best_match(AVAILABLE_LOCALES)
+    return match or "en"
+
+
+babel = Babel(app, locale_selector=_select_locale)
+
+
+@app.context_processor
+def _inject_locale() -> dict[str, Any]:
+    # Exposes the active locale to every template (base.html uses g.locale already).
+    current = str(_babel_get_locale() or "en")
+    g.locale = current
+    return {"locale": current, "available_locales": AVAILABLE_LOCALES}
+
+
+@app.route("/set-locale/<code>")
+def set_locale(code: str):  # type: ignore[no-untyped-def]
+    """Persist the UI language in a cookie, then bounce back."""
+    if code not in AVAILABLE_LOCALES:
+        return redirect(url_for("home"))
+    target = request.referrer or ""
+    if not target or not target.startswith(request.host_url):
+        target = url_for("home")
+    resp = redirect(target)
+    resp.set_cookie(
+        LOCALE_COOKIE_NAME,
+        code,
+        max_age=60 * 60 * 24 * 365,  # 1 year
+        samesite="Lax",
+        secure=request.is_secure,
+        httponly=False,  # allow JS read if we later add a SPA-style widget
+    )
+    return resp
+
 app.config["SESSION_COOKIE_NAME"] = "RansomLook"
 app.config["SESSION_COOKIE_SAMESITE"] = "Strict"
 if get_config("generic", "darkmode"):
@@ -1697,14 +1748,62 @@ def market(name: str):  # type: ignore[no-untyped-def]
             _canon = _canon_raw.decode() if _canon_raw else (alias_basis or "").strip() or "Unknwn"  # type: ignore[union-attr]
             crypto_link = url_for("cryptodetail", name=_canon)
 
+            modules = glob.glob(join(dirname(str(get_homedir()) + "/ransomlook/parsers/"), "*.py"))
+            parserlist = [
+                basename(f)[:-3].split(".")[0]
+                for f in modules
+                if isfile(f) and not f.endswith("__init__.py")
+            ]
+
+            now_dt = dt.now()
+            sparkline_30d = [0] * 30
+            for p in sorted_posts:
+                ts = None
+                for fmt in ("%Y-%m-%d %H:%M:%S.%f", "%Y-%m-%d %H:%M:%S"):
+                    try:
+                        ts = dt.strptime(p.get("discovered", ""), fmt)
+                        break
+                    except Exception:
+                        pass
+                if not ts:
+                    continue
+                delta_days = (now_dt - ts).days
+                idx = 29 - delta_days
+                if 0 <= idx < 30:
+                    sparkline_30d[idx] += 1
+
+            total_posts = len(sorted_posts)
+            posts_7d_count = sum(sparkline_30d[-7:])
+            posts_30d_count = sum(sparkline_30d)
+            mirrors_total = len(group["locations"])
+            mirrors_up = sum(1 for loc in group["locations"] if loc.get("available") is True)
+            uptimes = [loc["uptime30"] for loc in group["locations"] if "uptime30" in loc]
+            avg_uptime = round(sum(uptimes) / len(uptimes)) if uptimes else None
+            first_seen = sorted_posts[-1]["discovered"] if sorted_posts else None
+            last_seen = sorted_posts[0]["discovered"] if sorted_posts else None
+            if last_seen:
+                last_seen = last_seen[:16]
+
             return render_template(
                 "group.html",
                 group=group,
                 posts=sorted_posts,
+                parser=parserlist,
                 logo=logo,
                 aff_known=aff_known,
                 aff_unknown=aff_unknown,
+                note_previews=[],
+                note_count=0,
                 crypto_link=crypto_link,
+                sparkline_30d=sparkline_30d,
+                total_posts=total_posts,
+                posts_7d_count=posts_7d_count,
+                posts_30d_count=posts_30d_count,
+                mirrors_total=mirrors_total,
+                mirrors_up=mirrors_up,
+                avg_uptime=avg_uptime,
+                first_seen=first_seen,
+                last_seen=last_seen,
             )
     return redirect(url_for("home"))
 

@@ -1,13 +1,13 @@
 {% extends "base.html" %}
 
-{% block title %}Cryptocurrencies from Groups{% endblock %}
+{% block title %}{{ _('Cryptocurrencies from Groups') }}{% endblock %}
 
 {% block content %}
 
 <section class="hero">
   <div class="container">
-    <h1>Groups with crypto</h1>
-    <p class="lead">Browse cryptocurrency wallets grouped by actor.</p>
+    <h1>{{ _('Groups with crypto') }}</h1>
+    <p class="lead">{{ _('Browse cryptocurrency wallets grouped by actor.') }}</p>
   </div>
 </section>
 
@@ -19,11 +19,11 @@
       <div class="filters-wrap">
         <div class="filters">
           <div class="field field--search">
-            <label class="sr-only" for="crypto-filter">Search</label>
+            <label class="sr-only" for="crypto-filter">{{ _('Search') }}</label>
             <input id="crypto-filter" class="input" type="search"
-                   aria-label="Filter groups"
-                   placeholder="Group name or alias…">
-            <button class="input-clear" type="button" aria-label="Clear search">×</button>
+                   aria-label="{{ _('Filter groups') }}"
+                   placeholder="{{ _('Group name or alias…') }}">
+            <button class="input-clear" type="button" aria-label="{{ _('Clear search') }}">×</button>
           </div>
         </div>
         <div class="filters-meta"><span id="flt-count"></span></div>
