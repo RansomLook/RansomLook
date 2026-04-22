@@ -279,6 +279,14 @@ def main() -> None:
     run_command(f"poetry run {(Path('tools') / '3rdparty.py').as_posix()}")
     run_command(f"poetry run {(Path('tools') / 'generate_sri.py').as_posix()}")
 
+    logger.info("* Compile translation catalogs (Flask-Babel).")
+    keep_going(args.yes)
+    if (get_homedir() / "translations").is_dir():
+        run_command("poetry run pybabel compile -d translations/ --statistics",
+                    expect_fail=True)
+    else:
+        logger.info("  no translations/ directory, skipping.")
+
     logger.info("* Restarting RansomLook.")
     keep_going(args.yes)
     if platform.system() == "Windows":
