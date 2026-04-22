@@ -649,7 +649,7 @@ msgstr "Notes de rançon"
 
 #: website/web/templates/base.html:91
 msgid "Torrents"
-msgstr "Tendance"
+msgstr "Torrents"
 
 #: website/web/templates/admin/torrent_health.html:10
 #: website/web/templates/base.html:91
