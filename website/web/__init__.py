@@ -104,6 +104,7 @@ from .api.leaksapi import api as leaks_api
 from .api.notesapi import api as notes_api
 from .api.rfapi import api as rf_api
 from .api.statsapi import api as stats_api
+from .api.torrentapi import api as torrent_api
 from .forms import (
     ActorSelectForm,
     AddActorForm,
@@ -2495,69 +2496,9 @@ def _torrent_rate_limit_ok(infohash: str, ttl_seconds: int = 60) -> bool:
     return bool(r.set(key, "1", ex=ttl_seconds, nx=True))
 
 
-@app.route("/api/torrent/health")
-@require_api_key
-def api_torrent_health_list():  # type: ignore[no-untyped-def]
-    """Paginated list of tracked infohashes with their last known state."""
-    from ransomlook import torrent_health as th
-
-    try:
-        page = max(1, int(request.args.get("page", "1")))
-    except ValueError:
-        page = 1
-    try:
-        per_page = min(200, max(1, int(request.args.get("per_page", "50"))))
-    except ValueError:
-        per_page = 50
-
-    alive_only = request.args.get("alive") == "1"
-    query = (request.args.get("q") or "").strip().lower()
-
-    rows = []
-    for ih in th.list_infohashes():
-        meta = th.get_meta(ih)
-        if not meta:
-            continue
-        if alive_only and int(meta.get("last_peers_count") or 0) == 0:
-            continue
-        if query:
-            hay = " ".join([
-                ih.lower(),
-                (meta.get("name") or "").lower(),
-                " ".join(meta.get("groups") or []).lower(),
-            ])
-            if query not in hay:
-                continue
-        rows.append(meta)
-
-    rows.sort(key=lambda r: (-int(r.get("last_peers_count") or 0), r.get("name") or ""))
-    total = len(rows)
-    start = (page - 1) * per_page
-    return jsonify(
-        {
-            "total": total,
-            "page": page,
-            "per_page": per_page,
-            "results": rows[start:start + per_page],
-        }
-    )
-
-
-@app.route("/api/torrent/health/<infohash>")
-@require_api_key
-def api_torrent_health_detail(infohash: str):  # type: ignore[no-untyped-def]
-    from ransomlook import torrent_health as th
-
-    meta = th.get_meta(infohash)
-    if not meta:
-        return jsonify({"error": "unknown infohash"}), 404
-    try:
-        limit = min(200, max(1, int(request.args.get("history", "50"))))
-    except ValueError:
-        limit = 50
-    history = th.get_history(infohash, limit=limit)
-    _audit_torrent("read_detail", infohash)
-    return jsonify({"meta": meta, "history": history})
+# /api/torrent/health and /api/torrent/health/<ih> now live in
+# website/web/api/torrentapi.py so they appear on /doc. Only refresh stays
+# here because of its background-thread + rate-limit bookkeeping.
 
 
 @app.route("/api/torrent/refresh/<infohash>", methods=["POST"])
@@ -2584,14 +2525,17 @@ def api_torrent_refresh(infohash: str):  # type: ignore[no-untyped-def]
     _audit_torrent("refresh", infohash)
 
     # Atomic "running" guard so two concurrent refreshes don't double-scan.
+    # TTL = configured scan duration + 60 s safety buffer for DHT bootstrap
+    # and stragglers. Always ≥ 120 s so a misconfigured 0 still blocks sanely.
+    scan_secs = th._cfg("scan_duration_seconds")
     lock_key = f"ratelimit:torrent-running:{infohash}"
     lock_r = Valkey(unix_socket_path=get_socket_path("cache"), db=DB_TASKS)
-    if not lock_r.set(lock_key, "1", ex=180, nx=True):
+    if not lock_r.set(lock_key, "1", ex=max(120, scan_secs + 60), nx=True):
         return jsonify({"error": "a scan is already running for this infohash"}), 409
 
     def _worker() -> None:
         try:
-            th.run_once(only=[infohash], scan_duration=30)
+            th.run_once(only=[infohash], scan_duration=scan_secs)
         except Exception:
             app.logger.exception("background torrent refresh failed")
         finally:
@@ -2642,9 +2586,12 @@ def api_enrich_ip_bulk():  # type: ignore[no-untyped-def]
     return jsonify(ie.bulk_enrich(ips, force=force))
 
 
-@app.route("/admin/torrent-health")
-@flask_login.login_required
-def admin_torrent_health():  # type: ignore[no-untyped-def]
+# /api/torrent/top/*, /api/torrent/ip/<ip>, /api/torrent/asn/<asn> live in
+# website/web/api/torrentapi.py so they show up on /doc.
+
+
+@app.route("/torrent-health")
+def torrent_health_list():  # type: ignore[no-untyped-def]
     from ransomlook import torrent_health as th
     from datetime import datetime, timedelta, timezone
 
@@ -2688,25 +2635,197 @@ def admin_torrent_health():  # type: ignore[no-untyped-def]
         rows=rows,
         kpi=kpi,
         groups_all=sorted(groups_set),
+        scan_duration=th._cfg("scan_duration_seconds"),
     )
 
 
-@app.route("/admin/torrent-health/<infohash>")
-@flask_login.login_required  # type: ignore[untyped-decorator, unused-ignore]
-def admin_torrent_health_detail(infohash: str):  # type: ignore[no-untyped-def]
+@app.route("/torrent-health/<infohash>")
+def torrent_health_detail(infohash: str):  # type: ignore[no-untyped-def]
     from ransomlook import torrent_health as th
 
     meta = th.get_meta(infohash)
     if not meta:
         flash("Unknown infohash", "error")
-        return redirect(url_for("admin_torrent_health"))
+        return redirect(url_for("torrent_health_list"))
     history = th.get_history(infohash, limit=180)
-    _audit_torrent("read_detail_ui", infohash)
     return render_template(
         "admin/torrent_health_detail.html",
         meta=meta,
         history=history,
         latest=history[0] if history else None,
+        scan_duration=th._cfg("scan_duration_seconds"),
+    )
+
+
+@app.route("/torrent-health/pivot")
+def torrent_health_pivot():  # type: ignore[no-untyped-def]
+    """Top-N pivot dashboard: most-seen IPs, most-seen ASNs, seeder counterparts.
+
+    Accepts ``?days=N`` (0 = all time, otherwise compute from raw scans).
+    """
+    from ransomlook import torrent_health as th
+
+    try:
+        days = int(request.args.get("days") or 0)
+    except ValueError:
+        days = 0
+    days = max(0, min(90, days))
+
+    if days > 0:
+        top_ips = th.get_top_ips_windowed(limit=50, days=days)
+        top_ips_seed = th.get_top_ips_windowed(limit=50, seed_only=True, days=days)
+        top_asn = th.get_top_asn_windowed(limit=50, days=days)
+        top_asn_seed = th.get_top_asn_windowed(limit=50, seed_only=True, days=days)
+    else:
+        top_ips = th.get_top_ips(limit=50)
+        top_ips_seed = th.get_top_ips(limit=50, seed_only=True)
+        top_asn = th.get_top_asn(limit=50)
+        top_asn_seed = th.get_top_asn(limit=50, seed_only=True)
+
+    return render_template(
+        "admin/torrent_pivot.html",
+        top_ips=top_ips,
+        top_ips_seed=top_ips_seed,
+        top_asn=top_asn,
+        top_asn_seed=top_asn_seed,
+        cross_group=th.get_top_cross_group_ips(limit=50),
+        days=days,
+    )
+
+
+@app.route("/torrent-health/ip/<ip>")
+def torrent_health_ip_detail(ip: str):  # type: ignore[no-untyped-def]
+    from ransomlook import torrent_health as th
+
+    detail = th.get_ip_detail(ip.strip())
+    if not detail.get("torrents") and not detail.get("enrichment"):
+        flash(f"No data for IP {ip!r}", "error")
+        return redirect(url_for("torrent_health_pivot"))
+    timeline = th.get_ip_timeline(ip.strip(), days=30) if detail.get("torrents") else []
+    return render_template("admin/torrent_ip.html", detail=detail, timeline=timeline)
+
+
+@app.route("/torrent-health/asn/<asn>")
+def torrent_health_asn_detail(asn: str):  # type: ignore[no-untyped-def]
+    from ransomlook import torrent_health as th
+
+    detail = th.get_asn_detail(asn.strip())
+    if not detail.get("ips") and not detail.get("torrents"):
+        flash(f"No data for ASN {asn!r}", "error")
+        return redirect(url_for("torrent_health_pivot"))
+    return render_template("admin/torrent_asn.html", detail=detail)
+
+
+@app.route("/admin/torrent-health/manage", methods=["GET", "POST"])
+@flask_login.login_required
+def admin_torrent_manage():  # type: ignore[no-untyped-def]
+    """Unit + bulk add/delete of torrents manually attached to a group.
+
+    Orphan torrents (those not coming from a post) live in DB_TORRENT_HEALTH
+    meta with a groups list set. collect_magnets() merges them with the
+    post-derived ones so the cron scanner picks them up automatically.
+    """
+    from ransomlook import torrent_health as th
+    import tempfile as _tempfile
+
+    # Group list — reuse the existing DB_GROUPS, same way /admin/add does.
+    red_g = Valkey(unix_socket_path=get_socket_path("cache"), db=DB_GROUPS)
+    group_keys: list[bytes] = red_g.keys()  # type: ignore[assignment]
+    groups = sorted(k.decode() for k in group_keys)
+
+    if request.method == "POST":
+        action = request.form.get("action") or ""
+
+        # ── Delete (unit or bulk via checkboxes) ─────────────────────────
+        if action == "delete":
+            targets = request.form.getlist("infohash")
+            removed = 0
+            for ih in targets:
+                if th.delete_manual_torrent(ih.strip().lower()):
+                    removed += 1
+            flash(f"Removed {removed} torrent(s).", "success" if removed else "warning")
+            return redirect(url_for("admin_torrent_manage"))
+
+        # ── Add (unit magnet, unit .torrent upload, or bulk textarea) ────
+        group = (request.form.get("group") or "").strip()
+        if not group:
+            flash("Pick a group.", "error")
+            return redirect(url_for("admin_torrent_manage"))
+
+        added = merged = failed = 0
+        errors: list[str] = []
+
+        def _try(src: str) -> None:
+            nonlocal added, merged, failed
+            try:
+                info = th.add_manual_torrent(group, src)
+            except Exception as e:
+                failed += 1
+                errors.append(f"{src[:80]}: {e}")
+                return
+            if info["already_tracked"]:
+                merged += 1
+            else:
+                added += 1
+
+        # Single magnet
+        single = (request.form.get("magnet") or "").strip()
+        if single:
+            _try(single)
+
+        # Bulk textarea
+        bulk = request.form.get("bulk") or ""
+        for line in bulk.splitlines():
+            line = line.strip()
+            if line and not line.startswith("#"):
+                _try(line)
+
+        # .torrent file upload
+        uploaded = request.files.get("torrent_file")
+        if uploaded and uploaded.filename:
+            try:
+                with _tempfile.NamedTemporaryFile(delete=False, suffix=".torrent") as tmp:
+                    uploaded.save(tmp.name)
+                    tmp_path = tmp.name
+                _try(tmp_path)
+                try:
+                    os.unlink(tmp_path)
+                except Exception:
+                    pass
+            except Exception as e:
+                errors.append(f"upload: {e}")
+                failed += 1
+
+        parts = []
+        if added: parts.append(f"{added} new")
+        if merged: parts.append(f"{merged} merged")
+        if failed: parts.append(f"{failed} failed")
+        flash(f"{' · '.join(parts) or 'No input.'}", "success" if not failed else "warning")
+        for err in errors[:5]:
+            flash(err, "error")
+        return redirect(url_for("admin_torrent_manage"))
+
+    # GET — list orphans (meta entries with a manual group and no post).
+    rows: list[dict[str, Any]] = []
+    for ih in th.list_infohashes():
+        meta = th.get_meta(ih) or {}
+        rows.append({
+            "infohash": ih,
+            "name": meta.get("name") or "",
+            "groups": list(meta.get("groups") or []),
+            "size_bytes": meta.get("size_bytes") or 0,
+            "last_scan": meta.get("last_scan") or "",
+            "last_peers_count": meta.get("last_peers_count") or 0,
+        })
+    def _sort_key(r: dict[str, Any]) -> tuple[str, str]:
+        grps = r["groups"]
+        return (grps[0] if grps else "~", r["name"] or "~")
+    rows.sort(key=_sort_key)
+
+    return render_template(
+        "admin/torrent_manage.html",
+        rows=rows,
+        groups=groups,
     )
 
 
@@ -4546,6 +4665,7 @@ api.add_namespace(crypto_api)
 api.add_namespace(notes_api)
 api.add_namespace(leaks_api)
 api.add_namespace(rf_api)
+api.add_namespace(torrent_api)
 
 
 @api.documentation

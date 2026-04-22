@@ -42,3 +42,119 @@
 
 /* ===== Table ===== */
 #th-table .ts-sort { cursor: pointer; user-select: none; }
+
+/* ===== Pivot dashboard tabs ===== */
+.th-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 16px;
+}
+.th-tab {
+  background: transparent;
+  border: 0;
+  border-bottom: 2px solid transparent;
+  padding: 10px 16px;
+  color: var(--muted);
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: -1px;
+}
+.th-tab:hover { color: var(--text); }
+.th-tab.active {
+  color: var(--text);
+  border-bottom-color: var(--pri-bright);
+}
+.th-tab-count {
+  background: var(--surface-count);
+  color: var(--muted);
+  border-radius: 999px;
+  padding: 1px 8px;
+  font-size: 11px;
+  font-weight: 600;
+}
+.th-tab.active .th-tab-count {
+  background: var(--pri-bright);
+  color: #fff;
+}
+.th-panel { display: none; }
+.th-panel.active { display: block; }
+
+/* Time window selector above the tabs */
+.th-window-form {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 12px;
+  font-size: 13px;
+}
+.th-window-form select {
+  background: var(--input-bg);
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 4px 8px;
+  font-size: 13px;
+}
+
+/* Card-toolbar needs to hold the title on the left and an action on the right. */
+.card-toolbar.bb { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+
+/* Manage page — add/bulk forms */
+.th-manage-form label { display: block; margin-bottom: 4px; font-size: 12px; }
+.th-manage-form input[type="text"],
+.th-manage-form input[type="file"],
+.th-manage-form select,
+.th-manage-form textarea {
+  width: 100%;
+  background: var(--input-bg);
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 8px 10px;
+  font-size: 13px;
+  font-family: inherit;
+}
+.th-manage-form textarea {
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 12px;
+  resize: vertical;
+}
+.th-manage-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+  align-items: end;
+}
+@media (max-width: 760px) {
+  .th-manage-grid { grid-template-columns: 1fr; }
+}
+
+/* IP detail — timeline sparkline */
+.th-ip-timeline {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 16px;
+  align-items: center;
+  padding: 12px 16px;
+}
+.th-ip-timeline svg { width: 100%; height: 80px; }
+.th-ip-timeline-legend { font-size: 12px; color: var(--muted); }
+.th-ip-timeline-legend .dot { display: inline-block; width: 10px; height: 10px; border-radius: 2px; vertical-align: middle; margin-right: 4px; }
+.th-ip-timeline-legend .dot-seen { background: #3b82f6; }
+.th-ip-timeline-legend .dot-seed { background: #10b981; }
+
+/* ===== ASN detail — IPs next to torrents ===== */
+.th-asn-twocol {
+  display: grid;
+  grid-template-columns: minmax(240px, 1fr) 3fr;
+  gap: 16px;
+}
+@media (max-width: 860px) {
+  .th-asn-twocol { grid-template-columns: 1fr; }
+}

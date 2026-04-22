@@ -67,7 +67,8 @@
         "batch_size": 10,
         "alive_interval_hours": 6,
         "dead_interval_hours": 24,
-        "frozen_interval_days": 7
+        "frozen_interval_days": 7,
+        "ignored_ips": []
     },
     "users": {},
     "malpedia": "",
@@ -103,7 +104,7 @@
         "siteurl": "Url of your domain",
         "keepall": "Store all DLS main page on screenshots/old, be carefull of the size of your storage",
         "remote_lacus": "By default, lookyloo will do the capture locally. Enabling this feature means you have a dedicated Lacus instance somewhere",
-        "torrent_health": "BitTorrent swarm health tracker. scan_retention_days / dead_threshold_days / ip_cache_ttl_days: set to 0 to keep forever. scan_duration_seconds / batch_size / *_interval_*: worker scheduling."
+        "torrent_health": "BitTorrent swarm health tracker. scan_retention_days / dead_threshold_days / ip_cache_ttl_days: set to 0 to keep forever. scan_duration_seconds / batch_size / *_interval_*: worker scheduling. ignored_ips: list of peer IPs (exact match) to exclude from peer samples, pivot views and exports — useful to hide your own scanner host or known researchers."
     }
 
 }

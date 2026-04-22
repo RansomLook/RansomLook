@@ -11,8 +11,10 @@
     <h1>{{ meta.name or _('(unknown)') }}</h1>
     <p class="lead mono th-ih-line">{{ meta.infohash }}</p>
     <div class="cta-row">
-      <a class="btn btn-secondary" href="{{ url_for('admin_torrent_health') }}">← {{ _('Back') }}</a>
+      <a class="btn btn-secondary" href="{{ url_for('torrent_health_list') }}">← {{ _('Back') }}</a>
+      {% if current_user.is_authenticated %}
       <button class="btn btn-primary th-refresh" data-ih="{{ meta.infohash }}">{{ _('Refresh now') }}</button>
+      {% endif %}
     </div>
   </div>
 </section>
@@ -106,7 +108,7 @@
           <tbody>
             {% for p in latest.peers %}
             <tr data-ip="{{ p.ip }}">
-              <td class="mono">{{ p.ip }}</td>
+              <td class="mono"><a href="{{ url_for('torrent_health_ip_detail', ip=p.ip) }}" title="{{ _('Pivot on this IP') }}">{{ p.ip }}</a></td>
               <td><center>{{ p.port }}</center></td>
               <td><center>{{ p.progress }}%</center></td>
               <td>{{ p.client }}</td>
@@ -169,7 +171,7 @@
     if (!peers || !peers.length) return '<p class="muted" style="padding:8px">No peers in this scan.</p>';
     const rows = peers.map(p => `
       <tr data-ip="${p.ip}">
-        <td class="mono">${p.ip}</td>
+        <td class="mono"><a href="/torrent-health/ip/${encodeURIComponent(p.ip)}" title="Pivot on this IP">${p.ip}</a></td>
         <td><center>${p.port}</center></td>
         <td><center>${p.progress}%</center></td>
         <td>${p.client ? p.client.replace(/</g,'&lt;') : ''}</td>
@@ -210,7 +212,10 @@
         const info = data[r.dataset.ip];
         if (!info) return;
         const fmt = v => v ? String(v).replace(/</g,'&lt;') : '<span class="muted">—</span>';
-        const asn = r.querySelector('.enrich-asn'); if (asn) asn.innerHTML = fmt(info.asn ? 'AS' + info.asn : '');
+        const asnLink = info.asn
+          ? `<a href="/torrent-health/asn/${encodeURIComponent(info.asn)}" title="Pivot on this ASN">AS${info.asn}</a>`
+          : '<span class="muted">—</span>';
+        const asn = r.querySelector('.enrich-asn'); if (asn) asn.innerHTML = asnLink;
         const org = r.querySelector('.enrich-org'); if (org) org.innerHTML = fmt(info.asn_org);
         const cc  = r.querySelector('.enrich-cc');  if (cc)  cc.innerHTML = `<center>${fmt(info.country)}</center>`;
         const ptr = r.querySelector('.enrich-ptr'); if (ptr) ptr.innerHTML = fmt(info.ptr);
@@ -253,6 +258,8 @@
 </section>
 
 <script>
+(() => {
+const SCAN_DURATION = {{ scan_duration|default(45) }};
 document.querySelector('.th-refresh')?.addEventListener('click', async (ev) => {
   const btn = ev.currentTarget;
   const ih = btn.dataset.ih;
@@ -262,8 +269,8 @@ document.querySelector('.th-refresh')?.addEventListener('click', async (ev) => {
   try {
     const resp = await fetch(`/api/torrent/refresh/${ih}`, { method: 'POST' });
     if (resp.status === 202) {
-      btn.textContent = 'Scanning (≈45s) — page will reload';
-      setTimeout(() => location.reload(), 45000);
+      btn.textContent = `Scanning (≈${SCAN_DURATION}s) — page will reload`;
+      setTimeout(() => location.reload(), SCAN_DURATION * 1000);
     } else if (resp.ok) {
       btn.textContent = 'Done — reload';
       setTimeout(() => location.reload(), 800);
@@ -277,6 +284,7 @@ document.querySelector('.th-refresh')?.addEventListener('click', async (ev) => {
     setTimeout(() => { btn.textContent = prev; btn.disabled = false; }, 2000);
   }
 });
+})();
 </script>
 
 {% endblock %}

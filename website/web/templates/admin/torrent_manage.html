@@ -1,0 +1,134 @@
+{% extends "base.html" %}
+{% from 'bootstrap5/utils.html' import render_messages %}
+{% block title %}{{ _('Admin · Manage Torrents') }}{% endblock %}
+
+{% block content %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/torrent_health.css') }}" integrity="{{ get_sri('static', 'torrent_health.css') }}">
+{{ render_messages(container=True, dismissible=True) }}
+
+<section class="hero">
+  <div class="container">
+    <h1>{{ _('Manage torrents') }}</h1>
+    <p class="lead">
+      {{ _('Attach magnets or .torrent files to a ransomware group even when no post references them. Orphan entries listed below are managed independently of the parser pipeline.') }}
+    </p>
+    <div class="cta-row">
+      <a class="btn btn-secondary" href="{{ url_for('torrent_health_list') }}">← {{ _('Back to swarms') }}</a>
+    </div>
+  </div>
+</section>
+
+<section class="metrics-section">
+  <div class="container">
+
+    <!-- ── Unit add ─────────────────────────────────────────────────── -->
+    <div class="table-card pad-mb">
+      <div class="card-toolbar bb"><span class="fw-600">{{ _('Add a single torrent') }}</span></div>
+      <form method="post" enctype="multipart/form-data" class="th-manage-form" style="padding:16px">
+        <input type="hidden" name="action" value="add">
+        <div class="th-manage-grid">
+          <div>
+            <label for="th-single-group" class="muted">{{ _('Group') }}</label>
+            <select id="th-single-group" name="group" required>
+              <option value="">{{ _('— pick a group —') }}</option>
+              {% for g in groups %}<option value="{{ g }}">{{ g }}</option>{% endfor %}
+            </select>
+          </div>
+          <div style="grid-column: span 2">
+            <label for="th-single-magnet" class="muted">{{ _('Magnet URI') }}</label>
+            <input id="th-single-magnet" name="magnet" type="text" placeholder="magnet:?xt=urn:btih:…">
+          </div>
+          <div>
+            <label for="th-single-torrent" class="muted">{{ _('…or .torrent file') }}</label>
+            <input id="th-single-torrent" name="torrent_file" type="file" accept=".torrent">
+          </div>
+        </div>
+        <div style="margin-top:12px"><button type="submit" class="btn btn-primary">{{ _('Add') }}</button></div>
+      </form>
+    </div>
+
+    <!-- ── Bulk add ─────────────────────────────────────────────────── -->
+    <div class="table-card pad-mb">
+      <div class="card-toolbar bb"><span class="fw-600">{{ _('Bulk add (one magnet per line)') }}</span></div>
+      <form method="post" class="th-manage-form" style="padding:16px">
+        <input type="hidden" name="action" value="add">
+        <div class="th-manage-grid">
+          <div>
+            <label for="th-bulk-group" class="muted">{{ _('Group') }}</label>
+            <select id="th-bulk-group" name="group" required>
+              <option value="">{{ _('— pick a group —') }}</option>
+              {% for g in groups %}<option value="{{ g }}">{{ g }}</option>{% endfor %}
+            </select>
+          </div>
+          <div style="grid-column: span 2">
+            <label for="th-bulk-area" class="muted">{{ _('Magnets') }}</label>
+            <textarea id="th-bulk-area" name="bulk" rows="6" placeholder="magnet:?xt=urn:btih:...&#10;magnet:?xt=urn:btih:..."></textarea>
+          </div>
+        </div>
+        <div style="margin-top:12px"><button type="submit" class="btn btn-primary">{{ _('Add all') }}</button></div>
+      </form>
+    </div>
+
+    <!-- ── Existing orphans — bulk delete ──────────────────────────── -->
+    <div class="table-card">
+      <div class="card-toolbar bb">
+        <span class="fw-600">{{ _('Tracked torrents') }} <span class="muted">({{ rows|length }})</span></span>
+      </div>
+      <form method="post">
+        <input type="hidden" name="action" value="delete">
+        <div class="table-scroll">
+          <table class="rl-table">
+            <thead><tr>
+              <th style="width:36px"><input type="checkbox" onclick="document.querySelectorAll('.th-manage-check').forEach(c => c.checked = this.checked)"></th>
+              <th style="width:25%">{{ _('Name') }}</th>
+              <th style="width:15%">{{ _('Groups') }}</th>
+              <th style="width:22%">{{ _('Infohash') }}</th>
+              <th style="width:8%"><center>{{ _('Size') }}</center></th>
+              <th style="width:10%"><center>{{ _('Last peers') }}</center></th>
+              <th style="width:10%"><center>{{ _('Last scan') }}</center></th>
+              <th style="width:10%"><center>{{ _('Actions') }}</center></th>
+            </tr></thead>
+            <tbody>
+              {% for r in rows %}
+              <tr>
+                <td><input class="th-manage-check" type="checkbox" name="infohash" value="{{ r.infohash }}"></td>
+                <td>{{ r.name or _('(unknown)') }}</td>
+                <td>
+                  {% for g in r.groups %}
+                    <a href="/group/{{ g|urlencode }}">{{ g }}</a>{% if not loop.last %}, {% endif %}
+                  {% endfor %}
+                </td>
+                <td><a class="mono" href="{{ url_for('torrent_health_detail', infohash=r.infohash) }}">{{ r.infohash[:12] }}…{{ r.infohash[-6:] }}</a></td>
+                <td><center>
+                  {% set s = r.size_bytes %}
+                  {% if s and s > 0 %}
+                    {% if s >= 1099511627776 %}{{ '%.1f TB'|format(s / 1099511627776) }}
+                    {% elif s >= 1073741824 %}{{ '%.1f GB'|format(s / 1073741824) }}
+                    {% elif s >= 1048576 %}{{ '%.1f MB'|format(s / 1048576) }}
+                    {% else %}{{ '%.1f KB'|format(s / 1024) }}{% endif %}
+                  {% else %}<span class="muted">—</span>{% endif %}
+                </center></td>
+                <td><center>{{ r.last_peers_count }}</center></td>
+                <td><center>{% if r.last_scan %}{{ r.last_scan.split('T')[0] }}{% else %}<span class="muted">—</span>{% endif %}</center></td>
+                <td><center>
+                  <button type="submit" formaction="{{ url_for('admin_torrent_manage') }}" name="infohash" value="{{ r.infohash }}" class="btn btn-secondary btn-sm" onclick="return confirm('{{ _('Delete this torrent from the tracker?') }}')">{{ _('Delete') }}</button>
+                </center></td>
+              </tr>
+              {% endfor %}
+              {% if not rows %}
+              <tr><td colspan="8"><center><span class="muted">{{ _('No tracked torrent yet.') }}</span></center></td></tr>
+              {% endif %}
+            </tbody>
+          </table>
+        </div>
+        {% if rows %}
+        <div style="padding:12px 16px;border-top:1px solid var(--border)">
+          <button type="submit" class="btn btn-primary" onclick="return confirm('{{ _('Delete the selected torrents?') }}')">{{ _('Delete selected') }}</button>
+        </div>
+        {% endif %}
+      </form>
+    </div>
+
+  </div>
+</section>
+{% endblock %}

@@ -12,6 +12,9 @@
     <p class="lead">
       {{ _('Peer counts, seeders/leechers and peer samples for every magnet referenced by a tracked post. Scans are driven by the cron worker (poetry run torrent-health); use Refresh to force a live rescan for a specific swarm.') }}
     </p>
+    <div class="cta-row">
+      <a class="btn btn-primary" href="{{ url_for('torrent_health_pivot') }}">{{ _('Pivot on IP / ASN →') }}</a>
+    </div>
   </div>
 </section>
 
@@ -109,7 +112,7 @@
                 {% endfor %}
               </td>
               <td>
-                <a class="mono" href="{{ url_for('admin_torrent_health_detail', infohash=r.infohash) }}">
+                <a class="mono" href="{{ url_for('torrent_health_detail', infohash=r.infohash) }}">
                   {{ r.infohash[:12] }}…{{ r.infohash[-6:] }}
                 </a>
               </td>
@@ -129,8 +132,10 @@
                 {% else %}<span class="muted">{{ _('never') }}</span>{% endif %}
               </center></td>
               <td><center>
-                <a class="btn btn-secondary btn-sm" href="{{ url_for('admin_torrent_health_detail', infohash=r.infohash) }}">{{ _('Detail') }}</a>
+                <a class="btn btn-secondary btn-sm" href="{{ url_for('torrent_health_detail', infohash=r.infohash) }}">{{ _('Detail') }}</a>
+                {% if current_user.is_authenticated %}
                 <button class="btn btn-primary btn-sm th-refresh" data-ih="{{ r.infohash }}">{{ _('Refresh') }}</button>
+                {% endif %}
               </center></td>
             </tr>
             {% endfor %}
@@ -150,6 +155,7 @@
 
 <script>
 (() => {
+  const SCAN_DURATION = {{ scan_duration|default(45) }};
   const $q = document.getElementById('th-q');
   const $alive = document.getElementById('th-alive');
   const $tbody = document.querySelector('#th-table tbody');
@@ -245,8 +251,8 @@
     try {
       const resp = await fetch(`/api/torrent/refresh/${ih}`, { method: 'POST' });
       if (resp.status === 202) {
-        btn.textContent = 'Scanning (45s)…';
-        setTimeout(() => location.reload(), 45000);
+        btn.textContent = `Scanning (${SCAN_DURATION}s)…`;
+        setTimeout(() => location.reload(), SCAN_DURATION * 1000);
       } else if (resp.ok) {
         btn.textContent = 'Done — reload';
         setTimeout(() => location.reload(), 800);

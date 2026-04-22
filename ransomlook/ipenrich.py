@@ -176,7 +176,54 @@ def enrich(ip: str, force: bool = False) -> dict[str, Any]:
         r.set(key, json.dumps(record))
     else:
         r.set(key, json.dumps(record), ex=ttl)
+
+    # ── Pivot indexes (ASN side) ─────────────────────────────────────────
+    # Now that we know the ASN of this IP, link it to every infohash and
+    # seeder scan where the IP was observed. Silent on failure — enrichment
+    # should never break because of indexing.
+    try:
+        _index_ip_asn(ip, record.get("asn"))
+    except Exception as e:
+        logger.debug("asn index update failed for %s: %s", ip, e)
+
     return record
+
+
+def _index_ip_asn(ip: str, asn: Any) -> None:
+    """Wire the IP into the ASN-side pivot indexes.
+
+    Kept separate so :func:`enrich` stays readable and so the reindex script
+    can call it standalone.
+    """
+    if not asn:
+        return
+    try:
+        asn_num = int(asn)
+    except (TypeError, ValueError):
+        return
+    r = _redis()
+    asn_key = str(asn_num)
+
+    # IP ↔ ASN
+    r.sadd(f"torrent_health:asn_to_ip:{asn_key}", ip)
+
+    # Infohashes: pull them from the existing IP indexes.
+    ih_all: set[bytes] = r.smembers(f"torrent_health:ip_to_ih:{ip}")  # type: ignore[assignment]
+    ih_seed: set[bytes] = r.smembers(f"torrent_health:ip_seeds:{ip}")  # type: ignore[assignment]
+    if ih_all:
+        r.sadd(f"torrent_health:asn_to_ih:{asn_key}", *[x.decode() if isinstance(x, bytes) else x for x in ih_all])
+    if ih_seed:
+        r.sadd(f"torrent_health:asn_seed_ih:{asn_key}", *[x.decode() if isinstance(x, bytes) else x for x in ih_seed])
+
+    # Leaderboards. We count by DISTINCT IPs (not scan occurrences) so the
+    # zset score reflects "how many unique IPs from this ASN we saw", which
+    # is more meaningful than raw appearance counts.
+    r.zadd("torrent_health:top:asn", {asn_key: int(r.scard(f"torrent_health:asn_to_ip:{asn_key}"))})  # type: ignore[arg-type]
+    # For the seeder-asn leaderboard, use the count of IPs that ever seeded.
+    seed_ips_key = f"torrent_health:asn_seed_ips:{asn_key}"
+    if ih_seed:
+        r.sadd(seed_ips_key, ip)
+    r.zadd("torrent_health:top:asn_seed", {asn_key: int(r.scard(seed_ips_key) or 0)})  # type: ignore[arg-type]
 
 
 def bulk_enrich(ips: list[str], force: bool = False) -> dict[str, dict[str, Any]]:

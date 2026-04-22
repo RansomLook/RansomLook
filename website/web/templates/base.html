@@ -87,9 +87,7 @@
           {% if activatedRF %}
           {{ nav_link(url_for('rf'), _('RF Dumps'), ic_rf, match='/RF') }}
           {% endif %}
-          {% if current_user.is_authenticated %}
-          {{ nav_link('/admin/torrent-health', _('Torrents'), ic_torrent, match='/admin/torrent-health', title=_('Torrent swarm health')) }}
-          {% endif %}
+          {{ nav_link('/torrent-health', _('Torrents'), ic_torrent, match='/torrent-health', title=_('Torrent swarm health')) }}
         </ul>
       </div>
 

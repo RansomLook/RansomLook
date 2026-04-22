@@ -82,6 +82,24 @@ def _ttl_or_none(days: int) -> int | None:
     return days * 86400
 
 
+def _ignored_ips() -> set[str]:
+    """Return the user-configured IP blocklist from generic.json.
+
+    Lists under ``torrent_health.ignored_ips`` in the config: exact IP match,
+    one per entry. Applied before storage + indexing, so the listed IPs are
+    totally invisible in /admin/torrent-health (peer samples, pivot views,
+    exports, API). Useful to hide your own scanner, known researchers, etc.
+    """
+    try:
+        section = get_config("generic", "torrent_health", quiet=True) or {}
+    except Exception:
+        return set()
+    lst = section.get("ignored_ips") or []
+    if not isinstance(lst, list):
+        return set()
+    return {str(ip).strip() for ip in lst if ip and str(ip).strip()}
+
+
 SPARKLINE_MAX = 180  # 30 days × ~6 scans/day — capped regardless of retention
 DEFAULT_SCAN_DURATION = _cfg("scan_duration_seconds")
 DEFAULT_BATCH_SIZE = _cfg("batch_size")
@@ -219,6 +237,9 @@ def _self_ips(sess: lt.session) -> set[str]:
     # Drop loopback/empty placeholders we may have collected
     ips.discard("")
     ips.discard("0.0.0.0")
+    # Merge in the user-configured blocklist so ignored IPs never show up in
+    # peer samples, indexes, or exports.
+    ips |= _ignored_ips()
     return ips
 
 
@@ -519,6 +540,31 @@ def store_scan(result: ScanResult, magnets: list[str], groups: list[str]) -> Non
         mapping["last_seen_alive"] = _iso(result.ts)
     r.hset(meta_key, mapping=mapping)
 
+    # ── Pivot indexes ────────────────────────────────────────────────────
+    # For each peer observed in this scan, record the association with this
+    # infohash + increment the leaderboards. A peer is counted as seeder if
+    # libtorrent flagged it OR if its progress ≥ 99.9% (same rule as elsewhere).
+    for peer in result.peers:
+        ip = (peer.ip or "").strip()
+        if not ip or ip == "?":
+            continue
+        r.sadd(f"torrent_health:ip_to_ih:{ip}", ih)
+        r.zincrby("torrent_health:top:ip", 1, ip)
+        is_seeder = "seed" in (peer.flags or "") or peer.progress >= 99.9
+        if is_seeder:
+            r.sadd(f"torrent_health:ip_seeds:{ip}", ih)
+            r.zincrby("torrent_health:top:ip_seed", 1, ip)
+        # Cross-group correlation: track every ransomware group this IP has
+        # been observed in. An IP showing up across 2+ groups is a strong
+        # signal (shared seedbox, common actor, researcher downloading leaks…).
+        for grp in groups:
+            if not grp:
+                continue
+            r.sadd(f"torrent_health:ip_to_groups:{ip}", grp)
+        group_count: int = r.scard(f"torrent_health:ip_to_groups:{ip}") or 0  # type: ignore[assignment]
+        if group_count >= 2:
+            r.zadd("torrent_health:top:ip_cross_group", {ip: group_count})
+
 
 def list_infohashes() -> list[str]:
     """Return the set of infohashes known in the meta store."""
@@ -583,6 +629,320 @@ def get_scan(infohash: str, ts_iso: str) -> dict[str, Any] | None:
         return None
 
 
+# ─── Pivot queries (IP / ASN) ──────────────────────────────────────────────
+
+
+def get_top_ips(limit: int = 50, seed_only: bool = False) -> list[dict[str, Any]]:
+    """Return the top IPs ranked by scan appearances.
+
+    ``seed_only=True`` ranks by appearances where the IP was observed
+    seeding, which is usually the more operationally interesting signal.
+    """
+    r = _redis()
+    zkey = "torrent_health:top:ip_seed" if seed_only else "torrent_health:top:ip"
+    rows: list[tuple[bytes, float]] = r.zrevrange(zkey, 0, max(0, limit - 1), withscores=True)  # type: ignore[assignment]
+    out = []
+    for ip_b, score in rows:
+        ip = ip_b.decode() if isinstance(ip_b, bytes) else str(ip_b)
+        t_all: int = r.scard(f"torrent_health:ip_to_ih:{ip}") or 0  # type: ignore[assignment]
+        t_seed: int = r.scard(f"torrent_health:ip_seeds:{ip}") or 0  # type: ignore[assignment]
+        out.append({
+            "ip": ip,
+            "count": int(score),
+            "torrents": t_all,
+            "seed_torrents": t_seed,
+        })
+    return out
+
+
+def get_top_asn(limit: int = 50, seed_only: bool = False) -> list[dict[str, Any]]:
+    """Return the top ASNs ranked by number of distinct IPs (or seeder IPs)."""
+    r = _redis()
+    zkey = "torrent_health:top:asn_seed" if seed_only else "torrent_health:top:asn"
+    rows: list[tuple[bytes, float]] = r.zrevrange(zkey, 0, max(0, limit - 1), withscores=True)  # type: ignore[assignment]
+    out = []
+    for asn_b, score in rows:
+        asn = asn_b.decode() if isinstance(asn_b, bytes) else str(asn_b)
+        t_all: int = r.scard(f"torrent_health:asn_to_ih:{asn}") or 0  # type: ignore[assignment]
+        t_seed: int = r.scard(f"torrent_health:asn_seed_ih:{asn}") or 0  # type: ignore[assignment]
+        out.append({
+            "asn": asn,
+            "ips": int(score),
+            "torrents": t_all,
+            "seed_torrents": t_seed,
+        })
+    return out
+
+
+def get_ip_detail(ip: str) -> dict[str, Any]:
+    """Return everything we know about an IP: torrent associations + enrichment."""
+    r = _redis()
+    ih_all_b: set[bytes] = r.smembers(f"torrent_health:ip_to_ih:{ip}")  # type: ignore[assignment]
+    ih_seed_b: set[bytes] = r.smembers(f"torrent_health:ip_seeds:{ip}")  # type: ignore[assignment]
+    ih_all = sorted(b.decode() if isinstance(b, bytes) else b for b in ih_all_b)
+    ih_seed = {b.decode() if isinstance(b, bytes) else b for b in ih_seed_b}
+
+    # Resolve infohash → human-friendly name + groups so the UI can link nicely.
+    torrents = []
+    for ih in ih_all:
+        meta = get_meta(ih) or {}
+        torrents.append({
+            "infohash": ih,
+            "name": meta.get("name") or "",
+            "groups": meta.get("groups") or [],
+            "is_seeder": ih in ih_seed,
+            "last_scan": meta.get("last_scan"),
+            "last_peers_count": meta.get("last_peers_count") or 0,
+        })
+    # Newest-scan first, then by name
+    torrents.sort(key=lambda t: (t["last_scan"] or "", t["name"] or ""), reverse=True)
+
+    # Enrichment: fetch lazily if not cached. Safe to import here to avoid
+    # cyclic imports (ipenrich reads DB_TORRENT_HEALTH via this module too).
+    enrichment: dict[str, Any] = {}
+    try:
+        from . import ipenrich
+        enrichment = ipenrich.enrich(ip) or {}
+    except Exception as e:
+        logger.debug("enrichment lookup failed for %s: %s", ip, e)
+
+    return {
+        "ip": ip,
+        "enrichment": enrichment,
+        "torrents": torrents,
+        "seen_count": int(r.zscore("torrent_health:top:ip", ip) or 0),  # type: ignore[arg-type]
+        "seed_count": int(r.zscore("torrent_health:top:ip_seed", ip) or 0),  # type: ignore[arg-type]
+    }
+
+
+def get_top_ips_windowed(limit: int = 50, seed_only: bool = False, days: int = 7) -> list[dict[str, Any]]:
+    """Top IPs observed in the last ``days`` days, computed from raw scans.
+
+    No dedicated time-bucketed zsets on purpose: 200 swarms × 6 scans/day
+    × 30 days = 36k JSON reads worst case, takes well under a second on a
+    local Valkey. Keeps the schema simple.
+    """
+    r = _redis()
+    end = _now()
+    start = end - timedelta(days=days)
+
+    counts: dict[str, int] = {}
+    torrents_by_ip: dict[str, set[str]] = {}
+    seed_torrents_by_ip: dict[str, set[str]] = {}
+
+    for ih in list_infohashes():
+        scans_key = f"torrent_health:scans:{ih}"
+        members: list[bytes] = r.zrangebyscore(  # type: ignore[assignment]
+            scans_key, start.timestamp(), end.timestamp(),
+        )
+        for ts_b in members:
+            ts_iso = ts_b.decode() if isinstance(ts_b, bytes) else str(ts_b)
+            raw: bytes | None = r.get(f"torrent_health:scan:{ih}:{ts_iso}")  # type: ignore[assignment]
+            if not raw:
+                continue
+            try:
+                scan = json.loads(raw)
+            except Exception:
+                continue
+            for p in scan.get("peers") or []:
+                ip = (p.get("ip") or "").strip()
+                if not ip or ip == "?":
+                    continue
+                flags = p.get("flags") or ""
+                progress = float(p.get("progress") or 0)
+                is_seed = "seed" in flags or progress >= 99.9
+                if seed_only and not is_seed:
+                    continue
+                counts[ip] = counts.get(ip, 0) + 1
+                torrents_by_ip.setdefault(ip, set()).add(ih)
+                if is_seed:
+                    seed_torrents_by_ip.setdefault(ip, set()).add(ih)
+
+    ranked = sorted(counts.items(), key=lambda kv: -kv[1])[:limit]
+    return [
+        {
+            "ip": ip,
+            "count": c,
+            "torrents": len(torrents_by_ip.get(ip, set())),
+            "seed_torrents": len(seed_torrents_by_ip.get(ip, set())),
+        }
+        for ip, c in ranked
+    ]
+
+
+def get_top_asn_windowed(limit: int = 50, seed_only: bool = False, days: int = 7) -> list[dict[str, Any]]:
+    """Top ASNs in the last ``days`` days. ASN is resolved from the enrichment
+    cache for each observed IP; IPs without cached enrichment are skipped.
+    """
+    from . import ipenrich
+
+    ips_rows = get_top_ips_windowed(limit=limit * 10, seed_only=seed_only, days=days)
+    by_asn: dict[str, dict[str, Any]] = {}
+    for row in ips_rows:
+        ip = row["ip"]
+        enr = ipenrich.enrich(ip) or {}
+        asn = enr.get("asn")
+        if not asn:
+            continue
+        key = str(asn)
+        bucket = by_asn.setdefault(key, {"asn": key, "ips": 0, "torrents": 0, "seed_torrents": 0, "_ip_set": set(), "_ih_set": set(), "_ih_seed_set": set()})
+        bucket["_ip_set"].add(ip)
+        bucket["_ih_set"].add(row["torrents"])  # placeholder; we merge infohash sets below
+
+    # Second pass — we need actual IH sets, not counts. Re-walk to aggregate.
+    r = _redis()
+    for asn_key, bucket in by_asn.items():
+        bucket["_ih_set"] = set()
+        bucket["_ih_seed_set"] = set()
+    for row in ips_rows:
+        ip = row["ip"]
+        enr = ipenrich.enrich(ip) or {}
+        asn = enr.get("asn")
+        if not asn:
+            continue
+        key = str(asn)
+        ih_all_b: set[bytes] = r.smembers(f"torrent_health:ip_to_ih:{ip}")  # type: ignore[assignment]
+        ih_seed_b: set[bytes] = r.smembers(f"torrent_health:ip_seeds:{ip}")  # type: ignore[assignment]
+        by_asn[key]["_ih_set"].update(b.decode() if isinstance(b, bytes) else b for b in ih_all_b)
+        by_asn[key]["_ih_seed_set"].update(b.decode() if isinstance(b, bytes) else b for b in ih_seed_b)
+
+    out = []
+    for asn_key, bucket in by_asn.items():
+        out.append({
+            "asn": asn_key,
+            "ips": len(bucket["_ip_set"]),
+            "torrents": len(bucket["_ih_set"]),
+            "seed_torrents": len(bucket["_ih_seed_set"]),
+        })
+    out.sort(key=lambda x: -x["ips"])  # type: ignore[operator]
+    return out[:limit]
+
+
+def get_top_cross_group_ips(limit: int = 50) -> list[dict[str, Any]]:
+    """IPs seen across multiple ransomware groups, ordered by group count.
+
+    This is the most high-signal pivot view: an IP seeding for both Clop and
+    Akira (for example) is either a researcher aggregating leaks, a seedbox
+    shared between actors, or somebody with an unusual exfiltration pattern.
+    """
+    r = _redis()
+    rows: list[tuple[bytes, float]] = r.zrevrange(  # type: ignore[assignment]
+        "torrent_health:top:ip_cross_group", 0, max(0, limit - 1), withscores=True,
+    )
+    out = []
+    for ip_b, score in rows:
+        ip = ip_b.decode() if isinstance(ip_b, bytes) else str(ip_b)
+        groups_b: set[bytes] = r.smembers(f"torrent_health:ip_to_groups:{ip}")  # type: ignore[assignment]
+        groups = sorted(g.decode() if isinstance(g, bytes) else g for g in groups_b)
+        t_all: int = r.scard(f"torrent_health:ip_to_ih:{ip}") or 0  # type: ignore[assignment]
+        t_seed: int = r.scard(f"torrent_health:ip_seeds:{ip}") or 0  # type: ignore[assignment]
+        out.append({
+            "ip": ip,
+            "group_count": int(score),
+            "groups": groups,
+            "torrents": t_all,
+            "seed_torrents": t_seed,
+        })
+    return out
+
+
+def get_ip_timeline(ip: str, days: int = 30) -> list[dict[str, Any]]:
+    """Return daily observation counts for an IP over the last ``days`` days.
+
+    For each torrent the IP has been observed in, walks the scans in the
+    window and checks whether the IP was actually present in that specific
+    scan's peer list. Precise (not approximated from the top-level index)
+    so the sparkline reflects real activity. Bounded I/O: an IP tied to N
+    torrents × M scans = N·M JSON reads.
+    """
+    r = _redis()
+    ih_all_b: set[bytes] = r.smembers(f"torrent_health:ip_to_ih:{ip}")  # type: ignore[assignment]
+    ih_all = [b.decode() if isinstance(b, bytes) else b for b in ih_all_b]
+
+    end = _now()
+    start = end - timedelta(days=days)
+    by_day: dict[str, dict[str, int]] = {}
+    for i in range(days + 1):
+        d = (start + timedelta(days=i)).strftime("%Y-%m-%d")
+        by_day[d] = {"seen": 0, "seed": 0}
+
+    for ih in ih_all:
+        scans_key = f"torrent_health:scans:{ih}"
+        members: list[bytes] = r.zrangebyscore(  # type: ignore[assignment]
+            scans_key, start.timestamp(), end.timestamp(),
+        )
+        for ts_b in members:
+            ts_iso = ts_b.decode() if isinstance(ts_b, bytes) else str(ts_b)
+            day = ts_iso[:10]
+            if day not in by_day:
+                continue
+            raw: bytes | None = r.get(f"torrent_health:scan:{ih}:{ts_iso}")  # type: ignore[assignment]
+            if not raw:
+                continue
+            try:
+                scan = json.loads(raw)
+            except Exception:
+                continue
+            for p in scan.get("peers") or []:
+                if (p.get("ip") or "").strip() != ip:
+                    continue
+                by_day[day]["seen"] += 1
+                flags = p.get("flags") or ""
+                progress = float(p.get("progress") or 0)
+                if "seed" in flags or progress >= 99.9:
+                    by_day[day]["seed"] += 1
+                break  # Only count once per scan even if the IP recurs.
+
+    return [{"day": d, **counts} for d, counts in by_day.items()]
+
+
+def get_asn_detail(asn: str) -> dict[str, Any]:
+    """Return IPs and torrents associated with an ASN."""
+    r = _redis()
+    asn_key = str(asn).lstrip("AS").strip()
+    ips_b: set[bytes] = r.smembers(f"torrent_health:asn_to_ip:{asn_key}")  # type: ignore[assignment]
+    ih_all_b: set[bytes] = r.smembers(f"torrent_health:asn_to_ih:{asn_key}")  # type: ignore[assignment]
+    ih_seed_b: set[bytes] = r.smembers(f"torrent_health:asn_seed_ih:{asn_key}")  # type: ignore[assignment]
+    ips = sorted(b.decode() if isinstance(b, bytes) else b for b in ips_b)
+    ih_all = sorted(b.decode() if isinstance(b, bytes) else b for b in ih_all_b)
+    ih_seed = {b.decode() if isinstance(b, bytes) else b for b in ih_seed_b}
+
+    torrents = []
+    for ih in ih_all:
+        meta = get_meta(ih) or {}
+        torrents.append({
+            "infohash": ih,
+            "name": meta.get("name") or "",
+            "groups": meta.get("groups") or [],
+            "has_seeder": ih in ih_seed,
+            "last_scan": meta.get("last_scan"),
+        })
+    torrents.sort(key=lambda t: (t["last_scan"] or "", t["name"] or ""), reverse=True)
+
+    # Resolve ASN → org/country from one of its IPs (cheapest path: use the
+    # cached enrichment of any of the IPs; they all share the same ASN).
+    asn_org = ""
+    country = ""
+    for ip in ips:
+        try:
+            from . import ipenrich
+            enr = ipenrich.enrich(ip) or {}
+            if enr.get("asn_org"):
+                asn_org = enr["asn_org"]
+                country = enr.get("country") or ""
+                break
+        except Exception:
+            continue
+
+    return {
+        "asn": asn_key,
+        "asn_org": asn_org,
+        "country": country,
+        "ips": ips,
+        "torrents": torrents,
+    }
+
+
 def purge_dead(now: datetime | None = None) -> int:
     """Remove meta + zset for infohashes whose last_seen_alive is older than
     ``dead_threshold_days``. A value of 0 disables the purge entirely."""
@@ -644,6 +1004,22 @@ def collect_magnets() -> dict[str, dict[str, Any]]:
             entry["magnets"].add(mag)
             entry["groups"].add(group)
 
+    # Merge in manually-added "orphan" torrents (not tied to any post) from
+    # DB_TORRENT_HEALTH meta. A meta entry qualifies as an orphan when it
+    # carries ≥ 1 group. If an infohash is both post-linked AND in meta, we
+    # union the two groups lists so a manual tag survives.
+    th_r = _redis()
+    for meta_key in th_r.scan_iter(match="torrent_health:meta:*"):
+        ih = meta_key.decode().split(":", 2)[2]
+        meta = get_meta(ih) or {}
+        meta_groups = [g for g in (meta.get("groups") or []) if g]
+        meta_magnets = [m for m in (meta.get("magnets") or []) if m]
+        if not meta_groups or not meta_magnets:
+            continue
+        entry = out.setdefault(ih, {"magnets": set(), "groups": set()})
+        entry["magnets"].update(meta_magnets)
+        entry["groups"].update(meta_groups)
+
     return {
         ih: {
             "magnets": sorted(v["magnets"]),
@@ -651,6 +1027,104 @@ def collect_magnets() -> dict[str, dict[str, Any]]:
         }
         for ih, v in out.items()
     }
+
+
+def parse_magnet_or_torrent(source: str) -> dict[str, Any]:
+    """Normalise a user-supplied magnet URI or .torrent file path into a dict.
+
+    Returns ``{infohash, magnet, name, size_bytes}``. Raises ``ValueError`` on
+    anything we can't parse. Used by the CLI adder and the admin /manage form.
+    """
+    source = source.strip()
+    if source.startswith("magnet:"):
+        atp = lt.parse_magnet_uri(source)
+        ih_obj = atp.info_hashes
+        ih = str(getattr(ih_obj, "get_best", lambda: ih_obj)()).lower()
+        if not ih:
+            raise ValueError("magnet has no infohash")
+        # Name from the dn= parameter if any.
+        name = ""
+        try:
+            name = (atp.name or "") if hasattr(atp, "name") else ""
+        except Exception:
+            pass
+        return {"infohash": ih, "magnet": source, "name": name, "size_bytes": 0}
+
+    # Treat as a .torrent file path.
+    try:
+        ti = lt.torrent_info(source)
+    except Exception as e:
+        raise ValueError(f"cannot read .torrent file: {e}") from e
+    ih_obj = ti.info_hashes()
+    ih = str(getattr(ih_obj, "get_best", lambda: ih_obj)()).lower()
+    return {
+        "infohash": ih,
+        "magnet": lt.make_magnet_uri(ti),
+        "name": ti.name() or "",
+        "size_bytes": ti.total_size() or 0,
+    }
+
+
+def add_manual_torrent(group: str, magnet_or_path: str) -> dict[str, Any]:
+    """Register a torrent under ``group`` without requiring a post.
+
+    Writes (or merges) a ``torrent_health:meta:<ih>`` entry. Subsequent cron
+    runs of :func:`run_once` will pick it up via :func:`collect_magnets`.
+    Returns ``{infohash, name, size_bytes, magnet, groups, already_tracked}``.
+    """
+    info = parse_magnet_or_torrent(magnet_or_path)
+    ih = info["infohash"]
+    r = _redis()
+    meta_key = f"torrent_health:meta:{ih}"
+
+    existing: dict[bytes, bytes] = r.hgetall(meta_key) or {}  # type: ignore[assignment]
+    already = bool(existing)
+
+    existing_groups: list[str] = []
+    existing_magnets: list[str] = []
+    if existing:
+        try:
+            existing_groups = json.loads(existing.get(b"groups", b"[]").decode() or "[]") or []
+        except Exception:
+            existing_groups = []
+        try:
+            existing_magnets = json.loads(existing.get(b"magnets", b"[]").decode() or "[]") or []
+        except Exception:
+            existing_magnets = []
+
+    merged_groups = sorted(set(existing_groups + [group]))
+    merged_magnets = sorted(set(existing_magnets + [info["magnet"]]))
+
+    mapping: dict[str, str] = {
+        "name": info["name"] or existing.get(b"name", b"").decode(),
+        "size_bytes": str(info["size_bytes"] or int(existing.get(b"size_bytes", b"0") or 0)),
+        "magnets": json.dumps(merged_magnets),
+        "groups": json.dumps(merged_groups),
+    }
+    if not existing:
+        mapping["first_seen"] = _iso(_now())
+    r.hset(meta_key, mapping=mapping)
+
+    return {
+        "infohash": ih,
+        "name": info["name"],
+        "size_bytes": info["size_bytes"],
+        "magnet": info["magnet"],
+        "groups": merged_groups,
+        "already_tracked": already,
+    }
+
+
+def delete_manual_torrent(infohash: str) -> bool:
+    """Remove meta + history for ``infohash``. Returns True if something was removed."""
+    r = _redis()
+    deleted = 0
+    deleted += int(r.delete(f"torrent_health:meta:{infohash}") or 0)  # type: ignore[arg-type]
+    deleted += int(r.delete(f"torrent_health:scans:{infohash}") or 0)  # type: ignore[arg-type]
+    for k in r.scan_iter(match=f"torrent_health:scan:{infohash}:*"):
+        r.delete(k)
+        deleted += 1
+    return deleted > 0
 
 
 # ─── Orchestration ─────────────────────────────────────────────────────
