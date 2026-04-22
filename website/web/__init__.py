@@ -2646,6 +2646,7 @@ def api_enrich_ip_bulk():  # type: ignore[no-untyped-def]
 @flask_login.login_required
 def admin_torrent_health():  # type: ignore[no-untyped-def]
     from ransomlook import torrent_health as th
+    from datetime import datetime, timedelta, timezone
 
     rows = []
     for ih in th.list_infohashes():
@@ -2653,7 +2654,41 @@ def admin_torrent_health():  # type: ignore[no-untyped-def]
         if meta:
             rows.append(meta)
     rows.sort(key=lambda r: (-int(r.get("last_peers_count") or 0), r.get("name") or ""))
-    return render_template("admin/torrent_health.html", rows=rows)
+
+    # Aggregate KPIs for the banner + sidebar chips.
+    now = datetime.now(timezone.utc)
+    day_ago = now - timedelta(hours=24)
+    dead_threshold = now - timedelta(days=th._cfg("dead_threshold_days") or 90)
+    kpi = {"total": len(rows), "alive": 0, "dead": 0, "scans_24h": 0, "seeders_total": 0}
+    groups_set: set[str] = set()
+    for r in rows:
+        peers = int(r.get("last_peers_count") or 0)
+        kpi["seeders_total"] += int(r.get("last_seeders") or 0)
+        if peers > 0:
+            kpi["alive"] += 1
+        last_alive = r.get("last_seen_alive") or ""
+        try:
+            la = datetime.strptime(last_alive, "%Y-%m-%dT%H:%M:%SZ").replace(tzinfo=timezone.utc)
+            if la < dead_threshold:
+                kpi["dead"] += 1
+        except Exception:
+            pass
+        last_scan = r.get("last_scan") or ""
+        try:
+            ls = datetime.strptime(last_scan, "%Y-%m-%dT%H:%M:%SZ").replace(tzinfo=timezone.utc)
+            if ls >= day_ago:
+                kpi["scans_24h"] += 1
+        except Exception:
+            pass
+        for g in r.get("groups") or []:
+            groups_set.add(g)
+
+    return render_template(
+        "admin/torrent_health.html",
+        rows=rows,
+        kpi=kpi,
+        groups_all=sorted(groups_set),
+    )
 
 
 @app.route("/admin/torrent-health/<infohash>")

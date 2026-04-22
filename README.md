@@ -23,6 +23,8 @@ RansomLook is a tool to monitor Ransomware groups and markets and extract their 
 - [MISP](https://www.misp-project.org/) integration with the support of the [MISP ransomware galaxy](https://www.misp-galaxy.org/ransomware/)
 - Full REST API with interactive Swagger documentation at `/doc`
 - Cryptocurrency enrichment with [Breadcrumbs](https://www.breadcrumbs.app/)], an API key is requiered.
+- Torrent swarm health tracking (magnets referenced in posts): seeders, leechers and peer samples. Peer IPs are enriched via [CIRCL](https://www.circl.lu/) IP ASN History + BGP Ranking.
+- English / French UI with a cookie-based switcher.
 
 # Install guide
 
@@ -175,6 +177,8 @@ poetry run update_crypto_tx # Fetch/update transactions via Breadcrumbs One API 
 poetry run rf              # Fetch Recorded Future channel data (DB 10)
 poetry run notes           # Import/update ransom notes from ThreatLabz repo (DB 11)
 poetry run torrent         # Fetch torrent information from ransomware groups
+poetry run torrent-health  # Scan BitTorrent swarms for each tracked magnet (DB 13)
+poetry run enrich-ips      # Enrich observed peer IPs via CIRCL (cached 7 days)
 ```
 
 ## Cron setup
@@ -192,6 +196,12 @@ Example crontab (`crontab -e`):
 0 4 * * * cd /path/to/RansomLook && poetry run breach
 0 5 * * * cd /path/to/RansomLook && poetry run cryptocur && poetry run update_crypto_tx
 0 6 * * * cd /path/to/RansomLook && poetry run rf && poetry run notes
+
+# Torrent swarm health (every 6 hours, adaptive per-swarm)
+0 */6 * * * cd /path/to/RansomLook && flock -n /tmp/rl-torrent.lock poetry run torrent-health
+
+# CIRCL IP enrichment (daily, keeps the admin page instant)
+30 3 * * * cd /path/to/RansomLook && flock -n /tmp/rl-enrich.lock poetry run enrich-ips
 ```
 
 ## Adding groups

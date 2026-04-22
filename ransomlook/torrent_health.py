@@ -242,6 +242,19 @@ def _snapshot(torr: lt.torrent_handle, infohash: str, self_ips: set[str] | None 
     peers: list[Peer] = []
     seed_flag = int(getattr(lt.peer_info, "seed", 0))
     self_ips_set = self_ips or set()
+
+    def _is_seeder(pi: Any) -> bool:
+        # libtorrent sets ``peer_info.seed`` only once it has received a
+        # complete bitfield from the peer. Progress is updated as soon as any
+        # bitfield or HAVE message arrives, so a peer at ~100% is a seeder in
+        # practice even if the flag has not flipped yet.
+        try:
+            if float(getattr(pi, "progress", 0.0)) >= 0.999:
+                return True
+        except Exception:
+            pass
+        return bool(seed_flag) and bool(int(pi.flags) & seed_flag)
+
     for p in raw_peers:
         try:
             ip, port = p.ip
@@ -269,8 +282,19 @@ def _snapshot(torr: lt.torrent_handle, infohash: str, self_ips: set[str] | None 
     num_complete = int(getattr(status, "num_complete", -1))
     num_incomplete = int(getattr(status, "num_incomplete", -1))
 
-    local_seeders = sum(1 for p in raw_peers if int(p.flags) & seed_flag) if seed_flag else 0
+    local_seeders = sum(1 for p in raw_peers if _is_seeder(p))
     local_leechers = max(0, len(raw_peers) - local_seeders)
+
+    if logger.isEnabledFor(logging.DEBUG):
+        for i, pi in enumerate(raw_peers[:5]):
+            try:
+                logger.debug(
+                    "%s peer[%d] progress=%.3f flags=0x%x seed_flag_hit=%s",
+                    infohash, i, float(pi.progress), int(pi.flags),
+                    bool(seed_flag) and bool(int(pi.flags) & seed_flag),
+                )
+            except Exception:
+                continue
 
     seeders = num_complete if num_complete > 0 else local_seeders
     leechers = num_incomplete if num_incomplete > 0 else local_leechers
@@ -308,101 +332,127 @@ def scan_batch(sess: lt.session, magnets: list[str], duration: int = DEFAULT_SCA
     ``duration`` seconds, then snapshotted and removed. A single session
     sharing DHT state is materially more efficient than N sequential sessions.
 
-    Bandwidth: per-torrent download/upload limits are pinned at 1 byte/s once
-    added, so the swarm content is never actually transferred — peer handshakes
-    (which carry the bitfield we need for ``progress``) still complete because
-    they exchange BT control messages, not piece data.
+    Bandwidth: no per-torrent rate limit is applied. Earlier revisions pinned
+    both limits at 1 byte/s to avoid downloading any data, but this stalled the
+    BT handshake (68 bytes + bitfield) so peers never progressed past
+    ``handshake`` state and every swarm reported ``0 seed``. Any piece data that
+    flows during the short scan window is acceptable because the tempdir is
+    wiped at the end.
 
     Cleanup: each batch uses a dedicated tempdir. Removed torrents are wiped
     via ``delete_files`` and the tempdir is rmtree'd at the end so the leak
     filenames libtorrent allocates never linger on disk.
     """
     tempdir = tempfile.mkdtemp(prefix="rl-torrent-")
-
     handles: list[tuple[str, lt.torrent_handle]] = []
-    for magnet in magnets:
-        try:
-            atp = lt.parse_magnet_uri(magnet)
-        except Exception as e:
-            logger.warning("skip unparseable magnet %s: %s", magnet[:80], e)
-            continue
-        atp.save_path = tempdir
-        # Paused at add time so we can fix per-torrent rate limits before any
-        # bytes are exchanged. ``upload_mode`` is intentionally NOT set: it
-        # discourages libtorrent from initiating outgoing connections, which
-        # then breaks our peer enumeration.
-        atp.flags = lt.torrent_flags.paused
-        torr = sess.add_torrent(atp)
-        # Throttle to 1 B/s in both directions before resuming. With this cap
-        # the longest a 45–120 s scan can transfer is a few dozen bytes.
-        try:
-            torr.set_download_limit(1)
-            torr.set_upload_limit(1)
-        except Exception:
-            pass
-        infohash_obj = torr.info_hashes()
-        infohash = str(getattr(infohash_obj, "get_best", lambda: infohash_obj)())
-        handles.append((infohash, torr))
-        try:
-            trk = [t.get("url") if isinstance(t, dict) else getattr(t, "url", str(t))
-                   for t in (atp.trackers or [])]
-            logger.debug("%s trackers from magnet: %s", infohash, trk or "(none — DHT-only)")
-        except Exception:
-            pass
-
-    for _, torr in handles:
-        torr.resume()
-
-    # Drain alerts during the wait window — surfaces DHT and tracker errors
-    # that are otherwise silent. Only shown at DEBUG level.
-    deadline = time.time() + duration
-    while time.time() < deadline:
-        time.sleep(1)
-        if logger.isEnabledFor(logging.DEBUG):
+    results: list[ScanResult] = []
+    try:
+        for magnet in magnets:
             try:
-                alerts = sess.pop_alerts()
-                for a in alerts:
-                    msg = str(a) if not callable(getattr(a, "message", None)) else a.message()
-                    cat = a.__class__.__name__
-                    if any(k in cat.lower() for k in ("error", "warning", "tracker", "dht")):
-                        logger.debug("ALERT %s: %s", cat, msg[:200])
+                atp = lt.parse_magnet_uri(magnet)
+            except Exception as e:
+                logger.warning("skip unparseable magnet %s: %s", magnet[:80], e)
+                continue
+            atp.save_path = tempdir
+            # Paused at add time so we can fix per-torrent rate limits before any
+            # bytes are exchanged. ``upload_mode`` is intentionally NOT set: it
+            # discourages libtorrent from initiating outgoing connections, which
+            # then breaks our peer enumeration.
+            atp.flags = lt.torrent_flags.paused
+            torr = sess.add_torrent(atp)
+            infohash_obj = torr.info_hashes()
+            infohash = str(getattr(infohash_obj, "get_best", lambda: infohash_obj)())
+            handles.append((infohash, torr))
+            try:
+                trk = [t.get("url") if isinstance(t, dict) else getattr(t, "url", str(t))
+                       for t in (atp.trackers or [])]
+                logger.debug("%s trackers from magnet: %s", infohash, trk or "(none — DHT-only)")
             except Exception:
                 pass
 
-    results: list[ScanResult] = []
-    # Resolve the delete-files flag across libtorrent versions.
-    delete_flag = (
-        getattr(lt.session, "delete_files", None)
-        or getattr(getattr(lt, "options_t", None), "delete_files", None)
-        or 1
-    )
-    self_ips = _self_ips(sess)
-    if self_ips:
-        logger.debug("filtering out scanner IPs from peers: %s", sorted(self_ips))
-    for infohash, torr in handles:
-        try:
-            results.append(_snapshot(torr, infohash, self_ips=self_ips))
-        except Exception as e:
-            logger.warning("snapshot failed for %s: %s", infohash, e)
-        finally:
-            try:
-                sess.remove_torrent(torr, delete_flag)
-            except TypeError:
-                # Older binding: positional flag rejected, fall back without
-                # delete (we still rmtree the tempdir below).
+        for _, torr in handles:
+            torr.resume()
+
+        # Drain alerts during the wait window — surfaces DHT and tracker errors
+        # that are otherwise silent. Only shown at DEBUG level.
+        deadline = time.time() + duration
+        while time.time() < deadline:
+            time.sleep(1)
+            if logger.isEnabledFor(logging.DEBUG):
                 try:
-                    sess.remove_torrent(torr)
+                    alerts = sess.pop_alerts()
+                    for a in alerts:
+                        msg = str(a) if not callable(getattr(a, "message", None)) else a.message()
+                        cat = a.__class__.__name__
+                        if any(k in cat.lower() for k in ("error", "warning", "tracker", "dht")):
+                            logger.debug("ALERT %s: %s", cat, msg[:200])
                 except Exception:
                     pass
-            except Exception:
-                pass
 
-    # Belt and braces: scrub the tempdir even if libtorrent left fragments.
-    try:
+        # Resolve the delete-files flag across libtorrent versions.
+        delete_flag = (
+            getattr(lt.session, "delete_files", None)
+            or getattr(getattr(lt, "options_t", None), "delete_files", None)
+            or 1
+        )
+        self_ips = _self_ips(sess)
+        if self_ips:
+            logger.debug("filtering out scanner IPs from peers: %s", sorted(self_ips))
+        for infohash, torr in handles:
+            try:
+                results.append(_snapshot(torr, infohash, self_ips=self_ips))
+            except Exception as e:
+                logger.warning("snapshot failed for %s: %s", infohash, e)
+            finally:
+                try:
+                    sess.remove_torrent(torr, delete_flag)
+                except TypeError:
+                    # Older binding: positional flag rejected, fall back without
+                    # delete (we still rmtree the tempdir below).
+                    try:
+                        sess.remove_torrent(torr)
+                    except Exception:
+                        pass
+                except Exception:
+                    pass
+    finally:
+        # Guaranteed cleanup — runs even on KeyboardInterrupt, libtorrent
+        # crashes, or any exception raised mid-scan. Otherwise the caller
+        # accumulates ``rl-torrent-*`` dirs over time.
         shutil.rmtree(tempdir, ignore_errors=True)
-    except Exception:
-        pass
     return results
+
+
+def _purge_stale_tempdirs(max_age_seconds: int = 3600) -> int:
+    """Remove leftover ``rl-torrent-*`` directories older than ``max_age_seconds``.
+
+    These come from previous runs that were killed (SIGKILL, OOM, crash) before
+    their ``finally`` block could execute. Called at the start of every
+    ``run_once`` pass.
+    """
+    import os
+    removed = 0
+    base = tempfile.gettempdir()
+    now = time.time()
+    try:
+        entries = os.listdir(base)
+    except Exception:
+        return 0
+    for name in entries:
+        if not name.startswith("rl-torrent-"):
+            continue
+        path = os.path.join(base, name)
+        try:
+            age = now - os.path.getmtime(path)
+        except Exception:
+            continue
+        if age < max_age_seconds:
+            continue
+        shutil.rmtree(path, ignore_errors=True)
+        removed += 1
+    if removed:
+        logger.info("purged %d stale tempdir(s) from previous runs", removed)
+    return removed
 
 
 # ─── Storage helpers ────────────────────────────────────────────────────
@@ -661,6 +711,7 @@ def run_once(
     ``only`` is an optional list of infohashes to restrict to (lowercased).
     Returns counters ``{scanned, skipped, failed, purged, total}``.
     """
+    _purge_stale_tempdirs()
     targets = collect_magnets()
     only_set = {x.lower() for x in only} if only else None
     if only_set:

@@ -17,6 +17,29 @@
 <section class="metrics-section">
   <div class="container">
 
+    <div class="kpi-grid pad-mb" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px;margin-bottom:16px">
+      <div class="kpi-card">
+        <div class="kpi-label">{{ _('Swarms tracked') }}</div>
+        <div class="kpi-value">{{ kpi.total }}</div>
+      </div>
+      <div class="kpi-card kpi-up">
+        <div class="kpi-label">{{ _('Alive (peers > 0)') }}</div>
+        <div class="kpi-value">{{ kpi.alive }}</div>
+      </div>
+      <div class="kpi-card kpi-down">
+        <div class="kpi-label">{{ _('Dead (>%(d)s days)', d=(kpi.total and 90)) }}</div>
+        <div class="kpi-value">{{ kpi.dead }}</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-label">{{ _('Seeders total') }}</div>
+        <div class="kpi-value">{{ kpi.seeders_total }}</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-label">{{ _('Scans last 24 h') }}</div>
+        <div class="kpi-value">{{ kpi.scans_24h }}</div>
+      </div>
+    </div>
+
     <div class="table-card search-card pad-mb">
       <div class="filters-wrap" style="display:flex;flex-wrap:wrap;gap:12px;align-items:center;padding:10px">
         <div class="field field--search" style="flex:1 1 280px;min-width:220px">
@@ -29,6 +52,14 @@
         </label>
         <span id="th-count" class="muted"></span>
       </div>
+      {% if groups_all %}
+      <div class="th-group-chips" style="display:flex;flex-wrap:wrap;gap:6px;padding:0 10px 10px">
+        <button type="button" class="th-chip th-chip-active" data-group="">{{ _('All groups') }}</button>
+        {% for g in groups_all %}
+        <button type="button" class="th-chip" data-group="{{ g|lower }}">{{ g }}</button>
+        {% endfor %}
+      </div>
+      {% endif %}
     </div>
 
     <div class="table-card">
@@ -36,23 +67,44 @@
         <table class="rl-table" id="th-table" aria-label="{{ _('Torrent swarms') }}">
           <thead>
             <tr>
-              <th style="width:22%">{{ _('Name') }}</th>
-              <th style="width:16%">{{ _('Groups') }}</th>
-              <th style="width:22%">{{ _('Infohash') }}</th>
-              <th style="width:8%"><center>{{ _('Peers') }}</center></th>
-              <th style="width:8%"><center>{{ _('Seed / Leech') }}</center></th>
-              <th style="width:10%"><center>{{ _('Last scan') }}</center></th>
-              <th style="width:14%"><center>{{ _('Actions') }}</center></th>
+              <th class="th-sort" data-sort="name" style="width:20%;cursor:pointer">{{ _('Name') }} <span class="th-sort-ind"></span></th>
+              <th class="th-sort" data-sort="size" style="width:9%;cursor:pointer"><center>{{ _('Size') }} <span class="th-sort-ind"></span></center></th>
+              <th style="width:14%">{{ _('Groups') }}</th>
+              <th style="width:19%">{{ _('Infohash') }}</th>
+              <th class="th-sort" data-sort="peers" data-sort-default="desc" style="width:7%;cursor:pointer"><center>{{ _('Peers') }} <span class="th-sort-ind">▼</span></center></th>
+              <th class="th-sort" data-sort="seed" style="width:8%;cursor:pointer"><center>{{ _('Seed / Leech') }} <span class="th-sort-ind"></span></center></th>
+              <th class="th-sort" data-sort="scan" style="width:10%;cursor:pointer"><center>{{ _('Last scan') }} <span class="th-sort-ind"></span></center></th>
+              <th style="width:13%"><center>{{ _('Actions') }}</center></th>
             </tr>
           </thead>
           <tbody>
             {% for r in rows %}
-            <tr class="th-row"
+            {% set peers = r.last_peers_count or 0 %}
+            {% set seeders = r.last_seeders or 0 %}
+            {% set leechers = r.last_leechers or 0 %}
+            {% set size_b = r.size_bytes or 0 %}
+            {% if peers == 0 %}{% set row_cls = 'th-row-dead' %}
+            {% elif peers < 5 %}{% set row_cls = 'th-row-degraded' %}
+            {% else %}{% set row_cls = 'th-row-alive' %}{% endif %}
+            <tr class="th-row {{ row_cls }}"
                 data-ih="{{ r.infohash }}"
                 data-name="{{ (r.name or '')|lower }}"
+                data-name-sort="{{ (r.name or '~')|lower }}"
                 data-groups="{{ (r.groups|join(' '))|lower }}"
-                data-peers="{{ r.last_peers_count or 0 }}">
+                data-peers="{{ peers }}"
+                data-seed="{{ seeders }}"
+                data-leech="{{ leechers }}"
+                data-size="{{ size_b }}"
+                data-scan="{{ r.last_scan or '' }}">
               <td>{{ r.name or _('(unknown)') }}</td>
+              <td><center>
+                {% if size_b > 0 %}
+                  {% if size_b >= 1099511627776 %}{{ '%.1f TB'|format(size_b / 1099511627776) }}
+                  {% elif size_b >= 1073741824 %}{{ '%.1f GB'|format(size_b / 1073741824) }}
+                  {% elif size_b >= 1048576 %}{{ '%.1f MB'|format(size_b / 1048576) }}
+                  {% else %}{{ '%.1f KB'|format(size_b / 1024) }}{% endif %}
+                {% else %}<span class="muted">—</span>{% endif %}
+              </center></td>
               <td>
                 {% for g in r.groups or [] %}
                   <a href="/group/{{ g|urlencode }}">{{ g }}</a>{% if not loop.last %},{% endif %}
@@ -64,7 +116,6 @@
                 </a>
               </td>
               <td><center>
-                {% set peers = r.last_peers_count or 0 %}
                 {% if peers == 0 %}
                   <span class="badge-status badge-down">0</span>
                 {% elif peers < 5 %}
@@ -73,7 +124,7 @@
                   <span class="badge-status badge-up">{{ peers }}</span>
                 {% endif %}
               </center></td>
-              <td><center>{{ r.last_seeders or 0 }} / {{ r.last_leechers or 0 }}</center></td>
+              <td><center>{{ seeders }} / {{ leechers }}</center></td>
               <td><center>
                 {% if r.last_scan %}
                   <time datetime="{{ r.last_scan }}" data-ts="{{ r.last_scan }}">{{ r.last_scan.split('T')[0] }}</time>
@@ -100,13 +151,50 @@
   </div>
 </section>
 
+<style>
+/* Row tinting by health — very subtle so it doesn't fight the badge. */
+#th-table tr.th-row-dead     td { background: rgba(220,53,69,0.06); }
+#th-table tr.th-row-degraded td { background: rgba(255,193,7,0.06); }
+#th-table tr.th-row-alive    td { background: rgba(40,167,69,0.05); }
+
+.kpi-card {
+  background: var(--card-bg, #1b1f24);
+  border: 1px solid var(--border, rgba(255,255,255,.08));
+  border-radius: 8px;
+  padding: 12px 14px;
+  text-align: center;
+}
+.kpi-card .kpi-label { font-size: 12px; color: var(--muted); text-transform: uppercase; letter-spacing: .05em; }
+.kpi-card .kpi-value { font-size: 28px; font-weight: 600; margin-top: 4px; }
+.kpi-card.kpi-up    .kpi-value { color: #2ecc71; }
+.kpi-card.kpi-down  .kpi-value { color: #e74c3c; }
+
+.th-chip {
+  background: transparent;
+  border: 1px solid var(--border, rgba(255,255,255,.15));
+  border-radius: 999px;
+  padding: 3px 10px;
+  font-size: 12px;
+  color: var(--text, #d0d4dc);
+  cursor: pointer;
+}
+.th-chip:hover { background: rgba(255,255,255,.06); }
+.th-chip-active { background: var(--accent, #3b82f6); color: #fff; border-color: transparent; }
+
+.th-sort .th-sort-ind { font-size: 10px; opacity: .6; margin-left: 4px; }
+.th-sort:hover .th-sort-ind { opacity: 1; }
+</style>
+
 <script>
 (() => {
   const $q = document.getElementById('th-q');
   const $alive = document.getElementById('th-alive');
-  const $rows = document.querySelectorAll('#th-table .th-row');
+  const $tbody = document.querySelector('#th-table tbody');
+  const $rows = Array.from(document.querySelectorAll('#th-table .th-row'));
   const $count = document.getElementById('th-count');
   const $clear = document.querySelector('#th-q ~ .input-clear');
+  const $chips = Array.from(document.querySelectorAll('.th-chip'));
+  let activeGroup = '';
 
   function apply() {
     const q = ($q.value || '').toLowerCase().trim();
@@ -115,15 +203,75 @@
     $rows.forEach(row => {
       const okQ = !q || row.dataset.ih.includes(q) || row.dataset.name.includes(q) || row.dataset.groups.includes(q);
       const okAlive = !aliveOnly || parseInt(row.dataset.peers, 10) > 0;
-      const v = okQ && okAlive;
+      const okGroup = !activeGroup || row.dataset.groups.split(' ').includes(activeGroup);
+      const v = okQ && okAlive && okGroup;
       row.hidden = !v;
       if (v) shown++;
     });
     $count.textContent = shown + ' swarm' + (shown === 1 ? '' : 's');
   }
+
   $q.addEventListener('input', apply);
   $alive.addEventListener('change', apply);
   $clear?.addEventListener('click', () => { $q.value = ''; apply(); $q.focus(); });
+
+  $chips.forEach(chip => chip.addEventListener('click', () => {
+    $chips.forEach(c => c.classList.remove('th-chip-active'));
+    chip.classList.add('th-chip-active');
+    activeGroup = chip.dataset.group || '';
+    apply();
+  }));
+
+  // Sortable columns
+  const sortKeys = {
+    name:  r => (r.dataset.nameSort || '~'),
+    size:  r => parseInt(r.dataset.size || '0', 10),
+    peers: r => parseInt(r.dataset.peers || '0', 10),
+    seed:  r => parseInt(r.dataset.seed || '0', 10),
+    scan:  r => r.dataset.scan || '',
+  };
+  let currentSort = { key: 'peers', dir: 'desc' };
+
+  function renderSort() {
+    document.querySelectorAll('.th-sort').forEach(th => {
+      const ind = th.querySelector('.th-sort-ind');
+      if (!ind) return;
+      if (th.dataset.sort === currentSort.key) {
+        ind.textContent = currentSort.dir === 'desc' ? '▼' : '▲';
+        ind.style.opacity = 1;
+      } else {
+        ind.textContent = '';
+      }
+    });
+  }
+
+  function sortRows() {
+    const getter = sortKeys[currentSort.key];
+    const sign = currentSort.dir === 'desc' ? -1 : 1;
+    $rows.sort((a, b) => {
+      const va = getter(a), vb = getter(b);
+      if (va < vb) return -1 * sign;
+      if (va > vb) return  1 * sign;
+      return 0;
+    });
+    const frag = document.createDocumentFragment();
+    $rows.forEach(r => frag.appendChild(r));
+    $tbody.appendChild(frag);
+    renderSort();
+  }
+
+  document.querySelectorAll('.th-sort').forEach(th => th.addEventListener('click', () => {
+    const key = th.dataset.sort;
+    if (currentSort.key === key) {
+      currentSort.dir = currentSort.dir === 'desc' ? 'asc' : 'desc';
+    } else {
+      currentSort.key = key;
+      currentSort.dir = th.dataset.sortDefault || 'asc';
+    }
+    sortRows();
+  }));
+
+  renderSort();
   apply();
 
   document.querySelectorAll('.th-refresh').forEach(btn => btn.addEventListener('click', async () => {
@@ -134,7 +282,6 @@
     try {
       const resp = await fetch(`/api/torrent/refresh/${ih}`, { method: 'POST' });
       if (resp.status === 202) {
-        // Scan queued; runs in background. Give it ~45s then reload the page.
         btn.textContent = 'Scanning (45s)…';
         setTimeout(() => location.reload(), 45000);
       } else if (resp.ok) {
