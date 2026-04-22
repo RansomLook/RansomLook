@@ -23,7 +23,7 @@ msgstr "Page introuvable"
 
 #: website/web/templates/40x.html:10
 msgid "The page you’re looking for doesn’t exist or was moved."
-msgstr "La page que vous cherchez nâexiste pas ou a Ã©tÃ© dÃ©placÃ©e."
+msgstr "La page que vous cherchez n’existe pas ou a été déplacée."
 
 #: website/web/templates/40x.html:12 website/web/templates/500_generic.html:14
 msgid "Home"
@@ -37,7 +37,7 @@ msgstr "Parcourir"
 #: website/web/templates/40x.html:14 website/web/templates/recent.html:3
 #: website/web/templates/recent.html:9 website/web/templates/recent.html:89
 msgid "Recent posts"
-msgstr "Publications rÃ©centes"
+msgstr "Publications récentes"
 
 #: website/web/templates/500_generic.html:3
 msgid "Internal Server Error"
@@ -51,11 +51,11 @@ msgstr "Une erreur est survenue"
 msgid ""
 "An internal error occurred. The team has been notified. You can try again"
 " in a moment or head back to the homepage."
-msgstr "Une erreur interne est survenue. LâÃ©quipe a Ã©tÃ© notifiÃ©e. Vous pouvez rÃ©essayer dans un instant ou revenir Ã  lâaccueil."
+msgstr "Une erreur interne est survenue. L’équipe a été notifiée. Vous pouvez réessayer dans un instant ou revenir à l’accueil."
 
 #: website/web/templates/500_generic.html:15
 msgid "Retry"
-msgstr "RÃ©essayer"
+msgstr "Réessayer"
 
 #: website/web/templates/RF.html:3 website/web/templates/base.html:88
 #: website/web/templates/glossary.html:114
@@ -68,7 +68,7 @@ msgstr "Dumps RF"
 
 #: website/web/templates/RF.html:12
 msgid "Browse RF dumps. Click a dump to view details."
-msgstr "Parcourez les dumps RF. Cliquez sur un dump pour en voir les dÃ©tails."
+msgstr "Parcourez les dumps RF. Cliquez sur un dump pour en voir les détails."
 
 #: website/web/templates/RF.html:25
 msgid "Search RF dumps"
@@ -80,7 +80,7 @@ msgstr "Rechercher un dump RF par nom ou description"
 
 #: website/web/templates/RF.html:28
 msgid "Dump name or description…"
-msgstr "Nom ou description du dumpâ¦"
+msgstr "Nom ou description du dump…"
 
 #: website/web/templates/RF.html:29 website/web/templates/browse.html:43
 #: website/web/templates/crypto.html:26 website/web/templates/leaks.html:27
@@ -104,7 +104,7 @@ msgstr "Trier par date"
 
 #: website/web/templates/RF.html:48 website/web/templates/RF.html:92
 msgid "Downloaded"
-msgstr "TÃ©lÃ©chargÃ©"
+msgstr "Téléchargé"
 
 #: website/web/templates/RF.html:80
 msgid "RF dump"
@@ -119,7 +119,7 @@ msgstr "Fermer"
 
 #: website/web/templates/RF.html:87
 msgid "RF head"
-msgstr "En-tÃªte RF"
+msgstr "En-tête RF"
 
 #: website/web/templates/RF.html:91 website/web/templates/cryptodetail.html:129
 msgid "Source"
@@ -127,11 +127,11 @@ msgstr "Source"
 
 #: website/web/templates/RF.html:96
 msgid "Loading…"
-msgstr "Chargementâ¦"
+msgstr "Chargement…"
 
 #: website/web/templates/RF.html:105
 msgid "RF extra"
-msgstr "Infos supplÃ©mentaires RF"
+msgstr "Infos supplémentaires RF"
 
 #: website/web/templates/RF.html:108
 #: website/web/templates/admin/torrent_health.html:71
@@ -145,7 +145,7 @@ msgstr "Enregistrements"
 
 #: website/web/templates/RF.html:110 website/web/templates/leaks.html:42
 msgid "Detection"
-msgstr "DÃ©tection"
+msgstr "Détection"
 
 #: website/web/templates/RF.html:111 website/web/templates/leaks.html:85
 msgid "Columns"
@@ -153,11 +153,11 @@ msgstr "Colonnes"
 
 #: website/web/templates/RF.html:124
 msgid "RF breaches"
-msgstr "BrÃ¨ches RF"
+msgstr "Brèches RF"
 
 #: website/web/templates/RF.html:127
 msgid "Key"
-msgstr "ClÃ©"
+msgstr "Clé"
 
 #: website/web/templates/RF.html:128
 msgid "Value"
@@ -165,27 +165,27 @@ msgstr "Valeur"
 
 #: website/web/templates/about.html:3 website/web/templates/base.html:101
 msgid "About"
-msgstr "Ã propos"
+msgstr "À propos"
 
 #: website/web/templates/about.html:13
 msgid "About RansomLook"
-msgstr "Ã propos de RansomLook"
+msgstr "À propos de RansomLook"
 
 #: website/web/templates/about.html:15
 msgid ""
 "Open-source project providing real‑time ransomware intelligence: tracked "
 "groups, posts, mirrors, forums, and more."
-msgstr "Projet openâsource fournissant du renseignement en temps rÃ©el sur les ransomwares : groupes suivis, publications, miroirs, forums et plus."
+msgstr "Projet open‑source fournissant du renseignement en temps réel sur les ransomwares : groupes suivis, publications, miroirs, forums et plus."
 
 #: website/web/templates/about.html:26
 msgid "What is RansomLook?"
-msgstr "Qu'estâce que RansomLook ?"
+msgstr "Qu'est‑ce que RansomLook ?"
 
 #: website/web/templates/about.html:28
 msgid ""
 "RansomLook is an open‑source project aimed at assisting users in tracking"
 " ransomware‑related posts and activities across various sites and forums."
-msgstr "RansomLook est un projet openâsource destinÃ© Ã  aider ses utilisateurs Ã  suivre les publications et activitÃ©s liÃ©es aux ransomwares sur diffÃ©rents sites et forums."
+msgstr "RansomLook est un projet open‑source destiné à aider ses utilisateurs à suivre les publications et activités liées aux ransomwares sur différents sites et forums."
 
 #: website/web/templates/about.html:31
 msgid "The main components include:"
@@ -201,7 +201,7 @@ msgstr "Surveillance des forums (parsing non disponible)"
 
 #: website/web/templates/about.html:35
 msgid "Overview of Ransomware Notes"
-msgstr "AperÃ§u des notes de ranÃ§on"
+msgstr "Aperçu des notes de rançon"
 
 #: website/web/templates/about.html:36
 msgid "Tracking leaks from public sources"
@@ -209,7 +209,7 @@ msgstr "Suivi des fuites issues de sources publiques"
 
 #: website/web/templates/about.html:37
 msgid "Leak tracking from RecordedFuture provider (private API required)"
-msgstr "Suivi des fuites via RecordedFuture (API privÃ©e requise)"
+msgstr "Suivi des fuites via RecordedFuture (API privée requise)"
 
 #: website/web/templates/about.html:38
 msgid "Monitoring of various known Bitcoin wallets"
@@ -221,38 +221,38 @@ msgstr "Qui utilise RansomLook ?"
 
 #: website/web/templates/about.html:47
 msgid "RansomLook is built for, and used by:"
-msgstr "RansomLook est conÃ§u pour, et utilisÃ© par :"
+msgstr "RansomLook est conçu pour, et utilisé par :"
 
 #: website/web/templates/about.html:49
 msgid ""
 "<strong>SOC / IR teams</strong> — spotting victims in real time, "
 "correlating outbound traffic with known ransomware mirrors during "
 "incident response."
-msgstr "<strong>Ãquipes SOC / IR</strong> â repÃ©rer les victimes en temps rÃ©el et corrÃ©ler le trafic sortant avec les miroirs ransomware connus pendant une rÃ©ponse Ã  incident."
+msgstr "<strong>Équipes SOC / IR</strong> — repérer les victimes en temps réel et corréler le trafic sortant avec les miroirs ransomware connus pendant une réponse à incident."
 
 #: website/web/templates/about.html:50
 msgid ""
 "<strong>CTI analysts</strong> — tracking group activity, emergence of new"
 " actors, infrastructure churn, and producing trend reports."
-msgstr "<strong>Analystes CTI</strong> â suivre l'activitÃ© des groupes, l'Ã©mergence de nouveaux acteurs, le renouvellement d'infrastructure, et produire des rapports de tendance."
+msgstr "<strong>Analystes CTI</strong> — suivre l'activité des groupes, l'émergence de nouveaux acteurs, le renouvellement d'infrastructure, et produire des rapports de tendance."
 
 #: website/web/templates/about.html:51
 msgid ""
 "<strong>CSIRTs / national CERTs</strong> — building situational awareness"
 " and notifying constituents when they appear in a leak post."
-msgstr "<strong>CSIRT / CERT nationaux</strong> â construire une vision de situation et notifier les entitÃ©s concernÃ©es lorsqu'elles apparaissent dans une publication de leak."
+msgstr "<strong>CSIRT / CERT nationaux</strong> — construire une vision de situation et notifier les entités concernées lorsqu'elles apparaissent dans une publication de leak."
 
 #: website/web/templates/about.html:52
 msgid ""
 "<strong>Security researchers</strong> — studying the ransomware ecosystem"
 " over time via open data and the API."
-msgstr "<strong>Chercheurs en sÃ©curitÃ©</strong> â Ã©tudier l'Ã©cosystÃ¨me ransomware dans le temps via les donnÃ©es ouvertes et l'API."
+msgstr "<strong>Chercheurs en sécurité</strong> — étudier l'écosystème ransomware dans le temps via les données ouvertes et l'API."
 
 #: website/web/templates/about.html:53
 msgid ""
 "<strong>Journalists</strong> — verifying claims, confirming victim "
 "disclosures, and grounding reporting in public evidence."
-msgstr "<strong>Journalistes</strong> â vÃ©rifier les revendications, confirmer les divulgations de victimes, et fonder le reporting sur des preuves publiques."
+msgstr "<strong>Journalistes</strong> — vérifier les revendications, confirmer les divulgations de victimes, et fonder le reporting sur des preuves publiques."
 
 #: website/web/templates/about.html:61
 msgid "Getting started"
@@ -260,32 +260,32 @@ msgstr "Premiers pas"
 
 #: website/web/templates/about.html:62
 msgid "Start from the page that matches your use case:"
-msgstr "Commencez par la page qui correspond Ã  votre usage :"
+msgstr "Commencez par la page qui correspond à votre usage :"
 
 #: website/web/templates/about.html:64
 msgid ""
 "<strong>Incident response</strong> → <a href=\"/recent\">/recent</a> "
 "&nbsp;·&nbsp; <a href=\"/urls\">/urls</a> (check if a URL you observed "
 "matches a tracked mirror)."
-msgstr "<strong>RÃ©ponse Ã  incident</strong> â <a href=\"/recent\">/recent</a> &nbsp;Â·&nbsp; <a href=\"/urls\">/urls</a> (vÃ©rifiez si une URL observÃ©e correspond Ã  un miroir suivi)."
+msgstr "<strong>Réponse à incident</strong> → <a href=\"/recent\">/recent</a> &nbsp;·&nbsp; <a href=\"/urls\">/urls</a> (vérifiez si une URL observée correspond à un miroir suivi)."
 
 #: website/web/templates/about.html:65
 msgid ""
 "<strong>CTI / trend analysis</strong> → <a href=\"/stats\">/stats</a> "
 "&nbsp;·&nbsp; <a href=\"/hot\">/hot</a> (trending groups)."
-msgstr "<strong>CTI / analyse de tendance</strong> â <a href=\"/stats\">/stats</a> &nbsp;Â·&nbsp; <a href=\"/hot\">/hot</a> (groupes en tendance)."
+msgstr "<strong>CTI / analyse de tendance</strong> → <a href=\"/stats\">/stats</a> &nbsp;·&nbsp; <a href=\"/hot\">/hot</a> (groupes en tendance)."
 
 #: website/web/templates/about.html:66
 msgid ""
 "<strong>Directory / lookup</strong> → <a href=\"/browse\">/browse</a> "
 "(all groups, markets, actors)."
-msgstr "<strong>Annuaire / recherche</strong> â <a href=\"/browse\">/browse</a> (tous les groupes, marchÃ©s, acteurs)."
+msgstr "<strong>Annuaire / recherche</strong> → <a href=\"/browse\">/browse</a> (tous les groupes, marchés, acteurs)."
 
 #: website/web/templates/about.html:67
 msgid ""
 "<strong>Automation / integration</strong> → <a href=\"/doc/\">API "
 "documentation</a> &nbsp;·&nbsp; <a href=\"/rss.xml\">RSS feed</a>."
-msgstr "<strong>Automatisation / intÃ©gration</strong> â <a href=\"/doc/\">documentation API</a> &nbsp;Â·&nbsp; <a href=\"/rss.xml\">flux RSS</a>."
+msgstr "<strong>Automatisation / intégration</strong> → <a href=\"/doc/\">documentation API</a> &nbsp;·&nbsp; <a href=\"/rss.xml\">flux RSS</a>."
 
 #: website/web/templates/about.html:68
 msgid ""
@@ -293,11 +293,11 @@ msgid ""
 "href=\"https://github.com/RansomLook/RansomLook\" target=\"_blank\" "
 "rel=\"noopener\">GitHub repository</a> (Docker compose &amp; Poetry "
 "instructions in the README)."
-msgstr "<strong>Auto-hÃ©bergement</strong> â <a href=\"https://github.com/RansomLook/RansomLook\" target=\"_blank\" rel=\"noopener\">dÃ©pÃ´t GitHub</a> (instructions Docker compose et Poetry dans le README)."
+msgstr "<strong>Auto-hébergement</strong> → <a href=\"https://github.com/RansomLook/RansomLook\" target=\"_blank\" rel=\"noopener\">dépôt GitHub</a> (instructions Docker compose et Poetry dans le README)."
 
 #: website/web/templates/about.html:76
 msgid "Data freshness"
-msgstr "FraÃ®cheur des donnÃ©es"
+msgstr "Fraîcheur des données"
 
 #: website/web/templates/about.html:78
 msgid ""
@@ -306,7 +306,7 @@ msgid ""
 " day. The <a href=\"/\">homepage</a> shows the live <em>last 7 days</em> "
 "delta so you can judge activity at a glance; <a "
 "href=\"/stats\">/stats</a> exposes the full aggregation controls."
-msgstr "RansomLook scrape les DLS et forums suivis en boucle continue â la disponibilitÃ© des miroirs, les listes de publications et les captures d'Ã©cran sont rafraÃ®chies plusieurs fois par jour. La <a href=\"/\">page d'accueil</a> affiche le delta en direct des <em>7 derniers jours</em> pour juger l'activitÃ© en un coup d'Åil ; <a href=\"/stats\">/stats</a> expose tous les contrÃ´les d'agrÃ©gation."
+msgstr "RansomLook scrape les DLS et forums suivis en boucle continue — la disponibilité des miroirs, les listes de publications et les captures d'écran sont rafraîchies plusieurs fois par jour. La <a href=\"/\">page d'accueil</a> affiche le delta en direct des <em>7 derniers jours</em> pour juger l'activité en un coup d'œil ; <a href=\"/stats\">/stats</a> expose tous les contrôles d'agrégation."
 
 #: website/web/templates/about.html:81
 msgid ""
@@ -314,21 +314,21 @@ msgid ""
 "sites. Claims from operators are <strong>not</strong> independently "
 "verified against victim confirmations — always treat a post as a "
 "<em>claim</em> until corroborated elsewhere."
-msgstr "Les sources sont ouvertes par construction : nous suivons ce qui est publiquement revendiquÃ© sur les leak sites. Les revendications des opÃ©rateurs ne sont <strong>pas</strong> vÃ©rifiÃ©es indÃ©pendamment via les confirmations des victimes â traitez toujours une publication comme une <em>revendication</em> jusqu'Ã  corroboration ailleurs."
+msgstr "Les sources sont ouvertes par construction : nous suivons ce qui est publiquement revendiqué sur les leak sites. Les revendications des opérateurs ne sont <strong>pas</strong> vérifiées indépendamment via les confirmations des victimes — traitez toujours une publication comme une <em>revendication</em> jusqu'à corroboration ailleurs."
 
 #: website/web/templates/about.html:89
 msgid "Is it free?"
-msgstr "Estâce gratuit ?"
+msgstr "Est‑ce gratuit ?"
 
 #: website/web/templates/about.html:91
 msgid "Yes, it is free—and more importantly, it is open‑source."
-msgstr "Oui, c'est gratuit â et surtout, c'est openâsource."
+msgstr "Oui, c'est gratuit — et surtout, c'est open‑source."
 
 #: website/web/templates/about.html:95
 msgid ""
 "RansomLook is licensed under the GNU Affero General Public License (AGPL)"
 " v3.0."
-msgstr "RansomLook est distribuÃ© sous licence GNU Affero General Public License (AGPL) v3.0."
+msgstr "RansomLook est distribué sous licence GNU Affero General Public License (AGPL) v3.0."
 
 #: website/web/templates/about.html:104
 msgid "How can I follow new posts?"
@@ -340,7 +340,7 @@ msgstr "Plusieurs moyens permettent de suivre les nouvelles publications :"
 
 #: website/web/templates/about.html:107
 msgid "Run your own instance and enable RocketChat and/or email notifications"
-msgstr "HÃ©berger sa propre instance et activer les notifications RocketChat et/ou eâmail"
+msgstr "Héberger sa propre instance et activer les notifications RocketChat et/ou e‑mail"
 
 #: website/web/templates/about.html:109
 msgid "Check the public instance"
@@ -348,7 +348,7 @@ msgstr "Consulter l'instance publique"
 
 #: website/web/templates/about.html:113
 msgid "Access the API"
-msgstr "AccÃ©der Ã  l'API"
+msgstr "Accéder à l'API"
 
 #: website/web/templates/about.html:114
 msgid "Documentation"
@@ -364,19 +364,19 @@ msgstr "Il n'existe AUCUN canal Telegram officiel !"
 
 #: website/web/templates/about.html:128
 msgid "Want to be part of the RansomLook community?"
-msgstr "Envie de rejoindre la communautÃ© RansomLook ?"
+msgstr "Envie de rejoindre la communauté RansomLook ?"
 
 #: website/web/templates/about.html:129
 msgid "Join us in making RansomLook even better! Here's how you can contribute:"
-msgstr "Aidezânous Ã  amÃ©liorer RansomLook ! Voici comment contribuer :"
+msgstr "Aidez‑nous à améliorer RansomLook ! Voici comment contribuer :"
 
 #: website/web/templates/about.html:132
 msgid "Create an issue on our GitHub repository"
-msgstr "Ouvrir un ticket sur notre dÃ©pÃ´t GitHub"
+msgstr "Ouvrir un ticket sur notre dépôt GitHub"
 
 #: website/web/templates/about.html:135
 msgid "Submit pull requests with new features or improvements"
-msgstr "Proposer des pull requests avec de nouvelles fonctionnalitÃ©s ou amÃ©liorations"
+msgstr "Proposer des pull requests avec de nouvelles fonctionnalités ou améliorations"
 
 #: website/web/templates/about.html:136
 msgid "Share new sources of DLS (Darknet Leak Sites)"
@@ -384,27 +384,27 @@ msgstr "Partager de nouvelles sources de DLS (sites de fuite du dark web)"
 
 #: website/web/templates/about.html:137
 msgid "Report any bugs you come across"
-msgstr "Signaler tout bug rencontrÃ©"
+msgstr "Signaler tout bug rencontré"
 
 #: website/web/templates/about.html:138
 msgid "Suggest new functionalities that could enhance RansomLook"
-msgstr "SuggÃ©rer de nouvelles fonctionnalitÃ©s utiles Ã  RansomLook"
+msgstr "Suggérer de nouvelles fonctionnalités utiles à RansomLook"
 
 #: website/web/templates/about.html:139
 msgid "Follow us on LinkedIn and be part of the community"
-msgstr "Nous suivre sur LinkedIn et rejoindre la communautÃ©"
+msgstr "Nous suivre sur LinkedIn et rejoindre la communauté"
 
 #: website/web/templates/about.html:147
 msgid "Credits & Thanks"
-msgstr "CrÃ©dits et remerciements"
+msgstr "Crédits et remerciements"
 
 #: website/web/templates/about.html:158
 msgid "The original code was based on RansomWatch."
-msgstr "Le code original est basÃ© sur RansomWatch."
+msgstr "Le code original est basé sur RansomWatch."
 
 #: website/web/templates/about.html:165
 msgid "External data sources"
-msgstr "Sources de donnÃ©es externes"
+msgstr "Sources de données externes"
 
 #: website/web/templates/about.html:168
 msgid "Ransomwhe.re for cryptocurrency addresses"
@@ -412,7 +412,7 @@ msgstr "Ransomwhe.re pour les adresses de cryptomonnaies"
 
 #: website/web/templates/about.html:169
 msgid "ThreatLabz for the RansomNotes"
-msgstr "ThreatLabz pour les notes de ranÃ§on"
+msgstr "ThreatLabz pour les notes de rançon"
 
 #: website/web/templates/about.html:170
 msgid "leak-lookup for public leaks"
@@ -427,13 +427,13 @@ msgid ""
 "All content provided by ransomlook.io — including the website, API "
 "responses, and datasets — is made available under the Creative Commons "
 "Attribution 4.0 International (CC BY 4.0) license."
-msgstr "Tout le contenu fourni par ransomlook.io â y compris le site web, les rÃ©ponses d'API et les jeux de donnÃ©es â est mis Ã  disposition sous licence Creative Commons Attribution 4.0 International (CC BY 4.0)."
+msgstr "Tout le contenu fourni par ransomlook.io — y compris le site web, les réponses d'API et les jeux de données — est mis à disposition sous licence Creative Commons Attribution 4.0 International (CC BY 4.0)."
 
 #: website/web/templates/about.html:184
 msgid ""
 "You are free to share and adapt the material for any purpose, even "
 "commercially, provided that appropriate credit is given."
-msgstr "Vous Ãªtes libre de partager et d'adapter ce contenu Ã  toute fin, y compris commerciale, Ã  condition d'en attribuer correctement la source."
+msgstr "Vous êtes libre de partager et d'adapter ce contenu à toute fin, y compris commerciale, à condition d'en attribuer correctement la source."
 
 #: website/web/templates/actor.html:2
 msgid "Threat Actor"
@@ -441,7 +441,7 @@ msgstr "Acteur de menace"
 
 #: website/web/templates/actor.html:33
 msgid "WANTED"
-msgstr "RECHERCHÃ"
+msgstr "RECHERCHÉ"
 
 #: website/web/templates/actor.html:34 website/web/templates/group.html:124
 msgid "Inactive"
@@ -449,7 +449,7 @@ msgstr "Inactif"
 
 #: website/web/templates/actor.html:35
 msgid "Private"
-msgstr "PrivÃ©"
+msgstr "Privé"
 
 #: website/web/templates/actor.html:36
 #, python-format
@@ -463,7 +463,7 @@ msgstr ""
 
 #: website/web/templates/actor.html:43 website/web/templates/group.html:47
 msgid "Edit"
-msgstr "Ãditer"
+msgstr "Éditer"
 
 #: website/web/templates/actor.html:50
 msgid "AKA"
@@ -486,7 +486,7 @@ msgstr "Groupe"
 
 #: website/web/templates/actor.html:80
 msgid "Market / Forum"
-msgstr "MarchÃ© / Forum"
+msgstr "Marché / Forum"
 
 #: website/web/templates/actor.html:81
 msgid "Other actor"
@@ -498,7 +498,7 @@ msgstr "Inconnu (absent de la base)"
 
 #: website/web/templates/actor.html:99
 msgid "General description"
-msgstr "Description gÃ©nÃ©rale"
+msgstr "Description générale"
 
 #: website/web/templates/actor.html:101
 msgid "No description available."
@@ -530,7 +530,7 @@ msgstr "Aucun lien de groupe connu."
 
 #: website/web/templates/actor.html:145
 msgid "Forums / Markets"
-msgstr "Forums / MarchÃ©s"
+msgstr "Forums / Marchés"
 
 #: website/web/templates/actor.html:155
 msgid "No known forum links."
@@ -542,7 +542,7 @@ msgstr "Autres acteurs"
 
 #: website/web/templates/actor.html:168
 msgid "No peers documented."
-msgstr "Aucun pair documentÃ©."
+msgstr "Aucun pair documenté."
 
 #: website/web/templates/actor.html:177
 msgid "Images / Documents"
@@ -554,7 +554,7 @@ msgstr "Informations personnelles"
 
 #: website/web/templates/actor.html:203
 msgid "First name"
-msgstr "PrÃ©nom"
+msgstr "Prénom"
 
 #: website/web/templates/actor.html:204
 msgid "Last name"
@@ -562,7 +562,7 @@ msgstr "Nom"
 
 #: website/web/templates/actor.html:205
 msgid "Age"
-msgstr "Ãge"
+msgstr "Âge"
 
 #: website/web/templates/actor.html:206
 msgid "DOB"
@@ -570,7 +570,7 @@ msgstr "Date de naissance"
 
 #: website/web/templates/actor.html:207
 msgid "Nationality"
-msgstr "NationalitÃ©"
+msgstr "Nationalité"
 
 #: website/web/templates/actor.html:208
 msgid "Location"
@@ -578,15 +578,15 @@ msgstr "Localisation"
 
 #: website/web/templates/actor.html:216
 msgid "Contacts / Social"
-msgstr "Contacts / RÃ©seaux"
+msgstr "Contacts / Réseaux"
 
 #: website/web/templates/actor.html:224
 msgid "No contacts listed."
-msgstr "Aucun contact listÃ©."
+msgstr "Aucun contact listé."
 
 #: website/web/templates/base.html:6
 msgid "Real‑time ransomware intelligence (open data)"
-msgstr "Renseignement ransomware en temps rÃ©el (open data)"
+msgstr "Renseignement ransomware en temps réel (open data)"
 
 #: website/web/templates/base.html:7
 msgid ""
@@ -596,11 +596,11 @@ msgstr "Renseignement ouvert et interrogeable sur les groupes ransomware, avec s
 
 #: website/web/templates/base.html:71
 msgid "Data"
-msgstr "DonnÃ©es"
+msgstr "Données"
 
 #: website/web/templates/base.html:73
 msgid "Recent"
-msgstr "RÃ©cents"
+msgstr "Récents"
 
 #: website/web/templates/base.html:75 website/web/templates/hot.html:40
 msgid "Trending"
@@ -645,7 +645,7 @@ msgstr "Notes"
 
 #: website/web/templates/base.html:86 website/web/templates/notesdetails.html:3
 msgid "Ransomware Notes"
-msgstr "Notes de ranÃ§on"
+msgstr "Notes de rançon"
 
 #: website/web/templates/base.html:91
 msgid "Torrents"
@@ -675,7 +675,7 @@ msgstr "Glossaire"
 
 #: website/web/templates/base.html:107
 msgid "RSS feed — Recent posts"
-msgstr "Flux RSS â publications rÃ©centes"
+msgstr "Flux RSS — publications récentes"
 
 #: website/web/templates/base.html:136
 msgid "Admin"
@@ -704,7 +704,7 @@ msgstr "Basculer mode sombre/clair"
 
 #: website/web/templates/base.html:148
 msgid "Toggle theme"
-msgstr "Basculer le thÃ¨me"
+msgstr "Basculer le thème"
 
 #: website/web/templates/base.html:164
 msgid "Contribute on"
@@ -720,19 +720,19 @@ msgstr "Texte de recherche"
 
 #: website/web/templates/browse.html:27
 msgid "Groups, markets/forums and threat actors in one place."
-msgstr "Groupes, marchÃ©s/forums et acteurs de menace au mÃªme endroit."
+msgstr "Groupes, marchés/forums et acteurs de menace au même endroit."
 
 #: website/web/templates/browse.html:40
 msgid "Search across groups, markets and actors"
-msgstr "Rechercher dans les groupes, marchÃ©s et acteurs"
+msgstr "Rechercher dans les groupes, marchés et acteurs"
 
 #: website/web/templates/browse.html:41
 msgid "Search name or alias… (Ctrl/Cmd+K)"
-msgstr "Nom ou aliasâ¦ (Ctrl/Cmd+K)"
+msgstr "Nom ou alias… (Ctrl/Cmd+K)"
 
 #: website/web/templates/browse.html:48 website/web/templates/urls.html:60
 msgid "Entity type"
-msgstr "Type d'entitÃ©"
+msgstr "Type d'entité"
 
 #: website/web/templates/browse.html:50 website/web/templates/browse.html:83
 #: website/web/templates/cryptodetail.html:97
@@ -744,7 +744,7 @@ msgstr "Toutes"
 #: website/web/templates/browse.html:56 website/web/templates/search.html:36
 #: website/web/templates/search.html:39 website/web/templates/urls.html:68
 msgid "Markets"
-msgstr "MarchÃ©s"
+msgstr "Marchés"
 
 #: website/web/templates/browse.html:59
 msgid "Actors"
@@ -752,7 +752,7 @@ msgstr "Acteurs"
 
 #: website/web/templates/browse.html:63
 msgid "Filter by health"
-msgstr "Filtrer par santÃ©"
+msgstr "Filtrer par santé"
 
 #: website/web/templates/browse.html:64
 #, python-format
@@ -761,7 +761,7 @@ msgstr "Au moins 50%% des miroirs en ligne"
 
 #: website/web/templates/browse.html:65
 msgid "Healthy"
-msgstr "En bonne santÃ©"
+msgstr "En bonne santé"
 
 #: website/web/templates/browse.html:67
 #, python-format
@@ -770,7 +770,7 @@ msgstr "Moins de 50%% des miroirs en ligne"
 
 #: website/web/templates/browse.html:68
 msgid "Degraded"
-msgstr "DÃ©gradÃ©"
+msgstr "Dégradé"
 
 #: website/web/templates/browse.html:70
 msgid "No mirror up"
@@ -782,11 +782,11 @@ msgstr "Hors ligne"
 
 #: website/web/templates/browse.html:77
 msgid "Alphabet filter"
-msgstr "Filtre alphabÃ©tique"
+msgstr "Filtre alphabétique"
 
 #: website/web/templates/browse.html:81
 msgid "Names starting with a digit"
-msgstr "Noms commenÃ§ant par un chiffre"
+msgstr "Noms commençant par un chiffre"
 
 #: website/web/templates/browse.html:82
 msgid "Other / symbols"
@@ -794,7 +794,7 @@ msgstr "Autres / symboles"
 
 #: website/web/templates/browse.html:130
 msgid "Parser enabled"
-msgstr "Parser activÃ©"
+msgstr "Parser activé"
 
 #: website/web/templates/browse.html:130
 msgid "parser"
@@ -806,7 +806,7 @@ msgstr "Fiche de recherche (FBI/Europol/Interpol)"
 
 #: website/web/templates/browse.html:132
 msgid "wanted"
-msgstr "recherchÃ©"
+msgstr "recherché"
 
 #: website/web/templates/browse.html:133
 msgid "Known aliases"
@@ -819,12 +819,12 @@ msgstr ""
 
 #: website/web/templates/browse.html:135
 msgid "private"
-msgstr "privÃ©"
+msgstr "privé"
 
 #: website/web/templates/browse.html:147 website/web/templates/hot.html:166
 #: website/web/templates/recent.html:120 website/web/templates/urls.html:171
 msgid "No matches."
-msgstr "Aucun rÃ©sultat."
+msgstr "Aucun résultat."
 
 #: website/web/templates/compare.html:3 website/web/templates/compare.html:75
 #: website/web/templates/compare.html:115 website/web/templates/group.html:49
@@ -838,7 +838,7 @@ msgstr "Comparer deux sources"
 #: website/web/templates/compare.html:21
 #, python-format
 msgid "Pick two %(kind)s to compare (posts 7/30/365, mirrors up, 30-day uptime)."
-msgstr "Choisissez deux %(kind)s Ã  comparer (publications 7/30/365, miroirs en ligne, uptime 30 jours)."
+msgstr "Choisissez deux %(kind)s à comparer (publications 7/30/365, miroirs en ligne, uptime 30 jours)."
 
 #: website/web/templates/compare.html:21 website/web/templates/index.html:173
 msgid "groups"
@@ -846,16 +846,16 @@ msgstr "groupes"
 
 #: website/web/templates/compare.html:21
 msgid "markets/forums"
-msgstr "marchÃ©s/forums"
+msgstr "marchés/forums"
 
 #: website/web/templates/compare.html:30
 msgid "Choose type to compare"
-msgstr "Choisir le type Ã  comparer"
+msgstr "Choisir le type à comparer"
 
 #: website/web/templates/compare.html:35
 #: website/web/templates/glossary.html:110
 msgid "Markets / Forums"
-msgstr "MarchÃ©s / Forums"
+msgstr "Marchés / Forums"
 
 #: website/web/templates/compare.html:46 website/web/templates/compare.html:86
 msgid "Search A"
@@ -863,7 +863,7 @@ msgstr "Recherche A"
 
 #: website/web/templates/compare.html:47 website/web/templates/compare.html:87
 msgid "Filter options for Source A…"
-msgstr "Filtrer les options pour la Source Aâ¦"
+msgstr "Filtrer les options pour la Source A…"
 
 #: website/web/templates/compare.html:49 website/web/templates/compare.html:89
 msgid "Source A"
@@ -871,7 +871,7 @@ msgstr "Source A"
 
 #: website/web/templates/compare.html:51 website/web/templates/compare.html:64
 msgid "Select a group…"
-msgstr "Choisir un groupeâ¦"
+msgstr "Choisir un groupe…"
 
 #: website/web/templates/compare.html:59 website/web/templates/compare.html:99
 msgid "Search B"
@@ -879,7 +879,7 @@ msgstr "Recherche B"
 
 #: website/web/templates/compare.html:60 website/web/templates/compare.html:100
 msgid "Filter options for Source B…"
-msgstr "Filtrer les options pour la Source Bâ¦"
+msgstr "Filtrer les options pour la Source B…"
 
 #: website/web/templates/compare.html:62 website/web/templates/compare.html:102
 msgid "Source B"
@@ -887,11 +887,11 @@ msgstr "Source B"
 
 #: website/web/templates/compare.html:73 website/web/templates/compare.html:113
 msgid "Swap A ↔ B"
-msgstr "Ãchanger A â B"
+msgstr "Échanger A ↔ B"
 
 #: website/web/templates/compare.html:91 website/web/templates/compare.html:104
 msgid "Select a market/forum…"
-msgstr "Choisir un marchÃ©/forumâ¦"
+msgstr "Choisir un marché/forum…"
 
 #: website/web/templates/compare.html:156
 msgid "Posts 7d"
@@ -954,11 +954,11 @@ msgstr "Filtrer les groupes"
 
 #: website/web/templates/crypto.html:25 website/web/templates/notes.html:25
 msgid "Group name or alias…"
-msgstr "Nom ou alias du groupeâ¦"
+msgstr "Nom ou alias du groupe…"
 
 #: website/web/templates/cryptodetail.html:14
 msgid "Observed wallets and transactions for this group."
-msgstr "Portefeuilles et transactions observÃ©s pour ce groupe."
+msgstr "Portefeuilles et transactions observés pour ce groupe."
 
 #: website/web/templates/cryptodetail.html:16
 msgid "Aliases:"
@@ -1079,21 +1079,21 @@ msgstr "Entrante"
 
 #: website/web/templates/cryptodetail.html:196
 msgid "No transactions recorded."
-msgstr "Aucune transaction enregistrÃ©e."
+msgstr "Aucune transaction enregistrée."
 
 #: website/web/templates/cryptodetail.html:202
 msgid "No wallet found for this group."
-msgstr "Aucun portefeuille trouvÃ© pour ce groupe."
+msgstr "Aucun portefeuille trouvé pour ce groupe."
 
 #: website/web/templates/glossary.html:9
 msgid ""
 "Technical terms used across RansomLook: groups, actors, infrastructure "
 "types, metrics and relationships."
-msgstr "Termes techniques utilisÃ©s dans RansomLook : groupes, acteurs, types d'infrastructure, mÃ©triques et relations."
+msgstr "Termes techniques utilisés dans RansomLook : groupes, acteurs, types d'infrastructure, métriques et relations."
 
 #: website/web/templates/glossary.html:18
 msgid "Table of contents"
-msgstr "Table des matiÃ¨res"
+msgstr "Table des matières"
 
 #: website/web/templates/glossary.html:19
 msgid "Sections"
@@ -1112,12 +1112,12 @@ msgstr "Types d'infrastructure"
 #: website/web/templates/glossary.html:23
 #: website/web/templates/glossary.html:83
 msgid "Data and metrics"
-msgstr "DonnÃ©es et mÃ©triques"
+msgstr "Données et métriques"
 
 #: website/web/templates/glossary.html:24
 #: website/web/templates/glossary.html:107
 msgid "Ecosystem and sources"
-msgstr "ÃcosystÃ¨me et sources"
+msgstr "Écosystème et sources"
 
 #: website/web/templates/glossary.html:25
 #: website/web/templates/glossary.html:127
@@ -1129,7 +1129,7 @@ msgid ""
 "A ransomware group or data-extortion collective tracked by RansomLook. "
 "Groups usually operate one or more leak sites, file servers and "
 "communication channels."
-msgstr "Un groupe de ransomware ou un collectif d'extorsion de donnÃ©es suivi par RansomLook. Les groupes opÃ¨rent gÃ©nÃ©ralement un ou plusieurs leak sites, serveurs de fichiers et canaux de communication."
+msgstr "Un groupe de ransomware ou un collectif d'extorsion de données suivi par RansomLook. Les groupes opèrent généralement un ou plusieurs leak sites, serveurs de fichiers et canaux de communication."
 
 #: website/web/templates/glossary.html:38
 msgid "Actor"
@@ -1139,7 +1139,7 @@ msgstr "Acteur"
 msgid ""
 "A named individual or pseudonym (threat actor, developer, affiliate, "
 "broker, admin, etc.) related to ransomware or data-extortion activity."
-msgstr "Un individu ou pseudonyme (acteur, dÃ©veloppeur, affiliÃ©, broker, admin, etc.) liÃ© Ã  une activitÃ© de ransomware ou d'extorsion de donnÃ©es."
+msgstr "Un individu ou pseudonyme (acteur, développeur, affilié, broker, admin, etc.) lié à une activité de ransomware ou d'extorsion de données."
 
 #: website/web/templates/glossary.html:42
 msgid "Victim / Post"
@@ -1150,14 +1150,14 @@ msgid ""
 "A single entry published by a group about a targeted organisation. In "
 "RansomLook this is usually stored as a \"post\" and is associated with "
 "one group and one discovery timestamp."
-msgstr "Une entrÃ©e publiÃ©e par un groupe Ã  propos d'une organisation ciblÃ©e. Dans RansomLook elle est stockÃ©e comme Â« post Â» et associÃ©e Ã  un groupe et un horodatage de dÃ©couverte."
+msgstr "Une entrée publiée par un groupe à propos d'une organisation ciblée. Dans RansomLook elle est stockée comme « post » et associée à un groupe et un horodatage de découverte."
 
 #: website/web/templates/glossary.html:47
 msgid ""
 "Ransomware-as-a-Service. Operating model where a core team develops the "
 "ransomware and infrastructure, while affiliates perform intrusions and "
 "share the profits."
-msgstr "Ransomware-as-a-Service. ModÃ¨le oÃ¹ une Ã©quipe centrale dÃ©veloppe le ransomware et l'infrastructure, tandis que des affiliÃ©s rÃ©alisent les intrusions et partagent les bÃ©nÃ©fices."
+msgstr "Ransomware-as-a-Service. Modèle où une équipe centrale développe le ransomware et l'infrastructure, tandis que des affiliés réalisent les intrusions et partagent les bénéfices."
 
 #: website/web/templates/glossary.html:54
 msgid "DLS"
@@ -1167,7 +1167,7 @@ msgstr "DLS"
 msgid ""
 "Dedicated Leak Site / Darknet Leak Site. Tor-based website operated by a "
 "group to list victims and publish stolen data when ransoms are not paid."
-msgstr "Dedicated Leak Site / Darknet Leak Site. Site Tor opÃ©rÃ© par un groupe pour lister les victimes et publier les donnÃ©es volÃ©es en cas de non-paiement."
+msgstr "Dedicated Leak Site / Darknet Leak Site. Site Tor opéré par un groupe pour lister les victimes et publier les données volées en cas de non-paiement."
 
 #: website/web/templates/glossary.html:58
 msgid "FS"
@@ -1177,7 +1177,7 @@ msgstr "FS"
 msgid ""
 "File Server / File Storage. Infrastructure used to host or distribute "
 "stolen data (archives, samples, full dumps)."
-msgstr "File Server / File Storage. Infrastructure utilisÃ©e pour hÃ©berger ou distribuer les donnÃ©es volÃ©es (archives, Ã©chantillons, dumps complets)."
+msgstr "File Server / File Storage. Infrastructure utilisée pour héberger ou distribuer les données volées (archives, échantillons, dumps complets)."
 
 #: website/web/templates/glossary.html:62
 msgid "Chat"
@@ -1188,18 +1188,18 @@ msgid ""
 "Communication endpoints used for negotiation or contact with victims and "
 "affiliates. Includes web-based chat, Telegram, X/Twitter, email and other"
 " messaging."
-msgstr "Points de communication utilisÃ©s pour nÃ©gocier ou contacter les victimes et les affiliÃ©s. Comprend chat web, Telegram, X/Twitter, e-mail et autres messageries."
+msgstr "Points de communication utilisés pour négocier ou contacter les victimes et les affiliés. Comprend chat web, Telegram, X/Twitter, e-mail et autres messageries."
 
 #: website/web/templates/glossary.html:66
 msgid "Admin / Affiliates panel"
-msgstr "Panel admin / affiliÃ©s"
+msgstr "Panel admin / affiliés"
 
 #: website/web/templates/glossary.html:67
 msgid ""
 "Administrative or affiliate-focused infrastructure not intended for "
 "public victim browsing. Recruitment panels, campaign portals, status "
 "pages."
-msgstr "Infrastructure administrative ou orientÃ©e affiliÃ©s, non destinÃ©e Ã  Ãªtre consultÃ©e par les victimes. Panneaux de recrutement, portails de campagne, pages de statut."
+msgstr "Infrastructure administrative ou orientée affiliés, non destinée à être consultée par les victimes. Panneaux de recrutement, portails de campagne, pages de statut."
 
 #: website/web/templates/glossary.html:70
 msgid "Relay / Mirror"
@@ -1210,7 +1210,7 @@ msgid ""
 "A technical copy of a group's site accessible at a different domain or "
 "onion address. RansomLook tracks each relay as a separate location with "
 "its own status."
-msgstr "Une copie technique du site d'un groupe accessible Ã  une autre URL ou adresse onion. RansomLook suit chaque relay comme une location Ã  part entiÃ¨re avec son propre statut."
+msgstr "Une copie technique du site d'un groupe accessible à une autre URL ou adresse onion. RansomLook suit chaque relay comme une location à part entière avec son propre statut."
 
 #: website/web/templates/glossary.html:74
 msgid "Slug"
@@ -1220,17 +1220,17 @@ msgstr "Slug"
 msgid ""
 "Normalised name used internally to build URLs for a specific location of "
 "a group. Used to create deterministic filenames and links."
-msgstr "Nom normalisÃ© utilisÃ© en interne pour construire les URLs d'une location. Sert Ã  produire des noms de fichier et des liens dÃ©terministes."
+msgstr "Nom normalisé utilisé en interne pour construire les URLs d'une location. Sert à produire des noms de fichier et des liens déterministes."
 
 #: website/web/templates/glossary.html:78
 msgid "Private location"
-msgstr "Location privÃ©e"
+msgstr "Location privée"
 
 #: website/web/templates/glossary.html:79
 msgid ""
 "A location stored in the database but not displayed to unauthenticated "
 "visitors. Still used for scraping, monitoring and metrics."
-msgstr "Une location stockÃ©e en base mais non affichÃ©e aux visiteurs non authentifiÃ©s. Reste utilisÃ©e pour le scraping, la surveillance et les mÃ©triques."
+msgstr "Une location stockée en base mais non affichée aux visiteurs non authentifiés. Reste utilisée pour le scraping, la surveillance et les métriques."
 
 #: website/web/templates/glossary.html:86
 msgid "Parser"
@@ -1240,17 +1240,17 @@ msgstr "Parser"
 msgid ""
 "Piece of code dedicated to a specific group or site. Extracts structured "
 "data from HTML pages (victim name, sector, country, dates, etc.)."
-msgstr "Code dÃ©diÃ© Ã  un groupe ou site spÃ©cifique. Extrait des donnÃ©es structurÃ©es depuis les pages HTML (nom de la victime, secteur, pays, dates, etc.)."
+msgstr "Code dédié à un groupe ou site spécifique. Extrait des données structurées depuis les pages HTML (nom de la victime, secteur, pays, dates, etc.)."
 
 #: website/web/templates/glossary.html:90
 msgid "Discovery date"
-msgstr "Date de dÃ©couverte"
+msgstr "Date de découverte"
 
 #: website/web/templates/glossary.html:91
 msgid ""
 "Timestamp at which RansomLook first observed a victim post. May differ "
 "from the original intrusion or encryption date."
-msgstr "Horodatage auquel RansomLook a observÃ© pour la premiÃ¨re fois une publication de victime. Peut diffÃ©rer de la date de l'intrusion ou du chiffrement."
+msgstr "Horodatage auquel RansomLook a observé pour la première fois une publication de victime. Peut différer de la date de l'intrusion ou du chiffrement."
 
 #: website/web/templates/glossary.html:94
 msgid "Leak / Dataleak"
@@ -1261,18 +1261,18 @@ msgid ""
 "Public dataset containing credentials or other information exposed in "
 "previous breaches. RansomLook integrates external leak databases for "
 "enrichment."
-msgstr "Jeu de donnÃ©es public contenant des identifiants ou d'autres informations exposÃ©s lors de brÃ¨ches antÃ©rieures. RansomLook intÃ¨gre des bases de leaks externes pour l'enrichissement."
+msgstr "Jeu de données public contenant des identifiants ou d'autres informations exposés lors de brèches antérieures. RansomLook intègre des bases de leaks externes pour l'enrichissement."
 
 #: website/web/templates/glossary.html:98 website/web/templates/group.html:204
 msgid "Ransom notes"
-msgstr "Notes de ranÃ§on"
+msgstr "Notes de rançon"
 
 #: website/web/templates/glossary.html:99
 msgid ""
 "Text files or HTML pages left on compromised systems by ransomware "
 "operators. RansomLook indexes ransom notes to help identify families and "
 "operations."
-msgstr "Fichiers texte ou pages HTML laissÃ©s sur les systÃ¨mes compromis par les opÃ©rateurs de ransomware. RansomLook indexe les notes de ranÃ§on pour aider Ã  identifier les familles et les opÃ©rations."
+msgstr "Fichiers texte ou pages HTML laissés sur les systèmes compromis par les opérateurs de ransomware. RansomLook indexe les notes de rançon pour aider à identifier les familles et les opérations."
 
 #: website/web/templates/glossary.html:102
 msgid "Crypto address / Wallet"
@@ -1282,19 +1282,19 @@ msgstr "Adresse crypto / Portefeuille"
 msgid ""
 "Cryptocurrency address controlled or used by a group or affiliate to "
 "receive ransom payments. Monitored and correlated with known activity."
-msgstr "Adresse de cryptomonnaie contrÃ´lÃ©e ou utilisÃ©e par un groupe ou un affiliÃ© pour recevoir les paiements de ranÃ§on. SurveillÃ©e et corrÃ©lÃ©e avec l'activitÃ© connue."
+msgstr "Adresse de cryptomonnaie contrôlée ou utilisée par un groupe ou un affilié pour recevoir les paiements de rançon. Surveillée et corrélée avec l'activité connue."
 
 #: website/web/templates/glossary.html:111
 msgid ""
 "Darknet or clearnet platforms where actors trade access, data, tools or "
 "services. Tracked as separate entities from ransomware groups."
-msgstr "Plateformes darknet ou clearnet oÃ¹ les acteurs Ã©changent des accÃ¨s, donnÃ©es, outils ou services. Suivies comme des entitÃ©s distinctes des groupes de ransomware."
+msgstr "Plateformes darknet ou clearnet où les acteurs échangent des accès, données, outils ou services. Suivies comme des entités distinctes des groupes de ransomware."
 
 #: website/web/templates/glossary.html:115
 msgid ""
 "Optional Recorded Future integration providing additional leak "
 "information and dumps. Requires a private API key."
-msgstr "IntÃ©gration optionnelle Recorded Future fournissant des informations supplÃ©mentaires sur les leaks et les dumps. NÃ©cessite une clÃ© d'API privÃ©e."
+msgstr "Intégration optionnelle Recorded Future fournissant des informations supplémentaires sur les leaks et les dumps. Nécessite une clé d'API privée."
 
 #: website/web/templates/glossary.html:118
 msgid "Onion service (Tor)"
@@ -1304,7 +1304,7 @@ msgstr "Service onion (Tor)"
 msgid ""
 "Hidden service accessible through the Tor network. Most DLS, FS and "
 "negotiation panels are onion services, sometimes with multiple relays."
-msgstr "Service cachÃ© accessible via le rÃ©seau Tor. La plupart des DLS, FS et panneaux de nÃ©gociation sont des services onion, parfois avec plusieurs relais."
+msgstr "Service caché accessible via le réseau Tor. La plupart des DLS, FS et panneaux de négociation sont des services onion, parfois avec plusieurs relais."
 
 #: website/web/templates/glossary.html:122
 msgid "v3 onion"
@@ -1315,18 +1315,18 @@ msgid ""
 "Current version of Tor hidden service addresses (56-character "
 "<code>.onion</code> domains). RansomLook tracks versions to classify "
 "infrastructure changes."
-msgstr "Version actuelle des adresses de services cachÃ©s Tor (domaines <code>.onion</code> Ã  56 caractÃ¨res). RansomLook suit les versions pour classer les changements d'infrastructure."
+msgstr "Version actuelle des adresses de services cachés Tor (domaines <code>.onion</code> à 56 caractères). RansomLook suit les versions pour classer les changements d'infrastructure."
 
 #: website/web/templates/glossary.html:130 website/web/templates/group.html:416
 #: website/web/templates/group.html:419 website/web/templates/group.html:420
 msgid "Affiliates"
-msgstr "AffiliÃ©s"
+msgstr "Affiliés"
 
 #: website/web/templates/glossary.html:131
 msgid ""
 "External operators who work with a core ransomware group. Perform "
 "intrusions, deploy ransomware and share a percentage of the ransom."
-msgstr "OpÃ©rateurs externes travaillant avec une Ã©quipe principale de ransomware. RÃ©alisent les intrusions, dÃ©ploient le ransomware et partagent un pourcentage de la ranÃ§on."
+msgstr "Opérateurs externes travaillant avec une équipe principale de ransomware. Réalisent les intrusions, déploient le ransomware et partagent un pourcentage de la rançon."
 
 #: website/web/templates/admin/torrent_health.html:74
 #: website/web/templates/admin/torrent_health_detail.html:91
@@ -1339,7 +1339,7 @@ msgstr "Pairs"
 msgid ""
 "Other actors linked to a given individual. Can represent collaboration, "
 "shared infrastructure or repeated co-appearance in operations."
-msgstr "Autres acteurs liÃ©s Ã  un individu donnÃ©. Peut reprÃ©senter une collaboration, une infrastructure partagÃ©e ou une co-apparition rÃ©pÃ©tÃ©e dans des opÃ©rations."
+msgstr "Autres acteurs liés à un individu donné. Peut représenter une collaboration, une infrastructure partagée ou une co-apparition répétée dans des opérations."
 
 #: website/web/templates/glossary.html:138
 msgid "Groups / Forums relations"
@@ -1349,7 +1349,7 @@ msgstr "Relations groupes / forums"
 msgid ""
 "Links between one actor and multiple groups or markets. RansomLook stores"
 " these so users can explore which actors operate across which ecosystems."
-msgstr "Liens entre un acteur et plusieurs groupes ou marchÃ©s. RansomLook les stocke pour que les utilisateurs puissent explorer quels acteurs opÃ¨rent dans quels Ã©cosystÃ¨mes."
+msgstr "Liens entre un acteur et plusieurs groupes ou marchés. RansomLook les stocke pour que les utilisateurs puissent explorer quels acteurs opèrent dans quels écosystèmes."
 
 #: website/web/templates/group.html:55
 msgid "posts (all time)"
@@ -1369,7 +1369,7 @@ msgstr "uptime moyen 30j"
 
 #: website/web/templates/group.html:69 website/web/templates/index.html:63
 msgid "Activity · last 30 days"
-msgstr "ActivitÃ© Â· 30 derniers jours"
+msgstr "Activité · 30 derniers jours"
 
 #: website/web/templates/group.html:120
 msgid "Export URLs (CSV)"
@@ -1389,7 +1389,7 @@ msgstr "Exporter publications (CSV)"
 
 #: website/web/templates/group.html:134
 msgid "From date"
-msgstr "Date de dÃ©but"
+msgstr "Date de début"
 
 #: website/web/templates/group.html:136
 msgid "To date"
@@ -1409,7 +1409,7 @@ msgstr "Voir toutes les notes"
 
 #: website/web/templates/group.html:223
 msgid "No note linked."
-msgstr "Aucune note liÃ©e."
+msgstr "Aucune note liée."
 
 #: website/web/templates/group.html:234 website/web/templates/group.html:238
 msgid "Known hashes"
@@ -1497,15 +1497,15 @@ msgstr "Serveurs admin"
 
 #: website/web/templates/group.html:668
 msgid "Activity (interactive)"
-msgstr "ActivitÃ© (interactive)"
+msgstr "Activité (interactive)"
 
 #: website/web/templates/group.html:674
 msgid "Activity charts"
-msgstr "Graphiques d'activitÃ©"
+msgstr "Graphiques d'activité"
 
 #: website/web/templates/group.html:676 website/web/templates/stats.html:45
 msgid "Aggregation"
-msgstr "AgrÃ©gation"
+msgstr "Agrégation"
 
 #: website/web/templates/group.html:678 website/web/templates/stats.html:48
 msgid "Daily"
@@ -1544,7 +1544,7 @@ msgstr "Graphique agrandi"
 
 #: website/web/templates/group.html:762
 msgid "Previous"
-msgstr "PrÃ©cÃ©dent"
+msgstr "Précédent"
 
 #: website/web/templates/group.html:766
 msgid "Next"
@@ -1552,7 +1552,7 @@ msgstr "Suivant"
 
 #: website/web/templates/groups.html:29
 msgid "Availability, mirrors, last visit & quick links."
-msgstr "DisponibilitÃ©, miroirs, derniÃ¨re visite et liens rapides."
+msgstr "Disponibilité, miroirs, dernière visite et liens rapides."
 
 #: website/web/templates/hot.html:3
 #, python-format
@@ -1572,7 +1572,7 @@ msgstr "publications"
 #: website/web/templates/hot.html:45
 #, python-format
 msgid "vs prev %(n)sd"
-msgstr "vs %(n)sj prÃ©c."
+msgstr "vs %(n)sj préc."
 
 #: website/web/templates/hot.html:48
 msgid "flat"
@@ -1581,7 +1581,7 @@ msgstr "stable"
 #: website/web/templates/hot.html:59
 #, python-format
 msgid "Activity · last %(n)s days"
-msgstr "ActivitÃ© Â· %(n)s derniers jours"
+msgstr "Activité · %(n)s derniers jours"
 
 #: website/web/templates/hot.html:60 website/web/templates/recent.html:13
 #: website/web/templates/recent.html:40
@@ -1591,7 +1591,7 @@ msgstr ""
 
 #: website/web/templates/hot.html:92
 msgid "Window"
-msgstr "FenÃªtre"
+msgstr "Fenêtre"
 
 #: website/web/templates/hot.html:95
 #, python-format
@@ -1621,11 +1621,11 @@ msgstr "Appliquer"
 
 #: website/web/templates/hot.html:107
 msgid "Download as CSV"
-msgstr "TÃ©lÃ©charger en CSV"
+msgstr "Télécharger en CSV"
 
 #: website/web/templates/hot.html:115
 msgid "Filter group name…"
-msgstr "Filtrer par nom de groupeâ¦"
+msgstr "Filtrer par nom de groupe…"
 
 #: website/web/templates/hot.html:124
 msgid "Trending groups"
@@ -1637,11 +1637,11 @@ msgstr "Tendance"
 
 #: website/web/templates/hot.html:132
 msgid "Last post"
-msgstr "DerniÃ¨re publication"
+msgstr "Dernière publication"
 
 #: website/web/templates/hot.html:169
 msgid "No data for the selected window."
-msgstr "Aucune donnÃ©e pour la fenÃªtre sÃ©lectionnÃ©e."
+msgstr "Aucune donnée pour la fenêtre sélectionnée."
 
 #: website/web/templates/index.html:3
 msgid "Open ransomware intelligence"
@@ -1660,7 +1660,7 @@ msgstr "Suivies en open source."
 msgid ""
 "Open-source intelligence on %(n)s ransomware groups, markets and threat "
 "actors. Updated live since %(year)s."
-msgstr "Renseignement openâsource sur %(n)s groupes de ransomware, marchÃ©s et acteurs de la menace. Mis Ã  jour en direct depuis %(year)s."
+msgstr "Renseignement open‑source sur %(n)s groupes de ransomware, marchés et acteurs de la menace. Mis à jour en direct depuis %(year)s."
 
 #: website/web/templates/index.html:53
 msgid "Explore"
@@ -1668,7 +1668,7 @@ msgstr "Explorer"
 
 #: website/web/templates/index.html:65
 msgid "vs prev 7d"
-msgstr "vs 7j prÃ©c."
+msgstr "vs 7j préc."
 
 #: website/web/templates/index.html:87
 msgid "This week"
@@ -1704,7 +1704,7 @@ msgstr "Plus fortes variations"
 
 #: website/web/templates/index.html:125
 msgid "7d vs prev 7d"
-msgstr "7j vs 7j prÃ©c."
+msgstr "7j vs 7j préc."
 
 #: website/web/templates/index.html:139
 msgid "No movement this week."
@@ -1712,7 +1712,7 @@ msgstr "Aucun mouvement cette semaine."
 
 #: website/web/templates/index.html:145
 msgid "Latest posts"
-msgstr "DerniÃ¨res publications"
+msgstr "Dernières publications"
 
 #: website/web/templates/index.html:146
 msgid "see more"
@@ -1724,7 +1724,7 @@ msgstr "Aucune publication pour l'instant."
 
 #: website/web/templates/index.html:175
 msgid "markets"
-msgstr "marchÃ©s"
+msgstr "marchés"
 
 #: website/web/templates/index.html:177
 msgid "actors"
@@ -1736,7 +1736,7 @@ msgstr "fuites"
 
 #: website/web/templates/index.html:181
 msgid "ransom notes"
-msgstr "notes de ranÃ§on"
+msgstr "notes de rançon"
 
 #: website/web/templates/index.html:183
 msgid "crypto addrs"
@@ -1748,11 +1748,11 @@ msgstr "Liste des leaks"
 
 #: website/web/templates/leaks.html:11
 msgid "Browse known public leaks. Click a leak to view details."
-msgstr "Parcourez les leaks publics connus. Cliquez sur un leak pour voir les dÃ©tails."
+msgstr "Parcourez les leaks publics connus. Cliquez sur un leak pour voir les détails."
 
 #: website/web/templates/leaks.html:26
 msgid "Name, description, URL, page title…"
-msgstr "Nom, description, URL, titre de pageâ¦"
+msgstr "Nom, description, URL, titre de page…"
 
 #: website/web/templates/leaks.html:40
 msgid "Page title"
@@ -1760,23 +1760,23 @@ msgstr "Titre de page"
 
 #: website/web/templates/leaks.html:41
 msgid "Entries"
-msgstr "EntrÃ©es"
+msgstr "Entrées"
 
 #: website/web/templates/leaks.html:73
 msgid "Leak details"
-msgstr "DÃ©tails du leak"
+msgstr "Détails du leak"
 
 #: website/web/templates/leaks.html:79
 msgid "Leak data"
-msgstr "DonnÃ©es du leak"
+msgstr "Données du leak"
 
 #: website/web/templates/leaks.html:84
 msgid "Indexed"
-msgstr "IndexÃ©"
+msgstr "Indexé"
 
 #: website/web/templates/login.html:11
 msgid "Sign in to access admin features."
-msgstr "Connectez-vous pour accÃ©der aux fonctions d'administration."
+msgstr "Connectez-vous pour accéder aux fonctions d'administration."
 
 #: website/web/templates/notes.html:3
 msgid "Notes from Groups"
@@ -1788,11 +1788,11 @@ msgstr "Groupes avec notes"
 
 #: website/web/templates/notes.html:10
 msgid "Browse ransomware note samples grouped by actor."
-msgstr "Parcourez les Ã©chantillons de notes de ranÃ§on par acteur."
+msgstr "Parcourez les échantillons de notes de rançon par acteur."
 
 #: website/web/templates/notesdetails.html:14
 msgid "Original ransom notes collected for this group."
-msgstr "Notes de ranÃ§on originales collectÃ©es pour ce groupe."
+msgstr "Notes de rançon originales collectées pour ce groupe."
 
 #: website/web/templates/notesdetails.html:15
 msgid "note available."
@@ -1822,15 +1822,15 @@ msgstr ""
 #: website/web/templates/recent.html:15
 #, python-format
 msgid "showing most recent %(shown)s of %(total)s — older entries trimmed"
-msgstr "affichage des %(shown)s plus rÃ©centes sur %(total)s â les plus anciennes sont tronquÃ©es"
+msgstr "affichage des %(shown)s plus récentes sur %(total)s — les plus anciennes sont tronquées"
 
 #: website/web/templates/recent.html:21
 msgid "Time window"
-msgstr "FenÃªtre temporelle"
+msgstr "Fenêtre temporelle"
 
 #: website/web/templates/recent.html:22
 msgid "Window:"
-msgstr "FenÃªtre :"
+msgstr "Fenêtre :"
 
 #: website/web/templates/recent.html:28
 #, python-format
@@ -1839,7 +1839,7 @@ msgstr ""
 
 #: website/web/templates/recent.html:39
 msgid "Activity · last 24h"
-msgstr "ActivitÃ© Â· 24 derniÃ¨res heures"
+msgstr "Activité · 24 dernières heures"
 
 #: website/web/templates/recent.html:73
 msgid "Filter posts by title or group"
@@ -1847,7 +1847,7 @@ msgstr "Filtrer les publications par titre ou groupe"
 
 #: website/web/templates/recent.html:74
 msgid "Filter by title or group…"
-msgstr "Filtrer par titre ou groupeâ¦"
+msgstr "Filtrer par titre ou groupe…"
 
 #: website/web/templates/recent.html:77
 msgid "Filter by group"
@@ -1860,7 +1860,7 @@ msgstr "Tous les groupes (%(n)s)"
 
 #: website/web/templates/recent.html:123
 msgid "No recent items found."
-msgstr "Aucune publication rÃ©cente."
+msgstr "Aucune publication récente."
 
 #: website/web/templates/search.html:67
 msgid "Leak"
@@ -1868,7 +1868,7 @@ msgstr "Leak"
 
 #: website/web/templates/search.html:125
 msgid "Name of Ransom note"
-msgstr "Nom de la note de ranÃ§on"
+msgstr "Nom de la note de rançon"
 
 #: website/web/templates/search.html:152
 msgid "Blockchain"
@@ -1884,7 +1884,7 @@ msgstr "Tx"
 
 #: website/web/templates/search.html:173
 msgid "No result"
-msgstr "Aucun rÃ©sultat"
+msgstr "Aucun résultat"
 
 #: website/web/templates/stats.html:8
 msgid "Interactive statistics"
@@ -1894,7 +1894,7 @@ msgstr "Statistiques interactives"
 msgid ""
 "Explore posts by period, groups, and aggregation — fully client-side & "
 "interactive."
-msgstr "Explorez les publications par pÃ©riode, groupes et agrÃ©gation â entiÃ¨rement cÃ´tÃ© client et interactif."
+msgstr "Explorez les publications par période, groupes et agrégation — entièrement côté client et interactif."
 
 #: website/web/templates/stats.html:18
 msgid "Filters"
@@ -1902,7 +1902,7 @@ msgstr "Filtres"
 
 #: website/web/templates/stats.html:23
 msgid "Period"
-msgstr "PÃ©riode"
+msgstr "Période"
 
 #: website/web/templates/stats.html:25
 msgid "Last 7 days"
@@ -1922,7 +1922,7 @@ msgstr "90 derniers jours"
 
 #: website/web/templates/stats.html:29
 msgid "Custom…"
-msgstr "PersonnalisÃ©â¦"
+msgstr "Personnalisé…"
 
 #: website/web/templates/stats.html:47
 msgid "Hourly"
@@ -1960,7 +1960,7 @@ msgstr "Actualiser"
 
 #: website/web/templates/stats.html:81
 msgid "Export filtered data to CSV"
-msgstr "Exporter les donnÃ©es filtrÃ©es en CSV"
+msgstr "Exporter les données filtrées en CSV"
 
 #: website/web/templates/stats.html:82
 msgid "Copy shareable URL"
@@ -1972,11 +1972,11 @@ msgstr "Partager l'URL"
 
 #: website/web/templates/stats.html:89
 msgid "loading…"
-msgstr "chargementâ¦"
+msgstr "chargement…"
 
 #: website/web/templates/stats.html:91
 msgid "Search groups…"
-msgstr "Rechercher des groupesâ¦"
+msgstr "Rechercher des groupes…"
 
 #: website/web/templates/stats.html:93
 msgid "None"
@@ -1992,7 +1992,7 @@ msgstr "Groupe principal"
 
 #: website/web/templates/stats.html:110
 msgid "Posts in second half of window vs first half"
-msgstr "Publications sur la seconde moitiÃ© vs la premiÃ¨re"
+msgstr "Publications sur la seconde moitié vs la première"
 
 #: website/web/templates/stats.html:123
 msgid "Top-N (bar)"
@@ -2005,7 +2005,7 @@ msgstr "Agrandir le graphique"
 
 #: website/web/templates/stats.html:134
 msgid "Stacked area"
-msgstr "Aires empilÃ©es"
+msgstr "Aires empilées"
 
 #: website/web/templates/stats.html:145
 msgid "Timeline (scatter)"
@@ -2015,19 +2015,19 @@ msgstr "Chronologie (nuage)"
 msgid ""
 "All tracked mirrors across groups and markets, with live status and "
 "30-day health."
-msgstr "Tous les miroirs suivis pour les groupes et les marchÃ©s, avec le statut en direct et l'Ã©tat de santÃ© sur 30 jours."
+msgstr "Tous les miroirs suivis pour les groupes et les marchés, avec le statut en direct et l'état de santé sur 30 jours."
 
 #: website/web/templates/urls.html:52
 msgid "Search by group, market or URL"
-msgstr "Rechercher par groupe, marchÃ© ou URL"
+msgstr "Rechercher par groupe, marché ou URL"
 
 #: website/web/templates/urls.html:53
 msgid "Group, market or URL substring… (Ctrl/Cmd+K)"
-msgstr "Groupe, marchÃ© ou portion d'URLâ¦ (Ctrl/Cmd+K)"
+msgstr "Groupe, marché ou portion d'URL… (Ctrl/Cmd+K)"
 
 #: website/web/templates/urls.html:72
 msgid "Availability"
-msgstr "DisponibilitÃ©"
+msgstr "Disponibilité"
 
 #: website/web/templates/urls.html:78
 msgid "Online"
@@ -2035,15 +2035,15 @@ msgstr "En ligne"
 
 #: website/web/templates/urls.html:87
 msgid "Download current view as CSV"
-msgstr "TÃ©lÃ©charger la vue actuelle en CSV"
+msgstr "Télécharger la vue actuelle en CSV"
 
 #: website/web/templates/urls.html:87
 msgid "Download CSV"
-msgstr "TÃ©lÃ©charger CSV"
+msgstr "Télécharger CSV"
 
 #: website/web/templates/urls.html:100
 msgid "Group / Market"
-msgstr "Groupe / MarchÃ©"
+msgstr "Groupe / Marché"
 
 #: website/web/templates/urls.html:102
 msgid "Status"
@@ -2055,7 +2055,7 @@ msgstr "Dernier scrape"
 
 #: website/web/templates/urls.html:105
 msgid "Health"
-msgstr "SantÃ©"
+msgstr "Santé"
 
 #: website/web/templates/admin/torrent_health.html:3
 msgid "Admin · Torrent Health"
@@ -2155,7 +2155,7 @@ msgstr "Aucun swarm torrent scanné pour le moment. Lancez poetry run torrent-he
 #: website/web/templates/admin/torrent_health_detail.html:3
 #, python-format
 msgid "Admin · Torrent · %(ih)s…"
-msgstr "Admin Â· Torrent Â· %(ih)sâ¦"
+msgstr "Admin · Torrent · %(ih)s…"
 
 #: website/web/templates/admin/torrent_health_detail.html:13
 msgid "Back"
@@ -2163,7 +2163,7 @@ msgstr "Retour"
 
 #: website/web/templates/admin/torrent_health_detail.html:14
 msgid "Refresh now"
-msgstr "RafraÃ®chir"
+msgstr "Rafraîchir"
 
 #: website/web/templates/admin/torrent_health_detail.html:26
 msgid "peers (last scan)"
@@ -2187,7 +2187,7 @@ msgstr "groupes"
 
 #: website/web/templates/admin/torrent_health_detail.html:56
 msgid "Magnets:"
-msgstr "marchÃ©s"
+msgstr "marchés"
 
 #: website/web/templates/admin/torrent_health_detail.html:60
 msgid "Known since:"
@@ -2204,7 +2204,7 @@ msgstr "Peers dans le temps (30 derniers jours)"
 #: website/web/templates/admin/torrent_health_detail.html:87
 #, python-format
 msgid "Peer sample — %(ts)s"
-msgstr "Ãchantillon de peers â %(ts)s"
+msgstr "Échantillon de peers — %(ts)s"
 
 #: website/web/templates/admin/torrent_health_detail.html:88
 #, python-format
@@ -2225,7 +2225,7 @@ msgstr "publications"
 
 #: website/web/templates/admin/torrent_health_detail.html:97
 msgid "Client"
-msgstr "RÃ©cents"
+msgstr "Récents"
 
 #: website/web/templates/admin/torrent_health_detail.html:98
 msgid "ASN"
@@ -2249,11 +2249,11 @@ msgstr "stable"
 
 #: website/web/templates/admin/torrent_health_detail.html:124
 msgid "No peers observed on the last scan."
-msgstr "Aucun peer observÃ© lors du dernier scan."
+msgstr "Aucun peer observé lors du dernier scan."
 
 #: website/web/templates/admin/torrent_health_detail.html:131
 msgid "All scans (click a row to show its peer sample)"
-msgstr "Tous les scans (cliquer sur une ligne pour voir son Ã©chantillon de peers)"
+msgstr "Tous les scans (cliquer sur une ligne pour voir son échantillon de peers)"
 
 #: website/web/templates/admin/torrent_health_detail.html:135
 msgid "History"
