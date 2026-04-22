@@ -152,36 +152,50 @@
 </section>
 
 <style>
+/* Force the declared <th> widths to stick on the data rows. Without this,
+   the browser's auto layout resizes columns to fit contents and the header
+   drifts out of alignment with its cells. */
+#th-table { table-layout: fixed; }
+#th-table td, #th-table th { overflow: hidden; text-overflow: ellipsis; }
+#th-table td.mono, #th-table .mono { word-break: break-all; white-space: normal; }
+#th-table .btn-sm { padding: 3px 8px; font-size: 11px; }
+
 /* Row tinting by health — very subtle so it doesn't fight the badge. */
 #th-table tr.th-row-dead     td { background: rgba(220,53,69,0.06); }
 #th-table tr.th-row-degraded td { background: rgba(255,193,7,0.06); }
 #th-table tr.th-row-alive    td { background: rgba(40,167,69,0.05); }
 
 .kpi-card {
-  background: var(--card-bg, #1b1f24);
-  border: 1px solid var(--border, rgba(255,255,255,.08));
-  border-radius: 8px;
-  padding: 12px 14px;
+  background: var(--card);
+  border: 1px solid var(--border-card);
+  border-radius: 10px;
+  padding: 14px 16px;
   text-align: center;
 }
-.kpi-card .kpi-label { font-size: 12px; color: var(--muted); text-transform: uppercase; letter-spacing: .05em; }
-.kpi-card .kpi-value { font-size: 28px; font-weight: 600; margin-top: 4px; }
-.kpi-card.kpi-up    .kpi-value { color: #2ecc71; }
-.kpi-card.kpi-down  .kpi-value { color: #e74c3c; }
+.kpi-card .kpi-label { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: .06em; }
+.kpi-card .kpi-value { font-size: 28px; font-weight: 700; margin-top: 6px; color: var(--text); }
+.kpi-card.kpi-up    .kpi-value { color: var(--success-text); }
+.kpi-card.kpi-down  .kpi-value { color: var(--danger-text); }
 
 .th-chip {
-  background: transparent;
-  border: 1px solid var(--border, rgba(255,255,255,.15));
+  background: var(--surface-btn);
+  border: 1px solid var(--border);
   border-radius: 999px;
-  padding: 3px 10px;
+  padding: 4px 12px;
   font-size: 12px;
-  color: var(--text, #d0d4dc);
+  color: var(--text);
   cursor: pointer;
+  line-height: 1.3;
 }
-.th-chip:hover { background: rgba(255,255,255,.06); }
-.th-chip-active { background: var(--accent, #3b82f6); color: #fff; border-color: transparent; }
+.th-chip:hover { background: var(--surface-hover); border-color: var(--border-hover); }
+.th-chip-active {
+  background: var(--pri-bright);
+  color: #fff;
+  border-color: var(--pri-bright);
+}
+.th-chip-active:hover { background: var(--pri-deep); border-color: var(--pri-deep); }
 
-.th-sort .th-sort-ind { font-size: 10px; opacity: .6; margin-left: 4px; }
+.th-sort .th-sort-ind { font-size: 10px; opacity: .55; margin-left: 4px; }
 .th-sort:hover .th-sort-ind { opacity: 1; }
 </style>
 
