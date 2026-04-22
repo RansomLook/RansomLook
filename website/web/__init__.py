@@ -835,6 +835,10 @@ def home():  # type: ignore[no-untyped-def]
     posts_7d_prev = 0
     group_counts_7d: dict[str, int] = {}
     group_counts_prev: dict[str, int] = {}
+    # Track the earliest post we have ever seen per group, so we can tell
+    # apart a truly new group (first post inside the current window) from a
+    # group that simply resumed activity after a lull.
+    group_first_seen: dict[str, dt] = {}
     all_recent: list[dict[str, Any]] = []
 
     for key in red_posts.keys():  # type: ignore[union-attr]
@@ -848,6 +852,10 @@ def home():  # type: ignore[no-untyped-def]
             ts = _parse_ts(ts_str)
             if not ts:
                 continue
+            # first-seen per group
+            first = group_first_seen.get(gname)
+            if first is None or ts < first:
+                group_first_seen[gname] = ts
             # 30-day sparkline
             if ts >= win_30d_start:
                 days_ago = (now - ts).days
@@ -883,20 +891,24 @@ def home():  # type: ignore[no-untyped-def]
         top_group, top_group_count = max(group_counts_7d.items(), key=lambda kv: kv[1])
         top_group_share = round(top_group_count / posts_7d_cur * 100.0, 1) if posts_7d_cur else 0.0
 
-    # Movers — top 5 by absolute delta
+    # Movers — top 5 by absolute delta. ``is_new`` means truly new: we have
+    # no record of this group before the current 7-day window. Groups that
+    # merely resumed after a lull fall back to the regular delta badge.
     movers: list[dict[str, Any]] = []
     for g in set(group_counts_7d) | set(group_counts_prev):
         c = group_counts_7d.get(g, 0)
         p = group_counts_prev.get(g, 0)
         if c == 0:
             continue
+        first = group_first_seen.get(g)
+        truly_new = p == 0 and first is not None and first >= win_7d_start
         movers.append({
             "group": g,
             "cur": c,
             "prev": p,
             "raw": c - p,
             "pct": _pct(c, p),
-            "is_new": p == 0,
+            "is_new": truly_new,
         })
     movers.sort(key=lambda m: abs(m["raw"]), reverse=True)
     movers = movers[:5]
@@ -919,6 +931,12 @@ def home():  # type: ignore[no-untyped-def]
     weights = list(logos.values())
     logo = random.choices(paths, weights=weights, k=1)[0]
 
+    # Pair each sparkline value with the date it represents so the template
+    # can render a native SVG <title> tooltip on each bar.
+    spark_30d_dated = [
+        {"day": (now - timedelta(days=(29 - i))).strftime("%Y-%m-%d"), "count": v}
+        for i, v in enumerate(sparkline_30d)
+    ]
     return render_template(
         "index.html",
         date=date, data=data, alert=alert, posts=alertposts, logo=logo,
@@ -931,6 +949,7 @@ def home():  # type: ignore[no-untyped-def]
         top_group_count=top_group_count,
         top_group_share=top_group_share,
         sparkline_30d=sparkline_30d,
+        sparkline_30d_dated=spark_30d_dated,
         movers=movers,
         latest=latest,
     )

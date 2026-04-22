@@ -18,13 +18,13 @@
 
 {%- macro mover_badge(m) -%}
   {%- if m.is_new -%}
-    <span class="delta-badge delta-new">NEW</span>
+    <span class="delta-badge delta-new" title="{{ _('First posts ever observed for this group (not seen before the current period).') }}">NEW</span>
   {%- elif m.raw > 0 -%}
-    <span class="delta-badge delta-up-strong">▲ +{{ m.raw }}</span>
+    <span class="delta-badge delta-up-strong" title="{{ m.raw }} {{ ngettext('post', 'posts', m.raw) }}">▲ {%- if m.pct is not none %} +{{ m.pct }}%{% else %} +{{ m.raw }}{% endif -%}</span>
   {%- elif m.raw < 0 -%}
-    <span class="delta-badge delta-down-strong">▼ {{ m.raw }}</span>
+    <span class="delta-badge delta-down-strong" title="{{ m.raw }} {{ ngettext('post', 'posts', m.raw|abs) }}">▼ {%- if m.pct is not none %} {{ m.pct }}%{% else %} {{ m.raw }}{% endif -%}</span>
   {%- else -%}
-    <span class="delta-badge delta-flat">= 0</span>
+    <span class="delta-badge delta-flat">= 0%</span>
   {%- endif -%}
 {%- endmacro -%}
 
@@ -66,15 +66,15 @@
         {% endif %}
       </div>
       {% set gmax = (sparkline_30d|max) if sparkline_30d|length else 0 %}
-      <svg class="hero-spark" viewBox="0 0 300 48" preserveAspectRatio="none" aria-hidden="true">
+      <svg class="hero-spark" viewBox="0 0 300 48" preserveAspectRatio="none">
         <defs><linearGradient id="hero-spark-grad" x1="0" x2="0" y1="0" y2="1"><stop offset="0%" stop-color="currentColor" stop-opacity=".55"/><stop offset="100%" stop-color="currentColor" stop-opacity="0"/></linearGradient></defs>
-        {% set n = sparkline_30d|length %}
+        {% set n = sparkline_30d_dated|length %}
         {% set bw = ((300 - (n - 1) * 1.5) / n)|round(3) %}
-        {% for v in sparkline_30d %}
-          {% set h = ((v / gmax) * 42)|round(2) if gmax else 0 %}
+        {% for d in sparkline_30d_dated %}
+          {% set h = ((d.count / gmax) * 42)|round(2) if gmax else 0 %}
           {% set x = loop.index0 * (bw + 1.5) %}
           {% set y = 45 - h %}
-          <rect x="{{ x }}" y="{{ y }}" width="{{ bw }}" height="{{ h if h > 0 else 1.2 }}" rx="1" />
+          <rect x="{{ x }}" y="{{ y }}" width="{{ bw }}" height="{{ h if h > 0 else 1.2 }}" rx="1"><title>{{ d.day }} — {{ ngettext('%(n)s post', '%(n)s posts', d.count, n=d.count) }}</title></rect>
         {% endfor %}
       </svg>
     </div>

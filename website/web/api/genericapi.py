@@ -486,6 +486,43 @@ class Posts(Resource):  # type: ignore[misc]
         return {"posts": out}
 
 
+@api.route("/group-first-seen")
+@api.doc(description=(
+    "Return the earliest discovered timestamp of each tracked group "
+    "across the whole post database. Used by the /stats page to tell "
+    "truly new groups apart from groups that merely resumed activity."
+))
+class GroupFirstSeen(Resource):  # type: ignore[misc]
+    def get(self) -> dict[str, str]:
+        red_posts = Valkey(unix_socket_path=get_socket_path("cache"), db=DB_POSTS)
+        out: dict[str, str] = {}
+
+        def _parse_ts(s: str) -> Any:
+            for fmt in ("%Y-%m-%d %H:%M:%S.%f", "%Y-%m-%d %H:%M:%S"):
+                try:
+                    return datetime.strptime(s, fmt)
+                except Exception:
+                    pass
+            return None
+
+        for key in red_posts.keys():  # type: ignore[union-attr]
+            try:
+                entries = json.loads(red_posts.get(key))  # type: ignore[arg-type]
+            except Exception:
+                continue
+            gname = key.decode() if isinstance(key, (bytes, bytearray)) else str(key)
+            earliest: Any = None
+            for entry in entries:
+                ts = _parse_ts(entry.get("discovered") or "")
+                if ts is None:
+                    continue
+                if earliest is None or ts < earliest:
+                    earliest = ts
+            if earliest is not None:
+                out[gname] = earliest.strftime("%Y-%m-%dT%H:%M:%SZ")
+        return out
+
+
 @api.route("/posts/<year>/<month>")
 @api.route("/posts/<year>")
 @api.doc(

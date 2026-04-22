@@ -153,6 +153,19 @@ document.addEventListener('DOMContentLoaded', () => {
     state.raw = posts
       .map(x => ({ g: x.group_name, ts: x.discovered }))
       .filter(x => x.ts);
+
+    // Fetch the first-post-ever timestamp per group so we can tell truly
+    // new groups (first post inside the window) apart from groups merely
+    // resuming activity. Best-effort — if the endpoint is unavailable we
+    // just won't flag anything as NEW (safer than a false positive).
+    if (!state.groupFirstSeen) {
+      try {
+        const r = await fetch('/api/group-first-seen', { headers: { Accept: 'application/json' } });
+        state.groupFirstSeen = r.ok ? await r.json() : {};
+      } catch {
+        state.groupFirstSeen = {};
+      }
+    }
   }
 
   /* ====================================================================
@@ -342,6 +355,13 @@ document.addEventListener('DOMContentLoaded', () => {
     const firstN = first.length, secondN = second.length;
     const trendPct = firstN > 0 ? ((secondN - firstN) / firstN) * 100 : null;
 
+    // First-post-ever per group — fetched once from /api/group-first-seen
+    // so we can reliably flag truly new groups (not just ones that resumed
+    // activity after a lull). Falls back to never flagging NEW if the
+    // endpoint is unreachable.
+    const globalFirst = state.groupFirstSeen || {};
+    const windowStart = sorted.length > 0 ? sorted[0].ts : null;
+
     // Per-group movers
     const firstG = new Map(), secondG = new Map();
     for (const r of first)  firstG.set(r.g,  (firstG.get(r.g)  || 0) + 1);
@@ -353,7 +373,18 @@ document.addEventListener('DOMContentLoaded', () => {
       const c = secondG.get(g) || 0;
       const raw = c - p;
       const pct = p > 0 ? (raw / p) * 100 : null;
-      movers.push({ g, p, c, raw, pct, isNew: p === 0 && c > 0, isGone: c === 0 && p > 0 });
+      // Truly new: group's first ever post (across the whole DB) is at or
+      // after the start of the current window. Without this global source
+      // we cannot distinguish "new group" from "group that resumed", so
+      // we stay silent rather than mislabel.
+      let trulyNew = false;
+      if (windowStart !== null && globalFirst[g]) {
+        const fs = new Date(globalFirst[g]).getTime();
+        trulyNew = fs >= windowStart;
+      }
+      const isNew  = p === 0 && c > 0 && trulyNew;
+      const isGone = c === 0 && p > 0;
+      movers.push({ g, p, c, raw, pct, isNew, isGone });
     }
     movers.sort((a, b) => Math.abs(b.raw) - Math.abs(a.raw));
     return { total, activeGroups, topGroup, topCount, topShare, trendPct, movers };
@@ -387,11 +418,24 @@ document.addEventListener('DOMContentLoaded', () => {
       } else {
         for (const m of top) {
           const li = document.createElement('li');
-          const tag = m.isNew ? '<span class="delta-badge delta-new">NEW</span>'
-                   : m.isGone ? '<span class="delta-badge delta-down-strong">GONE</span>'
-                   : (m.raw > 0 ? '<span class="delta-badge delta-up-strong">▲ +' + m.raw + '</span>'
-                              : m.raw < 0 ? '<span class="delta-badge delta-down-strong">▼ ' + m.raw + '</span>'
-                                          : '<span class="delta-badge delta-flat">= 0</span>');
+          // Consistent formatting: always show a delta with % when possible,
+          // so positive and negative values have the same unit (matches the
+          // "movers-trend" indicator right above this list).
+          const pct = m.pct === null ? null : Math.round(m.pct * 10) / 10;
+          let tag;
+          if (m.isNew) {
+            tag = '<span class="delta-badge delta-new" title="First posts ever observed for this group (not seen before the current window).">NEW</span>';
+          } else if (m.isGone) {
+            tag = '<span class="delta-badge delta-down-strong">GONE</span>';
+          } else if (m.raw > 0) {
+            const pctTxt = pct !== null ? ' +' + pct + '%' : ' +' + m.raw;
+            tag = '<span class="delta-badge delta-up-strong" title="' + m.raw + ' posts">▲' + pctTxt + '</span>';
+          } else if (m.raw < 0) {
+            const pctTxt = pct !== null ? ' ' + pct + '%' : ' ' + m.raw;
+            tag = '<span class="delta-badge delta-down-strong" title="' + m.raw + ' posts">▼' + pctTxt + '</span>';
+          } else {
+            tag = '<span class="delta-badge delta-flat">= 0%</span>';
+          }
           li.innerHTML = `
             <span class="mover-dot" style="background:${colorFor(m.g)}"></span>
             <span class="mover-name" title="${m.g}">${m.g.replace(/\b\w/g, c => c.toUpperCase())}</span>

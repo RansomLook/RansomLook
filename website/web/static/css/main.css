@@ -2161,6 +2161,37 @@ html.light .input-clear:hover{
   .recent-date .t-rel{ display:none; }  /* save space on tiny screens */
 }
 
+/* Collapsible legend block above the recent table — keeps the page scannable
+   while giving first-time visitors a one-click breakdown of each column. */
+.recent-legend {
+  background: var(--card);
+  border: 1px solid var(--border-card);
+  border-radius: 10px;
+  padding: 10px 14px;
+}
+.recent-legend > summary {
+  cursor: pointer;
+  font-weight: 600;
+  font-size: .92rem;
+  color: var(--text);
+  list-style: none;
+}
+.recent-legend > summary::before {
+  content: "▸ ";
+  display: inline-block;
+  margin-right: 4px;
+  transition: transform .15s ease;
+}
+.recent-legend[open] > summary::before { content: "▾ "; }
+.recent-legend__body {
+  margin-top: 10px;
+  font-size: .9rem;
+  color: var(--muted);
+}
+.recent-legend__body ul { margin: 0; padding-left: 18px; }
+.recent-legend__body li { margin: 4px 0; }
+.recent-legend__body strong { color: var(--text); }
+
 /* ===========================
    HOT / TRENDING PAGE
    =========================== */

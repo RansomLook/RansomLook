@@ -39,7 +39,7 @@
         <span class="activity-label">{{ _('Activity · last 24h') }}</span>
         <span class="spark-total">{{ ngettext('%(n)s post', '%(n)s posts', total24, n=total24) }}</span>
       </div>
-      <svg class="hero-spark" viewBox="0 0 300 48" preserveAspectRatio="none" aria-hidden="true">
+      <svg class="hero-spark" viewBox="0 0 300 48" preserveAspectRatio="none">
         <defs><linearGradient id="hero-spark-grad" x1="0" x2="0" y1="0" y2="1"><stop offset="0%" stop-color="currentColor" stop-opacity=".55"/><stop offset="100%" stop-color="currentColor" stop-opacity="0"/></linearGradient></defs>
         {% set n = activity|length %}
         {% set bw = ((300 - (n - 1) * 1.5) / n)|round(3) %}
@@ -47,8 +47,9 @@
           {% set h = ((v / maxv) * 42)|round(2) if maxv else 0 %}
           {% set x = loop.index0 * (bw + 1.5) %}
           {% set y = 45 - h %}
+          {% set hours_ago = 23 - loop.index0 %}
           <rect x="{{ x }}" y="{{ y }}" width="{{ bw }}" height="{{ h if h > 0 else 1.2 }}" rx="1">
-            <title>{{ 23 - loop.index0 }}h ago · {{ v }} post{{ '' if v == 1 else 's' }}</title>
+            <title>{% if hours_ago == 0 %}{{ _('now') }}{% else %}-{{ hours_ago }}h{% endif %} — {{ ngettext('%(n)s post', '%(n)s posts', v, n=v) }}</title>
           </rect>
         {% endfor %}
       </svg>
@@ -82,6 +83,18 @@
       </select>
       <span id="recent-count" class="recent-count"></span>
     </div>
+
+    {# Quick legend — collapsed by default, helps first-time visitors decode the row layout. #}
+    <details class="recent-legend pad-mb" data-accordion>
+      <summary>{{ _('How to read this page') }}</summary>
+      <div class="recent-legend__body">
+        <ul>
+          <li><strong>{{ _('Date') }}</strong> — {{ _('when RansomLook first observed the post (UTC, displayed in your local timezone).') }}</li>
+          <li><strong>{{ _('Title') }}</strong> — {{ _('victim name as published by the group, kept verbatim. May include domain, country code or short description.') }}</li>
+          <li><strong>{{ _('Group') }}</strong> — {{ _('coloured dot is the group identity (consistent across the site so you can spot recurring actors faster). Click it to open the group page with all posts, mirrors and crypto wallets.') }}</li>
+        </ul>
+      </div>
+    </details>
 
     {% if data and data|length %}
       <div class="table-card">
