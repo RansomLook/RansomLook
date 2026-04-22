@@ -3,6 +3,7 @@
 {% block title %}{{ _('Admin · Torrent Health') }}{% endblock %}
 
 {% block content %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/torrent_health.css') }}" integrity="{{ get_sri('static', 'torrent_health.css') }}">
 {{ render_messages(container=True, dismissible=True) }}
 
 <section class="hero">
@@ -67,14 +68,14 @@
         <table class="rl-table" id="th-table" aria-label="{{ _('Torrent swarms') }}">
           <thead>
             <tr>
-              <th class="th-sort" data-sort="name" style="width:20%;cursor:pointer">{{ _('Name') }} <span class="th-sort-ind"></span></th>
-              <th class="th-sort" data-sort="size" style="width:9%;cursor:pointer"><center>{{ _('Size') }} <span class="th-sort-ind"></span></center></th>
-              <th style="width:14%">{{ _('Groups') }}</th>
-              <th style="width:19%">{{ _('Infohash') }}</th>
-              <th class="th-sort" data-sort="peers" data-sort-default="desc" style="width:7%;cursor:pointer"><center>{{ _('Peers') }} <span class="th-sort-ind">▼</span></center></th>
-              <th class="th-sort" data-sort="seed" style="width:8%;cursor:pointer"><center>{{ _('Seed / Leech') }} <span class="th-sort-ind"></span></center></th>
-              <th class="th-sort" data-sort="scan" style="width:10%;cursor:pointer"><center>{{ _('Last scan') }} <span class="th-sort-ind"></span></center></th>
-              <th style="width:13%"><center>{{ _('Actions') }}</center></th>
+              <th style="width:20%" class="ts-sort" data-sort="name">{{ _('Name') }}</th>
+              <th style="width:7%" class="ts-sort" data-sort="size"><center>{{ _('Size') }}</center></th>
+              <th style="width:10%">{{ _('Groups') }}</th>
+              <th style="width:15%">{{ _('Infohash') }}</th>
+              <th style="width:9%" class="ts-sort" data-sort="peers" data-sort-default="desc"><center>{{ _('Peers') }} ▼</center></th>
+              <th style="width:12%" class="ts-sort" data-sort="seed"><center>{{ _('Seed / Leech') }}</center></th>
+              <th style="width:10%" class="ts-sort" data-sort="scan"><center>{{ _('Last scan') }}</center></th>
+              <th style="width:17%"><center>{{ _('Actions') }}</center></th>
             </tr>
           </thead>
           <tbody>
@@ -83,10 +84,7 @@
             {% set seeders = r.last_seeders or 0 %}
             {% set leechers = r.last_leechers or 0 %}
             {% set size_b = r.size_bytes or 0 %}
-            {% if peers == 0 %}{% set row_cls = 'th-row-dead' %}
-            {% elif peers < 5 %}{% set row_cls = 'th-row-degraded' %}
-            {% else %}{% set row_cls = 'th-row-alive' %}{% endif %}
-            <tr class="th-row {{ row_cls }}"
+            <tr class="th-row"
                 data-ih="{{ r.infohash }}"
                 data-name="{{ (r.name or '')|lower }}"
                 data-name-sort="{{ (r.name or '~')|lower }}"
@@ -131,8 +129,7 @@
                 {% else %}<span class="muted">{{ _('never') }}</span>{% endif %}
               </center></td>
               <td><center>
-                <a class="btn btn-secondary btn-sm"
-                   href="{{ url_for('admin_torrent_health_detail', infohash=r.infohash) }}">{{ _('Detail') }}</a>
+                <a class="btn btn-secondary btn-sm" href="{{ url_for('admin_torrent_health_detail', infohash=r.infohash) }}">{{ _('Detail') }}</a>
                 <button class="btn btn-primary btn-sm th-refresh" data-ih="{{ r.infohash }}">{{ _('Refresh') }}</button>
               </center></td>
             </tr>
@@ -150,54 +147,6 @@
 
   </div>
 </section>
-
-<style>
-/* Force the declared <th> widths to stick on the data rows. Without this,
-   the browser's auto layout resizes columns to fit contents and the header
-   drifts out of alignment with its cells. */
-#th-table { table-layout: fixed; }
-#th-table td, #th-table th { overflow: hidden; text-overflow: ellipsis; }
-#th-table td.mono, #th-table .mono { word-break: break-all; white-space: normal; }
-#th-table .btn-sm { padding: 3px 8px; font-size: 11px; }
-
-/* Row tinting by health — very subtle so it doesn't fight the badge. */
-#th-table tr.th-row-dead     td { background: rgba(220,53,69,0.06); }
-#th-table tr.th-row-degraded td { background: rgba(255,193,7,0.06); }
-#th-table tr.th-row-alive    td { background: rgba(40,167,69,0.05); }
-
-.kpi-card {
-  background: var(--card);
-  border: 1px solid var(--border-card);
-  border-radius: 10px;
-  padding: 14px 16px;
-  text-align: center;
-}
-.kpi-card .kpi-label { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: .06em; }
-.kpi-card .kpi-value { font-size: 28px; font-weight: 700; margin-top: 6px; color: var(--text); }
-.kpi-card.kpi-up    .kpi-value { color: var(--success-text); }
-.kpi-card.kpi-down  .kpi-value { color: var(--danger-text); }
-
-.th-chip {
-  background: var(--surface-btn);
-  border: 1px solid var(--border);
-  border-radius: 999px;
-  padding: 4px 12px;
-  font-size: 12px;
-  color: var(--text);
-  cursor: pointer;
-  line-height: 1.3;
-}
-.th-chip:hover { background: var(--surface-hover); border-color: var(--border-hover); }
-.th-chip-active {
-  background: var(--pri-bright);
-  color: #fff;
-  border-color: var(--pri-bright);
-}
-.th-chip-active:hover { background: var(--pri-deep); border-color: var(--pri-deep); }
-
-.th-sort .th-sort-ind { font-size: 10px; opacity: .55; margin-left: 4px; }
-.th-sort:hover .th-sort-ind { opacity: 1; }
-</style>
 
 <script>
 (() => {
@@ -247,8 +196,8 @@
   let currentSort = { key: 'peers', dir: 'desc' };
 
   function renderSort() {
-    document.querySelectorAll('.th-sort').forEach(th => {
-      const ind = th.querySelector('.th-sort-ind');
+    document.querySelectorAll('.ts-sort').forEach(th => {
+      const ind = th.querySelector('.ts-sort-ind');
       if (!ind) return;
       if (th.dataset.sort === currentSort.key) {
         ind.textContent = currentSort.dir === 'desc' ? '▼' : '▲';
@@ -274,7 +223,7 @@
     renderSort();
   }
 
-  document.querySelectorAll('.th-sort').forEach(th => th.addEventListener('click', () => {
+  document.querySelectorAll('.ts-sort').forEach(th => th.addEventListener('click', () => {
     const key = th.dataset.sort;
     if (currentSort.key === key) {
       currentSort.dir = currentSort.dir === 'desc' ? 'asc' : 'desc';

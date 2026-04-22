@@ -1,0 +1,22 @@
+/* ===== Infohash line in the hero ===== */
+.th-ih-line { word-break: break-all; }
+
+/* ===== Magnets list ===== */
+.th-magnets-list { margin: 6px 0; }
+.th-magnets-list li { word-break: break-all; }
+
+/* ===== Sparkline SVG ===== */
+.th-sparkline { width: 100%; height: 80px; }
+
+/* ===== History section ===== */
+.th-history-details { margin-top: 16px; }
+.th-history-caret-col { width: 30px; }
+
+/* ===== Clickable history rows ===== */
+#th-history .th-hist-row { cursor: pointer; }
+
+/* ===== Peer enrichment cells ===== */
+.th-ptr-cell { font-size: 0.8rem; }
+
+/* ===== Inline history peers table ===== */
+.th-peers-inline { margin: 8px 0; }

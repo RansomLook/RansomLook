@@ -3,12 +3,13 @@
 {% block title %}{{ _('Admin · Torrent · %(ih)s…', ih=meta.infohash[:12]) }}{% endblock %}
 
 {% block content %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/torrent_health_detail.css') }}" integrity="{{ get_sri('static', 'torrent_health_detail.css') }}">
 {{ render_messages(container=True, dismissible=True) }}
 
 <section class="hero">
   <div class="container">
     <h1>{{ meta.name or _('(unknown)') }}</h1>
-    <p class="lead mono" style="word-break:break-all">{{ meta.infohash }}</p>
+    <p class="lead mono th-ih-line">{{ meta.infohash }}</p>
     <div class="cta-row">
       <a class="btn btn-secondary" href="{{ url_for('admin_torrent_health') }}">← {{ _('Back') }}</a>
       <button class="btn btn-primary th-refresh" data-ih="{{ meta.infohash }}">{{ _('Refresh now') }}</button>
@@ -54,8 +55,8 @@
       {% if not meta.groups %}<span class="muted">—</span>{% endif %}
       <br>
       <strong>{{ _('Magnets:') }}</strong>
-      <ul class="tight" style="margin:6px 0">
-        {% for m in meta.magnets or [] %}<li class="mono" style="word-break:break-all">{{ m }}</li>{% endfor %}
+      <ul class="tight th-magnets-list">
+        {% for m in meta.magnets or [] %}<li class="mono">{{ m }}</li>{% endfor %}
       </ul>
       <strong>{{ _('Known since:') }}</strong> {{ meta.first_seen or '—' }}<br>
       <strong>{{ _('Last scan:') }}</strong> {{ meta.last_scan or '—' }}
@@ -67,7 +68,7 @@
       <div class="card-toolbar bb"><span class="fw-600">{{ _('Peers over time (last 30 days)') }}</span></div>
       {% set values = meta.sparkline | map(attribute='peers_count') | list %}
       {% set vmax = (values | max) if values else 0 %}
-      <svg viewBox="0 0 600 80" preserveAspectRatio="none" style="width:100%;height:80px">
+      <svg viewBox="0 0 600 80" preserveAspectRatio="none" class="th-sparkline">
         {% set n = values | length %}
         {% set bw = ((600 - (n - 1) * 1.5) / n) | round(3) %}
         {% for v in values %}
@@ -112,7 +113,7 @@
               <td class="enrich-asn"><span class="muted">…</span></td>
               <td class="enrich-org"><span class="muted">…</span></td>
               <td class="enrich-cc"><center><span class="muted">…</span></center></td>
-              <td class="enrich-ptr mono" style="font-size:.8rem"><span class="muted">…</span></td>
+              <td class="enrich-ptr mono th-ptr-cell"><span class="muted">…</span></td>
               <td><code>{{ p.flags }}</code></td>
             </tr>
             {% endfor %}
@@ -126,7 +127,7 @@
 
     <!-- Full history — expand a row to see that scan's peer sample -->
     {% if history %}
-    <details class="section-block" style="margin-top:16px" data-accordion open>
+    <details class="section-block th-history-details" data-accordion open>
       <summary class="section-summary">
         <span>{{ _('All scans (click a row to show its peer sample)') }}</span><span class="count">{{ history | length }}</span>
       </summary>
@@ -135,7 +136,7 @@
           <table class="rl-table" aria-label="{{ _('History') }}" id="th-history">
             <thead>
               <tr>
-                <th style="width:30px"></th>
+                <th class="th-history-caret-col"></th>
                 <th>{{ _('Timestamp') }}</th>
                 <th><center>{{ _('Seeders') }}</center></th>
                 <th><center>{{ _('Leechers') }}</center></th>
@@ -144,7 +145,7 @@
             </thead>
             <tbody>
               {% for h in history %}
-              <tr class="th-hist-row" data-peers='{{ h.peers|tojson }}' data-ts="{{ h.ts }}" style="cursor:pointer">
+              <tr class="th-hist-row" data-peers='{{ h.peers|tojson }}' data-ts="{{ h.ts }}">
                 <td><center>{% if h.peers %}<span class="th-caret" aria-hidden="true">▸</span>{% else %}<span class="muted">·</span>{% endif %}</center></td>
                 <td><time datetime="{{ h.ts }}">{{ h.ts }}</time></td>
                 <td><center>{{ h.seeders }}</center></td>
@@ -175,11 +176,11 @@
         <td class="enrich-asn"><span class="muted">…</span></td>
         <td class="enrich-org"><span class="muted">…</span></td>
         <td class="enrich-cc"><center><span class="muted">…</span></center></td>
-        <td class="enrich-ptr mono" style="font-size:.8rem"><span class="muted">…</span></td>
+        <td class="enrich-ptr mono th-ptr-cell"><span class="muted">…</span></td>
         <td><code>${p.flags || '-'}</code></td>
       </tr>`).join('');
     return `
-      <div class="table-scroll"><table class="rl-table th-peers" style="margin:8px 0">
+      <div class="table-scroll"><table class="rl-table th-peers th-peers-inline">
         <thead><tr>
           <th style="width:13%">IP</th><th style="width:6%"><center>Port</center></th>
           <th style="width:7%"><center>Progress</center></th><th style="width:14%">Client</th>

@@ -39,7 +39,7 @@ from dataclasses import dataclass, field
 from datetime import datetime, timedelta, timezone
 from typing import Any
 
-import libtorrent as lt  # type: ignore[import-untyped]
+import libtorrent as lt  # type: ignore[import-untyped, import-not-found, unused-ignore]
 import valkey
 
 from .default import DB_POSTS, DB_TORRENT_HEALTH, get_socket_path
@@ -205,7 +205,7 @@ def _self_ips(sess: lt.session) -> set[str]:
     try:
         host = _sk.gethostname()
         for entry in _sk.getaddrinfo(host, None):
-            ips.add(entry[4][0])
+            ips.add(str(entry[4][0]))
     except Exception:
         pass
     try:
@@ -491,8 +491,9 @@ def store_scan(result: ScanResult, magnets: list[str], groups: list[str]) -> Non
         cutoff = (result.ts - timedelta(seconds=scan_ttl)).timestamp()
         r.zremrangebyscore(scans_key, "-inf", cutoff)
 
-    # Update meta
-    existing = r.hgetall(meta_key) or {}
+    # Update meta. valkey-py's hgetall is typed as Awaitable|dict for async/sync
+    # parity; this module is sync only, so narrow the type for mypy.
+    existing: dict[bytes, bytes] = r.hgetall(meta_key) or {}  # type: ignore[assignment]
     existing_first_seen = existing.get(b"first_seen", b"").decode() if existing else ""
     sparkline_raw = existing.get(b"sparkline", b"[]").decode() if existing else "[]"
     try:
@@ -531,7 +532,7 @@ def list_infohashes() -> list[str]:
 
 def get_meta(infohash: str) -> dict[str, Any] | None:
     r = _redis()
-    raw = r.hgetall(f"torrent_health:meta:{infohash}")
+    raw: dict[bytes, bytes] = r.hgetall(f"torrent_health:meta:{infohash}")  # type: ignore[assignment]
     if not raw:
         return None
     out: dict[str, Any] = {}
@@ -558,11 +559,11 @@ def get_history(infohash: str, limit: int | None = None) -> list[dict[str, Any]]
     """Return scans ordered from newest to oldest. ``limit`` caps result size."""
     r = _redis()
     scans_key = f"torrent_health:scans:{infohash}"
-    members = r.zrevrange(scans_key, 0, (limit or -1) - (0 if limit is None else 1))
+    members: list[bytes] = r.zrevrange(scans_key, 0, (limit or -1) - (0 if limit is None else 1))  # type: ignore[assignment]
     out = []
     for m in members:
         ts = m.decode()
-        raw = r.get(f"torrent_health:scan:{infohash}:{ts}")
+        raw: bytes | None = r.get(f"torrent_health:scan:{infohash}:{ts}")  # type: ignore[assignment]
         if raw:
             try:
                 out.append(json.loads(raw))
@@ -573,11 +574,11 @@ def get_history(infohash: str, limit: int | None = None) -> list[dict[str, Any]]
 
 def get_scan(infohash: str, ts_iso: str) -> dict[str, Any] | None:
     r = _redis()
-    raw = r.get(f"torrent_health:scan:{infohash}:{ts_iso}")
+    raw: bytes | None = r.get(f"torrent_health:scan:{infohash}:{ts_iso}")  # type: ignore[assignment]
     if not raw:
         return None
     try:
-        return json.loads(raw)  # type: ignore[no-any-return]
+        return json.loads(raw)
     except Exception:
         return None
 
@@ -618,10 +619,10 @@ def collect_magnets() -> dict[str, dict[str, Any]]:
     """
     posts_r = valkey.Valkey(unix_socket_path=get_socket_path("cache"), db=DB_POSTS)
     out: dict[str, dict[str, Any]] = {}
-    for key in posts_r.scan_iter():  # type: ignore[union-attr]
+    for key in posts_r.scan_iter():
         try:
             group = key.decode()
-            raw = posts_r.get(key)
+            raw: bytes | None = posts_r.get(key)  # type: ignore[assignment]
             if not raw:
                 continue
             posts = json.loads(raw)
@@ -776,20 +777,20 @@ def run_once(
             continue
         seen = set()
         for result in results:
-            data = by_infohash.get(result.infohash)
-            if not data:
+            entry: dict[str, Any] | None = by_infohash.get(result.infohash)
+            if not entry:
                 # infohash may differ (v1 vs v2); fall back to first batch entry not yet seen
                 for ih, d in batch:
                     if ih not in seen:
-                        data = d
+                        entry = d
                         seen.add(ih)
                         break
             else:
                 seen.add(result.infohash)
-            if not data:
+            if not entry:
                 continue
             try:
-                store_scan(result, data["magnets"], data["groups"])
+                store_scan(result, entry["magnets"], entry["groups"])
                 scanned += 1
                 logger.info(
                     "scanned %s: %d peers (%d seed / %d leech)",

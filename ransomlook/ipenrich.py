@@ -82,7 +82,7 @@ def _http_json(url: str, method: str = "GET", body: dict[str, Any] | None = None
     try:
         with urllib.request.urlopen(req, timeout=HTTP_TIMEOUT) as resp:
             raw = resp.read()
-        return json.loads(raw)  # type: ignore[no-any-return]
+        return json.loads(raw)
     except Exception as e:
         logger.debug("HTTP %s %s failed: %s", method, url, e)
         return None
@@ -143,7 +143,7 @@ def enrich(ip: str, force: bool = False) -> dict[str, Any]:
     r = _redis()
     key = _cache_key(ip)
     if not force:
-        raw = r.get(key)
+        raw: bytes | None = r.get(key)  # type: ignore[assignment]
         if raw:
             try:
                 cached = json.loads(raw)
@@ -197,7 +197,7 @@ def collect_torrent_health_ips() -> set[str]:
     ips: set[str] = set()
     for raw_key in r.scan_iter(match="torrent_health:scan:*"):
         try:
-            raw = r.get(raw_key)
+            raw: bytes | None = r.get(raw_key)  # type: ignore[assignment]
             if not raw:
                 continue
             payload = json.loads(raw)

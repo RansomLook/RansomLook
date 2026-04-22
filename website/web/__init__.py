@@ -41,7 +41,7 @@ from flask import (
     url_for,
 )
 from flask_babel import Babel  # type: ignore[import-untyped]
-from flask_babel import get_locale as _babel_get_locale  # type: ignore[import-untyped]
+from flask_babel import get_locale as _babel_get_locale
 from flask_bootstrap import Bootstrap5  # type: ignore
 from flask_login import current_user
 from flask_restx import Api  # type: ignore
@@ -2692,7 +2692,7 @@ def admin_torrent_health():  # type: ignore[no-untyped-def]
 
 
 @app.route("/admin/torrent-health/<infohash>")
-@flask_login.login_required
+@flask_login.login_required  # type: ignore[untyped-decorator, unused-ignore]
 def admin_torrent_health_detail(infohash: str):  # type: ignore[no-untyped-def]
     from ransomlook import torrent_health as th
 

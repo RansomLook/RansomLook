@@ -87,7 +87,7 @@ def main() -> int:
         return 2
     print(f"Clop key in DB_POSTS: {key!r}")
 
-    raw = red.get(key)
+    raw: bytes | None = red.get(key)  # type: ignore[assignment]
     if not raw:
         print("error: empty value for", key, file=sys.stderr)
         return 2

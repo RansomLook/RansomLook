@@ -2187,7 +2187,7 @@ msgstr "groupes"
 
 #: website/web/templates/admin/torrent_health_detail.html:56
 msgid "Magnets:"
-msgstr "marchés"
+msgstr "Magnets"
 
 #: website/web/templates/admin/torrent_health_detail.html:60
 msgid "Known since:"
