@@ -10,6 +10,7 @@ parse = "bin.parse:main"
 screen = "bin.screen:main"
 torrent = "bin.torrent:main"
 torrent-health = "bin.torrent_health:main"
+torrent-tracker-scrape = "bin.torrent_tracker_scrape:main"
 enrich-ips = "bin.enrich_ips:main"
 notify = "bin.notify:main"
 notifyleak = "bin.notifyleak:main"
@@ -39,7 +40,7 @@ valkey = "^6.1.0"
 # parsing / web
 tldextract = "^5.3.0"
 bs4 = "^0.0.2"
-requests = "^2.32.0"
+requests = {extras = ["socks"], version = "^2.32.0"}
 python-dateutil = "^2.9.0"
 # social / integrations
 mastodon-py = "^2.1.3"
