@@ -192,6 +192,19 @@ def _extract_torrent_metadata(ti: Any) -> dict[str, Any]:
     except Exception:
         pass
 
+    # BEP-19 webseeds (url-list / httpseeds). Huge intel value for ransomware
+    # leaks: each entry is a direct HTTP URL to the file served by the
+    # operator's own mirror infrastructure — often still alive when the BT
+    # swarm is empty.
+    webseeds: list[str] = []
+    try:
+        for w in (ti.web_seeds() or []):
+            url = getattr(w, "url", None) or (w.get("url") if isinstance(w, dict) else None)
+            if url:
+                webseeds.append(str(url))
+    except Exception:
+        pass
+
     files: list[dict[str, Any]] = []
     try:
         fs = ti.files()
@@ -210,6 +223,7 @@ def _extract_torrent_metadata(ti: Any) -> dict[str, Any]:
 
     return {
         "trackers": trackers,
+        "webseeds": webseeds,
         "files": files,
         "num_files": len(files),
         "created_by": _s(getattr(ti, "creator", lambda: "")),
@@ -630,6 +644,10 @@ def store_scan(result: ScanResult, magnets: list[str], groups: list[str]) -> Non
         if md.get("trackers"):
             merged_trackers = sorted(set(existing_trackers + md["trackers"]))
             mapping["trackers"] = json.dumps(merged_trackers)
+        existing_webseeds = json.loads(existing.get(b"webseeds", b"[]").decode() or "[]") if existing else []
+        if md.get("webseeds"):
+            merged_webseeds = sorted(set(existing_webseeds + md["webseeds"]))
+            mapping["webseeds"] = json.dumps(merged_webseeds)
         for key in ("created_by", "creation_date", "comment", "piece_length", "num_pieces"):
             val = md.get(key)
             if val in (None, "", 0):
@@ -688,7 +706,7 @@ def get_meta(infohash: str) -> dict[str, Any] | None:
         key = k.decode()
         val = v.decode()
         if key in ("magnets", "groups", "sparkline", "files", "trackers",
-                   "tracker_history"):
+                   "webseeds", "tracker_history"):
             try:
                 out[key] = json.loads(val)
             except Exception:
@@ -1156,7 +1174,45 @@ def parse_magnet_or_torrent(source: str) -> dict[str, Any]:
             name = (atp.name or "") if hasattr(atp, "name") else ""
         except Exception:
             pass
-        return {"infohash": ih, "magnet": source, "name": name, "size_bytes": 0}
+        # Magnets can carry trackers (tr=) and webseeds (ws=). Both are BEP
+        # extensions that the libtorrent parser already splits out into the
+        # add_torrent_params object — capture them so BEP-48 scrape + the
+        # detail page see the full picture even before DHT metadata arrives.
+        magnet_trackers: list[str] = []
+        try:
+            for t in (atp.trackers or []):
+                url = t.get("url") if isinstance(t, dict) else getattr(t, "url", str(t))
+                if url:
+                    magnet_trackers.append(str(url))
+        except Exception:
+            pass
+        magnet_webseeds: list[str] = []
+        try:
+            # ``url_seeds`` → BEP-19 (http), ``http_seeds`` → BEP-17 (deprecated).
+            for attr in ("url_seeds", "http_seeds"):
+                for w in (getattr(atp, attr, []) or []):
+                    if w:
+                        magnet_webseeds.append(str(w))
+        except Exception:
+            pass
+        return {
+            "infohash": ih,
+            "magnet": source,
+            "name": name,
+            "size_bytes": 0,
+            "metadata": {
+                "trackers": magnet_trackers,
+                "webseeds": magnet_webseeds,
+                "files": [],
+                "num_files": 0,
+                "created_by": "",
+                "creation_date": 0,
+                "comment": "",
+                "private": False,
+                "piece_length": 0,
+                "num_pieces": 0,
+            },
+        }
 
     # Treat as a .torrent file path.
     try:
@@ -1224,6 +1280,9 @@ def add_manual_torrent(group: str, magnet_or_path: str) -> dict[str, Any]:
         existing_trackers = json.loads(existing.get(b"trackers", b"[]").decode() or "[]") if existing else []
         if md.get("trackers"):
             mapping["trackers"] = json.dumps(sorted(set(existing_trackers + md["trackers"])))
+        existing_webseeds = json.loads(existing.get(b"webseeds", b"[]").decode() or "[]") if existing else []
+        if md.get("webseeds"):
+            mapping["webseeds"] = json.dumps(sorted(set(existing_webseeds + md["webseeds"])))
         for key in ("created_by", "creation_date", "comment", "piece_length", "num_pieces"):
             val = md.get(key)
             if val in (None, "", 0):

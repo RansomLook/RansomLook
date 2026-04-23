@@ -113,25 +113,26 @@ def _encode_infohash(ih_hex: str) -> str:
 
 
 # ─── scraping ───────────────────────────────────────────────────────────
-def scrape_tracker(scrape_url: str, infohashes: list[str], *, tor: bool,
-                   timeout: int = DEFAULT_TIMEOUT) -> dict[str, dict[str, int]]:
-    """Issue a single HTTP ``/scrape`` for a batch of infohashes.
-
-    Returns ``{ih_hex: {complete, incomplete, downloaded}}``. Missing
-    infohashes (unknown to the tracker) are simply absent from the result.
-    """
-    if not infohashes:
-        return {}
+def _do_scrape_request(scrape_url: str, infohashes: list[str], *, tor: bool,
+                       timeout: int) -> dict[str, dict[str, int]]:
     qs = "&".join(f"info_hash={_encode_infohash(ih)}" for ih in infohashes)
     sep = "&" if urlparse(scrape_url).query else "?"
     url = f"{scrape_url}{sep}{qs}"
     proxies = {"http": TOR_PROXY, "https": TOR_PROXY} if tor else None
+    logger.debug("GET %s (%d infohashes)", scrape_url, len(infohashes))
     r = requests.get(url, headers={"User-Agent": USER_AGENT},
                      proxies=proxies, timeout=timeout)
     r.raise_for_status()
-    decoded = _bdecode(r.content)
+    raw = r.content
+    logger.debug("response %d bytes: %s", len(raw), raw[:200])
+    decoded = _bdecode(raw)
     if not isinstance(decoded, dict):
         raise ValueError("scrape: non-dict response")
+    if b"failure reason" in decoded:
+        reason = decoded[b"failure reason"]
+        if isinstance(reason, (bytes, bytearray)):
+            reason = reason.decode("utf-8", "replace")
+        raise ValueError(f"tracker failure: {reason}")
     files = decoded.get(b"files") or {}
     if not isinstance(files, dict):
         raise ValueError("scrape: 'files' key missing or wrong type")
@@ -146,6 +147,34 @@ def scrape_tracker(scrape_url: str, infohashes: list[str], *, tor: bool,
             "incomplete": int(stats.get(b"incomplete", 0) or 0),
             "downloaded": int(stats.get(b"downloaded", 0) or 0),
         }
+    return out
+
+
+def scrape_tracker(scrape_url: str, infohashes: list[str], *, tor: bool,
+                   timeout: int = DEFAULT_TIMEOUT) -> dict[str, dict[str, int]]:
+    """Issue a single HTTP ``/scrape`` for a batch of infohashes.
+
+    Returns ``{ih_hex: {complete, incomplete, downloaded}}``. Missing
+    infohashes (unknown to the tracker) are simply absent from the result.
+
+    Some trackers reject multi-infohash batches (not all implement BEP-48
+    fully). On empty results from a batch of >1, we fall back to one
+    request per infohash — slower but always works.
+    """
+    if not infohashes:
+        return {}
+    out = _do_scrape_request(scrape_url, infohashes, tor=tor, timeout=timeout)
+    if not out and len(infohashes) > 1:
+        logger.info("batch returned 0 — tracker likely single-infohash only, falling back")
+        merged: dict[str, dict[str, int]] = {}
+        for ih in infohashes:
+            try:
+                one = _do_scrape_request(scrape_url, [ih], tor=tor, timeout=timeout)
+            except Exception as e:
+                logger.debug("single scrape %s: %s", ih, e)
+                continue
+            merged.update(one)
+        return merged
     return out
 
 

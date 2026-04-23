@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version:  RansomLook\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-04-23 14:01+0200\n"
+"POT-Creation-Date: 2026-04-23 14:19+0200\n"
 "PO-Revision-Date: 2026-04-21 13:39+0200\n"
 "Last-Translator: RansomLook team\n"
 "Language: fr\n"
@@ -139,7 +139,7 @@ msgstr "Infos supplémentaires RF"
 #: website/web/templates/admin/torrent_manage.html:84
 #: website/web/templates/leaks.html:82
 #: website/web/templates/torrent_health.html:75
-#: website/web/templates/torrent_health_detail.html:141
+#: website/web/templates/torrent_health_detail.html:149
 msgid "Size"
 msgstr "Taille"
 
@@ -1487,8 +1487,8 @@ msgstr ""
 
 #: website/web/templates/glossary.html:134
 #: website/web/templates/torrent_health.html:78
-#: website/web/templates/torrent_health_detail.html:193
-#: website/web/templates/torrent_health_detail.html:244
+#: website/web/templates/torrent_health_detail.html:201
+#: website/web/templates/torrent_health_detail.html:252
 #: website/web/templates/torrent_ip.html:85
 msgid "Peers"
 msgstr "Pairs"
@@ -2277,7 +2277,7 @@ msgid "IPs in this ASN"
 msgstr "IPs de cet ASN"
 
 #: website/web/templates/torrent_asn.html:47
-#: website/web/templates/torrent_health_detail.html:196
+#: website/web/templates/torrent_health_detail.html:204
 #: website/web/templates/torrent_pivot.html:64
 #: website/web/templates/torrent_pivot.html:97
 #: website/web/templates/torrent_pivot.html:199
@@ -2508,93 +2508,97 @@ msgid "Trackers"
 msgstr "Trackers"
 
 #: website/web/templates/torrent_health_detail.html:138
+msgid "Webseeds (HTTP mirrors, BEP-19)"
+msgstr "Webseeds (mirrors HTTP, BEP-19)"
+
+#: website/web/templates/torrent_health_detail.html:146
 msgid "File tree"
 msgstr "Arborescence"
 
-#: website/web/templates/torrent_health_detail.html:141
+#: website/web/templates/torrent_health_detail.html:149
 msgid "Path"
 msgstr "Chemin"
 
-#: website/web/templates/torrent_health_detail.html:156
+#: website/web/templates/torrent_health_detail.html:164
 #, python-format
 msgid "… %(n)s more files truncated"
 msgstr "… %(n)s fichiers supplémentaires tronqués"
 
-#: website/web/templates/torrent_health_detail.html:169
+#: website/web/templates/torrent_health_detail.html:177
 msgid "Peers over time (last 30 days)"
 msgstr "Peers dans le temps (30 derniers jours)"
 
-#: website/web/templates/torrent_health_detail.html:189
+#: website/web/templates/torrent_health_detail.html:197
 #, python-format
 msgid "Peer sample — %(ts)s"
 msgstr "Échantillon de peers — %(ts)s"
 
-#: website/web/templates/torrent_health_detail.html:190
+#: website/web/templates/torrent_health_detail.html:198
 #, python-format
 msgid "%(n)s peer · enrichment via CIRCL IP ASN History"
 msgid_plural "%(n)s peers · enrichment via CIRCL IP ASN History"
 msgstr[0] ""
 msgstr[1] ""
 
-#: website/web/templates/torrent_health_detail.html:197
+#: website/web/templates/torrent_health_detail.html:205
 msgid "Port"
 msgstr "Tri"
 
-#: website/web/templates/torrent_health_detail.html:198
+#: website/web/templates/torrent_health_detail.html:206
 msgid "Progress"
 msgstr "publications"
 
-#: website/web/templates/torrent_health_detail.html:199
+#: website/web/templates/torrent_health_detail.html:207
 msgid "Client"
 msgstr "Récents"
 
-#: website/web/templates/torrent_health_detail.html:200
+#: website/web/templates/torrent_health_detail.html:208
 #: website/web/templates/torrent_pivot.html:128
 #: website/web/templates/torrent_pivot.html:161
 msgid "ASN"
 msgstr "ASN"
 
-#: website/web/templates/torrent_health_detail.html:201
+#: website/web/templates/torrent_health_detail.html:209
 msgid "Org"
 msgstr "Org"
 
-#: website/web/templates/torrent_health_detail.html:202
+#: website/web/templates/torrent_health_detail.html:210
 msgid "CC"
 msgstr "CC"
 
-#: website/web/templates/torrent_health_detail.html:203
+#: website/web/templates/torrent_health_detail.html:211
 msgid "PTR"
 msgstr "PTR"
 
-#: website/web/templates/torrent_health_detail.html:204
+#: website/web/templates/torrent_health_detail.html:212
 msgid "Flags"
 msgstr "stable"
 
-#: website/web/templates/torrent_health_detail.html:210
+#: website/web/templates/torrent_health_detail.html:218
 msgid "Pivot on this IP"
 msgstr "Pivoter sur cette IP"
 
-#: website/web/templates/torrent_health_detail.html:226
+#: website/web/templates/torrent_health_detail.html:234
 msgid "No peers observed on the last scan."
 msgstr "Aucun peer observé lors du dernier scan."
 
-#: website/web/templates/torrent_health_detail.html:233
+#: website/web/templates/torrent_health_detail.html:241
 msgid "All scans (click a row to show its peer sample)"
 msgstr "Tous les scans (cliquer sur une ligne pour voir son échantillon de peers)"
 
-#: website/web/templates/torrent_health_detail.html:237
+#: website/web/templates/torrent_health_detail.html:245
 msgid "History"
 msgstr "Cet acteur"
 
-#: website/web/templates/torrent_health_detail.html:241
+#: website/web/templates/torrent_health_detail.html:249
 msgid "Timestamp"
 msgstr "Horodatage"
 
-#: website/web/templates/torrent_health_detail.html:242
+#: website/web/templates/torrent_health_detail.html:250
 msgid "Seeders"
 msgstr "Pairs"
 
-#: website/web/templates/torrent_health_detail.html:243
+#: website/web/templates/torrent_health_detail.html:251
 msgid "Leechers"
 msgstr "Pairs"
 

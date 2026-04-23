@@ -34,7 +34,10 @@ def main() -> int:
     logging.basicConfig(
         level=logging.DEBUG if args.verbose else logging.INFO,
         format="%(asctime)s %(name)s %(levelname)s %(message)s",
+        force=True,
     )
+    if args.verbose:
+        logging.getLogger("ransomlook.torrent_tracker_scrape").setLevel(logging.DEBUG)
 
     res = tts.run_once(limit=args.limit, clearnet_too=args.clearnet_too)
     print(f"scraped={res['scraped']} trackers={res['trackers']} "
