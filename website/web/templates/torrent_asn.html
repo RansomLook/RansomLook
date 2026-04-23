@@ -1,0 +1,98 @@
+{% extends "base.html" %}
+{% from 'bootstrap5/utils.html' import render_messages %}
+{% block title %}{{ _('AS%(asn)s', asn=detail.asn) }}{% endblock %}
+
+{% block content %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/torrent_health.css') }}" integrity="{{ get_sri('static', 'torrent_health.css') }}">
+{{ render_messages(container=True, dismissible=True) }}
+
+<section class="hero">
+  <div class="container">
+    <h1>AS{{ detail.asn }}</h1>
+    <p class="lead">
+      {% if detail.asn_org %}{{ detail.asn_org }}{% endif %}
+      {% if detail.country %} · {{ detail.country }}{% endif %}
+    </p>
+    <div class="cta-row">
+      <a class="btn btn-secondary" href="{{ url_for('torrent_health_pivot') }}">← {{ _('Back to pivot') }}</a>
+    </div>
+  </div>
+</section>
+
+<section class="metrics-section">
+  <div class="container">
+
+    <div class="kpi-grid pad-mb" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px;margin-bottom:16px">
+      <div class="kpi-card">
+        <div class="kpi-label">{{ _('Distinct IPs') }}</div>
+        <div class="kpi-value">{{ detail.ips|length }}</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-label">{{ _('Torrents observed') }}</div>
+        <div class="kpi-value">{{ detail.torrents|length }}</div>
+      </div>
+      <div class="kpi-card kpi-up">
+        <div class="kpi-label">{{ _('With seeders') }}</div>
+        <div class="kpi-value">{{ detail.torrents|selectattr('has_seeder')|list|length }}</div>
+      </div>
+    </div>
+
+    <div class="th-asn-twocol">
+
+      <div class="table-card">
+        <div class="card-toolbar bb"><span class="fw-600">{{ _('IPs in this ASN') }}</span></div>
+        <div class="table-scroll">
+          <table class="rl-table">
+            <thead><tr>
+              <th>{{ _('IP') }}</th>
+            </tr></thead>
+            <tbody>
+              {% for ip in detail.ips %}
+              <tr><td class="mono"><a href="{{ url_for('torrent_health_ip_detail', ip=ip) }}">{{ ip }}</a></td></tr>
+              {% endfor %}
+              {% if not detail.ips %}
+              <tr><td><span class="muted">{{ _('No IP indexed for this ASN.') }}</span></td></tr>
+              {% endif %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="table-card">
+        <div class="card-toolbar bb"><span class="fw-600">{{ _('Torrents observed') }}</span></div>
+        <div class="table-scroll">
+          <table class="rl-table">
+            <thead><tr>
+              <th style="width:35%">{{ _('Name') }}</th>
+              <th style="width:18%">{{ _('Groups') }}</th>
+              <th style="width:27%">{{ _('Infohash') }}</th>
+              <th style="width:10%"><center>{{ _('Seeder?') }}</center></th>
+              <th style="width:10%"><center>{{ _('Last scan') }}</center></th>
+            </tr></thead>
+            <tbody>
+              {% for t in detail.torrents %}
+              <tr>
+                <td>{{ t.name or _('(unknown)') }}</td>
+                <td>
+                  {% for g in t.groups %}
+                    <a href="/group/{{ g|urlencode }}">{{ g }}</a>{% if not loop.last %}, {% endif %}
+                  {% endfor %}
+                </td>
+                <td><a class="mono" href="{{ url_for('torrent_health_detail', infohash=t.infohash) }}">{{ t.infohash[:12] }}…{{ t.infohash[-6:] }}</a></td>
+                <td><center>{% if t.has_seeder %}<span class="badge-status badge-up">✓</span>{% else %}<span class="muted">—</span>{% endif %}</center></td>
+                <td><center>{% if t.last_scan %}{{ t.last_scan.split('T')[0] }}{% else %}—{% endif %}</center></td>
+              </tr>
+              {% endfor %}
+              {% if not detail.torrents %}
+              <tr><td colspan="5"><center><span class="muted">{{ _('No torrent observed for this ASN.') }}</span></center></td></tr>
+              {% endif %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+</section>
+{% endblock %}

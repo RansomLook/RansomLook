@@ -1,0 +1,275 @@
+{% extends "base.html" %}
+{% from 'bootstrap5/utils.html' import render_messages %}
+{% block title %}{{ _('Torrent Health') }}{% endblock %}
+
+{% block content %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/torrent_health.css') }}" integrity="{{ get_sri('static', 'torrent_health.css') }}">
+{{ render_messages(container=True, dismissible=True) }}
+
+<section class="hero">
+  <div class="container">
+    <h1>{{ _('Torrent swarm health') }}</h1>
+    <p class="lead">
+      {{ _('Peer counts, seeders/leechers and peer samples for every magnet referenced by a tracked post. Scans are driven by the cron worker (poetry run torrent-health); use Refresh to force a live rescan for a specific swarm.') }}
+    </p>
+    <div class="cta-row">
+      <a class="btn btn-primary" href="{{ url_for('torrent_health_pivot') }}">{{ _('Pivot on IP / ASN →') }}</a>
+    </div>
+  </div>
+</section>
+
+<section class="metrics-section">
+  <div class="container">
+
+    <div class="kpi-grid pad-mb" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px;margin-bottom:16px">
+      <div class="kpi-card">
+        <div class="kpi-label">{{ _('Swarms tracked') }}</div>
+        <div class="kpi-value">{{ kpi.total }}</div>
+      </div>
+      <div class="kpi-card kpi-up">
+        <div class="kpi-label">{{ _('Alive (peers > 0)') }}</div>
+        <div class="kpi-value">{{ kpi.alive }}</div>
+      </div>
+      <div class="kpi-card kpi-down">
+        <div class="kpi-label">{{ _('Dead (>%(d)s days)', d=(kpi.total and 90)) }}</div>
+        <div class="kpi-value">{{ kpi.dead }}</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-label">{{ _('Seeders total') }}</div>
+        <div class="kpi-value">{{ kpi.seeders_total }}</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-label">{{ _('Scans last 24 h') }}</div>
+        <div class="kpi-value">{{ kpi.scans_24h }}</div>
+      </div>
+    </div>
+
+    <div class="table-card search-card pad-mb">
+      <div class="filters-wrap" style="display:flex;flex-wrap:wrap;gap:12px;align-items:center;padding:10px">
+        <div class="field field--search" style="flex:1 1 280px;min-width:220px">
+          <input id="th-q" class="input" type="search"
+                 placeholder="{{ _('Infohash, name or group…') }}" aria-label="{{ _('Search torrents') }}">
+          <button class="input-clear" type="button" aria-label="{{ _('Clear') }}">×</button>
+        </div>
+        <label style="display:inline-flex;align-items:center;gap:6px">
+          <input id="th-alive" type="checkbox"> <span class="muted">{{ _('alive only (peers > 0)') }}</span>
+        </label>
+        <span id="th-count" class="muted"></span>
+      </div>
+      {% if groups_all %}
+      <div class="th-group-chips" style="display:flex;flex-wrap:wrap;gap:6px;padding:0 10px 10px">
+        <button type="button" class="th-chip th-chip-active" data-group="">{{ _('All groups') }}</button>
+        {% for g in groups_all %}
+        <button type="button" class="th-chip" data-group="{{ g|lower }}">{{ g }}</button>
+        {% endfor %}
+      </div>
+      {% endif %}
+    </div>
+
+    <div class="table-card">
+      <div class="table-scroll">
+        <table class="rl-table" id="th-table" aria-label="{{ _('Torrent swarms') }}">
+          <thead>
+            <tr>
+              <th style="width:20%" class="ts-sort" data-sort="name">{{ _('Name') }}</th>
+              <th style="width:7%" class="ts-sort" data-sort="size"><center>{{ _('Size') }}</center></th>
+              <th style="width:10%">{{ _('Groups') }}</th>
+              <th style="width:15%">{{ _('Infohash') }}</th>
+              <th style="width:9%" class="ts-sort" data-sort="peers" data-sort-default="desc"><center>{{ _('Peers') }} ▼</center></th>
+              <th style="width:12%" class="ts-sort" data-sort="seed"><center>{{ _('Seed / Leech') }}</center></th>
+              <th style="width:10%" class="ts-sort" data-sort="scan"><center>{{ _('Last scan') }}</center></th>
+              <th style="width:17%"><center>{{ _('Actions') }}</center></th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for r in rows %}
+            {% set peers = r.last_peers_count or 0 %}
+            {% set seeders = r.last_seeders or 0 %}
+            {% set leechers = r.last_leechers or 0 %}
+            {% set size_b = r.size_bytes or 0 %}
+            <tr class="th-row"
+                data-ih="{{ r.infohash }}"
+                data-name="{{ (r.name or '')|lower }}"
+                data-name-sort="{{ (r.name or '~')|lower }}"
+                data-groups="|{{ (r.groups|join('|'))|lower }}|"
+                data-peers="{{ peers }}"
+                data-seed="{{ seeders }}"
+                data-leech="{{ leechers }}"
+                data-size="{{ size_b }}"
+                data-scan="{{ r.last_scan or '' }}">
+              <td>{{ r.name or _('(unknown)') }}</td>
+              <td><center>
+                {% if size_b > 0 %}
+                  {% if size_b >= 1099511627776 %}{{ '%.1f TB'|format(size_b / 1099511627776) }}
+                  {% elif size_b >= 1073741824 %}{{ '%.1f GB'|format(size_b / 1073741824) }}
+                  {% elif size_b >= 1048576 %}{{ '%.1f MB'|format(size_b / 1048576) }}
+                  {% else %}{{ '%.1f KB'|format(size_b / 1024) }}{% endif %}
+                {% else %}<span class="muted">—</span>{% endif %}
+              </center></td>
+              <td>
+                {% for g in r.groups or [] %}
+                  <a href="/group/{{ g|urlencode }}">{{ g }}</a>{% if not loop.last %},{% endif %}
+                {% endfor %}
+              </td>
+              <td>
+                <a class="mono" href="{{ url_for('torrent_health_detail', infohash=r.infohash) }}">
+                  {{ r.infohash[:12] }}…{{ r.infohash[-6:] }}
+                </a>
+              </td>
+              <td><center>
+                {% if peers == 0 %}
+                  <span class="badge-status badge-down">0</span>
+                {% elif peers < 5 %}
+                  <span class="badge-status badge-degraded">{{ peers }}</span>
+                {% else %}
+                  <span class="badge-status badge-up">{{ peers }}</span>
+                {% endif %}
+              </center></td>
+              <td><center>{{ seeders }} / {{ leechers }}</center></td>
+              <td><center>
+                {% if r.last_scan %}
+                  <time datetime="{{ r.last_scan }}" data-ts="{{ r.last_scan }}">{{ r.last_scan.split('T')[0] }}</time>
+                {% else %}<span class="muted">{{ _('never') }}</span>{% endif %}
+              </center></td>
+              <td><center>
+                <a class="btn btn-secondary btn-sm" href="{{ url_for('torrent_health_detail', infohash=r.infohash) }}">{{ _('Detail') }}</a>
+                {% if current_user.is_authenticated %}
+                <button class="btn btn-primary btn-sm th-refresh" data-ih="{{ r.infohash }}">{{ _('Refresh') }}</button>
+                {% endif %}
+              </center></td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    {% if not rows %}
+      <p class="prose" style="color:var(--muted);text-align:center;padding:32px 0">
+        {{ _('No torrent swarms scanned yet. Run poetry run torrent-health to populate.') }}
+      </p>
+    {% endif %}
+
+  </div>
+</section>
+
+<script>
+(() => {
+  const SCAN_DURATION = {{ scan_duration|default(45) }};
+  const $q = document.getElementById('th-q');
+  const $alive = document.getElementById('th-alive');
+  const $tbody = document.querySelector('#th-table tbody');
+  const $rows = Array.from(document.querySelectorAll('#th-table .th-row'));
+  const $count = document.getElementById('th-count');
+  const $clear = document.querySelector('#th-q ~ .input-clear');
+  const $chips = Array.from(document.querySelectorAll('.th-chip'));
+  let activeGroup = '';
+
+  function apply() {
+    const q = ($q.value || '').toLowerCase().trim();
+    const aliveOnly = $alive.checked;
+    let shown = 0;
+    $rows.forEach(row => {
+      const okQ = !q || row.dataset.ih.includes(q) || row.dataset.name.includes(q) || row.dataset.groups.includes(q);
+      const okAlive = !aliveOnly || parseInt(row.dataset.peers, 10) > 0;
+      // Groups are stored pipe-bounded, e.g. "|clop|clop torrents|". Exact
+      // token match: surround the needle with the same delimiters so "clop"
+      // never matches "clop torrents".
+      const okGroup = !activeGroup || row.dataset.groups.includes('|' + activeGroup + '|');
+      const v = okQ && okAlive && okGroup;
+      row.hidden = !v;
+      if (v) shown++;
+    });
+    $count.textContent = shown + ' swarm' + (shown === 1 ? '' : 's');
+  }
+
+  $q.addEventListener('input', apply);
+  $alive.addEventListener('change', apply);
+  $clear?.addEventListener('click', () => { $q.value = ''; apply(); $q.focus(); });
+
+  $chips.forEach(chip => chip.addEventListener('click', () => {
+    $chips.forEach(c => c.classList.remove('th-chip-active'));
+    chip.classList.add('th-chip-active');
+    activeGroup = chip.dataset.group || '';
+    apply();
+  }));
+
+  // Sortable columns
+  const sortKeys = {
+    name:  r => (r.dataset.nameSort || '~'),
+    size:  r => parseInt(r.dataset.size || '0', 10),
+    peers: r => parseInt(r.dataset.peers || '0', 10),
+    seed:  r => parseInt(r.dataset.seed || '0', 10),
+    scan:  r => r.dataset.scan || '',
+  };
+  let currentSort = { key: 'peers', dir: 'desc' };
+
+  function renderSort() {
+    document.querySelectorAll('.ts-sort').forEach(th => {
+      const ind = th.querySelector('.ts-sort-ind');
+      if (!ind) return;
+      if (th.dataset.sort === currentSort.key) {
+        ind.textContent = currentSort.dir === 'desc' ? '▼' : '▲';
+        ind.style.opacity = 1;
+      } else {
+        ind.textContent = '';
+      }
+    });
+  }
+
+  function sortRows() {
+    const getter = sortKeys[currentSort.key];
+    const sign = currentSort.dir === 'desc' ? -1 : 1;
+    $rows.sort((a, b) => {
+      const va = getter(a), vb = getter(b);
+      if (va < vb) return -1 * sign;
+      if (va > vb) return  1 * sign;
+      return 0;
+    });
+    const frag = document.createDocumentFragment();
+    $rows.forEach(r => frag.appendChild(r));
+    $tbody.appendChild(frag);
+    renderSort();
+  }
+
+  document.querySelectorAll('.ts-sort').forEach(th => th.addEventListener('click', () => {
+    const key = th.dataset.sort;
+    if (currentSort.key === key) {
+      currentSort.dir = currentSort.dir === 'desc' ? 'asc' : 'desc';
+    } else {
+      currentSort.key = key;
+      currentSort.dir = th.dataset.sortDefault || 'asc';
+    }
+    sortRows();
+  }));
+
+  renderSort();
+  apply();
+
+  document.querySelectorAll('.th-refresh').forEach(btn => btn.addEventListener('click', async () => {
+    const ih = btn.dataset.ih;
+    btn.disabled = true;
+    const prev = btn.textContent;
+    btn.textContent = 'Queuing…';
+    try {
+      const resp = await fetch(`/api/torrent/refresh/${ih}`, { method: 'POST' });
+      if (resp.status === 202) {
+        btn.textContent = `Scanning (${SCAN_DURATION}s)…`;
+        setTimeout(() => location.reload(), SCAN_DURATION * 1000);
+      } else if (resp.ok) {
+        btn.textContent = 'Done — reload';
+        setTimeout(() => location.reload(), 800);
+      } else {
+        const msg = (await resp.json().catch(() => ({}))).error || resp.status;
+        btn.textContent = 'Err: ' + msg;
+        setTimeout(() => { btn.textContent = prev; btn.disabled = false; }, 3000);
+      }
+    } catch (e) {
+      btn.textContent = 'Err';
+      setTimeout(() => { btn.textContent = prev; btn.disabled = false; }, 2000);
+    }
+  }));
+})();
+</script>
+
+{% endblock %}

@@ -44,8 +44,8 @@ def main() -> int:
     ap.add_argument("--group", help="Ransomware group name to attach the torrent(s) to.")
     ap.add_argument("--magnet", action="append", default=[],
                     help="Magnet URI. Repeatable.")
-    ap.add_argument("--torrent", action="append", default=[],
-                    help="Path to a .torrent file. Repeatable.")
+    ap.add_argument("--torrent", action="append", default=[], nargs="+",
+                    help="Path(s) to .torrent file(s). Accepts multiple values and shell globs.")
     ap.add_argument("--from-file",
                     help="Path to a text file containing one magnet or .torrent path per line.")
     ap.add_argument("--remove",
@@ -66,7 +66,10 @@ def main() -> int:
     if not args.group:
         ap.error("--group is required when adding torrents")
 
-    sources: list[str] = list(args.magnet) + list(args.torrent)
+    # --torrent uses nargs='+' with action='append' so each invocation produces
+    # a list; flatten across invocations.
+    torrent_paths: list[str] = [p for group in args.torrent for p in group]
+    sources: list[str] = list(args.magnet) + torrent_paths
     if args.from_file:
         p = Path(args.from_file)
         if not p.is_file():

@@ -1,0 +1,336 @@
+{% extends "base.html" %}
+{% from 'bootstrap5/utils.html' import render_messages %}
+{% block title %}{{ _('Torrent Pivot') }}{% endblock %}
+
+{% block content %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/torrent_health.css') }}" integrity="{{ get_sri('static', 'torrent_health.css') }}">
+{{ render_messages(container=True, dismissible=True) }}
+
+<section class="hero">
+  <div class="container">
+    <h1>{{ _('Torrent pivot intelligence') }}</h1>
+    <p class="lead">
+      {{ _('Most-seen IPs and ASNs across all tracked swarms. Click an IP or ASN to see its torrent associations.') }}
+    </p>
+    <div class="cta-row">
+      <a class="btn btn-secondary" href="{{ url_for('torrent_health_list') }}">← {{ _('Back to swarms') }}</a>
+    </div>
+  </div>
+</section>
+
+<section class="metrics-section">
+  <div class="container">
+
+    <!-- Time window selector -->
+    <form method="get" class="th-window-form" aria-label="{{ _('Time window') }}">
+      <label for="th-days-select" class="muted">{{ _('Window:') }}</label>
+      <select id="th-days-select" name="days" onchange="this.form.submit()">
+        <option value="0"  {% if days == 0  %}selected{% endif %}>{{ _('All time') }}</option>
+        <option value="1"  {% if days == 1  %}selected{% endif %}>{{ _('Last 24h') }}</option>
+        <option value="7"  {% if days == 7  %}selected{% endif %}>{{ _('Last 7 days') }}</option>
+        <option value="30" {% if days == 30 %}selected{% endif %}>{{ _('Last 30 days') }}</option>
+        <option value="90" {% if days == 90 %}selected{% endif %}>{{ _('Last 90 days') }}</option>
+      </select>
+    </form>
+
+    <div class="th-tabs" role="tablist">
+      <button class="th-tab active" data-tab="top-ips">
+        {{ _('Top IPs') }} <span class="th-tab-count">{{ top_ips|length }}</span>
+      </button>
+      <button class="th-tab" data-tab="top-ips-seed">
+        {{ _('Seeder IPs') }} <span class="th-tab-count">{{ top_ips_seed|length }}</span>
+      </button>
+      <button class="th-tab" data-tab="top-asn">
+        {{ _('Top ASN') }} <span class="th-tab-count">{{ top_asn|length }}</span>
+      </button>
+      <button class="th-tab" data-tab="top-asn-seed">
+        {{ _('Seeder ASN') }} <span class="th-tab-count">{{ top_asn_seed|length }}</span>
+      </button>
+      <button class="th-tab" data-tab="cross-group">
+        {{ _('Cross-group') }} <span class="th-tab-count">{{ cross_group|length }}</span>
+      </button>
+    </div>
+
+    <!-- Panel 1: Top IPs (all observations) -->
+    <div class="th-panel active" data-panel="top-ips">
+      <div class="table-card">
+        <div class="card-toolbar bb">
+          <span class="fw-600">{{ _('Top IPs — all observations') }}</span>
+          <a class="btn btn-secondary btn-sm" href="/api/torrent/top/ips?format=csv{% if days %}&days={{ days }}{% endif %}">{{ _('Export CSV') }}</a>
+        </div>
+        <div class="table-scroll">
+          <table class="rl-table">
+            <thead><tr>
+              <th style="width:45%">{{ _('IP') }}</th>
+              <th style="width:20%"><center>{{ _('Scans') }}</center></th>
+              <th style="width:20%"><center>{{ _('Torrents') }}</center></th>
+              <th style="width:15%"><center>{{ _('As seeder') }}</center></th>
+            </tr></thead>
+            <tbody>
+              {% for row in top_ips %}
+              <tr>
+                <td class="mono"><a href="{{ url_for('torrent_health_ip_detail', ip=row.ip) }}">{{ row.ip }}</a></td>
+                <td><center>{{ row.count }}</center></td>
+                <td><center>{{ row.torrents }}</center></td>
+                <td><center>{% if row.seed_torrents %}<span class="badge-status badge-up">{{ row.seed_torrents }}</span>{% else %}<span class="muted">0</span>{% endif %}</center></td>
+              </tr>
+              {% endfor %}
+              {% if not top_ips %}
+              <tr><td colspan="4"><center><span class="muted">{{ _('No IP indexed yet — run poetry run tools/reindex_torrent_health.py') }}</span></center></td></tr>
+              {% endif %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- Panel 2: Seeder IPs -->
+    <div class="th-panel" data-panel="top-ips-seed">
+      <div class="table-card">
+        <div class="card-toolbar bb">
+          <span class="fw-600">{{ _('Top seeder IPs') }}</span>
+          <a class="btn btn-secondary btn-sm" href="/api/torrent/top/ips?format=csv&seed_only=1{% if days %}&days={{ days }}{% endif %}">{{ _('Export CSV') }}</a>
+        </div>
+        <div class="table-scroll">
+          <table class="rl-table">
+            <thead><tr>
+              <th style="width:50%">{{ _('IP') }}</th>
+              <th style="width:25%"><center>{{ _('Seed scans') }}</center></th>
+              <th style="width:25%"><center>{{ _('Torrents seeded') }}</center></th>
+            </tr></thead>
+            <tbody>
+              {% for row in top_ips_seed %}
+              <tr>
+                <td class="mono"><a href="{{ url_for('torrent_health_ip_detail', ip=row.ip) }}">{{ row.ip }}</a></td>
+                <td><center><span class="badge-status badge-up">{{ row.count }}</span></center></td>
+                <td><center>{{ row.seed_torrents }}</center></td>
+              </tr>
+              {% endfor %}
+              {% if not top_ips_seed %}
+              <tr><td colspan="3"><center><span class="muted">{{ _('No seeder recorded yet.') }}</span></center></td></tr>
+              {% endif %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- Panel 3: Top ASN (all) -->
+    <div class="th-panel" data-panel="top-asn">
+      <div class="table-card">
+        <div class="card-toolbar bb">
+          <span class="fw-600">{{ _('Top ASN — all IPs') }}</span>
+          <a class="btn btn-secondary btn-sm" href="/api/torrent/top/asn?format=csv{% if days %}&days={{ days }}{% endif %}">{{ _('Export CSV') }}</a>
+        </div>
+        <div class="table-scroll">
+          <table class="rl-table">
+            <thead><tr>
+              <th style="width:25%">{{ _('ASN') }}</th>
+              <th style="width:25%"><center>{{ _('Distinct IPs') }}</center></th>
+              <th style="width:25%"><center>{{ _('Torrents') }}</center></th>
+              <th style="width:25%"><center>{{ _('With seeders') }}</center></th>
+            </tr></thead>
+            <tbody>
+              {% for row in top_asn %}
+              <tr>
+                <td class="mono"><a href="{{ url_for('torrent_health_asn_detail', asn=row.asn) }}">AS{{ row.asn }}</a></td>
+                <td><center>{{ row.ips }}</center></td>
+                <td><center>{{ row.torrents }}</center></td>
+                <td><center>{% if row.seed_torrents %}<span class="badge-status badge-up">{{ row.seed_torrents }}</span>{% else %}<span class="muted">0</span>{% endif %}</center></td>
+              </tr>
+              {% endfor %}
+              {% if not top_asn %}
+              <tr><td colspan="4"><center><span class="muted">{{ _('No ASN indexed — run poetry run enrich-ips then poetry run tools/reindex_torrent_health.py') }}</span></center></td></tr>
+              {% endif %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- Panel 4: Seeder ASN -->
+    <div class="th-panel" data-panel="top-asn-seed">
+      <div class="table-card">
+        <div class="card-toolbar bb">
+          <span class="fw-600">{{ _('Top ASN — seeder IPs') }}</span>
+          <a class="btn btn-secondary btn-sm" href="/api/torrent/top/asn?format=csv&seed_only=1{% if days %}&days={{ days }}{% endif %}">{{ _('Export CSV') }}</a>
+        </div>
+        <div class="table-scroll">
+          <table class="rl-table">
+            <thead><tr>
+              <th style="width:40%">{{ _('ASN') }}</th>
+              <th style="width:30%"><center>{{ _('Seeder IPs') }}</center></th>
+              <th style="width:30%"><center>{{ _('Torrents seeded') }}</center></th>
+            </tr></thead>
+            <tbody>
+              {% for row in top_asn_seed %}
+              <tr>
+                <td class="mono"><a href="{{ url_for('torrent_health_asn_detail', asn=row.asn) }}">AS{{ row.asn }}</a></td>
+                <td><center><span class="badge-status badge-up">{{ row.ips }}</span></center></td>
+                <td><center>{{ row.seed_torrents }}</center></td>
+              </tr>
+              {% endfor %}
+              {% if not top_asn_seed %}
+              <tr><td colspan="3"><center><span class="muted">{{ _('No seeder ASN recorded yet.') }}</span></center></td></tr>
+              {% endif %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- Panel 5: Cross-group IPs -->
+    <div class="th-panel" data-panel="cross-group">
+      <div class="table-card">
+        <div class="card-toolbar bb">
+          <span class="fw-600">{{ _('IPs spanning multiple ransomware groups') }}</span>
+          <a class="btn btn-secondary btn-sm" href="/api/torrent/top/cross-group?format=csv">{{ _('Export CSV') }}</a>
+        </div>
+        <div style="padding:10px 14px;border-bottom:1px solid var(--border)">
+          <input id="cg-filter" class="input" type="search"
+                 placeholder="{{ _('Filter by IP, ASN, org or group…') }}"
+                 aria-label="{{ _('Filter cross-group table') }}"
+                 style="max-width:380px">
+          <span id="cg-count" class="muted" style="margin-left:10px;font-size:.9rem"></span>
+        </div>
+        <div class="table-scroll">
+          <table class="rl-table" id="cg-table">
+            <thead><tr>
+              <th style="width:20%">{{ _('IP') }}</th>
+              <th style="width:18%">{{ _('ASN · Org') }}</th>
+              <th style="width:10%"><center>{{ _('Groups') }}</center></th>
+              <th style="width:28%">{{ _('Group list') }}</th>
+              <th style="width:12%"><center>{{ _('Torrents') }}</center></th>
+              <th style="width:12%"><center>{{ _('As seeder') }}</center></th>
+            </tr></thead>
+            <tbody>
+              {% for row in cross_group %}
+              <tr class="cg-row"
+                  data-ip="{{ row.ip }}"
+                  data-groups="|{{ (row.groups|join('|'))|lower }}|">
+                <td class="mono"><a href="{{ url_for('torrent_health_ip_detail', ip=row.ip) }}">{{ row.ip }}</a></td>
+                <td class="cg-asn"><span class="muted">…</span></td>
+                <td><center><span class="badge-status badge-up">{{ row.group_count }}</span></center></td>
+                <td>
+                  {% for g in row.groups %}
+                    <a href="/group/{{ g|urlencode }}">{{ g }}</a>{% if not loop.last %}, {% endif %}
+                  {% endfor %}
+                </td>
+                <td><center>{{ row.torrents }}</center></td>
+                <td><center>{% if row.seed_torrents %}<span class="badge-status badge-up">{{ row.seed_torrents }}</span>{% else %}<span class="muted">0</span>{% endif %}</center></td>
+              </tr>
+              {% endfor %}
+              {% if not cross_group %}
+              <tr><td colspan="6"><center><span class="muted">{{ _('No IP has been observed across multiple groups yet.') }}</span></center></td></tr>
+              {% endif %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<script>
+(() => {
+  const tabs = document.querySelectorAll('.th-tab');
+  const panels = document.querySelectorAll('.th-panel');
+
+  function activate(tabName, updateHash) {
+    let found = false;
+    tabs.forEach(t => {
+      const on = t.dataset.tab === tabName;
+      t.classList.toggle('active', on);
+      if (on) found = true;
+    });
+    panels.forEach(p => {
+      p.classList.toggle('active', p.dataset.panel === tabName);
+    });
+    if (found && updateHash && location.hash !== '#' + tabName) {
+      history.replaceState(null, '', '#' + tabName);
+    }
+  }
+
+  tabs.forEach(t => t.addEventListener('click', () => activate(t.dataset.tab, true)));
+
+  // Deep-link support: #top-asn etc.
+  const wanted = (location.hash || '').replace('#', '');
+  if (wanted && document.querySelector(`.th-panel[data-panel="${wanted}"]`)) {
+    activate(wanted, false);
+  }
+})();
+</script>
+
+<script>
+// ─── Cross-group tab: bulk-enrich ASN + live filter ────────────────────
+(() => {
+  const rows = Array.from(document.querySelectorAll('.cg-row'));
+  if (!rows.length) return;
+
+  // 1. Bulk ASN enrichment — one round-trip to /api/enrich/ip/bulk
+  (async () => {
+    const ips = rows.map(r => r.dataset.ip).filter(ip => ip && ip !== '?');
+    if (!ips.length) return;
+    try {
+      const resp = await fetch('/api/enrich/ip/bulk', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({ips}),
+      });
+      if (!resp.ok) throw new Error('bulk enrich ' + resp.status);
+      const data = await resp.json();
+      rows.forEach(row => {
+        const info = data[row.dataset.ip] || {};
+        const asn = info.asn ? String(info.asn) : '';
+        const org = info.asn_org || '';
+        const cc  = info.country || '';
+        const cell = row.querySelector('.cg-asn');
+        if (!cell) return;
+        // Store ASN/org in the row dataset so the live filter can match on them.
+        row.dataset.asn = asn.toLowerCase();
+        row.dataset.org = org.toLowerCase();
+        row.dataset.cc  = cc.toLowerCase();
+        if (asn) {
+          const label = `AS${asn}${org ? ' · ' + org : ''}${cc ? ' · ' + cc : ''}`;
+          cell.innerHTML = `<a class="mono" href="/torrent-health/asn/${encodeURIComponent(asn)}" title="${label.replace(/"/g,'&quot;')}">AS${asn}</a>${org ? ' · ' + org.replace(/</g,'&lt;') : ''}`;
+        } else {
+          cell.innerHTML = '<span class="muted">—</span>';
+        }
+      });
+    } catch (e) {
+      console.warn('ASN enrichment failed:', e);
+      rows.forEach(r => { r.querySelector('.cg-asn').innerHTML = '<span class="muted">—</span>'; });
+    }
+  })();
+
+  // 2. Live filter — matches IP, ASN, org, country, group list
+  const $f = document.getElementById('cg-filter');
+  const $c = document.getElementById('cg-count');
+
+  function apply() {
+    const q = ($f.value || '').trim().toLowerCase();
+    let shown = 0;
+    rows.forEach(row => {
+      if (!q) {
+        row.hidden = false; shown++; return;
+      }
+      const hay = [
+        row.dataset.ip,
+        row.dataset.asn,
+        row.dataset.org,
+        row.dataset.cc,
+        row.dataset.groups,
+      ].filter(Boolean).join(' ');
+      const match = hay.includes(q);
+      row.hidden = !match;
+      if (match) shown++;
+    });
+    $c.textContent = shown + ' / ' + rows.length;
+  }
+  $f.addEventListener('input', apply);
+  apply();
+})();
+</script>
+
+{% endblock %}

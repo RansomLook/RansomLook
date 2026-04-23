@@ -27,12 +27,11 @@
       <form method="post" enctype="multipart/form-data" class="th-manage-form" style="padding:16px">
         <input type="hidden" name="action" value="add">
         <div class="th-manage-grid">
-          <div>
-            <label for="th-single-group" class="muted">{{ _('Group') }}</label>
-            <select id="th-single-group" name="group" required>
-              <option value="">{{ _('— pick a group —') }}</option>
-              {% for g in groups %}<option value="{{ g }}">{{ g }}</option>{% endfor %}
-            </select>
+          <div style="position:relative">
+            <label for="th-single-group-search" class="muted">{{ _('Group') }}</label>
+            <input id="th-single-group-search" class="input th-group-search" placeholder="{{ _('Search…') }}" autocomplete="off" data-target="th-single-group" required>
+            <input id="th-single-group" name="group" type="hidden" required>
+            <div class="search-dropdown th-group-dropdown" hidden><div class="th-group-results"></div></div>
           </div>
           <div style="grid-column: span 2">
             <label for="th-single-magnet" class="muted">{{ _('Magnet URI') }}</label>
@@ -53,12 +52,11 @@
       <form method="post" class="th-manage-form" style="padding:16px">
         <input type="hidden" name="action" value="add">
         <div class="th-manage-grid">
-          <div>
-            <label for="th-bulk-group" class="muted">{{ _('Group') }}</label>
-            <select id="th-bulk-group" name="group" required>
-              <option value="">{{ _('— pick a group —') }}</option>
-              {% for g in groups %}<option value="{{ g }}">{{ g }}</option>{% endfor %}
-            </select>
+          <div style="position:relative">
+            <label for="th-bulk-group-search" class="muted">{{ _('Group') }}</label>
+            <input id="th-bulk-group-search" class="input th-group-search" placeholder="{{ _('Search…') }}" autocomplete="off" data-target="th-bulk-group" required>
+            <input id="th-bulk-group" name="group" type="hidden" required>
+            <div class="search-dropdown th-group-dropdown" hidden><div class="th-group-results"></div></div>
           </div>
           <div style="grid-column: span 2">
             <label for="th-bulk-area" class="muted">{{ _('Magnets') }}</label>
@@ -131,4 +129,7 @@
 
   </div>
 </section>
+
+<script type="application/json" id="th-groups-data">{{ groups|tojson }}</script>
+<script src="{{ url_for('static', filename='js/torrent_manage.js') }}" integrity="{{ get_sri('static', 'torrent_manage.js') }}"></script>
 {% endblock %}

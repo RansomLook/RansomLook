@@ -2664,7 +2664,7 @@ def torrent_health_list():  # type: ignore[no-untyped-def]
             groups_set.add(g)
 
     return render_template(
-        "admin/torrent_health.html",
+        "torrent_health.html",
         rows=rows,
         kpi=kpi,
         groups_all=sorted(groups_set),
@@ -2682,7 +2682,7 @@ def torrent_health_detail(infohash: str):  # type: ignore[no-untyped-def]
         return redirect(url_for("torrent_health_list"))
     history = th.get_history(infohash, limit=180)
     return render_template(
-        "admin/torrent_health_detail.html",
+        "torrent_health_detail.html",
         meta=meta,
         history=history,
         latest=history[0] if history else None,
@@ -2716,7 +2716,7 @@ def torrent_health_pivot():  # type: ignore[no-untyped-def]
         top_asn_seed = th.get_top_asn(limit=50, seed_only=True)
 
     return render_template(
-        "admin/torrent_pivot.html",
+        "torrent_pivot.html",
         top_ips=top_ips,
         top_ips_seed=top_ips_seed,
         top_asn=top_asn,
@@ -2735,7 +2735,7 @@ def torrent_health_ip_detail(ip: str):  # type: ignore[no-untyped-def]
         flash(f"No data for IP {ip!r}", "error")
         return redirect(url_for("torrent_health_pivot"))
     timeline = th.get_ip_timeline(ip.strip(), days=30) if detail.get("torrents") else []
-    return render_template("admin/torrent_ip.html", detail=detail, timeline=timeline)
+    return render_template("torrent_ip.html", detail=detail, timeline=timeline)
 
 
 @app.route("/torrent-health/asn/<asn>")
@@ -2746,7 +2746,7 @@ def torrent_health_asn_detail(asn: str):  # type: ignore[no-untyped-def]
     if not detail.get("ips") and not detail.get("torrents"):
         flash(f"No data for ASN {asn!r}", "error")
         return redirect(url_for("torrent_health_pivot"))
-    return render_template("admin/torrent_asn.html", detail=detail)
+    return render_template("torrent_asn.html", detail=detail)
 
 
 @app.route("/admin/torrent-health/manage", methods=["GET", "POST"])
@@ -2772,10 +2772,17 @@ def admin_torrent_manage():  # type: ignore[no-untyped-def]
         # ── Delete (unit or bulk via checkboxes) ─────────────────────────
         if action == "delete":
             targets = request.form.getlist("infohash")
-            removed = 0
+            removed_ihs: list[str] = []
             for ih in targets:
-                if th.delete_manual_torrent(ih.strip().lower()):
-                    removed += 1
+                norm = ih.strip().lower()
+                if th.delete_manual_torrent(norm):
+                    removed_ihs.append(norm)
+            removed = len(removed_ihs)
+            if removed:
+                if removed == 1:
+                    audit_log("delete_torrent", removed_ihs[0])
+                else:
+                    audit_log("delete_torrent", f"{removed} torrents", ", ".join(removed_ihs[:10]) + ("…" if removed > 10 else ""))
             flash(f"Removed {removed} torrent(s).", "success" if removed else "warning")
             return redirect(url_for("admin_torrent_manage"))
 
@@ -2787,6 +2794,8 @@ def admin_torrent_manage():  # type: ignore[no-untyped-def]
 
         added = merged = failed = 0
         errors: list[str] = []
+        added_ihs: list[str] = []
+        merged_ihs: list[str] = []
 
         def _try(src: str) -> None:
             nonlocal added, merged, failed
@@ -2796,10 +2805,15 @@ def admin_torrent_manage():  # type: ignore[no-untyped-def]
                 failed += 1
                 errors.append(f"{src[:80]}: {e}")
                 return
+            ih = (info.get("infohash") or "").lower()
             if info["already_tracked"]:
                 merged += 1
+                if ih:
+                    merged_ihs.append(ih)
             else:
                 added += 1
+                if ih:
+                    added_ihs.append(ih)
 
         # Single magnet
         single = (request.form.get("magnet") or "").strip()
@@ -2833,6 +2847,13 @@ def admin_torrent_manage():  # type: ignore[no-untyped-def]
         if added: parts.append(f"{added} new")
         if merged: parts.append(f"{merged} merged")
         if failed: parts.append(f"{failed} failed")
+        if added or merged:
+            det_parts = []
+            if added_ihs:
+                det_parts.append(f"added={','.join(added_ihs[:10])}" + ("…" if len(added_ihs) > 10 else ""))
+            if merged_ihs:
+                det_parts.append(f"merged={','.join(merged_ihs[:10])}" + ("…" if len(merged_ihs) > 10 else ""))
+            audit_log("add_torrent", group, "; ".join(det_parts))
         flash(f"{' · '.join(parts) or 'No input.'}", "success" if not failed else "warning")
         for err in errors[:5]:
             flash(err, "error")

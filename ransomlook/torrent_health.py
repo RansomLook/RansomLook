@@ -137,6 +137,9 @@ class ScanResult:
     seeders: int
     leechers: int
     peers: list[Peer] = field(default_factory=list)
+    # Static torrent metadata — only filled when libtorrent has the info dict
+    # (either loaded from a .torrent or fetched from DHT during the scan).
+    metadata: dict[str, Any] | None = None
 
     @property
     def peers_count(self) -> int:
@@ -150,6 +153,72 @@ class ScanResult:
             "peers_count": self.peers_count,
             "peers": [p.to_dict() for p in self.peers],
         }
+
+
+def _extract_torrent_metadata(ti: Any) -> dict[str, Any]:
+    """Pull static metadata from a libtorrent ``torrent_info`` / ``torrent_file``.
+
+    Returns the subset that is interesting for intel: trackers, file list,
+    client that produced the .torrent, creation timestamp, user comment,
+    private flag, piece layout. All fields are defensive — different
+    libtorrent versions expose them differently.
+    """
+    def _s(fn: Any) -> str:
+        try:
+            v = fn()
+        except Exception:
+            return ""
+        if v is None:
+            return ""
+        if isinstance(v, bytes):
+            try:
+                return v.decode("utf-8", "replace")
+            except Exception:
+                return v.decode("latin-1", "replace")
+        return str(v)
+
+    def _i(fn: Any) -> int:
+        try:
+            return int(fn() or 0)
+        except Exception:
+            return 0
+
+    trackers: list[str] = []
+    try:
+        for t in (ti.trackers() or []):
+            url = getattr(t, "url", None) or (t.get("url") if isinstance(t, dict) else None)
+            if url:
+                trackers.append(str(url))
+    except Exception:
+        pass
+
+    files: list[dict[str, Any]] = []
+    try:
+        fs = ti.files()
+        n = ti.num_files()
+        for i in range(n):
+            try:
+                path = fs.file_path(i)
+                size = int(fs.file_size(i))
+                if isinstance(path, bytes):
+                    path = path.decode("utf-8", "replace")
+                files.append({"path": path, "size": size})
+            except Exception:
+                continue
+    except Exception:
+        pass
+
+    return {
+        "trackers": trackers,
+        "files": files,
+        "num_files": len(files),
+        "created_by": _s(getattr(ti, "creator", lambda: "")),
+        "creation_date": _i(getattr(ti, "creation_date", lambda: 0)),
+        "comment": _s(getattr(ti, "comment", lambda: "")),
+        "private": bool(getattr(ti, "priv", lambda: False)()),
+        "piece_length": _i(getattr(ti, "piece_length", lambda: 0)),
+        "num_pieces": _i(getattr(ti, "num_pieces", lambda: 0)),
+    }
 
 
 # ─── libtorrent session ─────────────────────────────────────────────────
@@ -327,6 +396,13 @@ def _snapshot(torr: lt.torrent_handle, infohash: str, self_ips: set[str] | None 
         local_seeders, local_leechers, seeders, leechers,
     )
 
+    metadata: dict[str, Any] | None = None
+    if tf is not None:
+        try:
+            metadata = _extract_torrent_metadata(tf)
+        except Exception:
+            metadata = None
+
     return ScanResult(
         infohash=infohash,
         ts=datetime.now(timezone.utc),
@@ -335,6 +411,7 @@ def _snapshot(torr: lt.torrent_handle, infohash: str, self_ips: set[str] | None 
         seeders=seeders,
         leechers=leechers,
         peers=peers,
+        metadata=metadata,
     )
 
 
@@ -538,6 +615,31 @@ def store_scan(result: ScanResult, magnets: list[str], groups: list[str]) -> Non
     }
     if result.peers_count > 0:
         mapping["last_seen_alive"] = _iso(result.ts)
+
+    # Persist static torrent metadata on first availability. We keep the
+    # richer value: once the full file list / trackers / created_by are
+    # known, later scans (which may only have partial metadata from DHT)
+    # must not overwrite them with emptier versions.
+    if result.metadata:
+        md = result.metadata
+        existing_files = json.loads(existing.get(b"files", b"[]").decode() or "[]") if existing else []
+        if md.get("files") and len(md["files"]) >= len(existing_files):
+            mapping["files"] = json.dumps(md["files"])
+            mapping["num_files"] = str(md.get("num_files") or len(md["files"]))
+        existing_trackers = json.loads(existing.get(b"trackers", b"[]").decode() or "[]") if existing else []
+        if md.get("trackers"):
+            merged_trackers = sorted(set(existing_trackers + md["trackers"]))
+            mapping["trackers"] = json.dumps(merged_trackers)
+        for key in ("created_by", "creation_date", "comment", "piece_length", "num_pieces"):
+            val = md.get(key)
+            if val in (None, "", 0):
+                continue
+            existing_val = existing.get(key.encode(), b"").decode() if existing else ""
+            if not existing_val:
+                mapping[key] = str(val)
+        if md.get("private") and not existing.get(b"private"):
+            mapping["private"] = "1"
+
     r.hset(meta_key, mapping=mapping)
 
     # ── Pivot indexes ────────────────────────────────────────────────────
@@ -585,16 +687,20 @@ def get_meta(infohash: str) -> dict[str, Any] | None:
     for k, v in raw.items():
         key = k.decode()
         val = v.decode()
-        if key in ("magnets", "groups", "sparkline"):
+        if key in ("magnets", "groups", "sparkline", "files", "trackers"):
             try:
                 out[key] = json.loads(val)
             except Exception:
                 out[key] = []
-        elif key in ("size_bytes", "last_seeders", "last_leechers", "last_peers_count"):
+        elif key in ("size_bytes", "last_seeders", "last_leechers",
+                     "last_peers_count", "num_files", "num_pieces",
+                     "piece_length", "creation_date"):
             try:
                 out[key] = int(val)
             except Exception:
                 out[key] = 0
+        elif key == "private":
+            out[key] = val == "1"
         else:
             out[key] = val
     out["infohash"] = infohash
@@ -1062,6 +1168,7 @@ def parse_magnet_or_torrent(source: str) -> dict[str, Any]:
         "magnet": lt.make_magnet_uri(ti),
         "name": ti.name() or "",
         "size_bytes": ti.total_size() or 0,
+        "metadata": _extract_torrent_metadata(ti),
     }
 
 
@@ -1103,6 +1210,27 @@ def add_manual_torrent(group: str, magnet_or_path: str) -> dict[str, Any]:
     }
     if not existing:
         mapping["first_seen"] = _iso(_now())
+
+    # Persist static metadata from the .torrent when available (magnets give
+    # us nothing at this stage; the DHT fetch in scan_batch will fill it in).
+    md = info.get("metadata") or {}
+    if md:
+        existing_files = json.loads(existing.get(b"files", b"[]").decode() or "[]") if existing else []
+        if md.get("files") and len(md["files"]) >= len(existing_files):
+            mapping["files"] = json.dumps(md["files"])
+            mapping["num_files"] = str(md.get("num_files") or len(md["files"]))
+        existing_trackers = json.loads(existing.get(b"trackers", b"[]").decode() or "[]") if existing else []
+        if md.get("trackers"):
+            mapping["trackers"] = json.dumps(sorted(set(existing_trackers + md["trackers"])))
+        for key in ("created_by", "creation_date", "comment", "piece_length", "num_pieces"):
+            val = md.get(key)
+            if val in (None, "", 0):
+                continue
+            if not (existing.get(key.encode(), b"").decode() if existing else ""):
+                mapping[key] = str(val)
+        if md.get("private") and not existing.get(b"private"):
+            mapping["private"] = "1"
+
     r.hset(meta_key, mapping=mapping)
 
     return {
