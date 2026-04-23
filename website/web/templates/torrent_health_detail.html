@@ -64,6 +64,36 @@
       <strong>{{ _('Last scan:') }}</strong> {{ meta.last_scan or '—' }}
     </div>
 
+    <!-- BEP-48 tracker scrape (onion trackers, etc.) -->
+    {% if meta.tracker_last_scrape %}
+    <div class="table-card p-12 mb-14">
+      <div class="card-toolbar bb">
+        <span class="fw-600">{{ _('Tracker scrape (BEP-48)') }}</span>
+        <span class="muted">{{ meta.tracker_last_url }}</span>
+      </div>
+      <div class="week-grid" style="padding:10px 0">
+        <div class="week-kpi">
+          <div class="week-kpi__value">{{ meta.tracker_seeders or 0 }}</div>
+          <div class="week-kpi__label">{{ _('tracker seeders') }}</div>
+        </div>
+        <div class="week-kpi">
+          <div class="week-kpi__value">{{ meta.tracker_leechers or 0 }}</div>
+          <div class="week-kpi__label">{{ _('tracker leechers') }}</div>
+        </div>
+        <div class="week-kpi">
+          <div class="week-kpi__value">{{ meta.tracker_downloaded or 0 }}</div>
+          <div class="week-kpi__label">{{ _('downloads (all-time)') }}</div>
+        </div>
+        <div class="week-kpi">
+          <div class="week-kpi__value">
+            <time datetime="{{ meta.tracker_last_scrape }}" data-ts="{{ meta.tracker_last_scrape }}">{{ meta.tracker_last_scrape.split('T')[0] }}</time>
+          </div>
+          <div class="week-kpi__label">{{ _('last tracker scrape') }}</div>
+        </div>
+      </div>
+    </div>
+    {% endif %}
+
     <!-- Static torrent metadata (created_by / trackers / files / …) -->
     {% if meta.created_by or meta.creation_date or meta.comment or meta.trackers or meta.files or meta.piece_length %}
     <div class="table-card p-12 mb-14">

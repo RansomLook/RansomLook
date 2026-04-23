@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2026-04-23 13:39+0200\n"
+"POT-Creation-Date: 2026-04-23 14:01+0200\n"
 "PO-Revision-Date: 2026-04-21 13:39+0200\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: en\n"
@@ -138,7 +138,7 @@ msgstr ""
 #: website/web/templates/admin/torrent_manage.html:84
 #: website/web/templates/leaks.html:82
 #: website/web/templates/torrent_health.html:75
-#: website/web/templates/torrent_health_detail.html:111
+#: website/web/templates/torrent_health_detail.html:141
 msgid "Size"
 msgstr ""
 
@@ -838,7 +838,7 @@ msgstr[0] ""
 msgstr[1] ""
 
 #: website/web/templates/browse.html:135
-#: website/web/templates/torrent_health_detail.html:92
+#: website/web/templates/torrent_health_detail.html:122
 msgid "private"
 msgstr ""
 
@@ -1364,8 +1364,8 @@ msgstr ""
 
 #: website/web/templates/glossary.html:134
 #: website/web/templates/torrent_health.html:78
-#: website/web/templates/torrent_health_detail.html:163
-#: website/web/templates/torrent_health_detail.html:214
+#: website/web/templates/torrent_health_detail.html:193
+#: website/web/templates/torrent_health_detail.html:244
 #: website/web/templates/torrent_ip.html:85
 msgid "Peers"
 msgstr ""
@@ -2131,7 +2131,7 @@ msgid "IPs in this ASN"
 msgstr ""
 
 #: website/web/templates/torrent_asn.html:47
-#: website/web/templates/torrent_health_detail.html:166
+#: website/web/templates/torrent_health_detail.html:196
 #: website/web/templates/torrent_pivot.html:64
 #: website/web/templates/torrent_pivot.html:97
 #: website/web/templates/torrent_pivot.html:199
@@ -2303,126 +2303,146 @@ msgstr ""
 msgid "Last scan:"
 msgstr ""
 
-#: website/web/templates/torrent_health_detail.html:70
-msgid "Torrent metadata"
+#: website/web/templates/torrent_health_detail.html:71
+msgid "Tracker scrape (BEP-48)"
 msgstr ""
 
-#: website/web/templates/torrent_health_detail.html:73
-msgid "Created by:"
-msgstr ""
-
-#: website/web/templates/torrent_health_detail.html:76
-msgid "Creation date:"
+#: website/web/templates/torrent_health_detail.html:77
+msgid "tracker seeders"
 msgstr ""
 
 #: website/web/templates/torrent_health_detail.html:81
-msgid "Piece length:"
+msgid "tracker leechers"
 msgstr ""
 
 #: website/web/templates/torrent_health_detail.html:85
-msgid "pieces"
+msgid "downloads (all-time)"
 msgstr ""
 
-#: website/web/templates/torrent_health_detail.html:89
-msgid "Files:"
-msgstr ""
-
-#: website/web/templates/torrent_health_detail.html:96
-msgid "Comment:"
+#: website/web/templates/torrent_health_detail.html:91
+msgid "last tracker scrape"
 msgstr ""
 
 #: website/web/templates/torrent_health_detail.html:100
-msgid "Trackers"
+msgid "Torrent metadata"
 msgstr ""
 
-#: website/web/templates/torrent_health_detail.html:108
-msgid "File tree"
+#: website/web/templates/torrent_health_detail.html:103
+msgid "Created by:"
+msgstr ""
+
+#: website/web/templates/torrent_health_detail.html:106
+msgid "Creation date:"
 msgstr ""
 
 #: website/web/templates/torrent_health_detail.html:111
-msgid "Path"
+msgid "Piece length:"
+msgstr ""
+
+#: website/web/templates/torrent_health_detail.html:115
+msgid "pieces"
+msgstr ""
+
+#: website/web/templates/torrent_health_detail.html:119
+msgid "Files:"
 msgstr ""
 
 #: website/web/templates/torrent_health_detail.html:126
+msgid "Comment:"
+msgstr ""
+
+#: website/web/templates/torrent_health_detail.html:130
+msgid "Trackers"
+msgstr ""
+
+#: website/web/templates/torrent_health_detail.html:138
+msgid "File tree"
+msgstr ""
+
+#: website/web/templates/torrent_health_detail.html:141
+msgid "Path"
+msgstr ""
+
+#: website/web/templates/torrent_health_detail.html:156
 #, python-format
 msgid "… %(n)s more files truncated"
 msgstr ""
 
-#: website/web/templates/torrent_health_detail.html:139
+#: website/web/templates/torrent_health_detail.html:169
 msgid "Peers over time (last 30 days)"
 msgstr ""
 
-#: website/web/templates/torrent_health_detail.html:159
+#: website/web/templates/torrent_health_detail.html:189
 #, python-format
 msgid "Peer sample — %(ts)s"
 msgstr ""
 
-#: website/web/templates/torrent_health_detail.html:160
+#: website/web/templates/torrent_health_detail.html:190
 #, python-format
 msgid "%(n)s peer · enrichment via CIRCL IP ASN History"
 msgid_plural "%(n)s peers · enrichment via CIRCL IP ASN History"
 msgstr[0] ""
 msgstr[1] ""
 
-#: website/web/templates/torrent_health_detail.html:167
+#: website/web/templates/torrent_health_detail.html:197
 msgid "Port"
 msgstr ""
 
-#: website/web/templates/torrent_health_detail.html:168
+#: website/web/templates/torrent_health_detail.html:198
 msgid "Progress"
 msgstr ""
 
-#: website/web/templates/torrent_health_detail.html:169
+#: website/web/templates/torrent_health_detail.html:199
 msgid "Client"
 msgstr ""
 
-#: website/web/templates/torrent_health_detail.html:170
+#: website/web/templates/torrent_health_detail.html:200
 #: website/web/templates/torrent_pivot.html:128
 #: website/web/templates/torrent_pivot.html:161
 msgid "ASN"
 msgstr ""
 
-#: website/web/templates/torrent_health_detail.html:171
+#: website/web/templates/torrent_health_detail.html:201
 msgid "Org"
 msgstr ""
 
-#: website/web/templates/torrent_health_detail.html:172
+#: website/web/templates/torrent_health_detail.html:202
 msgid "CC"
 msgstr ""
 
-#: website/web/templates/torrent_health_detail.html:173
+#: website/web/templates/torrent_health_detail.html:203
 msgid "PTR"
 msgstr ""
 
-#: website/web/templates/torrent_health_detail.html:174
+#: website/web/templates/torrent_health_detail.html:204
 msgid "Flags"
 msgstr ""
 
-#: website/web/templates/torrent_health_detail.html:180
+#: website/web/templates/torrent_health_detail.html:210
 msgid "Pivot on this IP"
 msgstr ""
 
-#: website/web/templates/torrent_health_detail.html:196
+#: website/web/templates/torrent_health_detail.html:226
 msgid "No peers observed on the last scan."
 msgstr ""
 
-#: website/web/templates/torrent_health_detail.html:203
+#: website/web/templates/torrent_health_detail.html:233
 msgid "All scans (click a row to show its peer sample)"
 msgstr ""
 
-#: website/web/templates/torrent_health_detail.html:207
+#: website/web/templates/torrent_health_detail.html:237
 msgid "History"
 msgstr ""
 
-#: website/web/templates/torrent_health_detail.html:211
+#: website/web/templates/torrent_health_detail.html:241
 msgid "Timestamp"
 msgstr ""
 
-#: website/web/templates/torrent_health_detail.html:212
+#: website/web/templates/torrent_health_detail.html:242
 msgid "Seeders"
 msgstr ""
 
-#: website/web/templates/torrent_health_detail.html:213
+#: website/web/templates/torrent_health_detail.html:243
 msgid "Leechers"
 msgstr ""
 

@@ -687,14 +687,16 @@ def get_meta(infohash: str) -> dict[str, Any] | None:
     for k, v in raw.items():
         key = k.decode()
         val = v.decode()
-        if key in ("magnets", "groups", "sparkline", "files", "trackers"):
+        if key in ("magnets", "groups", "sparkline", "files", "trackers",
+                   "tracker_history"):
             try:
                 out[key] = json.loads(val)
             except Exception:
                 out[key] = []
         elif key in ("size_bytes", "last_seeders", "last_leechers",
                      "last_peers_count", "num_files", "num_pieces",
-                     "piece_length", "creation_date"):
+                     "piece_length", "creation_date",
+                     "tracker_seeders", "tracker_leechers", "tracker_downloaded"):
             try:
                 out[key] = int(val)
             except Exception:
