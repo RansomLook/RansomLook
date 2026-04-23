@@ -22,7 +22,7 @@ from dateutil.relativedelta import relativedelta
 from lacuscore import LacusCore
 from PIL import Image
 from PIL.PngImagePlugin import PngInfo
-from pylacus import CaptureSettings, PyLacus
+from pylacus import PyLacus
 from valkey import Valkey
 
 from .default import DB_GROUPS, DB_HEALTH, DB_LACUS, DB_POSTS, DB_TASKS
@@ -198,7 +198,10 @@ def scraper(base: int, only_names: list[str] | None = None) -> None:
             except Exception:
                 logger.error("Error with : %s", host["slug"])
                 continue
-            settings: CaptureSettings = {"url": host["slug"], "general_timeout_in_sec": 90, "max_retries": 1}
+            # pylacus ≥ 1.24 switched CaptureSettings from TypedDict to a
+            # pydantic model. Build a plain dict — the enqueue() overload
+            # still accepts dict[str, Any].
+            settings: dict[str, Any] = {"url": host["slug"], "general_timeout_in_sec": 90, "max_retries": 1}
             if "header" in host:
                 settings["headers"] = host["header"]
             if "browser" in host and host["browser"] is not None:
@@ -426,7 +429,7 @@ def screen() -> None:
                     capture.update({"slug2": urllib.parse.urljoin(host["slug"], str(capture["link"]))})
                     if capture["slug2"] not in slugs:
                         slugs.append(capture["slug2"])
-                        settings: CaptureSettings = {
+                        settings: dict[str, Any] = {
                             "url": capture["slug2"],
                             "general_timeout_in_sec": 90,
                             "max_retries": 1,
