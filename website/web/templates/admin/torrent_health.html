@@ -91,7 +91,7 @@
                 data-ih="{{ r.infohash }}"
                 data-name="{{ (r.name or '')|lower }}"
                 data-name-sort="{{ (r.name or '~')|lower }}"
-                data-groups="{{ (r.groups|join(' '))|lower }}"
+                data-groups="|{{ (r.groups|join('|'))|lower }}|"
                 data-peers="{{ peers }}"
                 data-seed="{{ seeders }}"
                 data-leech="{{ leechers }}"
@@ -172,7 +172,10 @@
     $rows.forEach(row => {
       const okQ = !q || row.dataset.ih.includes(q) || row.dataset.name.includes(q) || row.dataset.groups.includes(q);
       const okAlive = !aliveOnly || parseInt(row.dataset.peers, 10) > 0;
-      const okGroup = !activeGroup || row.dataset.groups.split(' ').includes(activeGroup);
+      // Groups are stored pipe-bounded, e.g. "|clop|clop torrents|". Exact
+      // token match: surround the needle with the same delimiters so "clop"
+      // never matches "clop torrents".
+      const okGroup = !activeGroup || row.dataset.groups.includes('|' + activeGroup + '|');
       const v = okQ && okAlive && okGroup;
       row.hidden = !v;
       if (v) shown++;

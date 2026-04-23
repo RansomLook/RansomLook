@@ -45,10 +45,10 @@ cross_group_model = api.model("CrossGroupIp", {
 
 @api.route("/health")
 @api.doc(description="Paginated list of tracked swarms with last known state.",
-         params={"page": "page number (default 1)",
-                 "per_page": "items per page (max 200, default 50)",
-                 "alive": "when 1, only include swarms with peers>0",
-                 "q": "substring match against infohash, name, groups"})
+         params={"page": "Page number (default 1).",
+                 "per_page": "Items per page (1-200, default 50).",
+                 "alive": "When 1, only include swarms with peers>0. Default 0 (all swarms).",
+                 "q": "Substring match against infohash, name, groups. Default: no filter."})
 class HealthList(Resource):  # type: ignore[misc]
     def get(self) -> Any:
         from ransomlook import torrent_health as th
@@ -92,8 +92,8 @@ class HealthList(Resource):  # type: ignore[misc]
 
 @api.route("/health/<string:infohash>")
 @api.doc(description="Full metadata + historic scans for one infohash.",
-         params={"infohash": "SHA-1 or SHA-256 infohash",
-                 "history": "number of historic scans to return (max 200, default 50)"})
+         params={"infohash": "SHA-1 or SHA-256 infohash.",
+                 "history": "Number of historic scans to return (1-200, default 50)."})
 class HealthDetail(Resource):  # type: ignore[misc]
     def get(self, infohash: str) -> Any:
         from ransomlook import torrent_health as th
@@ -118,9 +118,10 @@ class HealthDetail(Resource):  # type: ignore[misc]
 
 @api.route("/top/ips")
 @api.doc(description="Top IPs by scan appearances. Optionally restrict to the last N days.",
-         params={"limit": "max rows (1-500, default 50)",
-                 "seed_only": "1 = rank by seeder appearances only",
-                 "days": "time window in days; 0 or omitted = all time"})
+         params={"limit": "Max rows (1-500, default 50).",
+                 "seed_only": "1 = rank by seeder appearances only. Default 0.",
+                 "days": "Time window in days. 0 or omitted = all time (default).",
+                 "format": "Response format: 'json' (default) or 'csv'."})
 class TopIps(Resource):  # type: ignore[misc]
     @api.response(200, "Top IPs", [top_ip_model])  # type: ignore[untyped-decorator]
     def get(self) -> Any:
@@ -143,9 +144,10 @@ class TopIps(Resource):  # type: ignore[misc]
 
 @api.route("/top/asn")
 @api.doc(description="Top ASNs by distinct IPs observed on tracked swarms.",
-         params={"limit": "max rows (1-500, default 50)",
-                 "seed_only": "1 = rank by seeder IPs only",
-                 "days": "time window in days; 0 or omitted = all time"})
+         params={"limit": "Max rows (1-500, default 50).",
+                 "seed_only": "1 = rank by seeder IPs only. Default 0.",
+                 "days": "Time window in days. 0 or omitted = all time (default).",
+                 "format": "Response format: 'json' (default) or 'csv'."})
 class TopAsn(Resource):  # type: ignore[misc]
     @api.response(200, "Top ASNs", [top_asn_model])  # type: ignore[untyped-decorator]
     def get(self) -> Any:
@@ -168,7 +170,8 @@ class TopAsn(Resource):  # type: ignore[misc]
 
 @api.route("/top/cross-group")
 @api.doc(description="IPs observed seeding/leeching for 2+ distinct ransomware groups.",
-         params={"limit": "max rows (default 50)"})
+         params={"limit": "Max rows (1-500, default 50).",
+                 "format": "Response format: 'json' (default) or 'csv'."})
 class TopCrossGroup(Resource):  # type: ignore[misc]
     @api.response(200, "IPs spanning multiple groups", [cross_group_model])  # type: ignore[untyped-decorator]
     def get(self) -> Any:
@@ -186,7 +189,8 @@ class TopCrossGroup(Resource):  # type: ignore[misc]
 
 @api.route("/ip/<string:ip>")
 @api.doc(description="Everything known about an IP: torrent associations, enrichment, group span.",
-         params={"ip": "peer IP address"})
+         params={"ip": "Peer IP address.",
+                 "format": "Response format: 'json' (default) or 'csv'."})
 class IpDetail(Resource):  # type: ignore[misc]
     def get(self, ip: str) -> Any:
         from ransomlook import torrent_health as th
@@ -197,8 +201,9 @@ class IpDetail(Resource):  # type: ignore[misc]
 
 
 @api.route("/ip/<string:ip>/timeline")
-@api.doc(description="Daily observation counts over the last N days (default 30).",
-         params={"ip": "peer IP address", "days": "window (1-90, default 30)"})
+@api.doc(description="Daily observation counts over the last N days.",
+         params={"ip": "Peer IP address.",
+                 "days": "Time window in days (1-90, default 30)."})
 class IpTimeline(Resource):  # type: ignore[misc]
     def get(self, ip: str) -> Any:
         from ransomlook import torrent_health as th
@@ -214,7 +219,8 @@ class IpTimeline(Resource):  # type: ignore[misc]
 
 @api.route("/asn/<string:asn>")
 @api.doc(description="Everything known about an ASN: IPs and torrents observed.",
-         params={"asn": "Autonomous System Number (with or without AS prefix)"})
+         params={"asn": "Autonomous System Number (with or without AS prefix).",
+                 "format": "Response format: 'json' (default) or 'csv'."})
 class AsnDetail(Resource):  # type: ignore[misc]
     def get(self, asn: str) -> Any:
         from ransomlook import torrent_health as th

@@ -24,6 +24,9 @@ logger = get_logger("torrent_health")
 def main() -> None:
     ap = argparse.ArgumentParser(description=__doc__)
     ap.add_argument("--only", action="append", help="Infohash to scan (repeatable). Bypasses interval check.")
+    ap.add_argument("--group", action="append",
+                    help="Ransomware group name (case-insensitive). Expands to every infohash "
+                         "currently associated with that group. Repeatable, bypasses interval check.")
     ap.add_argument("--magnet", action="append",
                     help="Ad-hoc magnet URI to scan, outside the DB_POSTS scope. Result is still persisted in "
                          "DB_TORRENT_HEALTH; group/post linkage will be empty. Repeatable.")
@@ -76,8 +79,23 @@ def main() -> None:
         logger.info("done: scanned=%d failed=%d", ok, failed)
         sys.exit(0 if failed == 0 else 1)
 
+    # ── Resolve --group → list of infohashes, merge with --only ─────────
+    only = list(args.only or [])
+    if args.group:
+        wanted = {g.lower().strip() for g in args.group if g and g.strip()}
+        targets = torrent_health.collect_magnets()
+        matched = [
+            ih for ih, data in targets.items()
+            if any(g.lower() in wanted for g in data.get("groups") or [])
+        ]
+        if not matched:
+            logger.warning("no infohash found for group(s): %s", ", ".join(sorted(wanted)))
+        else:
+            logger.info("--group %s → %d infohash(es)", ", ".join(sorted(wanted)), len(matched))
+            only.extend(matched)
+
     stats = torrent_health.run_once(
-        only=args.only,
+        only=only if only else None,
         scan_duration=args.scan_duration,
         batch_size=args.batch_size,
         alive_interval=args.alive_interval,

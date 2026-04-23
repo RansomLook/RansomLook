@@ -113,7 +113,10 @@ posts_stat_response = api.model(
 
 
 @api.route("/recent", "/recent/<int:number>")
-@api.doc(description="Return the X most recent posts across all groups.")
+@api.doc(
+    description="Return the X most recent posts across all groups.",
+    params={"number": "Number of posts to return (default 100)."},
+)
 class RecentPost(Resource):  # type: ignore[misc]
     @api.response(200, "List of posts", [post_model])  # type: ignore[untyped-decorator]
     def get(self, number: int = 100) -> list[str]:
@@ -134,7 +137,10 @@ class RecentPost(Resource):  # type: ignore[misc]
 
 
 @api.route("/last", "/last/<int:number>")
-@api.doc(description="Return posts discovered in the last X days (default 1).")
+@api.doc(
+    description="Return posts discovered in the last X days.",
+    params={"number": "Number of days to look back (default 1)."},
+)
 class LastPost(Resource):  # type: ignore[misc]
     @api.response(200, "List of posts", [post_model])  # type: ignore[untyped-decorator]
     def get(self, number: int = 1) -> list[dict[str, Any]]:
@@ -417,10 +423,10 @@ def _date_only_to_utc_end(day: str) -> datetime:
 class Posts(Resource):  # type: ignore[misc]
     @api.doc(
         params={  # type: ignore[untyped-decorator]
-            "days": 'Relative period in days (e.g. 7, 14, 30, 90). Ignored if "from" and "to" are provided.',
-            "from": "Start date (YYYY-MM-DD) UTC (inclusive).",
-            "to": "End date (YYYY-MM-DD) UTC (inclusive).",
-            "groups": "Comma-separated group names to include (optional).",
+            "days": 'Relative period in days (e.g. 7, 14, 30, 90). Default 30. Ignored if "from" and "to" are provided.',
+            "from": "Start date (YYYY-MM-DD) UTC (inclusive). Requires 'to'. If omitted, 'days' is used.",
+            "to": "End date (YYYY-MM-DD) UTC (inclusive). Requires 'from'. If omitted, 'days' is used.",
+            "groups": "Comma-separated group names to include. Default: all groups.",
         }
     )
     @api.response(200, "Posts matching the filter", posts_stat_response)  # type: ignore[untyped-decorator]
