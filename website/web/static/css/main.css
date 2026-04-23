@@ -2598,6 +2598,15 @@ html.light .hl-number{
   .btn-hero{ padding:10px 16px; font-size:14px; }
   .insight-card:last-of-type .insight-list li{ grid-template-columns: 54px 1fr; }
   .insight-card:last-of-type .insight-list .insight-name--right{ grid-column: 1 / -1; justify-self:start; }
+  /* Homepage KPI sections: wrap the eyebrow + muted subtitle instead of
+     forcing them on one line, and make the torrent CTAs wrap too. */
+  .insight-head{ flex-wrap:wrap; gap:4px 10px; }
+  .home-torrent .home-hero__ctas{ flex-wrap:wrap; }
+}
+@media (max-width:420px){
+  /* Very narrow viewports (small phones in portrait): stack KPI cards so
+     values stay legible instead of getting squeezed into two columns. */
+  .week-grid{ grid-template-columns:1fr; }
 }
 
 /* ===========================

@@ -19,6 +19,9 @@ from __future__ import annotations
 
 import json
 import logging
+import os
+import socket
+import struct
 import time
 from collections import defaultdict
 from datetime import datetime, timezone
@@ -85,14 +88,20 @@ def _scrape_url_from_announce(announce_url: str) -> str | None:
     """BEP-48: replace the final ``announce`` in the path with ``scrape``.
 
     Returns ``None`` when the tracker advertises no scrape endpoint (the
-    announce URL does not contain ``announce`` in its path).
+    announce URL does not contain ``announce`` in its path). For UDP
+    trackers (BEP-15) the announce URL IS the scrape endpoint — we keep
+    it as-is and the caller branches on the ``udp://`` scheme.
     """
     try:
         p = urlparse(announce_url)
     except Exception:
         return None
+    if p.scheme == "udp":
+        # BEP-15: no /scrape path, the announce endpoint also handles scrape
+        # via the action field in the binary protocol. Return as-is.
+        return announce_url
     if not p.scheme.startswith("http"):
-        return None  # udp:// trackers don't have HTTP scrape
+        return None  # ws/wss/other exotic schemes — skip
     idx = p.path.rfind("announce")
     if idx < 0:
         return None
@@ -113,6 +122,76 @@ def _encode_infohash(ih_hex: str) -> str:
 
 
 # ─── scraping ───────────────────────────────────────────────────────────
+# ─── BEP-15: UDP tracker scrape ─────────────────────────────────────────
+# Two-phase protocol:
+#   1. Connection request  (16B) → connection response (16B, connection_id)
+#   2. Scrape request      (16 + 20*N B) → scrape response (8 + 12*N B)
+# See https://www.bittorrent.org/beps/bep_0015.html
+_UDP_MAGIC = 0x41727101980   # protocol_id for connection request
+_UDP_ACTION_CONNECT = 0
+_UDP_ACTION_SCRAPE = 2
+_UDP_ACTION_ERROR = 3
+
+
+def _udp_scrape(host: str, port: int, infohashes: list[str], *,
+                timeout: int = 10) -> dict[str, dict[str, int]]:
+    """BEP-15 UDP tracker scrape. Clearnet only (UDP does not pass SOCKS5).
+
+    Single attempt with ``timeout`` seconds. No retry — caller decides.
+    """
+    if not infohashes:
+        return {}
+    addrs = socket.getaddrinfo(host, port, type=socket.SOCK_DGRAM)
+    if not addrs:
+        raise OSError(f"resolve failed: {host}")
+    family, _, _, _, sockaddr = addrs[0]
+
+    with socket.socket(family, socket.SOCK_DGRAM) as s:
+        s.settimeout(timeout)
+
+        # ── Phase 1: connection request / response ───────────────────────
+        tx1 = int.from_bytes(os.urandom(4), "big")
+        s.sendto(struct.pack(">QII", _UDP_MAGIC, _UDP_ACTION_CONNECT, tx1),
+                 sockaddr)
+        data, _ = s.recvfrom(65535)
+        if len(data) < 16:
+            raise ValueError("short connect response")
+        action, tx, connection_id = struct.unpack(">IIQ", data[:16])
+        if action == _UDP_ACTION_ERROR:
+            raise ValueError(f"tracker error: {data[8:].decode('utf-8', 'replace')}")
+        if action != _UDP_ACTION_CONNECT or tx != tx1:
+            raise ValueError(f"unexpected connect response (action={action})")
+
+        # ── Phase 2: scrape request / response ───────────────────────────
+        tx2 = int.from_bytes(os.urandom(4), "big")
+        header = struct.pack(">QII", connection_id, _UDP_ACTION_SCRAPE, tx2)
+        payload = b"".join(bytes.fromhex(ih) for ih in infohashes)
+        s.sendto(header + payload, sockaddr)
+        data, _ = s.recvfrom(65535)
+        if len(data) < 8:
+            raise ValueError("short scrape response")
+        action, tx = struct.unpack(">II", data[:8])
+        if action == _UDP_ACTION_ERROR:
+            raise ValueError(f"tracker error: {data[8:].decode('utf-8', 'replace')}")
+        if action != _UDP_ACTION_SCRAPE or tx != tx2:
+            raise ValueError(f"unexpected scrape response (action={action})")
+
+        body = data[8:]
+        if len(body) != 12 * len(infohashes):
+            raise ValueError(f"scrape body size mismatch: got {len(body)}, "
+                             f"expected {12 * len(infohashes)}")
+        out: dict[str, dict[str, int]] = {}
+        for i, ih in enumerate(infohashes):
+            complete, downloaded, incomplete = struct.unpack(
+                ">III", body[i * 12:(i + 1) * 12])
+            out[ih.lower()] = {
+                "complete": int(complete),
+                "incomplete": int(incomplete),
+                "downloaded": int(downloaded),
+            }
+        return out
+
+
 def _do_scrape_request(scrape_url: str, infohashes: list[str], *, tor: bool,
                        timeout: int) -> dict[str, dict[str, int]]:
     qs = "&".join(f"info_hash={_encode_infohash(ih)}" for ih in infohashes)
@@ -152,17 +231,25 @@ def _do_scrape_request(scrape_url: str, infohashes: list[str], *, tor: bool,
 
 def scrape_tracker(scrape_url: str, infohashes: list[str], *, tor: bool,
                    timeout: int = DEFAULT_TIMEOUT) -> dict[str, dict[str, int]]:
-    """Issue a single HTTP ``/scrape`` for a batch of infohashes.
+    """Scrape a tracker for a batch of infohashes.
 
     Returns ``{ih_hex: {complete, incomplete, downloaded}}``. Missing
     infohashes (unknown to the tracker) are simply absent from the result.
 
-    Some trackers reject multi-infohash batches (not all implement BEP-48
-    fully). On empty results from a batch of >1, we fall back to one
-    request per infohash — slower but always works.
+    Routes by scheme:
+    * ``http(s)://`` — BEP-48 multi-infohash GET; falls back to one request
+      per infohash if the tracker rejects the batch.
+    * ``udp://`` — BEP-15 binary scrape; Tor-incompatible (UDP doesn't
+      pass SOCKS5), handled clearnet-only by the caller.
     """
     if not infohashes:
         return {}
+    parsed = urlparse(scrape_url)
+    if parsed.scheme == "udp":
+        host = parsed.hostname or ""
+        port = parsed.port or 80
+        return _udp_scrape(host, port, infohashes, timeout=timeout)
+
     out = _do_scrape_request(scrape_url, infohashes, tor=tor, timeout=timeout)
     if not out and len(infohashes) > 1:
         logger.info("batch returned 0 — tracker likely single-infohash only, falling back")
@@ -227,8 +314,15 @@ def run_once(*, limit: int | None = None, only_onion: bool | None = None,
         meta = get_meta(ih) or {}
         trackers = meta.get("trackers") or []
         for ann in trackers:
-            if only_onion and not _is_onion(ann):
-                continue
+            is_onion = _is_onion(ann)
+            scheme = (urlparse(ann).scheme or "").lower()
+            # ``only_onion`` means "restrict to onion-reachable trackers".
+            # UDP can't be tunnelled through SOCKS5, so UDP is always
+            # dropped under only_onion. Non-onion HTTP(S)/UDP are kept
+            # only when only_onion is False.
+            if only_onion:
+                if scheme == "udp" or not is_onion:
+                    continue
             scrape = _scrape_url_from_announce(ann)
             if scrape:
                 tracker_to_ihs[scrape].append(ih)
@@ -239,8 +333,10 @@ def run_once(*, limit: int | None = None, only_onion: bool | None = None,
     start = time.time()
 
     for scrape_url, ihs in tracker_to_ihs.items():
-        tor = _is_onion(scrape_url)
-        logger.info("scrape %s (%d infohashes, tor=%s)", scrape_url, len(ihs), tor)
+        scheme = (urlparse(scrape_url).scheme or "").lower()
+        tor = scheme != "udp" and _is_onion(scrape_url)
+        logger.info("scrape %s (%d infohashes, scheme=%s tor=%s)",
+                    scrape_url, len(ihs), scheme, tor)
         for i in range(0, len(ihs), BATCH_SIZE):
             if limit is not None and total_batches >= limit:
                 logger.info("limit reached after %d batches", total_batches)

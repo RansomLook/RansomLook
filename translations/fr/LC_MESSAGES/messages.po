@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version:  RansomLook\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-04-23 14:32+0200\n"
+"POT-Creation-Date: 2026-04-23 15:04+0200\n"
 "PO-Revision-Date: 2026-04-21 13:39+0200\n"
 "Last-Translator: RansomLook team\n"
 "Language: fr\n"
@@ -922,7 +922,7 @@ msgstr ""
 "Choisissez deux %(kind)s à comparer (publications 7/30/365, miroirs en "
 "ligne, uptime 30 jours)."
 
-#: website/web/templates/compare.html:21 website/web/templates/index.html:173
+#: website/web/templates/compare.html:21 website/web/templates/index.html:208
 msgid "groups"
 msgstr "groupes"
 
@@ -1907,23 +1907,63 @@ msgstr "voir plus"
 msgid "No posts yet."
 msgstr "Aucune publication pour l'instant."
 
+#: website/web/templates/index.html:174
+msgid "Torrent intelligence"
+msgstr "Renseignement torrent"
+
 #: website/web/templates/index.html:175
+msgid ""
+"passive swarm scan · IP/ASN pivot · BEP-48 tracker scrape · webseed "
+"mirrors"
+msgstr ""
+"scan passif de swarm · pivot IP/ASN · scrape tracker BEP-48 · mirrors "
+"webseed"
+
+#: website/web/templates/index.html:180
+msgid "swarms tracked"
+msgstr "swarms suivis"
+
+#: website/web/templates/index.html:184
+msgid "alive"
+msgstr "vivants"
+
+#: website/web/templates/index.html:188
+msgid "seeders total"
+msgstr "seeders au total"
+
+#: website/web/templates/index.html:192
+msgid "cross-group IPs"
+msgstr "IPs cross-groupe"
+
+#: website/web/templates/index.html:193
+msgid "pivot signal"
+msgstr "signal de pivot"
+
+#: website/web/templates/index.html:197
+msgid "Swarm health"
+msgstr "État des swarms"
+
+#: website/web/templates/index.html:198
+msgid "Pivot IP / ASN"
+msgstr "Pivot IP / ASN"
+
+#: website/web/templates/index.html:210
 msgid "markets"
 msgstr "marchés"
 
-#: website/web/templates/index.html:177
+#: website/web/templates/index.html:212
 msgid "actors"
 msgstr "acteurs"
 
-#: website/web/templates/index.html:179
+#: website/web/templates/index.html:214
 msgid "leaks"
 msgstr "fuites"
 
-#: website/web/templates/index.html:181
+#: website/web/templates/index.html:216
 msgid "ransom notes"
 msgstr "notes de rançon"
 
-#: website/web/templates/index.html:183
+#: website/web/templates/index.html:218
 msgid "crypto addrs"
 msgstr "adresses crypto"
 

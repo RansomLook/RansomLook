@@ -686,6 +686,53 @@ def store_scan(result: ScanResult, magnets: list[str], groups: list[str]) -> Non
             r.zadd("torrent_health:top:ip_cross_group", {ip: group_count})
 
 
+def get_homepage_kpis(ttl: int = 60) -> dict[str, int]:
+    """Cheap aggregation for the public homepage banner.
+
+    Iterates ``torrent_health:meta:*`` keys once and reads the two fields
+    needed (``last_peers_count`` + ``last_seeders``) via ``HMGET``; the
+    cross-group count is a single ``ZCARD``. The result is cached in Redis
+    for ``ttl`` seconds so homepage hits don't fan out to N HMGETs.
+    """
+    r = _redis()
+    try:
+        cached = r.get("torrent_health:homepage_kpis")
+        if cached:
+            return json.loads(cached.decode() if isinstance(cached, bytes) else cached)
+    except Exception:
+        pass
+
+    total = 0
+    alive = 0
+    seeders_total = 0
+    for key in r.scan_iter(match="torrent_health:meta:*", count=500):
+        total += 1
+        try:
+            vals = r.hmget(key, "last_peers_count", "last_seeders")  # type: ignore[arg-type]
+            if int(vals[0] or 0) > 0:
+                alive += 1
+            seeders_total += int(vals[1] or 0)
+        except (TypeError, ValueError):
+            continue
+
+    try:
+        cross_group_ips = int(r.zcard("torrent_health:top:ip_cross_group") or 0)
+    except Exception:
+        cross_group_ips = 0
+
+    kpis = {
+        "total": total,
+        "alive": alive,
+        "seeders_total": seeders_total,
+        "cross_group_ips": cross_group_ips,
+    }
+    try:
+        r.set("torrent_health:homepage_kpis", json.dumps(kpis), ex=ttl)
+    except Exception:
+        pass
+    return kpis
+
+
 def list_infohashes() -> list[str]:
     """Return the set of infohashes known in the meta store."""
     r = _redis()

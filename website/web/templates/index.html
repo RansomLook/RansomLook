@@ -166,6 +166,41 @@
   </div>
 </section>
 
+{# ─────────────  TORRENT INTELLIGENCE  ───────────── #}
+{% if torrent_kpis and torrent_kpis.total > 0 %}
+<section class="home-torrent">
+  <div class="container">
+    <div class="insight-head">
+      <h2 class="section-eyebrow">{{ _('Torrent intelligence') }}</h2>
+      <span class="muted">{{ _('passive swarm scan · IP/ASN pivot · BEP-48 tracker scrape · webseed mirrors') }}</span>
+    </div>
+    <div class="week-grid">
+      <div class="week-kpi">
+        <div class="week-kpi__value">{{ torrent_kpis.total }}</div>
+        <div class="week-kpi__label">{{ _('swarms tracked') }}</div>
+      </div>
+      <div class="week-kpi kpi-up">
+        <div class="week-kpi__value">{{ torrent_kpis.alive }}</div>
+        <div class="week-kpi__label">{{ _('alive') }}</div>
+      </div>
+      <div class="week-kpi">
+        <div class="week-kpi__value">{{ torrent_kpis.seeders_total }}</div>
+        <div class="week-kpi__label">{{ _('seeders total') }}</div>
+      </div>
+      <div class="week-kpi">
+        <div class="week-kpi__value">{{ torrent_kpis.cross_group_ips }}</div>
+        <div class="week-kpi__label">{{ _('cross-group IPs') }}</div>
+        <div class="week-kpi__delta"><span class="muted">{{ _('pivot signal') }}</span></div>
+      </div>
+    </div>
+    <div class="home-hero__ctas" style="margin-top:16px">
+      <a class="btn-hero btn-hero--ghost" href="{{ url_for('torrent_health_list') }}">{{ _('Swarm health') }} &rarr;</a>
+      <a class="btn-hero btn-hero--ghost" href="{{ url_for('torrent_health_pivot') }}">{{ _('Pivot IP / ASN') }} &rarr;</a>
+    </div>
+  </div>
+</section>
+{% endif %}
+
 {# ─────────────  COVERAGE  ───────────── #}
 <section class="home-coverage">
   <div class="container">

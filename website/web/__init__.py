@@ -942,6 +942,14 @@ def home():  # type: ignore[no-untyped-def]
         {"day": (now - timedelta(days=(29 - i))).strftime("%Y-%m-%d"), "count": v}
         for i, v in enumerate(sparkline_30d)
     ]
+    # Torrent intel snapshot — computed cheaply and cached 60 s in Redis
+    # so the homepage doesn't fan out N HMGETs per hit.
+    try:
+        from ransomlook import torrent_health as _th
+        torrent_kpis = _th.get_homepage_kpis()
+    except Exception:
+        torrent_kpis = {"total": 0, "alive": 0, "seeders_total": 0, "cross_group_ips": 0}
+
     return render_template(
         "index.html",
         date=date, data=data, alert=alert, posts=alertposts, logo=logo,
@@ -957,6 +965,7 @@ def home():  # type: ignore[no-untyped-def]
         sparkline_30d_dated=spark_30d_dated,
         movers=movers,
         latest=latest,
+        torrent_kpis=torrent_kpis,
     )
 
 

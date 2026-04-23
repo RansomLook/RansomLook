@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2026-04-23 14:32+0200\n"
+"POT-Creation-Date: 2026-04-23 15:04+0200\n"
 "PO-Revision-Date: 2026-04-21 13:39+0200\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: en\n"
@@ -861,7 +861,7 @@ msgstr ""
 msgid "Pick two %(kind)s to compare (posts 7/30/365, mirrors up, 30-day uptime)."
 msgstr ""
 
-#: website/web/templates/compare.html:21 website/web/templates/index.html:173
+#: website/web/templates/compare.html:21 website/web/templates/index.html:208
 msgid "groups"
 msgstr ""
 
@@ -1774,23 +1774,61 @@ msgstr ""
 msgid "No posts yet."
 msgstr ""
 
+#: website/web/templates/index.html:174
+msgid "Torrent intelligence"
+msgstr ""
+
 #: website/web/templates/index.html:175
+msgid ""
+"passive swarm scan · IP/ASN pivot · BEP-48 tracker scrape · webseed "
+"mirrors"
+msgstr ""
+
+#: website/web/templates/index.html:180
+msgid "swarms tracked"
+msgstr ""
+
+#: website/web/templates/index.html:184
+msgid "alive"
+msgstr ""
+
+#: website/web/templates/index.html:188
+msgid "seeders total"
+msgstr ""
+
+#: website/web/templates/index.html:192
+msgid "cross-group IPs"
+msgstr ""
+
+#: website/web/templates/index.html:193
+msgid "pivot signal"
+msgstr ""
+
+#: website/web/templates/index.html:197
+msgid "Swarm health"
+msgstr ""
+
+#: website/web/templates/index.html:198
+msgid "Pivot IP / ASN"
+msgstr ""
+
+#: website/web/templates/index.html:210
 msgid "markets"
 msgstr ""
 
-#: website/web/templates/index.html:177
+#: website/web/templates/index.html:212
 msgid "actors"
 msgstr ""
 
-#: website/web/templates/index.html:179
+#: website/web/templates/index.html:214
 msgid "leaks"
 msgstr ""
 
-#: website/web/templates/index.html:181
+#: website/web/templates/index.html:216
 msgid "ransom notes"
 msgstr ""
 
-#: website/web/templates/index.html:183
+#: website/web/templates/index.html:218
 msgid "crypto addrs"
 msgstr ""
 
