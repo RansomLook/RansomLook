@@ -1057,6 +1057,10 @@ def hot():  # type: ignore[no-untyped-def]
     groups: dict[str, dict[str, Any]] = {}
     # Global daily bucket (oldest → newest, length = number)
     global_daily = [0] * number
+    # Earliest post we have on record for each group. Used to tell apart a
+    # truly new group (first post inside the current window) from a group
+    # that merely resumed activity after a lull.
+    group_first_seen: dict[str, dt] = {}
 
     def _parse(s: str) -> Optional[dt]:
         for fmt in ("%Y-%m-%d %H:%M:%S.%f", "%Y-%m-%d %H:%M:%S"):
@@ -1078,6 +1082,9 @@ def hot():  # type: ignore[no-untyped-def]
             ts = _parse(entry.get("discovered", ""))
             if not ts:
                 continue
+            first = group_first_seen.get(g)
+            if first is None or ts < first:
+                group_first_seen[g] = ts
             if ts >= window_start:
                 rec = groups.setdefault(g, {
                     "group": gname, "count": 0, "prev_count": 0,
@@ -1108,9 +1115,11 @@ def hot():  # type: ignore[no-untyped-def]
         cur = rec["count"]
         if cur == 0:
             continue  # only show groups active in current window
-        is_new = prev == 0
+        first = group_first_seen.get(g)
+        # Truly new: group has never been recorded before the current window.
+        is_new = prev == 0 and first is not None and first >= window_start
         delta_raw = cur - prev
-        delta_pct = None if is_new else round(((cur - prev) / prev) * 100.0, 1)
+        delta_pct = None if prev == 0 else round(((cur - prev) / prev) * 100.0, 1)
         rec["is_new"] = is_new
         rec["delta_raw"] = delta_raw
         rec["delta_pct"] = delta_pct
