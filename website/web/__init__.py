@@ -880,8 +880,13 @@ def home():  # type: ignore[no-untyped-def]
     groups_prev_n    = len(group_counts_prev)
     groups_delta_pct = _pct(groups_7d_n, groups_prev_n)
 
-    # New groups this week (active now, absent from previous)
-    new_groups_n = sum(1 for g in group_counts_7d if g not in group_counts_prev)
+    # New groups this week: truly first seen inside the current 7-day
+    # window. Groups that were simply silent the previous week don't count.
+    new_groups_n = sum(
+        1 for g in group_counts_7d
+        if group_first_seen.get(g) is not None
+        and group_first_seen[g] >= win_7d_start
+    )
 
     # Top group this week
     top_group: Optional[str] = None
