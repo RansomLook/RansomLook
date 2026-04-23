@@ -134,10 +134,32 @@
       </details>
       {% endif %}
       {% if meta.webseeds %}
+      {% set wstatus = meta.webseed_status or {} %}
+      {% set up_count = wstatus.values() | selectattr('online') | list | length %}
       <details style="padding:6px 0" open>
-        <summary class="muted" style="cursor:pointer">{{ _('Webseeds (HTTP mirrors, BEP-19)') }} <span class="muted">({{ meta.webseeds|length }})</span></summary>
-        <ul class="tight mono" style="margin:6px 0 0 16px;font-size:.85rem">
-          {% for w in meta.webseeds %}<li style="word-break:break-all">{{ w }}</li>{% endfor %}
+        <summary class="muted" style="cursor:pointer">
+          {{ _('Webseeds (HTTP mirrors, BEP-19)') }}
+          <span class="muted">({{ meta.webseeds|length }}{% if wstatus %} · {{ up_count }} up{% endif %})</span>
+        </summary>
+        {% if meta.webseed_last_check %}
+        <div class="muted" style="font-size:.8rem;padding:4px 0 0 16px">
+          {{ _('Last check:') }} <time datetime="{{ meta.webseed_last_check }}" data-ts="{{ meta.webseed_last_check }}">{{ meta.webseed_last_check }}</time>
+        </div>
+        {% endif %}
+        <ul class="tight mono" style="margin:6px 0 0 16px;font-size:.85rem;list-style:none;padding:0">
+          {% for w in meta.webseeds %}
+          {% set s = wstatus.get(w) %}
+          <li style="word-break:break-all;padding:2px 0">
+            {% if s %}
+              <span class="th-webseed-dot th-webseed-{{ 'up' if s.online else 'down' }}"
+                    title="code={{ s.code }} · {{ s.rtt_ms }}ms{% if s.error %} · {{ s.error }}{% endif %}">●</span>
+              <span class="muted" style="font-size:.75rem;margin:0 4px">{{ s.code or '—' }} · {{ s.rtt_ms }}ms</span>
+            {% else %}
+              <span class="th-webseed-dot th-webseed-unknown" title="not checked yet">○</span>
+            {% endif %}
+            {{ w }}
+          </li>
+          {% endfor %}
         </ul>
       </details>
       {% endif %}

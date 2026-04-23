@@ -73,6 +73,9 @@
     "torrent_tracker_scrape": {
         "only_onion": true
     },
+    "torrent_webseed_check": {
+        "onion_only": false
+    },
     "users": {},
     "malpedia": "",
     "rf": "",
@@ -108,7 +111,8 @@
         "keepall": "Store all DLS main page on screenshots/old, be carefull of the size of your storage",
         "remote_lacus": "By default, lookyloo will do the capture locally. Enabling this feature means you have a dedicated Lacus instance somewhere",
         "torrent_health": "BitTorrent swarm health tracker. scan_retention_days / dead_threshold_days / ip_cache_ttl_days: set to 0 to keep forever. scan_duration_seconds / batch_size / *_interval_*: worker scheduling. ignored_ips: list of peer IPs (exact match) to exclude from peer samples, pivot views and exports — useful to hide your own scanner host or known researchers.",
-        "torrent_tracker_scrape": "BEP-48 HTTP scrape on announce URLs extracted from .torrent metadata. Cron with poetry run torrent-tracker-scrape. only_onion: skip clearnet trackers (recommended — clearnet swarms are already covered by the libtorrent scanner). Onion trackers go through Tor SOCKS5 on 127.0.0.1:9050."
+        "torrent_tracker_scrape": "BEP-48 HTTP scrape on announce URLs extracted from .torrent metadata. Cron with poetry run torrent-tracker-scrape. only_onion: skip clearnet trackers (recommended — clearnet swarms are already covered by the libtorrent scanner). Onion trackers go through Tor SOCKS5 on 127.0.0.1:9050.",
+        "torrent_webseed_check": "HEAD-check every BEP-19 webseed URL via Tor (onion) or direct (clearnet). Cron with poetry run torrent-webseed-check. onion_only: skip clearnet webseeds. Results persisted per-infohash in meta.webseed_status and shown next to each URL on the torrent detail page — useful for tracking ransomware mirror takedowns."
     }
 
 }

@@ -706,7 +706,7 @@ def get_meta(infohash: str) -> dict[str, Any] | None:
         key = k.decode()
         val = v.decode()
         if key in ("magnets", "groups", "sparkline", "files", "trackers",
-                   "webseeds", "tracker_history"):
+                   "webseeds", "tracker_history", "webseed_status"):
             try:
                 out[key] = json.loads(val)
             except Exception:

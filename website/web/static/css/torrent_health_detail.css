@@ -20,3 +20,9 @@
 
 /* ===== Inline history peers table ===== */
 .th-peers-inline { margin: 8px 0; }
+
+/* ===== Webseed liveness dots ===== */
+.th-webseed-dot { display: inline-block; font-size: 0.9rem; line-height: 1; margin-right: 4px; vertical-align: middle; }
+.th-webseed-up { color: #10b981; }
+.th-webseed-down { color: #ef4444; }
+.th-webseed-unknown { color: #9ca3af; }
