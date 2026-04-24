@@ -19,7 +19,7 @@ from datetime import datetime, timezone
 from typing import Any
 from urllib.parse import urlparse
 
-import requests  # type: ignore[import-untyped]
+import requests
 
 from ransomlook.default import get_config
 from ransomlook.torrent_health import _redis, list_infohashes, get_meta
@@ -153,7 +153,7 @@ def run_once(*, limit: int | None = None, workers: int = DEFAULT_WORKERS,
         meta_key = f"torrent_health:meta:{ih}"
         # Merge into any prior status so URLs skipped this run (over limit)
         # keep their last-known value instead of disappearing.
-        raw = r.hget(meta_key, "webseed_status")
+        raw: bytes | None = r.hget(meta_key, "webseed_status")  # type: ignore[assignment]
         prior: dict[str, Any] = {}
         if raw:
             try:

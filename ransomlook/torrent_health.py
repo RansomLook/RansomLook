@@ -696,7 +696,7 @@ def get_homepage_kpis(ttl: int = 60) -> dict[str, int]:
     """
     r = _redis()
     try:
-        cached = r.get("torrent_health:homepage_kpis")
+        cached: bytes | None = r.get("torrent_health:homepage_kpis")  # type: ignore[assignment]
         if cached:
             return json.loads(cached.decode() if isinstance(cached, bytes) else cached)
     except Exception:
@@ -708,7 +708,7 @@ def get_homepage_kpis(ttl: int = 60) -> dict[str, int]:
     for key in r.scan_iter(match="torrent_health:meta:*", count=500):
         total += 1
         try:
-            vals = r.hmget(key, "last_peers_count", "last_seeders")  # type: ignore[arg-type]
+            vals: list[bytes | None] = r.hmget(key, "last_peers_count", "last_seeders")  # type: ignore[assignment,arg-type]
             if int(vals[0] or 0) > 0:
                 alive += 1
             seeders_total += int(vals[1] or 0)
@@ -716,7 +716,7 @@ def get_homepage_kpis(ttl: int = 60) -> dict[str, int]:
             continue
 
     try:
-        cross_group_ips = int(r.zcard("torrent_health:top:ip_cross_group") or 0)
+        cross_group_ips = int(r.zcard("torrent_health:top:ip_cross_group") or 0)  # type: ignore[arg-type]
     except Exception:
         cross_group_ips = 0
 

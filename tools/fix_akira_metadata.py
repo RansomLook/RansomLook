@@ -131,12 +131,12 @@ def fix_meta(dry_run: bool = True, only_akira: bool = False) -> dict[str, int]:
         for m in magnets:
             if not isinstance(m, str):
                 continue
-            cleaned = _clean_magnet(m)
-            if cleaned is None:
+            cleaned_magnet = _clean_magnet(m)
+            if cleaned_magnet is None:
                 dropped.append(m)
                 stats["magnets_dropped"] += 1
             else:
-                kept.append(cleaned)
+                kept.append(cleaned_magnet)
 
         if dropped:
             if kept:

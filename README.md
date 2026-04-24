@@ -176,10 +176,85 @@ poetry run cryptocur       # Sync cryptocurrency addresses from ransomwhe.re (DB
 poetry run update_crypto_tx # Fetch/update transactions via Breadcrumbs One API (DB 7)
 poetry run rf              # Fetch Recorded Future channel data (DB 10)
 poetry run notes           # Import/update ransom notes from ThreatLabz repo (DB 11)
-poetry run torrent         # Fetch torrent information from ransomware groups
-poetry run torrent-health  # Scan BitTorrent swarms for each tracked magnet (DB 13)
-poetry run enrich-ips      # Enrich observed peer IPs via CIRCL (cached 7 days)
+poetry run torrent                  # Fetch torrent information from ransomware groups
+poetry run torrent-health           # Scan BitTorrent swarms for each tracked magnet (DB 13)
+poetry run torrent-health-backfill  # Rescan torrents missing name / trackers (longer DHT window)
+poetry run torrent-tracker-scrape   # BEP-48 / BEP-15 tracker scrape (HTTP onion via Tor, HTTP clearnet, UDP)
+poetry run torrent-webseed-check    # HEAD every BEP-19 webseed URL, mark online/offline
+poetry run enrich-ips               # Enrich observed peer IPs via CIRCL (cached 7 days)
 ```
+
+### Torrent scanning — targeted runs
+
+`poetry run torrent-health` without arguments honours the adaptive schedule
+(alive/dead/frozen intervals) and scans whatever is due. To bypass the
+schedule and force a scan:
+
+```bash
+poetry run torrent-health --only <infohash>                 # one specific swarm
+poetry run torrent-health --group "clop torrents"           # every torrent of a group
+poetry run torrent-health --group clop --group akira        # multiple groups at once
+poetry run torrent-health --magnet "magnet:?xt=urn:btih:…"  # ad-hoc magnet (not stored against any group)
+poetry run torrent-health --scan-duration 120               # longer DHT observation window
+```
+
+### Attach torrents to a group without a post
+
+When a group publishes a leak outside the regular DLS pipeline (Telegram
+drops, private mirrors, forum posts), attach the magnet or `.torrent` file
+to the group manually so the swarm health pipeline picks it up:
+
+```bash
+poetry run tools/add_group_torrent.py --group clop --magnet "magnet:?xt=urn:btih:…"
+poetry run tools/add_group_torrent.py --group akira --torrent /path/leak.torrent
+poetry run tools/add_group_torrent.py --group clop --from-file magnets.txt
+poetry run tools/add_group_torrent.py --remove <infohash>
+```
+
+Manually attached torrents are merged with post-linked ones and scanned by
+the next cron run.
+
+### Torrent metadata backfill
+
+Torrents added from a bare magnet (no `ws=`, minimal `tr=`) rely on
+libtorrent's `ut_metadata` extension (BEP 9) to fetch the info dict from a
+willing peer. With the default 45 s scan window this often doesn't
+complete and the meta row ends up with peers but no name / size / files /
+trackers. `torrent-health-backfill` enumerates those incomplete rows and
+rescans them with a longer window (default 300 s):
+
+```bash
+poetry run torrent-health-backfill                  # live-peer torrents, missing name/trackers
+poetry run torrent-health-backfill --dry-run        # preview what would be scanned
+poetry run torrent-health-backfill --scan-duration 600   # stubborn swarms
+poetry run torrent-health-backfill --max 50         # cap per run
+poetry run torrent-health-backfill --include-files  # also fill missing file lists
+poetry run torrent-health-backfill --all            # include dead swarms too (rarely useful)
+```
+
+Safe to run on-demand or from a daily cron — the candidate list is
+recomputed each run, so already-populated rows are skipped automatically.
+
+### Tracker scrape & webseed liveness
+
+Two complementary passive probes that don't require running a full
+libtorrent scan — perfect for daily refresh of per-swarm intel:
+
+```bash
+# BEP-48 (HTTP) + BEP-15 (UDP) scrape — gives seeders / leechers / downloaded-all-time
+poetry run torrent-tracker-scrape                   # onion HTTP only (default)
+poetry run torrent-tracker-scrape --clearnet-too    # adds clearnet HTTP + UDP
+poetry run torrent-tracker-scrape --limit 5 -v      # sanity probe
+
+# BEP-19 webseed HEAD check — green/red dot per mirror on the detail page
+poetry run torrent-webseed-check                    # full pass, threaded
+poetry run torrent-webseed-check --workers 32 -v    # faster, noisier
+poetry run torrent-webseed-check --onion-only       # skip clearnet mirrors
+```
+
+Results are persisted on the torrent detail page (`/torrent-health/<ih>`):
+a dedicated KPI banner for the tracker numbers and a green/red dot next
+to every webseed URL.
 
 ## Cron setup
 
@@ -199,6 +274,15 @@ Example crontab (`crontab -e`):
 
 # Torrent swarm health (every 6 hours, adaptive per-swarm)
 0 */6 * * * cd /path/to/RansomLook && flock -n /tmp/rl-torrent.lock poetry run torrent-health
+
+# Tracker scrape — single pass covering onion HTTP, clearnet HTTP, UDP (every 3 hours)
+0 */3 * * * cd /path/to/RansomLook && poetry run torrent-tracker-scrape --clearnet-too
+
+# Webseed liveness — green/red dot map of mirror infrastructure (every 6 hours)
+30 */6 * * * cd /path/to/RansomLook && poetry run torrent-webseed-check
+
+# Daily metadata backfill — rescan torrents still missing name / trackers
+0 1 * * * cd /path/to/RansomLook && poetry run torrent-health-backfill
 
 # CIRCL IP enrichment (daily, keeps the admin page instant)
 30 3 * * * cd /path/to/RansomLook && flock -n /tmp/rl-enrich.lock poetry run enrich-ips

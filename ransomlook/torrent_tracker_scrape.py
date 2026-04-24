@@ -28,7 +28,7 @@ from datetime import datetime, timezone
 from typing import Any
 from urllib.parse import quote, urlparse, urlunparse
 
-import requests  # type: ignore[import-untyped]
+import requests
 
 from ransomlook.default import get_config
 from ransomlook.torrent_health import _redis, list_infohashes, get_meta
@@ -38,7 +38,16 @@ logger = logging.getLogger(__name__)
 TOR_PROXY = "socks5h://127.0.0.1:9050"
 USER_AGENT = "RansomLook/2 BEP-48 tracker scraper"
 BATCH_SIZE = 64
-DEFAULT_TIMEOUT = 45
+UDP_BATCH_SIZE = 32          # smaller payload → no MTU fragmentation
+DEFAULT_TIMEOUT = 45         # HTTP over Tor is slow, allow 45 s
+UDP_TIMEOUT = 8              # UDP is lossy, prefer fast failure
+UDP_RETRIES = 2
+UDP_BATCH_DELAY = 1.0        # seconds between consecutive UDP batches on the
+                             # same tracker — public trackers rate-limit (e.g.
+                             # opentrackr.org accepts 1 batch every ~45s, the
+                             # rest are silently dropped). Spacing them out
+                             # trades latency for success rate.
+MAX_TRACKER_FAILURES = 2     # skip remaining batches on repeated failures
 
 
 # ─── minimal bencode decoder ────────────────────────────────────────────
@@ -116,6 +125,19 @@ def _is_onion(url: str) -> bool:
         return False
 
 
+def _is_i2p(url: str) -> bool:
+    """I2P trackers (``*.i2p`` hostnames) require an I2P router to resolve.
+
+    We don't run one — filter them out upfront instead of letting every
+    scrape attempt fail with a NameResolutionError.
+    """
+    try:
+        host = (urlparse(url).hostname or "").lower()
+        return host.endswith(".i2p") or ".b32.i2p" in host
+    except Exception:
+        return False
+
+
 def _encode_infohash(ih_hex: str) -> str:
     """20-byte binary infohash → percent-encoded string for the query."""
     return quote(bytes.fromhex(ih_hex), safe="")
@@ -133,15 +155,17 @@ _UDP_ACTION_SCRAPE = 2
 _UDP_ACTION_ERROR = 3
 
 
-def _udp_scrape(host: str, port: int, infohashes: list[str], *,
-                timeout: int = 10) -> dict[str, dict[str, int]]:
-    """BEP-15 UDP tracker scrape. Clearnet only (UDP does not pass SOCKS5).
+def _udp_scrape_once(host: str, port: int, infohashes: list[str], *,
+                     timeout: int) -> dict[str, dict[str, int]]:
+    """Single UDP scrape attempt — raises ``socket.timeout`` / ``OSError`` on
+    network errors so the caller can retry.
 
-    Single attempt with ``timeout`` seconds. No retry — caller decides.
+    Forces IPv4 resolution. A few public trackers only answer on v4 and
+    getaddrinfo() otherwise returns AAAA first on dual-stack hosts, which
+    would silently fail even though the tracker is up.
     """
-    if not infohashes:
-        return {}
-    addrs = socket.getaddrinfo(host, port, type=socket.SOCK_DGRAM)
+    addrs = socket.getaddrinfo(host, port, family=socket.AF_INET,
+                               type=socket.SOCK_DGRAM)
     if not addrs:
         raise OSError(f"resolve failed: {host}")
     family, _, _, _, sockaddr = addrs[0]
@@ -190,6 +214,34 @@ def _udp_scrape(host: str, port: int, infohashes: list[str], *,
                 "downloaded": int(downloaded),
             }
         return out
+
+
+def _udp_scrape(host: str, port: int, infohashes: list[str], *,
+                timeout: int = UDP_TIMEOUT,
+                retries: int = UDP_RETRIES) -> dict[str, dict[str, int]]:
+    """BEP-15 UDP tracker scrape with retry. Clearnet only.
+
+    UDP is lossy — public trackers drop packets under load, and the
+    two-phase protocol (connect + scrape) has two chances to fail. BEP-15
+    recommends exponential backoff ``15 * 2^n`` but that's way too slow
+    for a batch run — we do up to ``retries`` attempts with a short
+    linear backoff instead.
+    """
+    if not infohashes:
+        return {}
+    last_err: Exception | None = None
+    for attempt in range(retries):
+        try:
+            return _udp_scrape_once(host, port, infohashes, timeout=timeout)
+        except (socket.timeout, OSError, ValueError) as e:
+            last_err = e
+            if attempt + 1 < retries:
+                sleep = 1.5 * (attempt + 1)  # 1.5 s, 3.0 s, 4.5 s …
+                logger.debug("udp %s:%d attempt %d failed (%s) — retry in %.1fs",
+                             host, port, attempt + 1, e, sleep)
+                time.sleep(sleep)
+    assert last_err is not None
+    raise last_err
 
 
 def _do_scrape_request(scrape_url: str, infohashes: list[str], *, tor: bool,
@@ -248,13 +300,32 @@ def scrape_tracker(scrape_url: str, infohashes: list[str], *, tor: bool,
     if parsed.scheme == "udp":
         host = parsed.hostname or ""
         port = parsed.port or 80
-        return _udp_scrape(host, port, infohashes, timeout=timeout)
+        # UDP has its own, shorter timeout — HTTP/Tor's 45 s default is
+        # wildly too long for a protocol that's either answering in
+        # <1 s or not at all.
+        return _udp_scrape(host, port, infohashes)
 
     out = _do_scrape_request(scrape_url, infohashes, tor=tor, timeout=timeout)
     if not out and len(infohashes) > 1:
-        logger.info("batch returned 0 — tracker likely single-infohash only, falling back")
-        merged: dict[str, dict[str, int]] = {}
-        for ih in infohashes:
+        # Two possibilities at this point:
+        #   (a) tracker doesn't support BEP-48 multi-infohash → single
+        #       requests would work.
+        #   (b) tracker supports multi-infohash but knows none of these
+        #       hashes → single requests would also be empty.
+        # Probe with the first infohash: if it comes back empty too, we're
+        # in case (b) and 63 more requests would be pure waste.
+        logger.info("batch returned 0 — probing with single infohash")
+        try:
+            probe = _do_scrape_request(scrape_url, infohashes[:1], tor=tor, timeout=timeout)
+        except Exception as e:
+            logger.debug("probe scrape %s: %s", infohashes[0], e)
+            return {}
+        if not probe:
+            logger.info("probe also empty — tracker knows none of these infohashes, giving up")
+            return {}
+        logger.info("probe worked — tracker is single-infohash only, continuing one-by-one")
+        merged: dict[str, dict[str, int]] = dict(probe)
+        for ih in infohashes[1:]:
             try:
                 one = _do_scrape_request(scrape_url, [ih], tor=tor, timeout=timeout)
             except Exception as e:
@@ -277,7 +348,7 @@ def _persist(ih: str, scrape_url: str, stats: dict[str, int]) -> None:
         "tracker_downloaded": str(stats["downloaded"]),
     }
     # Tiny historical ring — last 30 measurements, for a future sparkline.
-    existing = r.hget(meta_key, "tracker_history")
+    existing: bytes | None = r.hget(meta_key, "tracker_history")  # type: ignore[assignment]
     history: list[dict[str, Any]] = []
     if existing:
         try:
@@ -314,6 +385,9 @@ def run_once(*, limit: int | None = None, only_onion: bool | None = None,
         meta = get_meta(ih) or {}
         trackers = meta.get("trackers") or []
         for ann in trackers:
+            # I2P trackers need a local i2pd router — skip unconditionally.
+            if _is_i2p(ann):
+                continue
             is_onion = _is_onion(ann)
             scheme = (urlparse(ann).scheme or "").lower()
             # ``only_onion`` means "restrict to onion-reachable trackers".
@@ -335,27 +409,49 @@ def run_once(*, limit: int | None = None, only_onion: bool | None = None,
     for scrape_url, ihs in tracker_to_ihs.items():
         scheme = (urlparse(scrape_url).scheme or "").lower()
         tor = scheme != "udp" and _is_onion(scrape_url)
-        logger.info("scrape %s (%d infohashes, scheme=%s tor=%s)",
-                    scrape_url, len(ihs), scheme, tor)
-        for i in range(0, len(ihs), BATCH_SIZE):
+        batch_size = UDP_BATCH_SIZE if scheme == "udp" else BATCH_SIZE
+        logger.info("scrape %s (%d infohashes, scheme=%s tor=%s, batch=%d)",
+                    scrape_url, len(ihs), scheme, tor, batch_size)
+
+        consecutive_failures = 0
+        skipped_remainder = False
+        for i in range(0, len(ihs), batch_size):
             if limit is not None and total_batches >= limit:
                 logger.info("limit reached after %d batches", total_batches)
                 break
-            chunk = ihs[i:i + BATCH_SIZE]
+            chunk = ihs[i:i + batch_size]
             total_batches += 1
+            # Inter-batch spacing for UDP — public UDP trackers rate-limit
+            # per source IP (opentrackr in particular). A 1-second gap
+            # between batches on the same tracker trades a bit of latency
+            # for a materially higher success rate.
+            if scheme == "udp" and i > 0:
+                time.sleep(UDP_BATCH_DELAY)
             try:
                 stats_map = scrape_tracker(scrape_url, chunk, tor=tor)
             except Exception as e:
                 total_errors += 1
-                logger.warning("scrape %s batch %d: %s", scrape_url, i // BATCH_SIZE, e)
+                consecutive_failures += 1
+                logger.warning("scrape %s batch %d: %s", scrape_url, i // batch_size, e)
+                if consecutive_failures >= MAX_TRACKER_FAILURES:
+                    remaining = len(ihs) - (i + batch_size)
+                    if remaining > 0:
+                        logger.warning(
+                            "scrape %s: %d consecutive failures, skipping remaining "
+                            "%d infohash(es) — will retry on next cron tick",
+                            scrape_url, consecutive_failures, remaining)
+                        skipped_remainder = True
+                        break
                 continue
+            consecutive_failures = 0  # reset on success
             for ih, stats in stats_map.items():
                 _persist(ih, scrape_url, stats)
                 total_scraped += 1
             logger.info("  batch %d: %d/%d returned stats",
-                        i // BATCH_SIZE, len(stats_map), len(chunk))
+                        i // batch_size, len(stats_map), len(chunk))
         if limit is not None and total_batches >= limit:
             break
+        _ = skipped_remainder  # consumed via log only, kept for readability
 
     elapsed = time.time() - start
     logger.info("scrape finished: %d results across %d trackers (%d batches, %d errors, %.1fs)",
