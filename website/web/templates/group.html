@@ -45,6 +45,19 @@
       <div class="group-hero__actions">
         {% if current_user.is_authenticated %}
           <a class="btn-hero btn-hero--ghost btn-sm" href="/admin/edit/{{ group['db'] }}/{{ group['name']|urlencode }}">{{ _('Edit') }}</a>
+          <a class="btn-hero btn-hero--ghost btn-sm" href="{{ url_for('admin_group_analyses', name=group['name']) }}" title="{{ _('Manage technical analyses (Markdown)') }}">{{ _('Edit analyses') }}</a>
+        {% endif %}
+        {% set _vs = group.get('analysis_variants', []) %}
+        {% if _vs %}
+          {% if _vs|length == 1 %}
+            <a class="btn-hero btn-sm" href="{{ _vs[0].view_url }}" title="{{ _('In-house technical analysis') }}">{{ _('View analysis') }}</a>
+            <a class="btn-hero btn-hero--ghost btn-sm" href="{{ _vs[0].pdf_url }}" title="{{ _('Download analysis as PDF') }}">PDF</a>
+          {% else %}
+            {% for v in _vs %}
+              <a class="btn-hero btn-sm" href="{{ v.view_url }}" title="{{ _('In-house technical analysis') }} — {{ v.label }}">{{ _('View') }} {{ v.label }}</a>
+              <a class="btn-hero btn-hero--ghost btn-sm" href="{{ v.pdf_url }}" title="{{ _('PDF') }} — {{ v.label }}">{{ v.label }} PDF</a>
+            {% endfor %}
+          {% endif %}
         {% endif %}
         <a class="btn-hero btn-hero--ghost btn-sm" href="{{ url_for('compare') }}">{{ _('Compare') }}</a>
         {% if crypto_link %}<a class="btn-hero btn-hero--ghost btn-sm" href="{{ crypto_link }}" title="View crypto">Crypto</a>{% endif %}
@@ -154,7 +167,7 @@
     {% if group['meta'] is not none %}
       <div class="profile-desc prose">
         <h3 class="section-title" style="padding:0">{{ _('Description') }}</h3>
-        <p>{{ group['meta']|safe }}</p>
+        <p>{{ group['meta']|e|replace('\n', '<br/>'|safe) }}</p>
       </div>
     {% endif %}
 

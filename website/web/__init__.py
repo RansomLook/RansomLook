@@ -77,6 +77,7 @@ from ransomlook.sharedutils import (
     createfile,
     cryptostats,
     currentmonthstr,
+    get_private_entity_names,
     groupcount,
     hostcount,
     hostcountadmin,
@@ -111,6 +112,8 @@ from .forms import (
     AddForm,
     AddPostForm,
     AlertForm,
+    AnalysisForm,
+    AnalysisSelectForm,
     DeleteForm,
     EditActorForm,
     EditForm,
@@ -812,6 +815,7 @@ def home():  # type: ignore[no-untyped-def]
     data["nbnotes"]      = notecount()
     data["nbleaks"]      = leakcount()
     data["nbposts"]      = postcount()
+    data["nbanalyses"]   = _public_analyses_count()
     data["year"]         = dt.now().year
 
     # ── Insights: posts 7d vs prev 7d, sparkline 30d, movers, latest ─────
@@ -1193,13 +1197,17 @@ def hot():  # type: ignore[no-untyped-def]
 @app.route("/rss.xml")
 def feeds():  # type: ignore[no-untyped-def]
     posts = []
+    private_names = get_private_entity_names()
     red = Valkey(unix_socket_path=get_socket_path("cache"), db=DB_POSTS)
 
     # Iterate over Redis keys and parse entries
     for key in red.keys():  # type: ignore[union-attr]
+        group_name = key.decode()
+        if group_name.lower() in private_names:
+            continue
         entries = json.loads(red.get(key))  # type: ignore[arg-type]
         for entry in entries:
-            entry["group_name"] = key.decode()
+            entry["group_name"] = group_name
             posts.append(entry)
 
     # Sort posts by 'discovered' field
@@ -1562,8 +1570,6 @@ def group(name: str):  # type: ignore[no-untyped-def]
                     logo.append("/logo/group/" + name + "/" + f)
 
             group["name"] = key.decode()
-            if group["meta"] is not None:
-                group["meta"] = group["meta"].replace("\n", "<br/>")
             for location in group["locations"]:
                 screenfile = "/screenshots/" + group["name"] + "-" + createfile(location["slug"]) + ".png"
                 if os.path.exists(str(get_homedir()) + "/source" + screenfile):
@@ -1721,6 +1727,26 @@ def group(name: str):  # type: ignore[no-untyped-def]
             if last_seen:
                 last_seen = last_seen[:16]  # "YYYY-MM-DD HH:MM"
 
+            # In-house technical analyses present on disk and visible to this viewer.
+            # Each variant becomes a separate button pair on the page.
+            visible = _visible_variants(group["name"])
+            group["analysis_variants"] = [
+                {
+                    "id": v["id"],
+                    "label": _variant_label(v["id"]),
+                    "view_url": url_for("group_analysis") if False else (
+                        url_for("group_analysis", name=group["name"]) if not v["id"]
+                        else url_for("group_analysis_variant", name=group["name"], variant=v["id"])
+                    ),
+                    "pdf_url": (
+                        url_for("group_analysis_pdf", name=group["name"]) if not v["id"]
+                        else url_for("group_analysis_variant_pdf", name=group["name"], variant=v["id"])
+                    ),
+                }
+                for v in visible
+            ]
+            group["has_analysis"] = bool(group["analysis_variants"])
+
             return render_template(
                 "group.html",
                 group=group,
@@ -1744,6 +1770,794 @@ def group(name: str):  # type: ignore[no-untyped-def]
             )
 
     return redirect(url_for("home"))
+
+
+# ============================================================
+# Technical Analyses (Markdown → HTML / PDF, with admin upload)
+# ------------------------------------------------------------
+# Reports live under <homedir>/data/analyses/<group-lowercase>/
+#   FULL_ANALYSIS.md           (the report itself)
+#   meta.json                  (optional: author, date, sha256, private)
+# Public routes:
+#   GET /group/<name>/analysis        — render MD as HTML
+#   GET /group/<name>/analysis.pdf    — render MD as PDF (WeasyPrint)
+# Admin routes (login_required):
+#   GET     /admin/analyses           — list groups with/without analysis
+#   GET     /admin/analysis/<name>    — edit form (textarea + file upload)
+#   POST    /admin/analysis/<name>    — save MD content / uploaded file
+#   POST    /admin/analysis/<name>/delete — remove the analysis
+# ============================================================
+
+def _analyses_root() -> str:
+    """Absolute path to the analyses storage directory."""
+    return os.path.normpath(str(get_homedir()) + "/data/analyses")
+
+
+def _safe_group_name(name: str) -> Optional[str]:
+    """Sanitise a group name into a safe folder slug (lowercase, no path traversal)."""
+    if not name:
+        return None
+    safe = secure_filename(name.lower().strip())
+    return safe or None
+
+
+def _analysis_dir(name: str) -> Optional[str]:
+    """Return the absolute path of the analysis directory for a group, path-traversal safe."""
+    safe = _safe_group_name(name)
+    if not safe:
+        return None
+    root = _analyses_root()
+    candidate = os.path.normpath(os.path.join(root, safe))
+    if not (candidate == root or candidate.startswith(root + os.sep)):
+        return None
+    return candidate
+
+
+RESERVED_VARIANT_NAMES = {"assets", "pdf"}
+
+
+def _is_valid_variant(variant: str) -> bool:
+    """Validate a variant identifier (subdirectory name)."""
+    if not variant or variant in RESERVED_VARIANT_NAMES:
+        return False
+    return bool(re.fullmatch(r"[a-z0-9_-]{1,64}", variant))
+
+
+def _extract_sha256_from_md(text: str) -> Optional[str]:
+    """Find the first 64-hex-char SHA-256 inside a Markdown analysis.
+
+    Looks for a row of the standard ``## 1. Sample Identification`` table:
+      ``| SHA-256 | `fb24…776` |``
+    Falls back to ``SHA-256: fb24…776`` outside tables. Returns the lowercase hash or None.
+    """
+    if not text:
+        return None
+    # Table-cell variant (most common in our analyses).
+    m = re.search(r"SHA-?256[^\n]*?\|[^|\n]*?([a-fA-F0-9]{64})", text)
+    if not m:
+        # Plain "SHA-256: <hash>" or "SHA-256 = <hash>".
+        m = re.search(r"SHA-?256\s*[:=]\s*`?\s*([a-fA-F0-9]{64})", text)
+    if not m:
+        # Last resort: a backticked 64-hex right after the literal "SHA-256".
+        m = re.search(r"SHA-?256[^\n]{0,40}([a-fA-F0-9]{64})", text)
+    return m.group(1).lower() if m else None
+
+
+def _read_meta_json(path: str) -> Dict[str, Any]:
+    if not os.path.isfile(path):
+        return {}
+    try:
+        with open(path, "r", encoding="utf-8") as f:
+            return json.load(f) or {}
+    except Exception:
+        return {}
+
+
+def _list_variants(name: str) -> list:
+    """Return all analysis variants for a group, ordered alphabetically.
+
+    A legacy root-level ``FULL_ANALYSIS.md`` is exposed with id="" (empty
+    variant id, ``is_root=True``) — its public URL stays ``/group/<g>/analysis``.
+
+    A subdirectory ``data/analyses/<g>/<variant>/FULL_ANALYSIS.md`` is exposed
+    with id=variant, ``is_root=False``.
+    """
+    d = _analysis_dir(name)
+    if not d or not os.path.isdir(d):
+        return []
+    out = []
+    root_md = os.path.join(d, "FULL_ANALYSIS.md")
+    if os.path.isfile(root_md):
+        out.append({
+            "id": "",
+            "is_root": True,
+            "md_path": root_md,
+            "assets_dir": os.path.join(d, "assets"),
+            "meta": _read_meta_json(os.path.join(d, "meta.json")),
+            "mtime": os.path.getmtime(root_md),
+        })
+    try:
+        entries = sorted(os.listdir(d))
+    except OSError:
+        entries = []
+    for entry in entries:
+        if entry == "assets" or entry.startswith("."):
+            continue
+        sub = os.path.join(d, entry)
+        sub_md = os.path.join(sub, "FULL_ANALYSIS.md")
+        if not (os.path.isdir(sub) and os.path.isfile(sub_md)):
+            continue
+        if not _is_valid_variant(entry):
+            continue
+        out.append({
+            "id": entry,
+            "is_root": False,
+            "md_path": sub_md,
+            "assets_dir": os.path.join(sub, "assets"),
+            "meta": _read_meta_json(os.path.join(sub, "meta.json")),
+            "mtime": os.path.getmtime(sub_md),
+        })
+    return out
+
+
+def _resolve_variant(name: str, variant: Optional[str]) -> Optional[Dict[str, Any]]:
+    """Return the variant info dict for (group, variant), or None.
+
+    variant=None ⇒ default variant (legacy root-level if present, else first alpha).
+    """
+    variants = _list_variants(name)
+    if not variants:
+        return None
+    if not variant:
+        for v in variants:
+            if v["is_root"]:
+                return v
+        return variants[0]
+    for v in variants:
+        if v["id"] == variant:
+            return v
+    return None
+
+
+def _analysis_md_path(name: str, variant: Optional[str] = None) -> Optional[str]:
+    """Path to FULL_ANALYSIS.md for the default (or specified) variant, or None."""
+    v = _resolve_variant(name, variant)
+    return v["md_path"] if v else None
+
+
+def _analysis_meta(name: str, variant: Optional[str] = None) -> Dict[str, Any]:
+    """Read the optional meta.json sidecar for the default (or specified) variant."""
+    v = _resolve_variant(name, variant)
+    return v["meta"] if v else {}
+
+
+def _render_markdown_text(text: str) -> str:
+    """Render raw Markdown to HTML5 with our standard extension set."""
+    import markdown  # type: ignore[import-not-found]
+
+    return markdown.markdown(
+        text,
+        extensions=[
+            "tables",
+            "fenced_code",
+            "sane_lists",
+            "attr_list",
+            "toc",
+            "codehilite",
+            "def_list",
+            "footnotes",
+        ],
+        extension_configs={
+            "codehilite": {"guess_lang": False, "noclasses": False},
+            "toc": {"permalink": False, "baselevel": 2, "title": "Table of Contents"},
+        },
+        output_format="html5",
+    )
+
+
+def _render_analysis_html(md_path: str) -> str:
+    """Render a Markdown file to HTML5."""
+    with open(md_path, "r", encoding="utf-8") as f:
+        return _render_markdown_text(f.read())
+
+
+def _list_groups_with_analysis_status() -> list:
+    """Build a list of all known groups + a flag indicating whether they have an analysis."""
+    red = Valkey(unix_socket_path=get_socket_path("cache"), db=DB_GROUPS)
+    out = []
+    for key in red.keys():  # type: ignore[union-attr]
+        gname = key.decode()
+        variants = _list_variants(gname)
+        out.append({
+            "name": gname,
+            "has_analysis": bool(variants),
+            "variants": variants,
+        })
+    out.sort(key=lambda x: (not x["has_analysis"], x["name"].lower()))
+    return out
+
+
+def _is_analysis_public(name: str, variant: Optional[str] = None) -> bool:
+    """True if an analysis variant exists on disk *and* is not flagged private."""
+    v = _resolve_variant(name, variant)
+    return bool(v) and not v["meta"].get("private", False)
+
+
+def _public_analyses_count() -> int:
+    """Number of publicly-visible analysis variants across all groups."""
+    red = Valkey(unix_socket_path=get_socket_path("cache"), db=DB_GROUPS)
+    n = 0
+    for key in red.keys():  # type: ignore[union-attr]
+        gname = key.decode()
+        for v in _list_variants(gname):
+            if not v["meta"].get("private", False):
+                n += 1
+    return n
+
+
+# ── Image assets attached to an analysis ───────────────────────────────────
+ALLOWED_ASSET_EXTS = {".png", ".jpg", ".jpeg", ".gif", ".webp", ".svg"}
+
+
+def _safe_asset_filename(fn: str) -> Optional[str]:
+    """Sanitise an uploaded asset filename. Returns None if rejected."""
+    safe = secure_filename(fn or "")
+    if not safe:
+        return None
+    ext = os.path.splitext(safe)[1].lower()
+    if ext not in ALLOWED_ASSET_EXTS:
+        return None
+    return safe
+
+
+def _assets_dir(name: str, variant: Optional[str] = None) -> Optional[str]:
+    """Filesystem path to the assets/ subdir for a group's default or specific variant."""
+    v = _resolve_variant(name, variant)
+    if v:
+        return v["assets_dir"]
+    # Fallback: even if no MD exists yet, the admin upload route needs to know
+    # where to drop the file. For variant=None we point at the legacy root layout.
+    base = _analysis_dir(name)
+    if not base:
+        return None
+    if variant:
+        if not _is_valid_variant(variant):
+            return None
+        return os.path.join(base, variant, "assets")
+    return os.path.join(base, "assets")
+
+
+def _rewrite_asset_urls(html: str, group_name: str, mode: str, variant: Optional[str] = None) -> str:
+    """Rewrite Markdown-relative `assets/<file>` image refs to a usable URL.
+
+    mode='web' → public asset endpoint; mode='pdf' → ``file://`` URL so
+    WeasyPrint reads from disk without an HTTP round-trip.
+    """
+    if mode == "web":
+        if variant:
+            prefix = f"/group/{quote(group_name, safe='')}/analysis/{quote(variant, safe='')}/assets/"
+        else:
+            prefix = f"/group/{quote(group_name, safe='')}/analysis/assets/"
+    elif mode == "pdf":
+        adir = _assets_dir(group_name, variant)
+        if not adir:
+            return html
+        prefix = "file://" + adir + "/"
+    else:
+        return html
+    return re.sub(
+        r'(<img\b[^>]*?\bsrc=["\'])assets/([^"\']+)(["\'])',
+        lambda m: m.group(1) + prefix + m.group(2) + m.group(3),
+        html,
+        flags=re.IGNORECASE,
+    )
+
+
+@app.route("/analyses")
+def analyses_index():  # type: ignore[no-untyped-def]
+    """Public listing of all in-house technical analyses.
+
+    Authenticated viewers see private analyses too; everyone else only sees
+    the publicly-flagged ones.
+    """
+    show_private = current_user.is_authenticated
+    items = []
+    for g in _list_groups_with_analysis_status():
+        if not g["has_analysis"]:
+            continue
+        for v in g["variants"]:
+            is_private = bool(v["meta"].get("private", False))
+            if is_private and not show_private:
+                continue
+            mtime = dt.fromtimestamp(v["mtime"]).strftime("%Y-%m-%d")
+            items.append({
+                "name": g["name"],
+                "variant": v["id"],
+                "variant_label": _variant_label(v["id"]),
+                "view_url": (url_for("group_analysis", name=g["name"]) if not v["id"]
+                             else url_for("group_analysis_variant", name=g["name"], variant=v["id"])),
+                "pdf_url": (url_for("group_analysis_pdf", name=g["name"]) if not v["id"]
+                            else url_for("group_analysis_variant_pdf", name=g["name"], variant=v["id"])),
+                "private": is_private,
+                "mtime": mtime,
+                "sha256": v["meta"].get("sha256"),
+            })
+    items.sort(key=lambda x: (x["mtime"] or "", x["name"].lower(), x["variant"].lower()), reverse=True)
+    return render_template("analyses_index.html", items=items, total=len(items))
+
+
+def _visible_variants(name: str) -> list:
+    """Return variants for this group filtered for the current viewer (drops privates if anon)."""
+    out = []
+    for v in _list_variants(name):
+        if v["meta"].get("private", False) and not current_user.is_authenticated:
+            continue
+        out.append(v)
+    return out
+
+
+def _variant_label(variant_id: str) -> str:
+    """Human-readable label for a variant id. Empty id ⇒ "Default" (root-level legacy)."""
+    return variant_id.replace("-", " ").replace("_", " ").title() if variant_id else "Default"
+
+
+def _do_render_analysis_html(name: str, variant: Optional[str]):  # type: ignore[no-untyped-def]
+    v = _resolve_variant(name, variant)
+    if not v:
+        abort(404)
+    if v["meta"].get("private", False) and not current_user.is_authenticated:
+        return redirect(url_for("home"))
+    html = _rewrite_asset_urls(_render_analysis_html(v["md_path"]), name, "web", variant=v["id"] or None)
+    mtime = dt.fromtimestamp(v["mtime"]).strftime("%Y-%m-%d")
+    visible = _visible_variants(name)
+    switcher = [
+        {
+            "id": vv["id"],
+            "label": _variant_label(vv["id"]),
+            "is_current": vv["id"] == v["id"],
+        }
+        for vv in visible
+    ]
+    return render_template(
+        "analysis.html",
+        group_name=name,
+        variant=v["id"],
+        variant_label=_variant_label(v["id"]),
+        variants=switcher,
+        content=html,
+        analysis_mtime=mtime,
+        meta=v["meta"],
+    )
+
+
+def _do_render_analysis_pdf(name: str, variant: Optional[str]):  # type: ignore[no-untyped-def]
+    v = _resolve_variant(name, variant)
+    if not v:
+        abort(404)
+    if v["meta"].get("private", False) and not current_user.is_authenticated:
+        return redirect(url_for("home"))
+    html = _rewrite_asset_urls(_render_analysis_html(v["md_path"]), name, "pdf", variant=v["id"] or None)
+    mtime = dt.fromtimestamp(v["mtime"]).strftime("%Y-%m-%d")
+    logo_svg_url = ""
+    try:
+        big_logo = os.path.join(app.static_folder or "", "ransomlook.svg")
+        if os.path.isfile(big_logo):
+            logo_svg_url = "file://" + big_logo
+    except Exception:
+        pass
+    page = render_template(
+        "analysis_pdf.html",
+        group_name=name,
+        variant=v["id"],
+        variant_label=_variant_label(v["id"]),
+        content=html,
+        analysis_mtime=mtime,
+        meta=v["meta"],
+        logo_svg_url=logo_svg_url,
+    )
+    try:
+        from weasyprint import HTML  # type: ignore[import-not-found]
+    except ImportError:
+        return Response(
+            page,
+            mimetype="text/html",
+            headers={"Content-Disposition": f"inline; filename={secure_filename(name)}_analysis.html"},
+        )
+    pdf_bytes = HTML(string=page, base_url=request.host_url).write_pdf()
+    safe_name = secure_filename(name) or "analysis"
+    fname = f"{safe_name}_analysis.pdf" if not v["id"] else f"{safe_name}_{secure_filename(v['id'])}_analysis.pdf"
+    return Response(
+        pdf_bytes,
+        mimetype="application/pdf",
+        headers={
+            "Content-Disposition": f"attachment; filename={fname}",
+            "Cache-Control": "public, max-age=3600",
+        },
+    )
+
+
+@app.route("/group/<name>/analysis")
+def group_analysis(name: str):  # type: ignore[no-untyped-def]
+    return _do_render_analysis_html(name, None)
+
+
+@app.route("/group/<name>/analysis/<variant>")
+def group_analysis_variant(name: str, variant: str):  # type: ignore[no-untyped-def]
+    if not _is_valid_variant(variant):
+        abort(404)
+    return _do_render_analysis_html(name, variant)
+
+
+@app.route("/group/<name>/analysis.pdf")
+def group_analysis_pdf(name: str):  # type: ignore[no-untyped-def]
+    return _do_render_analysis_pdf(name, None)
+
+
+@app.route("/group/<name>/analysis/<variant>.pdf")
+def group_analysis_variant_pdf(name: str, variant: str):  # type: ignore[no-untyped-def]
+    if not _is_valid_variant(variant):
+        abort(404)
+    return _do_render_analysis_pdf(name, variant)
+
+
+@app.route("/admin/analyses", methods=["GET", "POST"])
+@flask_login.login_required
+def admin_analyses():  # type: ignore[no-untyped-def]
+    groups = _list_groups_with_analysis_status()
+    have = sum(1 for g in groups if g["has_analysis"])
+    form = AnalysisSelectForm()
+    form.group.choices = [("", "Please select the group")] + [
+        (g["name"], ("✓  " if g["has_analysis"] else "+  ") + g["name"])
+        for g in groups
+    ]
+    if form.validate_on_submit():
+        # The selector picks a group; the variant management page does the rest.
+        return redirect(url_for("admin_group_analyses", name=form.group.data))
+    return render_template(
+        "admin/analyses.html",
+        form=form,
+        total=len(groups),
+        have=have,
+    )
+
+
+@app.route("/admin/analysis/<name>", methods=["GET", "POST"])
+@flask_login.login_required
+def admin_group_analyses(name: str):  # type: ignore[no-untyped-def]
+    """Variants management page: list existing variants + form to create a new one."""
+    safe = _safe_group_name(name)
+    if not safe:
+        abort(400)
+    red = Valkey(unix_socket_path=get_socket_path("cache"), db=DB_GROUPS)
+    keys_lc = {k.decode().lower() for k in red.keys()}  # type: ignore[union-attr]
+    if name.lower() not in keys_lc:
+        flash(f"No such group: {name}", "error")
+        return redirect(url_for("admin_analyses"))
+
+    if request.method == "POST":
+        new_id = (request.form.get("new_variant") or "").strip().lower()
+        if not _is_valid_variant(new_id):
+            flash("Invalid variant id (use [a-z0-9_-], 1–64 chars; not 'assets'/'pdf').", "error")
+            return redirect(url_for("admin_group_analyses", name=name))
+        # Ensure no collision.
+        if any(v["id"] == new_id for v in _list_variants(name)):
+            flash(f"Variant '{new_id}' already exists.", "error")
+            return redirect(url_for("admin_group_analyses", name=name))
+        # Create empty variant directory and an empty MD so the editor opens cleanly.
+        base = _analysis_dir(name)
+        if not base:
+            abort(400)
+        variant_dir = os.path.join(base, new_id)
+        os.makedirs(variant_dir, exist_ok=True)
+        md = os.path.join(variant_dir, "FULL_ANALYSIS.md")
+        if not os.path.isfile(md):
+            with open(md, "w", encoding="utf-8") as f:
+                f.write(f"# {name.title()} — {_variant_label(new_id)}\n\n")
+        audit_log("analysis_variant_create", name, f"variant={new_id}")
+        return redirect(url_for("admin_edit_analysis_variant", name=name, variant_url=new_id))
+
+    return render_template(
+        "admin/analysis_variants.html",
+        group_name=name,
+        variants=_list_variants(name),
+        delete_form=DeleteForm(),
+    )
+
+
+# ── Variant resolution sentinel ─────────────────────────────────────────────
+# `_root` in the URL means "the legacy root-level FULL_ANALYSIS.md (no subdir)".
+# The internal variant id is "" (empty). RESERVED_VARIANT_NAMES keeps `_root`
+# from being usable as a real variant directory name on disk.
+ROOT_VARIANT_SENTINEL = "_root"
+
+
+def _decode_variant_url(variant_url: str) -> Optional[str]:
+    """URL → internal variant id. Empty string for ROOT_VARIANT_SENTINEL."""
+    if variant_url == ROOT_VARIANT_SENTINEL:
+        return ""
+    if _is_valid_variant(variant_url):
+        return variant_url
+    return None
+
+
+def _encode_variant_url(variant_id: str) -> str:
+    return variant_id or ROOT_VARIANT_SENTINEL
+
+
+def _admin_check_group(name: str):  # type: ignore[no-untyped-def]
+    """Validate that a group exists and the request is for a sane name.
+
+    Returns None on success, or a (response, status) tuple on failure suitable
+    for the caller to ``return`` directly.
+    """
+    if not _safe_group_name(name):
+        return redirect(url_for("admin_analyses"))
+    red = Valkey(unix_socket_path=get_socket_path("cache"), db=DB_GROUPS)
+    keys_lc = {k.decode().lower() for k in red.keys()}  # type: ignore[union-attr]
+    if name.lower() not in keys_lc:
+        flash(f"No such group: {name}", "error")
+        return redirect(url_for("admin_analyses"))
+    return None
+
+
+@app.route("/admin/analysis/<name>/<variant_url>", methods=["GET", "POST"])
+@flask_login.login_required
+def admin_edit_analysis_variant(name: str, variant_url: str):  # type: ignore[no-untyped-def]
+    # Reserved suffixes (preview/delete/upload-asset) are handled by their own routes;
+    # if Werkzeug routed something like 'preview' here, it means there's no more specific
+    # match — fall through to 404.
+    if variant_url in ("preview", "delete", "upload-asset"):
+        abort(404)
+    chk = _admin_check_group(name)
+    if chk:
+        return chk
+    variant = _decode_variant_url(variant_url)
+    if variant is None:
+        flash("Invalid variant id", "error")
+        return redirect(url_for("admin_group_analyses", name=name))
+
+    form = AnalysisForm()
+    v_info = _resolve_variant(name, variant)
+    md_path = v_info["md_path"] if v_info else None
+    existing_text = ""
+    if md_path:
+        try:
+            with open(md_path, "r", encoding="utf-8") as f:
+                existing_text = f.read()
+        except Exception:
+            existing_text = ""
+
+    if request.method == "GET":
+        existing_meta = v_info["meta"] if v_info else {}
+        form.content.data = existing_text
+        form.private.data = bool(existing_meta.get("private", False))
+        form.sha256.data = existing_meta.get("sha256", "") or ""
+        form.author.data = existing_meta.get("author", "") or ""
+        form.analysis_date.data = existing_meta.get("date", "") or ""
+        return render_template(
+            "admin/edit_analysis.html",
+            form=form,
+            delete_form=DeleteForm(),
+            group_name=name,
+            variant=variant,
+            variant_url=variant_url,
+            variant_label=_variant_label(variant),
+            has_existing=bool(md_path),
+        )
+
+    # POST — accept either a textarea body or an uploaded .md file (uploaded file wins).
+    if not form.validate_on_submit():
+        flash("Invalid form submission", "error")
+        return redirect(url_for("admin_edit_analysis_variant", name=name, variant_url=variant_url))
+
+    # Compute the target directory for THIS variant.
+    base = _analysis_dir(name)
+    if not base:
+        abort(400)
+    target_dir = base if not variant else os.path.join(base, variant)
+    os.makedirs(target_dir, exist_ok=True)
+    target_md = os.path.join(target_dir, "FULL_ANALYSIS.md")
+
+    new_content: Optional[str] = None
+    if form.upload.data and getattr(form.upload.data, "filename", ""):
+        f_in = form.upload.data
+        try:
+            raw = f_in.read()
+            new_content = raw.decode("utf-8", errors="replace")
+        except Exception:
+            flash("Could not read uploaded file as UTF-8 text", "error")
+            return redirect(url_for("admin_edit_analysis_variant", name=name, variant_url=variant_url))
+    elif form.content.data is not None:
+        new_content = form.content.data
+
+    if new_content is None or new_content.strip() == "":
+        flash("Empty content — nothing saved", "error")
+        return redirect(url_for("admin_edit_analysis_variant", name=name, variant_url=variant_url))
+
+    if "\n#" not in ("\n" + new_content):
+        flash("Warning: no Markdown heading found — saving anyway", "warning")
+
+    with open(target_md, "w", encoding="utf-8") as f:
+        f.write(new_content)
+
+    meta = _read_meta_json(os.path.join(target_dir, "meta.json"))
+    meta["private"] = bool(form.private.data)
+    meta["last_edited_by"] = getattr(current_user, "id", "unknown")
+    meta["last_edited_at"] = dt.now().strftime("%Y-%m-%d %H:%M:%S")
+
+    sha_in = (form.sha256.data or "").strip().lower()
+    if sha_in:
+        if re.fullmatch(r"[0-9a-f]{64}", sha_in):
+            meta["sha256"] = sha_in
+        else:
+            flash("SHA-256 ignored: must be 64 hex chars", "warning")
+    else:
+        # Field empty → try to autodetect inside the Markdown's ## 1. Sample Identification.
+        auto = _extract_sha256_from_md(new_content)
+        if auto:
+            meta["sha256"] = auto
+            flash(f"SHA-256 auto-extracted from Markdown: {auto[:16]}…", "info")
+        else:
+            meta.pop("sha256", None)
+
+    author_in = (form.author.data or "").strip()
+    if author_in:
+        meta["author"] = author_in
+    else:
+        meta.pop("author", None)
+
+    date_in = (form.analysis_date.data or "").strip()
+    if date_in:
+        if re.fullmatch(r"\d{4}-\d{2}-\d{2}", date_in):
+            meta["date"] = date_in
+        else:
+            flash("Analysis date ignored: expected YYYY-MM-DD", "warning")
+    else:
+        meta.pop("date", None)
+
+    try:
+        with open(os.path.join(target_dir, "meta.json"), "w", encoding="utf-8") as f:
+            json.dump(meta, f, indent=2, ensure_ascii=False)
+    except Exception:
+        pass
+
+    audit_log("analysis_save", name, f"variant={variant or '(root)'}; bytes={len(new_content)}; private={meta['private']}")
+    flash(f"Saved analysis for {name}{' / ' + variant if variant else ''} ({len(new_content)} bytes)", "success")
+    return redirect(url_for("admin_group_analyses", name=name))
+
+
+@app.route("/admin/analysis/<name>/<variant_url>/preview", methods=["POST"])
+@flask_login.login_required
+def admin_preview_analysis_variant(name: str, variant_url: str):  # type: ignore[no-untyped-def]
+    """Render an unsaved Markdown body via the production pipeline (variant-aware)."""
+    if not _safe_group_name(name):
+        abort(400)
+    variant = _decode_variant_url(variant_url)
+    if variant is None:
+        abort(400)
+    body = request.form.get("content", "")
+    html = _rewrite_asset_urls(_render_markdown_text(body), name, "web", variant=variant or None)
+    return render_template(
+        "analysis.html",
+        group_name=name,
+        variant=variant,
+        variant_label=_variant_label(variant),
+        variants=[],
+        content=html,
+        analysis_mtime="(unsaved preview)",
+        meta={},
+    )
+
+
+def _do_serve_asset(name: str, variant: Optional[str], filename: str):  # type: ignore[no-untyped-def]
+    """Shared body for /group/<name>/analysis[/<variant>]/assets/<filename>."""
+    if "/" in filename or "\\" in filename:
+        abort(404)
+    safe = _safe_asset_filename(filename)
+    if not safe or safe != filename:
+        abort(404)
+    v = _resolve_variant(name, variant)
+    if not v:
+        abort(404)
+    if v["meta"].get("private", False) and not current_user.is_authenticated:
+        return redirect(url_for("home"))
+    adir = v["assets_dir"]
+    if not adir or not os.path.isfile(os.path.join(adir, safe)):
+        abort(404)
+    return send_from_directory(adir, safe, conditional=True)
+
+
+@app.route("/group/<name>/analysis/assets/<filename>")
+def group_analysis_asset(name: str, filename: str):  # type: ignore[no-untyped-def]
+    return _do_serve_asset(name, None, filename)
+
+
+@app.route("/group/<name>/analysis/<variant>/assets/<filename>")
+def group_analysis_variant_asset(name: str, variant: str, filename: str):  # type: ignore[no-untyped-def]
+    if not _is_valid_variant(variant):
+        abort(404)
+    return _do_serve_asset(name, variant, filename)
+
+
+@app.route("/admin/analysis/<name>/<variant_url>/upload-asset", methods=["POST"])
+@flask_login.login_required
+def admin_upload_asset_variant(name: str, variant_url: str):  # type: ignore[no-untyped-def]
+    """Receive an image dragged/pasted into the editor (variant-aware)."""
+    if not _safe_group_name(name):
+        return jsonify(ok=False, error="bad_group"), 400
+    variant = _decode_variant_url(variant_url)
+    if variant is None:
+        return jsonify(ok=False, error="bad_variant"), 400
+    red = Valkey(unix_socket_path=get_socket_path("cache"), db=DB_GROUPS)
+    keys_lc = {k.decode().lower() for k in red.keys()}  # type: ignore[union-attr]
+    if name.lower() not in keys_lc:
+        return jsonify(ok=False, error="no_such_group"), 404
+
+    from flask_wtf.csrf import validate_csrf  # type: ignore[import-untyped]
+    try:
+        validate_csrf(request.form.get("csrf_token") or request.headers.get("X-CSRFToken"))
+    except Exception:
+        return jsonify(ok=False, error="csrf"), 400
+
+    f = request.files.get("file")
+    if not f or not f.filename:
+        return jsonify(ok=False, error="no_file"), 400
+    safe = _safe_asset_filename(f.filename)
+    if not safe:
+        return jsonify(ok=False, error="bad_extension_or_name"), 400
+    adir = _assets_dir(name, variant or None)
+    if not adir:
+        return jsonify(ok=False, error="bad_dir"), 400
+    os.makedirs(adir, exist_ok=True)
+
+    target = os.path.join(adir, safe)
+    if os.path.exists(target):
+        stem, ext = os.path.splitext(safe)
+        safe = f"{stem}-{dt.now().strftime('%Y%m%d%H%M%S')}{ext}"
+        target = os.path.join(adir, safe)
+    f.save(target)
+    audit_log("analysis_asset_upload", name, f"variant={variant or '(root)'}; file={safe}; bytes={os.path.getsize(target)}")
+    return jsonify(ok=True, filename=safe, snippet=f"![](assets/{safe})")
+
+
+@app.route("/admin/analysis/<name>/<variant_url>/delete", methods=["POST"])
+@flask_login.login_required
+def admin_delete_analysis_variant(name: str, variant_url: str):  # type: ignore[no-untyped-def]
+    chk = _admin_check_group(name)
+    if chk:
+        return chk
+    variant = _decode_variant_url(variant_url)
+    if variant is None:
+        flash("Invalid variant id", "error")
+        return redirect(url_for("admin_group_analyses", name=name))
+    v = _resolve_variant(name, variant)
+    if not v:
+        flash("Nothing to delete for that variant", "error")
+        return redirect(url_for("admin_group_analyses", name=name))
+    target_dir = os.path.dirname(v["md_path"])
+    root = _analyses_root()
+    if not target_dir.startswith(root + os.sep):
+        abort(400)
+    try:
+        for fn in ("FULL_ANALYSIS.md", "meta.json"):
+            p = os.path.join(target_dir, fn)
+            if os.path.isfile(p):
+                os.remove(p)
+        # If the variant has its own assets/ dir AND it's now an empty container, also remove.
+        # (Keep the legacy root-level assets/ alone if other variants exist alongside.)
+        if v["id"]:
+            adir = os.path.join(target_dir, "assets")
+            if os.path.isdir(adir) and not os.listdir(adir):
+                os.rmdir(adir)
+            if os.path.isdir(target_dir) and not os.listdir(target_dir):
+                os.rmdir(target_dir)
+    except Exception as e:
+        flash(f"Delete failed: {e}", "error")
+        return redirect(url_for("admin_group_analyses", name=name))
+
+    audit_log("analysis_delete", name, f"variant={v['id'] or '(root)'}")
+    flash(f"Deleted analysis for {name}{' / ' + v['id'] if v['id'] else ''}", "success")
+    return redirect(url_for("admin_group_analyses", name=name))
 
 
 @app.route("/market/<name>")

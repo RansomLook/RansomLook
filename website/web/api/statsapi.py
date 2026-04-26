@@ -20,6 +20,7 @@ from ransomlook.default import (
 )
 from ransomlook.sharedutils import (
     currentmonthstr,
+    get_private_entity_names,
     groupcount,
     hostcount,
     hostcountadmin,
@@ -151,9 +152,13 @@ class HotEndpoint(Resource):  # type: ignore[misc]
 
         red = Valkey(unix_socket_path=get_socket_path("cache"), db=DB_POSTS)
         actualdate = datetime.now() + timedelta(days=-days)
+        private_names = get_private_entity_names()
 
         posts = []
         for key in red.keys():  # type: ignore[union-attr]
+            group_name = key.decode() if isinstance(key, (bytes, bytearray)) else str(key)
+            if group_name.lower() in private_names:
+                continue
             try:
                 entries = json.loads(red.get(key))  # type: ignore[arg-type]
             except Exception:
@@ -170,7 +175,7 @@ class HotEndpoint(Resource):  # type: ignore[misc]
                     continue
                 if dt_obj > actualdate:
                     e = dict(entry)
-                    e["group_name"] = key.decode() if isinstance(key, (bytes, bytearray)) else str(key)
+                    e["group_name"] = group_name
                     posts.append(e)
 
         by_group: dict[str, dict[str, Any]] = {}
@@ -238,15 +243,19 @@ class SearchEndpoint(Resource):  # type: ignore[misc]
         markets.sort(key=lambda x: x["name"].lower())
 
         # Posts (DB=2)
+        private_names = get_private_entity_names()
         red = Valkey(unix_socket_path=get_socket_path("cache"), db=DB_POSTS)
         found_posts = []
         for key in red.keys():  # type: ignore[union-attr]
+            group_name = key.decode()
+            if group_name.lower() in private_names:
+                continue
             entries = json.loads(red.get(key))  # type: ignore[arg-type]
             for entry in entries:
                 title = (entry.get("post_title") or "").lower()
                 desc = (entry.get("description") or "").lower()
                 if ql in title or ql in desc:
-                    entry["group_name"] = key.decode()
+                    entry["group_name"] = group_name
                     found_posts.append(entry)
         found_posts.sort(key=lambda x: x.get("discovered", ""), reverse=True)
 
@@ -320,6 +329,14 @@ class HealthEndpoint(Resource):  # type: ignore[misc]
             red_tmp = Valkey(unix_socket_path=get_socket_path("cache"), db=db_num)
             for k in red_tmp.keys():  # type: ignore[union-attr]
                 if k.decode().lower() == name.lower():
+                    entry_raw = red_tmp.get(k)
+                    if entry_raw:
+                        try:
+                            entry_data = json.loads(entry_raw)  # type: ignore[arg-type]
+                            if entry_data.get("private") is True:
+                                api.abort(404, "No health data found for this group")
+                        except ValueError:
+                            pass
                     real_name = k.decode()
                     break
             if real_name:
@@ -465,6 +482,9 @@ def _compute_entry(kind: str, name: str) -> dict[str, Any] | None:
     try:
         entry = json.loads(red.get(key))  # type: ignore[arg-type]
     except Exception:
+        return None
+
+    if entry.get("private") is True:
         return None
 
     entry["name"] = entry.get("name") or real_name

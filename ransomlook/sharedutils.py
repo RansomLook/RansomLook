@@ -39,6 +39,29 @@ def honk(msg: Any) -> None:
     sys.exit()
 
 
+def get_private_entity_names() -> set[str]:
+    """Return lowercase names of groups/markets flagged `private: true`.
+
+    Posts and health series are keyed by group/market name in separate DBs
+    without carrying the private flag. Callers use this set to filter
+    aggregate endpoints that would otherwise leak private-group activity.
+    """
+    names: set[str] = set()
+    for db_num in (DB_GROUPS, DB_MARKETS):
+        red = valkey.Valkey(unix_socket_path=get_socket_path("cache"), db=db_num)
+        for key in red.keys():  # type: ignore[union-attr]
+            raw = red.get(key)
+            if not raw:
+                continue
+            try:
+                data = json.loads(raw)  # type: ignore[arg-type]
+            except Exception:
+                continue
+            if data.get("private") is True:
+                names.add(key.decode().lower())
+    return names
+
+
 def gcount(posts: list[dict[str, Any]]) -> dict[str, int]:
     group_counts: dict[str, int] = {}
     for post in posts:

@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+{% block title %}{{ group_name|title }}{% if variant %} / {{ variant_label }}{% endif %} — Technical Analysis · RansomLook{% endblock %}
+
+{% block content %}
+<section class="container">
+
+  <nav class="analysis-breadcrumb" style="margin: 16px 0; font-size: 0.9em;">
+    <a href="{{ url_for('browse') }}">{{ _('Groups') }}</a>
+    &nbsp;›&nbsp;
+    <a href="{{ url_for('group', name=group_name) }}">{{ group_name|title }}</a>
+    &nbsp;›&nbsp;
+    <span>{{ _('Technical Analysis') }}{% if variant_label and variant_label != 'Default' %} — {{ variant_label }}{% endif %}</span>
+  </nav>
+
+  <header style="display:flex;justify-content:space-between;align-items:flex-start;gap:16px;flex-wrap:wrap;margin-bottom:16px;">
+    <div>
+      <h1 style="margin:0">
+        {{ group_name|title }} — Technical Analysis
+        {% if variant_label and variant_label != 'Default' %}
+          <small style="color:var(--muted); font-weight:500;">/ {{ variant_label }}</small>
+        {% endif %}
+      </h1>
+      {% if meta and meta.get('private') %}
+        <small style="color:#888;"><span class="badge-private">private</span></small>
+      {% endif %}
+    </div>
+    <div>
+      <a href="{% if variant %}{{ url_for('group_analysis_variant_pdf', name=group_name, variant=variant) }}{% else %}{{ url_for('group_analysis_pdf', name=group_name) }}{% endif %}" class="btn btn-secondary">⬇ PDF</a>
+      <a href="{{ url_for('group', name=group_name) }}" class="btn btn-link">← {{ _('back to group') }}</a>
+      {% if current_user.is_authenticated %}
+        <a href="{{ url_for('admin_group_analyses', name=group_name) }}" class="btn btn-warning">{{ _('Edit') }}</a>
+      {% endif %}
+    </div>
+  </header>
+
+  {% if variants and variants|length > 1 %}
+  <div class="variant-switcher" style="display:flex; gap:6px; flex-wrap:wrap; align-items:center; margin-bottom:14px; padding:8px 12px; background:var(--panel); border:1px solid var(--border); border-radius:6px;">
+    <span class="muted" style="font-size:.85em">{{ _('Variants:') }}</span>
+    {% for v in variants %}
+      {% if v.is_current %}
+        <span class="btn btn-sm btn-primary" aria-current="page">{{ v.label }}</span>
+      {% else %}
+        <a class="btn btn-sm btn-secondary"
+           href="{% if v.id %}{{ url_for('group_analysis_variant', name=group_name, variant=v.id) }}{% else %}{{ url_for('group_analysis', name=group_name) }}{% endif %}">{{ v.label }}</a>
+      {% endif %}
+    {% endfor %}
+  </div>
+  {% endif %}
+
+  {# Markdown -> HTML rendered by python-markdown. #}
+  <article class="markdown-section analysis-body">
+    {{ content | safe }}
+  </article>
+
+</section>
+{% endblock %}

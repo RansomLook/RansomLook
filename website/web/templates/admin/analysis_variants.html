@@ -1,0 +1,119 @@
+{% extends "base.html" %}
+{% from 'bootstrap5/utils.html' import render_messages %}
+{% block title %}Admin · {{ _('Analyses') }} · {{ group_name|title }}{% endblock %}
+
+{% block content %}
+{{ render_messages(container=True, dismissible=True) }}
+
+<section class="hero">
+  <div class="container">
+    <h1>{{ _('Technical Analyses') }} — {{ group_name|title }}</h1>
+    <p class="lead">
+      {{ _('Manage analysis variants for this group. Each variant gets its own Markdown source, metadata and assets.') }}
+    </p>
+  </div>
+</section>
+
+<section class="metrics-section">
+  <div class="container">
+
+    <div class="table-card p-12 mb-14" style="display:flex; gap:8px; flex-wrap:wrap; align-items:center;">
+      <a href="{{ url_for('admin_analyses') }}" class="btn btn-secondary btn-sm">← {{ _('Back to selector') }}</a>
+      <a href="{{ url_for('group', name=group_name) }}" class="btn btn-secondary btn-sm" target="_blank" rel="noopener">↗ {{ _('Group page') }}</a>
+    </div>
+
+    {# ── Existing variants ────────────────────────────────────────────────── #}
+    {% if variants %}
+    <div class="table-card overflow-visible mb-14">
+      <table class="rl-table" style="width:100%">
+        <thead>
+          <tr>
+            <th>{{ _('Variant') }}</th>
+            <th>{{ _('Status') }}</th>
+            <th>SHA-256</th>
+            <th>{{ _('Updated') }}</th>
+            <th style="text-align:right;">{{ _('Actions') }}</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for v in variants %}
+          <tr>
+            <td>
+              <strong>
+                {% if v.is_root %}
+                  {{ _('Default (legacy)') }}
+                {% else %}
+                  {{ v.id|replace('-', ' ')|replace('_', ' ')|title }}
+                  <code style="font-size:.85em;color:var(--muted)">{{ v.id }}</code>
+                {% endif %}
+              </strong>
+            </td>
+            <td>
+              {% if v.meta.get('private') %}
+                <span class="badge-private">private</span>
+              {% else %}
+                <span class="muted">public</span>
+              {% endif %}
+            </td>
+            <td>
+              {% if v.meta.get('sha256') %}
+                <code style="font-size:.85em">{{ v.meta.sha256[:16] }}…</code>
+              {% else %}
+                <span class="muted">—</span>
+              {% endif %}
+            </td>
+            <td>
+              {% if v.meta.get('date') %}{{ v.meta.date }}{% else %}<span class="muted">—</span>{% endif %}
+            </td>
+            <td style="text-align:right; white-space:nowrap;">
+              {% set vurl = '_root' if v.is_root else v.id %}
+              <a class="btn btn-sm btn-secondary" target="_blank" rel="noopener"
+                 href="{% if v.is_root %}{{ url_for('group_analysis', name=group_name) }}{% else %}{{ url_for('group_analysis_variant', name=group_name, variant=v.id) }}{% endif %}">↗ {{ _('View') }}</a>
+              <a class="btn btn-sm btn-warning"
+                 href="{{ url_for('admin_edit_analysis_variant', name=group_name, variant_url=vurl) }}">{{ _('Edit') }}</a>
+              <form method="POST" style="display:inline-block;"
+                    action="{{ url_for('admin_delete_analysis_variant', name=group_name, variant_url=vurl) }}"
+                    onsubmit="return confirm('{{ _('Delete this analysis variant?') }}');">
+                {{ delete_form.hidden_tag() }}
+                <button type="submit" class="btn btn-sm btn-danger">🗑 {{ _('Delete') }}</button>
+              </form>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    {% else %}
+    <div class="table-card p-16 mb-14">
+      <p class="muted" style="margin:0">{{ _('No analyses attached to this group yet.') }}</p>
+    </div>
+    {% endif %}
+
+    {# ── Create a new variant ─────────────────────────────────────────────── #}
+    <form method="POST" action="" novalidate class="table-card admin-form p-16">
+      {{ delete_form.hidden_tag() }}
+      <h3 style="margin-top:0">{{ _('Add a new variant') }}</h3>
+      <p class="muted" style="font-size:.9em">
+        {{ _('Examples:') }} <code>windows</code>, <code>linux</code>, <code>esxi</code>, <code>macos</code>.
+        {{ _('Allowed: lowercase letters, digits, dash and underscore (max 64 chars).') }}
+      </p>
+      <div class="picker-row">
+        <div>
+          <label class="label" for="new_variant">{{ _('Variant id') }}</label>
+          <input type="text" id="new_variant" name="new_variant" class="input w-full" pattern="[a-z0-9_-]{1,64}"
+                 placeholder="e.g. windows" required spellcheck="false" autocomplete="off">
+        </div>
+        <div class="self-end">
+          <button type="submit" class="btn btn-primary">+ {{ _('Create variant') }}</button>
+        </div>
+      </div>
+      {% if not variants %}
+      <p class="muted" style="font-size:.85em; margin-top:10px;">
+        {{ _('Tip: leaving variant empty in the URL still works for legacy single-analysis groups — but new analyses are best created as named variants.') }}
+      </p>
+      {% endif %}
+    </form>
+
+  </div>
+</section>
+{% endblock %}

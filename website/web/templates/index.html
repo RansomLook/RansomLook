@@ -216,6 +216,10 @@
       <span><strong>{{ data.nbnotes }}</strong> {{ _('ransom notes') }}</span>
       <span class="sep">·</span>
       <span><strong>{{ data.nbcryptoaddr }}</strong> {{ _('crypto addrs') }}</span>
+      {% if data.nbanalyses %}
+      <span class="sep">·</span>
+      <span><a href="{{ url_for('analyses_index') }}"><strong>{{ data.nbanalyses }}</strong> {{ _('in-house analyses') }}</a></span>
+      {% endif %}
     </div>
   </div>
 </section>

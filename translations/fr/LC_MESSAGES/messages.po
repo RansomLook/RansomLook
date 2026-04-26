@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version:  RansomLook\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-04-23 15:04+0200\n"
+"POT-Creation-Date: 2026-04-25 15:41+0200\n"
 "PO-Revision-Date: 2026-04-21 13:39+0200\n"
 "Last-Translator: RansomLook team\n"
 "Language: fr\n"
@@ -59,7 +59,7 @@ msgstr ""
 msgid "Retry"
 msgstr "Réessayer"
 
-#: website/web/templates/RF.html:3 website/web/templates/base.html:88
+#: website/web/templates/RF.html:3 website/web/templates/base.html:89
 #: website/web/templates/glossary.html:114
 msgid "RF Dumps"
 msgstr "RF Dumps"
@@ -94,8 +94,8 @@ msgstr "Effacer la recherche"
 msgid "Dump"
 msgstr "Dump"
 
-#: website/web/templates/RF.html:45 website/web/templates/group.html:156
-#: website/web/templates/group.html:718 website/web/templates/search.html:18
+#: website/web/templates/RF.html:45 website/web/templates/group.html:169
+#: website/web/templates/group.html:731 website/web/templates/search.html:18
 #: website/web/templates/search.html:43 website/web/templates/search.html:68
 msgid "Description"
 msgstr "Description"
@@ -112,9 +112,9 @@ msgstr "Téléchargé"
 msgid "RF dump"
 msgstr "Dump RF"
 
-#: website/web/templates/RF.html:81 website/web/templates/base.html:174
-#: website/web/templates/group.html:751 website/web/templates/group.html:760
-#: website/web/templates/group.html:787 website/web/templates/leaks.html:74
+#: website/web/templates/RF.html:81 website/web/templates/base.html:175
+#: website/web/templates/group.html:764 website/web/templates/group.html:773
+#: website/web/templates/group.html:800 website/web/templates/leaks.html:74
 #: website/web/templates/stats.html:162
 msgid "Close"
 msgstr "Fermer"
@@ -136,6 +136,7 @@ msgid "RF extra"
 msgstr "Infos supplémentaires RF"
 
 #: website/web/templates/RF.html:108
+#: website/web/templates/admin/torrent_health.html:75
 #: website/web/templates/admin/torrent_manage.html:84
 #: website/web/templates/leaks.html:82
 #: website/web/templates/torrent_health.html:75
@@ -167,7 +168,7 @@ msgstr "Clé"
 msgid "Value"
 msgstr "Valeur"
 
-#: website/web/templates/about.html:3 website/web/templates/base.html:99
+#: website/web/templates/about.html:3 website/web/templates/base.html:100
 msgid "About"
 msgstr "À propos"
 
@@ -503,7 +504,7 @@ msgstr "Acteur de menace"
 msgid "WANTED"
 msgstr "RECHERCHÉ"
 
-#: website/web/templates/actor.html:34 website/web/templates/group.html:124
+#: website/web/templates/actor.html:34 website/web/templates/group.html:137
 msgid "Inactive"
 msgstr "Inactif"
 
@@ -525,7 +526,9 @@ msgid_plural "%(n)s peers"
 msgstr[0] ""
 msgstr[1] ""
 
-#: website/web/templates/actor.html:43 website/web/templates/group.html:47
+#: website/web/templates/actor.html:43
+#: website/web/templates/admin/analysis_variants.html:73
+#: website/web/templates/analysis.html:31 website/web/templates/group.html:47
 msgid "Edit"
 msgstr "Éditer"
 
@@ -544,6 +547,7 @@ msgstr "Cet acteur"
 #: website/web/templates/actor.html:79
 #: website/web/templates/admin/torrent_manage.html:31
 #: website/web/templates/admin/torrent_manage.html:56
+#: website/web/templates/analyses_index.html:28
 #: website/web/templates/glossary.html:34 website/web/templates/hot.html:128
 #: website/web/templates/recent.html:94 website/web/templates/recent.html:107
 #: website/web/templates/search.html:17 website/web/templates/search.html:42
@@ -584,10 +588,14 @@ msgid "Relations"
 msgstr "Relations"
 
 #: website/web/templates/actor.html:132
+#: website/web/templates/admin/torrent_asn.html:67
+#: website/web/templates/admin/torrent_health.html:76
+#: website/web/templates/admin/torrent_ip.html:82
 #: website/web/templates/admin/torrent_manage.html:82
-#: website/web/templates/browse.html:53 website/web/templates/compare.html:32
-#: website/web/templates/search.html:11 website/web/templates/search.html:14
-#: website/web/templates/stats.html:89
+#: website/web/templates/admin/torrent_pivot.html:193
+#: website/web/templates/analysis.html:8 website/web/templates/browse.html:53
+#: website/web/templates/compare.html:32 website/web/templates/search.html:11
+#: website/web/templates/search.html:14 website/web/templates/stats.html:89
 #: website/web/templates/torrent_asn.html:67
 #: website/web/templates/torrent_health.html:76
 #: website/web/templates/torrent_ip.html:82
@@ -656,6 +664,86 @@ msgstr "Contacts / Réseaux"
 msgid "No contacts listed."
 msgstr "Aucun contact listé."
 
+#: website/web/templates/admin/analyses.html:10
+#: website/web/templates/admin/analysis_variants.html:10
+#: website/web/templates/analyses_index.html:2
+#: website/web/templates/analyses_index.html:7
+#, fuzzy
+msgid "Technical Analyses"
+msgstr "Analyse externe"
+
+#: website/web/templates/analyses_index.html:9
+msgid "Reverse-engineered, in-house analyses of ransomware samples."
+msgstr "Analyses internes de samples ransomware, issues de reverse engineering."
+
+#: website/web/templates/analyses_index.html:10
+#, fuzzy
+msgid "reports available."
+msgstr "rapports disponibles."
+
+#: website/web/templates/admin/analyses.html:22
+#: website/web/templates/analyses_index.html:19
+#: website/web/templates/base.html:144 website/web/templates/base.html:176
+#: website/web/templates/base.html:179 website/web/templates/browse.html:37
+#: website/web/templates/crypto.html:22 website/web/templates/leaks.html:23
+#: website/web/templates/leaks.html:25 website/web/templates/notes.html:22
+#: website/web/templates/recent.html:71 website/web/templates/search.html:3
+msgid "Search"
+msgstr "Rechercher"
+
+#: website/web/templates/analyses_index.html:20
+#, fuzzy
+msgid "Filter by group name…"
+msgstr "Filtrer par nom de groupe…"
+
+#: website/web/templates/admin/analysis_variants.html:31
+#: website/web/templates/analyses_index.html:29
+msgid "Variant"
+msgstr "Variante"
+
+#: website/web/templates/admin/analysis_variants.html:34
+#: website/web/templates/analyses_index.html:30
+#, fuzzy
+msgid "Updated"
+msgstr "Date"
+
+#: website/web/templates/admin/analysis_variants.html:35
+#: website/web/templates/admin/torrent_health.html:81
+#: website/web/templates/admin/torrent_manage.html:87
+#: website/web/templates/analyses_index.html:32
+#: website/web/templates/torrent_health.html:81
+msgid "Actions"
+msgstr "Actions"
+
+#: website/web/templates/analyses_index.html:41
+msgid "Visible to authenticated users only"
+msgstr "Visible uniquement aux utilisateurs authentifiés"
+
+#: website/web/templates/admin/analysis_variants.html:71
+#: website/web/templates/analyses_index.html:56
+#: website/web/templates/group.html:57
+msgid "View"
+msgstr "Voir"
+
+#: website/web/templates/analyses_index.html:66
+#, fuzzy
+msgid "No analyses are available yet."
+msgstr "Aucune analyse n'est disponible pour le moment."
+
+#: website/web/templates/analysis.html:12
+#, fuzzy
+msgid "Technical Analysis"
+msgstr "Analyse externe"
+
+#: website/web/templates/analysis.html:29
+#, fuzzy
+msgid "back to group"
+msgstr "Groupe principal"
+
+#: website/web/templates/analysis.html:38
+msgid "Variants:"
+msgstr "Variantes :"
+
 #: website/web/templates/base.html:6
 msgid "Real‑time ransomware intelligence (open data)"
 msgstr "Renseignement ransomware en temps réel (open data)"
@@ -689,7 +777,7 @@ msgstr "Statistiques"
 msgid "Intel"
 msgstr "Renseignement"
 
-#: website/web/templates/base.html:83 website/web/templates/group.html:452
+#: website/web/templates/base.html:83 website/web/templates/group.html:465
 msgid "URLs"
 msgstr "URLs"
 
@@ -721,77 +809,85 @@ msgstr "Notes"
 msgid "Ransomware Notes"
 msgstr "Notes de rançon"
 
-#: website/web/templates/base.html:90
+#: website/web/templates/admin/analyses.html:3
+#: website/web/templates/admin/analysis_variants.html:3
+#: website/web/templates/base.html:87
+#, fuzzy
+msgid "Analyses"
+msgstr "Alias :"
+
+#: website/web/templates/base.html:87
+#, fuzzy
+msgid "In-house technical analyses"
+msgstr "Analyse externe"
+
+#: website/web/templates/admin/torrent_pivot.html:66
+#: website/web/templates/admin/torrent_pivot.html:130
+#: website/web/templates/admin/torrent_pivot.html:195
+#: website/web/templates/base.html:91
 #: website/web/templates/torrent_pivot.html:66
 #: website/web/templates/torrent_pivot.html:130
 #: website/web/templates/torrent_pivot.html:203
 msgid "Torrents"
 msgstr "Torrents"
 
-#: website/web/templates/base.html:90
+#: website/web/templates/admin/torrent_health.html:11
+#: website/web/templates/base.html:91
 #: website/web/templates/torrent_health.html:11
 msgid "Torrent swarm health"
 msgstr "État des swarms torrent"
 
-#: website/web/templates/base.html:95
+#: website/web/templates/base.html:96
 msgid "Info"
 msgstr "Infos"
 
-#: website/web/templates/base.html:97 website/web/templates/index.html:55
+#: website/web/templates/base.html:98 website/web/templates/index.html:55
 msgid "API"
 msgstr "API"
 
-#: website/web/templates/base.html:97
+#: website/web/templates/base.html:98
 msgid "API documentation (Swagger)"
 msgstr "Documentation de l'API (Swagger)"
 
-#: website/web/templates/base.html:98 website/web/templates/glossary.html:2
+#: website/web/templates/base.html:99 website/web/templates/glossary.html:2
 #: website/web/templates/glossary.html:7
 msgid "Glossary"
 msgstr "Glossaire"
 
-#: website/web/templates/base.html:105
+#: website/web/templates/base.html:106
 msgid "RSS feed — Recent posts"
 msgstr "Flux RSS — publications récentes"
 
-#: website/web/templates/base.html:134
+#: website/web/templates/base.html:135
 msgid "Admin"
 msgstr "Admin"
 
-#: website/web/templates/base.html:136 website/web/templates/login.html:3
+#: website/web/templates/base.html:137 website/web/templates/login.html:3
 #: website/web/templates/login.html:10
 msgid "Login"
 msgstr "Connexion"
 
-#: website/web/templates/base.html:139
+#: website/web/templates/base.html:140
 msgid "Search (Ctrl/Cmd+K)"
 msgstr "Rechercher (Ctrl/Cmd+K)"
 
-#: website/web/templates/base.html:143 website/web/templates/base.html:175
-#: website/web/templates/base.html:178 website/web/templates/browse.html:37
-#: website/web/templates/crypto.html:22 website/web/templates/leaks.html:23
-#: website/web/templates/leaks.html:25 website/web/templates/notes.html:22
-#: website/web/templates/recent.html:71 website/web/templates/search.html:3
-msgid "Search"
-msgstr "Rechercher"
-
-#: website/web/templates/base.html:146
+#: website/web/templates/base.html:147
 msgid "Toggle dark/light mode"
 msgstr "Basculer mode sombre/clair"
 
-#: website/web/templates/base.html:146
+#: website/web/templates/base.html:147
 msgid "Toggle theme"
 msgstr "Basculer le thème"
 
-#: website/web/templates/base.html:162
+#: website/web/templates/base.html:163
 msgid "Contribute on"
 msgstr "Contribuer sur"
 
-#: website/web/templates/base.html:177
+#: website/web/templates/base.html:178
 msgid "type to search"
 msgstr "saisir pour rechercher"
 
-#: website/web/templates/base.html:177
+#: website/web/templates/base.html:178
 msgid "Search text"
 msgstr "Texte de recherche"
 
@@ -907,7 +1003,7 @@ msgid "No matches."
 msgstr "Aucun résultat."
 
 #: website/web/templates/compare.html:3 website/web/templates/compare.html:75
-#: website/web/templates/compare.html:115 website/web/templates/group.html:49
+#: website/web/templates/compare.html:115 website/web/templates/group.html:62
 msgid "Compare"
 msgstr "Comparer"
 
@@ -1089,6 +1185,11 @@ msgid_plural "%(n)s txs"
 msgstr[0] ""
 msgstr[1] ""
 
+#: website/web/templates/admin/torrent_pivot.html:59
+#: website/web/templates/admin/torrent_pivot.html:92
+#: website/web/templates/admin/torrent_pivot.html:123
+#: website/web/templates/admin/torrent_pivot.html:156
+#: website/web/templates/admin/torrent_pivot.html:187
 #: website/web/templates/cryptodetail.html:71
 #: website/web/templates/hot.html:108 website/web/templates/stats.html:81
 #: website/web/templates/torrent_pivot.html:59
@@ -1100,7 +1201,7 @@ msgid "Export CSV"
 msgstr "Exporter CSV"
 
 #: website/web/templates/cryptodetail.html:71
-#: website/web/templates/group.html:126 website/web/templates/group.html:137
+#: website/web/templates/group.html:139 website/web/templates/group.html:150
 msgid "CSV"
 msgstr "CSV"
 
@@ -1132,6 +1233,7 @@ msgstr "Sens"
 msgid "Filter"
 msgstr "Filtrer"
 
+#: website/web/templates/admin/torrent_health.html:52
 #: website/web/templates/cryptodetail.html:103
 #: website/web/templates/hot.html:116 website/web/templates/recent.html:76
 #: website/web/templates/torrent_health.html:52
@@ -1147,7 +1249,7 @@ msgid "Transaction"
 msgstr "Transaction"
 
 #: website/web/templates/cryptodetail.html:124
-#: website/web/templates/group.html:716 website/web/templates/recent.html:92
+#: website/web/templates/group.html:729 website/web/templates/recent.html:92
 #: website/web/templates/recent.html:105 website/web/templates/search.html:94
 msgid "Date"
 msgstr "Date"
@@ -1399,7 +1501,7 @@ msgstr ""
 " exposés lors de brèches antérieures. RansomLook intègre des bases de "
 "leaks externes pour l'enrichissement."
 
-#: website/web/templates/glossary.html:98 website/web/templates/group.html:204
+#: website/web/templates/glossary.html:98 website/web/templates/group.html:217
 msgid "Ransom notes"
 msgstr "Notes de rançon"
 
@@ -1471,8 +1573,8 @@ msgstr ""
 "<code>.onion</code> à 56 caractères). RansomLook suit les versions pour "
 "classer les changements d'infrastructure."
 
-#: website/web/templates/glossary.html:130 website/web/templates/group.html:416
-#: website/web/templates/group.html:419 website/web/templates/group.html:420
+#: website/web/templates/glossary.html:130 website/web/templates/group.html:429
+#: website/web/templates/group.html:432 website/web/templates/group.html:433
 msgid "Affiliates"
 msgstr "Affiliés"
 
@@ -1485,6 +1587,10 @@ msgstr ""
 " Réalisent les intrusions, déploient le ransomware et partagent un "
 "pourcentage de la rançon."
 
+#: website/web/templates/admin/torrent_health.html:78
+#: website/web/templates/admin/torrent_health_detail.html:94
+#: website/web/templates/admin/torrent_health_detail.html:145
+#: website/web/templates/admin/torrent_ip.html:85
 #: website/web/templates/glossary.html:134
 #: website/web/templates/torrent_health.html:78
 #: website/web/templates/torrent_health_detail.html:223
@@ -1515,202 +1621,228 @@ msgstr ""
 "stocke pour que les utilisateurs puissent explorer quels acteurs opèrent "
 "dans quels écosystèmes."
 
-#: website/web/templates/group.html:55
+#: website/web/templates/group.html:48
+msgid "Manage technical analyses (Markdown)"
+msgstr "Gérer les analyses techniques (Markdown)"
+
+#: website/web/templates/group.html:48
+msgid "Edit analyses"
+msgstr "Éditer les analyses"
+
+#: website/web/templates/group.html:53 website/web/templates/group.html:57
+msgid "In-house technical analysis"
+msgstr "Analyse technique interne"
+
+#: website/web/templates/group.html:53
+#, fuzzy
+msgid "View analysis"
+msgstr "Analyse externe"
+
+#: website/web/templates/group.html:54
+#, fuzzy
+msgid "Download analysis as PDF"
+msgstr "Télécharger en CSV"
+
+#: website/web/templates/group.html:58
+msgid "PDF"
+msgstr ""
+
+#: website/web/templates/group.html:68
 msgid "posts (all time)"
 msgstr "publications (total)"
 
-#: website/web/templates/group.html:56
+#: website/web/templates/group.html:69
 msgid "last 30 days"
 msgstr "30 derniers jours"
 
-#: website/web/templates/group.html:57
+#: website/web/templates/group.html:70
 msgid "last 7 days"
 msgstr "7 derniers jours"
 
-#: website/web/templates/group.html:60
+#: website/web/templates/group.html:73
 msgid "avg uptime 30d"
 msgstr "uptime moyen 30j"
 
-#: website/web/templates/group.html:69 website/web/templates/index.html:63
+#: website/web/templates/group.html:82 website/web/templates/index.html:63
 msgid "Activity · last 30 days"
 msgstr "Activité · 30 derniers jours"
 
-#: website/web/templates/group.html:120
+#: website/web/templates/group.html:133
 msgid "Export URLs (CSV)"
 msgstr "Exporter URLs (CSV)"
 
-#: website/web/templates/group.html:122
+#: website/web/templates/group.html:135
 msgid "All statuses"
 msgstr "Tous les statuts"
 
-#: website/web/templates/group.html:123
+#: website/web/templates/group.html:136
 msgid "Active"
 msgstr "Actif"
 
-#: website/web/templates/group.html:133
+#: website/web/templates/group.html:146
 msgid "Export Posts (CSV)"
 msgstr "Exporter publications (CSV)"
 
-#: website/web/templates/group.html:134
+#: website/web/templates/group.html:147
 msgid "From date"
 msgstr "Date de début"
 
-#: website/web/templates/group.html:136
+#: website/web/templates/group.html:149
 msgid "To date"
 msgstr "Date de fin"
 
-#: website/web/templates/group.html:183 website/web/templates/group.html:188
+#: website/web/templates/group.html:196 website/web/templates/group.html:201
 msgid "External Analysis"
 msgstr "Analyse externe"
 
-#: website/web/templates/group.html:187
+#: website/web/templates/group.html:200
 msgid "External analysis"
 msgstr "Analyse externe"
 
-#: website/web/templates/group.html:220
+#: website/web/templates/group.html:233
 msgid "View all notes"
 msgstr "Voir toutes les notes"
 
-#: website/web/templates/group.html:223
+#: website/web/templates/group.html:236
 msgid "No note linked."
 msgstr "Aucune note liée."
 
-#: website/web/templates/group.html:234 website/web/templates/group.html:238
+#: website/web/templates/group.html:247 website/web/templates/group.html:251
 msgid "Known hashes"
 msgstr "Hashs connus"
 
-#: website/web/templates/group.html:239
+#: website/web/templates/group.html:252
 msgid "Hash"
 msgstr "Hash"
 
-#: website/web/templates/group.html:256 website/web/templates/group.html:259
-#: website/web/templates/group.html:260
+#: website/web/templates/group.html:269 website/web/templates/group.html:272
+#: website/web/templates/group.html:273
 msgid "Jabber"
 msgstr "Jabber"
 
-#: website/web/templates/group.html:272 website/web/templates/group.html:275
-#: website/web/templates/group.html:276
+#: website/web/templates/group.html:285 website/web/templates/group.html:288
+#: website/web/templates/group.html:289
 msgid "Mail"
 msgstr "E-mail"
 
-#: website/web/templates/group.html:288 website/web/templates/group.html:291
-#: website/web/templates/group.html:292
+#: website/web/templates/group.html:301 website/web/templates/group.html:304
+#: website/web/templates/group.html:305
 msgid "PGP"
 msgstr "PGP"
 
-#: website/web/templates/group.html:304 website/web/templates/group.html:307
-#: website/web/templates/group.html:308
+#: website/web/templates/group.html:317 website/web/templates/group.html:320
+#: website/web/templates/group.html:321
 msgid "Matrix"
 msgstr "Matrix"
 
-#: website/web/templates/group.html:320 website/web/templates/group.html:323
-#: website/web/templates/group.html:324
+#: website/web/templates/group.html:333 website/web/templates/group.html:336
+#: website/web/templates/group.html:337
 msgid "Session"
 msgstr "Session"
 
-#: website/web/templates/group.html:336 website/web/templates/group.html:339
-#: website/web/templates/group.html:340
+#: website/web/templates/group.html:349 website/web/templates/group.html:352
+#: website/web/templates/group.html:353
 msgid "Telegram"
 msgstr "Telegram"
 
-#: website/web/templates/group.html:352 website/web/templates/group.html:355
-#: website/web/templates/group.html:356
+#: website/web/templates/group.html:365 website/web/templates/group.html:368
+#: website/web/templates/group.html:369
 msgid "Tox"
 msgstr "Tox"
 
-#: website/web/templates/group.html:368 website/web/templates/group.html:371
-#: website/web/templates/group.html:372
+#: website/web/templates/group.html:381 website/web/templates/group.html:384
+#: website/web/templates/group.html:385
 msgid "Simplex"
 msgstr "Simplex"
 
-#: website/web/templates/group.html:384 website/web/templates/group.html:387
-#: website/web/templates/group.html:388
+#: website/web/templates/group.html:397 website/web/templates/group.html:400
+#: website/web/templates/group.html:401
 msgid "Max"
 msgstr "Max"
 
-#: website/web/templates/group.html:400 website/web/templates/group.html:403
-#: website/web/templates/group.html:404
+#: website/web/templates/group.html:413 website/web/templates/group.html:416
+#: website/web/templates/group.html:417
 msgid "Sonar"
 msgstr "Sonar"
 
-#: website/web/templates/group.html:433 website/web/templates/group.html:436
-#: website/web/templates/group.html:437
+#: website/web/templates/group.html:446 website/web/templates/group.html:449
+#: website/web/templates/group.html:450
 msgid "Other"
 msgstr "Autre"
 
-#: website/web/templates/group.html:448
+#: website/web/templates/group.html:461
 msgid "Urls"
 msgstr "URLs"
 
-#: website/web/templates/group.html:455 website/web/templates/group.html:510
-#: website/web/templates/group.html:565 website/web/templates/group.html:620
+#: website/web/templates/group.html:468 website/web/templates/group.html:523
+#: website/web/templates/group.html:578 website/web/templates/group.html:633
 msgid "Url"
 msgstr "URL"
 
-#: website/web/templates/group.html:503 website/web/templates/group.html:507
+#: website/web/templates/group.html:516 website/web/templates/group.html:520
 msgid "File servers"
 msgstr "Serveurs de fichiers"
 
-#: website/web/templates/group.html:558 website/web/templates/group.html:562
+#: website/web/templates/group.html:571 website/web/templates/group.html:575
 msgid "Chat servers"
 msgstr "Serveurs de chat"
 
-#: website/web/templates/group.html:613 website/web/templates/group.html:617
+#: website/web/templates/group.html:626 website/web/templates/group.html:630
 msgid "Admin servers"
 msgstr "Serveurs admin"
 
-#: website/web/templates/group.html:668
+#: website/web/templates/group.html:681
 msgid "Activity (interactive)"
 msgstr "Activité (interactive)"
 
-#: website/web/templates/group.html:674
+#: website/web/templates/group.html:687
 msgid "Activity charts"
 msgstr "Graphiques d'activité"
 
-#: website/web/templates/group.html:676 website/web/templates/stats.html:45
+#: website/web/templates/group.html:689 website/web/templates/stats.html:45
 msgid "Aggregation"
 msgstr "Agrégation"
 
-#: website/web/templates/group.html:678 website/web/templates/stats.html:48
+#: website/web/templates/group.html:691 website/web/templates/stats.html:48
 msgid "Daily"
 msgstr "Quotidien"
 
-#: website/web/templates/group.html:679 website/web/templates/stats.html:49
+#: website/web/templates/group.html:692 website/web/templates/stats.html:49
 msgid "Weekly"
 msgstr "Hebdomadaire"
 
-#: website/web/templates/group.html:681 website/web/templates/stats.html:54
+#: website/web/templates/group.html:694 website/web/templates/stats.html:54
 msgid "Rolling avg."
 msgstr "Moyenne glissante"
 
-#: website/web/templates/group.html:683 website/web/templates/stats.html:56
+#: website/web/templates/group.html:696 website/web/templates/stats.html:56
 msgid "Off"
 msgstr "Off"
 
-#: website/web/templates/group.html:708 website/web/templates/group.html:713
+#: website/web/templates/group.html:721 website/web/templates/group.html:726
 #: website/web/templates/hot.html:129 website/web/templates/search.html:86
 #: website/web/templates/search.html:89 website/web/templates/stats.html:103
 msgid "Posts"
 msgstr "Publications"
 
-#: website/web/templates/group.html:717 website/web/templates/recent.html:93
+#: website/web/templates/group.html:730 website/web/templates/recent.html:93
 #: website/web/templates/recent.html:106 website/web/templates/search.html:93
 msgid "Title"
 msgstr "Titre"
 
-#: website/web/templates/group.html:719
+#: website/web/templates/group.html:732
 msgid "Screen"
 msgstr "Capture"
 
-#: website/web/templates/group.html:750 website/web/templates/stats.html:161
+#: website/web/templates/group.html:763 website/web/templates/stats.html:161
 msgid "Enlarged chart"
 msgstr "Graphique agrandi"
 
-#: website/web/templates/group.html:762
+#: website/web/templates/group.html:775
 msgid "Previous"
 msgstr "Précédent"
 
-#: website/web/templates/group.html:766
+#: website/web/templates/group.html:779
 msgid "Next"
 msgstr "Suivant"
 
@@ -1967,6 +2099,11 @@ msgstr "notes de rançon"
 msgid "crypto addrs"
 msgstr "adresses crypto"
 
+#: website/web/templates/index.html:221
+#, fuzzy
+msgid "in-house analyses"
+msgstr "Analyse externe"
+
 #: website/web/templates/leaks.html:10
 msgid "Leaks listing"
 msgstr "Liste des leaks"
@@ -2057,11 +2194,13 @@ msgstr ""
 "affichage des %(shown)s plus récentes sur %(total)s — les plus anciennes "
 "sont tronquées"
 
+#: website/web/templates/admin/torrent_pivot.html:25
 #: website/web/templates/recent.html:21
 #: website/web/templates/torrent_pivot.html:25
 msgid "Time window"
 msgstr "Fenêtre temporelle"
 
+#: website/web/templates/admin/torrent_pivot.html:26
 #: website/web/templates/recent.html:22
 #: website/web/templates/torrent_pivot.html:26
 msgid "Window:"
@@ -2177,6 +2316,7 @@ msgstr "Filtres"
 msgid "Period"
 msgstr "Période"
 
+#: website/web/templates/admin/torrent_pivot.html:30
 #: website/web/templates/stats.html:25
 #: website/web/templates/torrent_pivot.html:30
 msgid "Last 7 days"
@@ -2186,11 +2326,13 @@ msgstr "7 derniers jours"
 msgid "Last 14 days"
 msgstr "14 derniers jours"
 
+#: website/web/templates/admin/torrent_pivot.html:31
 #: website/web/templates/stats.html:27
 #: website/web/templates/torrent_pivot.html:31
 msgid "Last 30 days"
 msgstr "30 derniers jours"
 
+#: website/web/templates/admin/torrent_pivot.html:32
 #: website/web/templates/stats.html:28
 #: website/web/templates/torrent_pivot.html:32
 msgid "Last 90 days"
@@ -2229,6 +2371,7 @@ msgstr "Normaliser (%%)"
 msgid "Reload from API"
 msgstr "Recharger depuis l'API"
 
+#: website/web/templates/admin/torrent_health.html:137
 #: website/web/templates/stats.html:80
 #: website/web/templates/torrent_health.html:137
 msgid "Refresh"
@@ -2292,30 +2435,44 @@ msgstr "Chronologie (nuage)"
 msgid "AS%(asn)s"
 msgstr "AS%(asn)s"
 
+#: website/web/templates/admin/torrent_asn.html:17
+#: website/web/templates/admin/torrent_ip.html:25
 #: website/web/templates/torrent_asn.html:17
 #: website/web/templates/torrent_ip.html:25
 msgid "Back to pivot"
 msgstr "Retour au pivot"
 
+#: website/web/templates/admin/torrent_asn.html:27
+#: website/web/templates/admin/torrent_pivot.html:129
 #: website/web/templates/torrent_asn.html:27
 #: website/web/templates/torrent_pivot.html:129
 msgid "Distinct IPs"
 msgstr "IPs distinctes"
 
+#: website/web/templates/admin/torrent_asn.html:31
+#: website/web/templates/admin/torrent_asn.html:62
 #: website/web/templates/torrent_asn.html:31
 #: website/web/templates/torrent_asn.html:62
 msgid "Torrents observed"
 msgstr "Torrents observés"
 
+#: website/web/templates/admin/torrent_asn.html:35
+#: website/web/templates/admin/torrent_pivot.html:131
 #: website/web/templates/torrent_asn.html:35
 #: website/web/templates/torrent_pivot.html:131
 msgid "With seeders"
 msgstr "Avec seeders"
 
+#: website/web/templates/admin/torrent_asn.html:43
 #: website/web/templates/torrent_asn.html:43
 msgid "IPs in this ASN"
 msgstr "IPs de cet ASN"
 
+#: website/web/templates/admin/torrent_asn.html:47
+#: website/web/templates/admin/torrent_health_detail.html:97
+#: website/web/templates/admin/torrent_pivot.html:64
+#: website/web/templates/admin/torrent_pivot.html:97
+#: website/web/templates/admin/torrent_pivot.html:192
 #: website/web/templates/torrent_asn.html:47
 #: website/web/templates/torrent_health_detail.html:226
 #: website/web/templates/torrent_pivot.html:64
@@ -2324,10 +2481,14 @@ msgstr "IPs de cet ASN"
 msgid "IP"
 msgstr "IP"
 
+#: website/web/templates/admin/torrent_asn.html:54
 #: website/web/templates/torrent_asn.html:54
 msgid "No IP indexed for this ASN."
 msgstr "Aucune IP indexée pour cet ASN."
 
+#: website/web/templates/admin/torrent_asn.html:66
+#: website/web/templates/admin/torrent_health.html:74
+#: website/web/templates/admin/torrent_ip.html:81
 #: website/web/templates/admin/torrent_manage.html:81
 #: website/web/templates/torrent_asn.html:66
 #: website/web/templates/torrent_health.html:74
@@ -2335,6 +2496,9 @@ msgstr "Aucune IP indexée pour cet ASN."
 msgid "Name"
 msgstr "Nom"
 
+#: website/web/templates/admin/torrent_asn.html:68
+#: website/web/templates/admin/torrent_health.html:77
+#: website/web/templates/admin/torrent_ip.html:83
 #: website/web/templates/admin/torrent_manage.html:83
 #: website/web/templates/torrent_asn.html:68
 #: website/web/templates/torrent_health.html:77
@@ -2342,10 +2506,14 @@ msgstr "Nom"
 msgid "Infohash"
 msgstr "Infohash"
 
+#: website/web/templates/admin/torrent_asn.html:69
 #: website/web/templates/torrent_asn.html:69
 msgid "Seeder?"
 msgstr "Seeder ?"
 
+#: website/web/templates/admin/torrent_asn.html:70
+#: website/web/templates/admin/torrent_health.html:80
+#: website/web/templates/admin/torrent_ip.html:86
 #: website/web/templates/admin/torrent_manage.html:86
 #: website/web/templates/torrent_asn.html:70
 #: website/web/templates/torrent_health.html:80
@@ -2353,6 +2521,10 @@ msgstr "Seeder ?"
 msgid "Last scan"
 msgstr "Dernier scan"
 
+#: website/web/templates/admin/torrent_asn.html:75
+#: website/web/templates/admin/torrent_health.html:100
+#: website/web/templates/admin/torrent_health_detail.html:11
+#: website/web/templates/admin/torrent_ip.html:91
 #: website/web/templates/admin/torrent_manage.html:93
 #: website/web/templates/torrent_asn.html:75
 #: website/web/templates/torrent_health.html:100
@@ -2361,6 +2533,7 @@ msgstr "Dernier scan"
 msgid "(unknown)"
 msgstr "(inconnu)"
 
+#: website/web/templates/admin/torrent_asn.html:87
 #: website/web/templates/torrent_asn.html:87
 msgid "No torrent observed for this ASN."
 msgstr "Aucun torrent observé pour cet ASN."
@@ -2369,6 +2542,7 @@ msgstr "Aucun torrent observé pour cet ASN."
 msgid "Torrent Health"
 msgstr "Santé des torrents"
 
+#: website/web/templates/admin/torrent_health.html:13
 #: website/web/templates/torrent_health.html:13
 msgid ""
 "Peer counts, seeders/leechers and peer samples for every magnet "
@@ -2381,69 +2555,80 @@ msgstr ""
 "(poetry run torrent-health) ; utilisez Actualiser pour forcer un rescan "
 "immédiat d'un swarm."
 
+#: website/web/templates/admin/torrent_health.html:16
 #: website/web/templates/torrent_health.html:16
 msgid "Pivot on IP / ASN →"
 msgstr "Pivot sur IP / ASN →"
 
+#: website/web/templates/admin/torrent_health.html:26
 #: website/web/templates/torrent_health.html:26
 msgid "Swarms tracked"
 msgstr "Swarms suivis"
 
+#: website/web/templates/admin/torrent_health.html:30
 #: website/web/templates/torrent_health.html:30
 msgid "Alive (peers > 0)"
 msgstr "Vivants (pairs > 0)"
 
+#: website/web/templates/admin/torrent_health.html:34
 #: website/web/templates/torrent_health.html:34
 #, python-format
 msgid "Dead (>%(d)s days)"
 msgstr "Morts (>%(d)s jours)"
 
+#: website/web/templates/admin/torrent_health.html:38
 #: website/web/templates/torrent_health.html:38
 msgid "Seeders total"
 msgstr "Seeders au total"
 
+#: website/web/templates/admin/torrent_health.html:42
 #: website/web/templates/torrent_health.html:42
 msgid "Scans last 24 h"
 msgstr "Scans des 24 dernières heures"
 
+#: website/web/templates/admin/torrent_health.html:51
 #: website/web/templates/torrent_health.html:51
 msgid "Infohash, name or group…"
 msgstr "Infohash, nom ou groupe…"
 
+#: website/web/templates/admin/torrent_health.html:51
 #: website/web/templates/torrent_health.html:51
 msgid "Search torrents"
 msgstr "Rechercher des torrents"
 
+#: website/web/templates/admin/torrent_health.html:55
 #: website/web/templates/torrent_health.html:55
 msgid "alive only (peers > 0)"
 msgstr "vivants uniquement (pairs > 0)"
 
+#: website/web/templates/admin/torrent_health.html:61
 #: website/web/templates/torrent_health.html:61
 msgid "All groups"
 msgstr "Tous les groupes"
 
+#: website/web/templates/admin/torrent_health.html:71
 #: website/web/templates/torrent_health.html:71
 msgid "Torrent swarms"
 msgstr "Swarms torrent"
 
+#: website/web/templates/admin/torrent_health.html:79
 #: website/web/templates/torrent_health.html:79
 msgid "Seed / Leech"
 msgstr "Seed / Leech"
 
-#: website/web/templates/admin/torrent_manage.html:87
-#: website/web/templates/torrent_health.html:81
-msgid "Actions"
-msgstr "Actions"
-
+#: website/web/templates/admin/torrent_health.html:132
+#: website/web/templates/admin/torrent_health_detail.html:45
 #: website/web/templates/torrent_health.html:132
 #: website/web/templates/torrent_health_detail.html:45
 msgid "never"
 msgstr "jamais"
 
+#: website/web/templates/admin/torrent_health.html:135
 #: website/web/templates/torrent_health.html:135
 msgid "Detail"
 msgstr "Détail"
 
+#: website/web/templates/admin/torrent_health.html:149
 #: website/web/templates/torrent_health.html:149
 msgid "No torrent swarms scanned yet. Run poetry run torrent-health to populate."
 msgstr ""
@@ -2455,42 +2640,52 @@ msgstr ""
 msgid "Torrent · %(ih)s…"
 msgstr "Torrent · %(ih)s…"
 
+#: website/web/templates/admin/torrent_health_detail.html:14
 #: website/web/templates/torrent_health_detail.html:14
 msgid "Back"
 msgstr "Retour"
 
+#: website/web/templates/admin/torrent_health_detail.html:16
 #: website/web/templates/torrent_health_detail.html:16
 msgid "Refresh now"
 msgstr "Rafraîchir"
 
+#: website/web/templates/admin/torrent_health_detail.html:29
 #: website/web/templates/torrent_health_detail.html:29
 msgid "peers (last scan)"
 msgstr "peers (dernier scan)"
 
+#: website/web/templates/admin/torrent_health_detail.html:33
 #: website/web/templates/torrent_health_detail.html:33
 msgid "seed / leech"
 msgstr "seed / leech"
 
+#: website/web/templates/admin/torrent_health_detail.html:39
 #: website/web/templates/torrent_health_detail.html:39
 msgid "size"
 msgstr "Taille"
 
+#: website/web/templates/admin/torrent_health_detail.html:47
 #: website/web/templates/torrent_health_detail.html:47
 msgid "last seen alive"
 msgstr "Nom"
 
+#: website/web/templates/admin/torrent_health_detail.html:53
 #: website/web/templates/torrent_health_detail.html:53
 msgid "Groups:"
 msgstr "groupes"
 
+#: website/web/templates/admin/torrent_health_detail.html:59
 #: website/web/templates/torrent_health_detail.html:59
 msgid "Magnets:"
 msgstr "Magnet"
 
+#: website/web/templates/admin/torrent_health_detail.html:63
 #: website/web/templates/torrent_health_detail.html:63
 msgid "Known since:"
 msgstr "Hashs connus"
 
+#: website/web/templates/admin/torrent_health_detail.html:64
 #: website/web/templates/torrent_health_detail.html:64
 msgid "Last scan:"
 msgstr "Dernier scrape"
@@ -2568,15 +2763,18 @@ msgstr "Chemin"
 msgid "… %(n)s more files truncated"
 msgstr "… %(n)s fichiers supplémentaires tronqués"
 
+#: website/web/templates/admin/torrent_health_detail.html:70
 #: website/web/templates/torrent_health_detail.html:199
 msgid "Peers over time (last 30 days)"
 msgstr "Peers dans le temps (30 derniers jours)"
 
+#: website/web/templates/admin/torrent_health_detail.html:90
 #: website/web/templates/torrent_health_detail.html:219
 #, python-format
 msgid "Peer sample — %(ts)s"
 msgstr "Échantillon de peers — %(ts)s"
 
+#: website/web/templates/admin/torrent_health_detail.html:91
 #: website/web/templates/torrent_health_detail.html:220
 #, python-format
 msgid "%(n)s peer · enrichment via CIRCL IP ASN History"
@@ -2584,64 +2782,81 @@ msgid_plural "%(n)s peers · enrichment via CIRCL IP ASN History"
 msgstr[0] ""
 msgstr[1] ""
 
+#: website/web/templates/admin/torrent_health_detail.html:98
 #: website/web/templates/torrent_health_detail.html:227
 msgid "Port"
 msgstr "Tri"
 
+#: website/web/templates/admin/torrent_health_detail.html:99
 #: website/web/templates/torrent_health_detail.html:228
 msgid "Progress"
 msgstr "publications"
 
+#: website/web/templates/admin/torrent_health_detail.html:100
 #: website/web/templates/torrent_health_detail.html:229
 msgid "Client"
 msgstr "Récents"
 
+#: website/web/templates/admin/torrent_health_detail.html:101
+#: website/web/templates/admin/torrent_pivot.html:128
+#: website/web/templates/admin/torrent_pivot.html:161
 #: website/web/templates/torrent_health_detail.html:230
 #: website/web/templates/torrent_pivot.html:128
 #: website/web/templates/torrent_pivot.html:161
 msgid "ASN"
 msgstr "ASN"
 
+#: website/web/templates/admin/torrent_health_detail.html:102
 #: website/web/templates/torrent_health_detail.html:231
 msgid "Org"
 msgstr "Org"
 
+#: website/web/templates/admin/torrent_health_detail.html:103
 #: website/web/templates/torrent_health_detail.html:232
 msgid "CC"
 msgstr "CC"
 
+#: website/web/templates/admin/torrent_health_detail.html:104
 #: website/web/templates/torrent_health_detail.html:233
 msgid "PTR"
 msgstr "PTR"
 
+#: website/web/templates/admin/torrent_health_detail.html:105
 #: website/web/templates/torrent_health_detail.html:234
 msgid "Flags"
 msgstr "stable"
 
+#: website/web/templates/admin/torrent_health_detail.html:111
 #: website/web/templates/torrent_health_detail.html:240
 msgid "Pivot on this IP"
 msgstr "Pivoter sur cette IP"
 
+#: website/web/templates/admin/torrent_health_detail.html:127
 #: website/web/templates/torrent_health_detail.html:256
 msgid "No peers observed on the last scan."
 msgstr "Aucun peer observé lors du dernier scan."
 
+#: website/web/templates/admin/torrent_health_detail.html:134
 #: website/web/templates/torrent_health_detail.html:263
 msgid "All scans (click a row to show its peer sample)"
 msgstr "Tous les scans (cliquer sur une ligne pour voir son échantillon de peers)"
 
+#: website/web/templates/admin/torrent_health_detail.html:138
 #: website/web/templates/torrent_health_detail.html:267
 msgid "History"
 msgstr "Cet acteur"
 
+#: website/web/templates/admin/torrent_health_detail.html:142
 #: website/web/templates/torrent_health_detail.html:271
 msgid "Timestamp"
 msgstr "Horodatage"
 
+#: website/web/templates/admin/torrent_health_detail.html:143
 #: website/web/templates/torrent_health_detail.html:272
 msgid "Seeders"
 msgstr "Pairs"
 
+#: website/web/templates/admin/torrent_health_detail.html:144
 #: website/web/templates/torrent_health_detail.html:273
 msgid "Leechers"
 msgstr "Pairs"
@@ -2651,49 +2866,63 @@ msgstr "Pairs"
 msgid "IP %(ip)s"
 msgstr "IP %(ip)s"
 
+#: website/web/templates/admin/torrent_ip.html:20
 #: website/web/templates/torrent_ip.html:20
 msgid "No enrichment available"
 msgstr "Aucun enrichissement disponible"
 
+#: website/web/templates/admin/torrent_ip.html:35
 #: website/web/templates/torrent_ip.html:35
 msgid "Scans seen"
 msgstr "Scans vus"
 
+#: website/web/templates/admin/torrent_ip.html:39
+#: website/web/templates/admin/torrent_pivot.html:67
+#: website/web/templates/admin/torrent_pivot.html:196
 #: website/web/templates/torrent_ip.html:39
 #: website/web/templates/torrent_pivot.html:67
 #: website/web/templates/torrent_pivot.html:204
 msgid "As seeder"
 msgstr "En seeder"
 
+#: website/web/templates/admin/torrent_ip.html:43
 #: website/web/templates/torrent_ip.html:43
 msgid "Distinct torrents"
 msgstr "Torrents distincts"
 
+#: website/web/templates/admin/torrent_ip.html:53
 #: website/web/templates/torrent_ip.html:53
 msgid "Activity — last 30 days"
 msgstr "Activité · 30 derniers jours"
 
+#: website/web/templates/admin/torrent_ip.html:55
 #: website/web/templates/torrent_ip.html:55
 msgid "seen"
 msgstr "vue"
 
+#: website/web/templates/admin/torrent_ip.html:56
+#: website/web/templates/admin/torrent_ip.html:100
 #: website/web/templates/torrent_ip.html:56
 #: website/web/templates/torrent_ip.html:100
 msgid "seeder"
 msgstr "seeder"
 
+#: website/web/templates/admin/torrent_ip.html:77
 #: website/web/templates/torrent_ip.html:77
 msgid "Torrent associations"
 msgstr "Associations torrent"
 
+#: website/web/templates/admin/torrent_ip.html:84
 #: website/web/templates/torrent_ip.html:84
 msgid "Role"
 msgstr "Rôle"
 
+#: website/web/templates/admin/torrent_ip.html:102
 #: website/web/templates/torrent_ip.html:102
 msgid "leecher"
 msgstr "leecher"
 
+#: website/web/templates/admin/torrent_ip.html:110
 #: website/web/templates/torrent_ip.html:110
 msgid "No torrent associations."
 msgstr "Aucune association torrent."
@@ -2702,10 +2931,12 @@ msgstr "Aucune association torrent."
 msgid "Torrent Pivot"
 msgstr "Pivot Torrent"
 
+#: website/web/templates/admin/torrent_pivot.html:11
 #: website/web/templates/torrent_pivot.html:11
 msgid "Torrent pivot intelligence"
 msgstr "Renseignement de pivot torrent"
 
+#: website/web/templates/admin/torrent_pivot.html:13
 #: website/web/templates/torrent_pivot.html:13
 msgid ""
 "Most-seen IPs and ASNs across all tracked swarms. Click an IP or ASN to "
@@ -2715,72 +2946,91 @@ msgstr ""
 " IP ou un ASN pour voir ses associations torrent."
 
 #: website/web/templates/admin/torrent_manage.html:16
+#: website/web/templates/admin/torrent_pivot.html:16
 #: website/web/templates/torrent_pivot.html:16
 msgid "Back to swarms"
 msgstr "Retour aux swarms"
 
+#: website/web/templates/admin/torrent_pivot.html:28
 #: website/web/templates/torrent_pivot.html:28
 msgid "All time"
 msgstr "Depuis toujours"
 
+#: website/web/templates/admin/torrent_pivot.html:29
 #: website/web/templates/torrent_pivot.html:29
 msgid "Last 24h"
 msgstr "Dernières 24 h"
 
+#: website/web/templates/admin/torrent_pivot.html:38
 #: website/web/templates/torrent_pivot.html:38
 msgid "Top IPs"
 msgstr "Top IPs"
 
+#: website/web/templates/admin/torrent_pivot.html:41
+#: website/web/templates/admin/torrent_pivot.html:162
 #: website/web/templates/torrent_pivot.html:41
 #: website/web/templates/torrent_pivot.html:162
 msgid "Seeder IPs"
 msgstr "IPs seeders"
 
+#: website/web/templates/admin/torrent_pivot.html:44
 #: website/web/templates/torrent_pivot.html:44
 msgid "Top ASN"
 msgstr "Top ASN"
 
+#: website/web/templates/admin/torrent_pivot.html:47
 #: website/web/templates/torrent_pivot.html:47
 msgid "Seeder ASN"
 msgstr "ASN seeders"
 
+#: website/web/templates/admin/torrent_pivot.html:50
 #: website/web/templates/torrent_pivot.html:50
 msgid "Cross-group"
 msgstr "Cross-groupe"
 
+#: website/web/templates/admin/torrent_pivot.html:58
 #: website/web/templates/torrent_pivot.html:58
 msgid "Top IPs — all observations"
 msgstr "Top IPs — toutes observations"
 
+#: website/web/templates/admin/torrent_pivot.html:65
 #: website/web/templates/torrent_pivot.html:65
 msgid "Scans"
 msgstr "Scans"
 
+#: website/web/templates/admin/torrent_pivot.html:79
 #: website/web/templates/torrent_pivot.html:79
 msgid "No IP indexed yet — run poetry run tools/reindex_torrent_health.py"
 msgstr "Aucune IP indexée — lancez poetry run tools/reindex_torrent_health.py"
 
+#: website/web/templates/admin/torrent_pivot.html:91
 #: website/web/templates/torrent_pivot.html:91
 msgid "Top seeder IPs"
 msgstr "Top IPs seeders"
 
+#: website/web/templates/admin/torrent_pivot.html:98
 #: website/web/templates/torrent_pivot.html:98
 msgid "Seed scans"
 msgstr "Scans seeders"
 
+#: website/web/templates/admin/torrent_pivot.html:99
+#: website/web/templates/admin/torrent_pivot.html:163
 #: website/web/templates/torrent_pivot.html:99
 #: website/web/templates/torrent_pivot.html:163
 msgid "Torrents seeded"
 msgstr "Torrents seedés"
 
+#: website/web/templates/admin/torrent_pivot.html:110
 #: website/web/templates/torrent_pivot.html:110
 msgid "No seeder recorded yet."
 msgstr "Aucun seeder enregistré pour le moment."
 
+#: website/web/templates/admin/torrent_pivot.html:122
 #: website/web/templates/torrent_pivot.html:122
 msgid "Top ASN — all IPs"
 msgstr "Top ASN — toutes IPs"
 
+#: website/web/templates/admin/torrent_pivot.html:143
 #: website/web/templates/torrent_pivot.html:143
 msgid ""
 "No ASN indexed — run poetry run enrich-ips then poetry run "
@@ -2789,14 +3039,17 @@ msgstr ""
 "Aucun ASN indexé — lancez poetry run enrich-ips puis poetry run "
 "tools/reindex_torrent_health.py"
 
+#: website/web/templates/admin/torrent_pivot.html:155
 #: website/web/templates/torrent_pivot.html:155
 msgid "Top ASN — seeder IPs"
 msgstr "Top ASN — IPs seeders"
 
+#: website/web/templates/admin/torrent_pivot.html:174
 #: website/web/templates/torrent_pivot.html:174
 msgid "No seeder ASN recorded yet."
 msgstr "Aucun ASN seeder enregistré pour le moment."
 
+#: website/web/templates/admin/torrent_pivot.html:186
 #: website/web/templates/torrent_pivot.html:186
 msgid "IPs spanning multiple ransomware groups"
 msgstr "IPs couvrant plusieurs groupes ransomware"
@@ -2813,10 +3066,12 @@ msgstr "Filtrer le tableau cross-groupe"
 msgid "ASN · Org"
 msgstr "ASN · Org"
 
+#: website/web/templates/admin/torrent_pivot.html:194
 #: website/web/templates/torrent_pivot.html:202
 msgid "Group list"
 msgstr "Liste des groupes"
 
+#: website/web/templates/admin/torrent_pivot.html:213
 #: website/web/templates/torrent_pivot.html:224
 msgid "No IP has been observed across multiple groups yet."
 msgstr "Aucune IP n'a encore été observée dans plusieurs groupes."
@@ -2857,6 +3112,7 @@ msgstr "Télécharger CSV"
 msgid "Group / Market"
 msgstr "Groupe / Marché"
 
+#: website/web/templates/admin/analysis_variants.html:32
 #: website/web/templates/urls.html:102
 msgid "Status"
 msgstr "Statut"
@@ -2868,6 +3124,195 @@ msgstr "Dernier scrape"
 #: website/web/templates/urls.html:105
 msgid "Health"
 msgstr "Santé"
+
+#: website/web/templates/admin/analyses.html:12
+msgid "Pick a group to add or edit its in-house Markdown analysis."
+msgstr "Choisissez un groupe pour ajouter ou éditer son analyse Markdown interne."
+
+#: website/web/templates/admin/analyses.html:13
+msgid "groups currently have one attached."
+msgstr "groupes ont actuellement une analyse attachée."
+
+#: website/web/templates/admin/analyses.html:23
+#, fuzzy
+msgid "Filter groups…"
+msgstr "Filtrer les groupes"
+
+#: website/web/templates/admin/analyses.html:25
+msgid "analysis already attached"
+msgstr "analyse déjà attachée"
+
+#: website/web/templates/admin/analyses.html:25
+#: website/web/templates/admin/edit_analysis.html:52
+#, fuzzy
+msgid "no analysis yet"
+msgstr "Analyse externe"
+
+#: website/web/templates/admin/analysis_variants.html:12
+msgid ""
+"Manage analysis variants for this group. Each variant gets its own "
+"Markdown source, metadata and assets."
+msgstr "Gérez les variantes d'analyse pour ce groupe. Chaque variante a son propre "
+"Markdown source, ses métadonnées et ses assets."
+
+#: website/web/templates/admin/analysis_variants.html:21
+#, fuzzy
+msgid "Back to selector"
+msgstr "Retour aux swarms"
+
+#: website/web/templates/admin/analysis_variants.html:22
+msgid "Group page"
+msgstr "Page du groupe"
+
+#: website/web/templates/admin/analysis_variants.html:44
+msgid "Default (legacy)"
+msgstr "Par défaut (legacy)"
+
+#: website/web/templates/admin/analysis_variants.html:76
+msgid "Delete this analysis variant?"
+msgstr "Supprimer cette variante d'analyse ?"
+
+#: website/web/templates/admin/analysis_variants.html:78
+#: website/web/templates/admin/edit_analysis.html:48
+#: website/web/templates/admin/torrent_manage.html:112
+msgid "Delete"
+msgstr "Supprimer"
+
+#: website/web/templates/admin/analysis_variants.html:88
+msgid "No analyses attached to this group yet."
+msgstr "Aucune analyse attachée à ce groupe pour le moment."
+
+#: website/web/templates/admin/analysis_variants.html:95
+msgid "Add a new variant"
+msgstr "Ajouter une nouvelle variante"
+
+#: website/web/templates/admin/analysis_variants.html:97
+msgid "Examples:"
+msgstr "Exemples :"
+
+#: website/web/templates/admin/analysis_variants.html:98
+msgid "Allowed: lowercase letters, digits, dash and underscore (max 64 chars)."
+msgstr "Autorisé : minuscules, chiffres, tiret et underscore (max 64 caractères)."
+
+#: website/web/templates/admin/analysis_variants.html:102
+msgid "Variant id"
+msgstr "Identifiant de la variante"
+
+#: website/web/templates/admin/analysis_variants.html:107
+msgid "Create variant"
+msgstr "Créer la variante"
+
+#: website/web/templates/admin/analysis_variants.html:112
+msgid ""
+"Tip: leaving variant empty in the URL still works for legacy single-"
+"analysis groups — but new analyses are best created as named variants."
+msgstr "Astuce : laisser la variante vide dans l'URL fonctionne toujours pour les "
+"groupes legacy mono-analyse — mais les nouvelles analyses sont mieux créées "
+"comme variantes nommées."
+
+#: website/web/templates/admin/edit_analysis.html:3
+#, fuzzy
+msgid "Edit Analysis"
+msgstr "Analyse externe"
+
+#: website/web/templates/admin/edit_analysis.html:11
+#, fuzzy
+msgid "Edit analysis"
+msgstr "Analyse externe"
+
+#: website/web/templates/admin/edit_analysis.html:11
+#, fuzzy
+msgid "Add analysis"
+msgstr "Analyse externe"
+
+#: website/web/templates/admin/edit_analysis.html:15
+msgid "Markdown source stored at"
+msgstr "Source Markdown stockée à"
+
+#: website/web/templates/admin/edit_analysis.html:17
+msgid "Rendered as HTML on the public group page and exported as PDF on demand."
+msgstr ""
+"Rendue en HTML sur la page publique du groupe et exportée en PDF à la "
+"demande."
+
+#: website/web/templates/admin/edit_analysis.html:36
+msgid "Back to variants"
+msgstr "Retour aux variantes"
+
+#: website/web/templates/admin/edit_analysis.html:39
+#, fuzzy
+msgid "Preview HTML"
+msgstr "Précédent"
+
+#: website/web/templates/admin/edit_analysis.html:42
+#, fuzzy
+msgid "Download PDF"
+msgstr "Téléchargé"
+
+#: website/web/templates/admin/edit_analysis.html:46
+#, fuzzy
+msgid "Delete this analysis?"
+msgstr "Analyse externe"
+
+#: website/web/templates/admin/edit_analysis.html:50
+#: website/web/templates/admin/edit_analysis.html:52
+#, fuzzy
+msgid "Status:"
+msgstr "Statut"
+
+#: website/web/templates/admin/edit_analysis.html:50
+msgid "attached"
+msgstr "attachée"
+
+#: website/web/templates/admin/edit_analysis.html:63
+msgid "If a file is uploaded, it overrides the textarea content below."
+msgstr ""
+"Si un fichier est uploadé, il remplace le contenu de la zone de texte ci-"
+"dessous."
+
+#: website/web/templates/admin/edit_analysis.html:72
+msgid "Metadata"
+msgstr "Métadonnées"
+
+#: website/web/templates/admin/edit_analysis.html:91
+msgid ""
+"Used on the cover page of the PDF. SHA-256 must be 64 hex chars; date "
+"must be YYYY-MM-DD."
+msgstr ""
+"Utilisé sur la page de garde du PDF. Le SHA-256 doit faire 64 caractères "
+"hex ; la date doit être au format YYYY-MM-DD."
+
+#: website/web/templates/admin/edit_analysis.html:100
+msgid "Drag-and-drop or paste an image to upload it as an asset."
+msgstr "Glisse-dépose ou colle une image pour l'uploader comme asset."
+
+#: website/web/templates/admin/edit_analysis.html:103
+msgid "Preview unsaved (server-rendered)"
+msgstr "Prévisualiser sans sauvegarder (rendu serveur)"
+
+#: website/web/templates/admin/edit_analysis.html:120
+msgid "Cancel"
+msgstr "Annuler"
+
+#: website/web/templates/admin/torrent_asn.html:3
+#, fuzzy, python-format
+msgid "Admin · AS%(asn)s"
+msgstr "AS%(asn)s"
+
+#: website/web/templates/admin/torrent_health.html:3
+#, fuzzy
+msgid "Admin · Torrent Health"
+msgstr "Santé des torrents"
+
+#: website/web/templates/admin/torrent_health_detail.html:3
+#, fuzzy, python-format
+msgid "Admin · Torrent · %(ih)s…"
+msgstr "Torrent · %(ih)s…"
+
+#: website/web/templates/admin/torrent_ip.html:3
+#, fuzzy, python-format
+msgid "Admin · IP %(ip)s"
+msgstr "IP %(ip)s"
 
 #: website/web/templates/admin/torrent_manage.html:3
 msgid "Admin · Manage Torrents"
@@ -2932,10 +3377,6 @@ msgstr "Derniers pairs"
 msgid "Delete this torrent from the tracker?"
 msgstr "Supprimer ce torrent du tracker ?"
 
-#: website/web/templates/admin/torrent_manage.html:112
-msgid "Delete"
-msgstr "Supprimer"
-
 #: website/web/templates/admin/torrent_manage.html:117
 msgid "No tracked torrent yet."
 msgstr "Aucun torrent suivi pour l'instant."
@@ -2947,6 +3388,11 @@ msgstr "Supprimer les torrents sélectionnés ?"
 #: website/web/templates/admin/torrent_manage.html:124
 msgid "Delete selected"
 msgstr "Supprimer la sélection"
+
+#: website/web/templates/admin/torrent_pivot.html:3
+#, fuzzy
+msgid "Admin · Torrent Pivot"
+msgstr "Pivot Torrent"
 
 #~ msgid "%(n)s group"
 #~ msgstr ""
@@ -3010,4 +3456,36 @@ msgstr "Supprimer la sélection"
 
 #~ msgid "…or .torrent file"
 #~ msgstr ""
+
+#~ msgid "Reverse-engineered analysis · rendered from"
+#~ msgstr ""
+
+#~ msgid "Manage Analyses"
+#~ msgstr "Analyse externe"
+
+#~ msgid "groups have an in-house analysis attached."
+#~ msgstr ""
+
+#~ msgid "present"
+#~ msgstr "Récents"
+
+#~ msgid "Delete analysis for"
+#~ msgstr "Analyse externe"
+
+#~ msgid "Stored at"
+#~ msgstr "Source A"
+
+#~ msgid "Delete analysis"
+#~ msgstr "Analyse externe"
+
+#~ msgid ""
+#~ "Source: RansomLook in-house technical "
+#~ "analysis. Reverse-engineered directly from "
+#~ "the binary; no third-party threat-"
+#~ "intel sources."
+#~ msgstr ""
+#~ "Source : analyse technique interne "
+#~ "RansomLook. Reverse engineering effectué "
+#~ "directement sur le binaire ; aucune "
+#~ "source de threat intel tierce."
 

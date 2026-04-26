@@ -3050,3 +3050,88 @@ html.light .about-hero-logo{
   width:8px; height:8px;
   flex-shrink:0;
 }
+
+/* ===== Markdown analysis page (rendered FULL_ANALYSIS.md) ===== */
+.markdown-section{
+  max-width: 980px;
+  margin: 0 auto;
+  color: var(--text);
+  line-height: 1.6;
+}
+.markdown-section h1,
+.markdown-section h2,
+.markdown-section h3,
+.markdown-section h4{
+  margin: 1.6em 0 .6em;
+  color: var(--text);
+  border-bottom: 1px solid var(--border);
+  padding-bottom: .25em;
+}
+.markdown-section h3,
+.markdown-section h4{ border-bottom: 0; }
+.markdown-section p{ margin: .6em 0; }
+.markdown-section a{ color: #6aa9ff; }
+.markdown-section a:hover{ text-decoration: underline; }
+.markdown-section ul,
+.markdown-section ol{ padding-left: 1.4em; }
+.markdown-section li{ margin: .25em 0; }
+.markdown-section blockquote{
+  border-left: 3px solid var(--border-hover);
+  margin: 1em 0;
+  padding: .4em 1em;
+  background: var(--panel);
+  color: var(--muted);
+}
+.markdown-section code{
+  font-family: 'JetBrains Mono', Menlo, Consolas, monospace;
+  font-size: 13px;
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 1px 5px;
+}
+.markdown-section pre{
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 12px;
+  overflow-x: auto;
+}
+.markdown-section pre code{
+  background: transparent;
+  border: 0;
+  padding: 0;
+  font-size: 12.5px;
+}
+
+/* Tables rendered from Markdown (no class on <table>) */
+.markdown-section table{
+  border-collapse: collapse;
+  width: 100%;
+  margin: 1em 0;
+  font-size: 14px;
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  overflow: hidden;
+}
+.markdown-section thead th{
+  background: var(--bg);
+  text-align: left;
+  font-weight: 600;
+  padding: 8px 12px;
+  border-bottom: 1px solid var(--border);
+  color: var(--text);
+  white-space: nowrap;
+}
+.markdown-section tbody td{
+  padding: 8px 12px;
+  border-top: 1px solid var(--border);
+  vertical-align: top;
+}
+.markdown-section tbody tr:hover{ background: rgba(255,255,255,.02); }
+.markdown-section tbody td code,
+.markdown-section thead th code{ font-size: 12.5px; }
+@media (max-width: 720px){
+  .markdown-section table{ display: block; overflow-x: auto; }
+}

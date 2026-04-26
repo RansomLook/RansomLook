@@ -1,0 +1,182 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>{{ group_name|title }} — Technical Analysis</title>
+  <style>
+    /* ---------------------------------------------------------------
+       PDF stylesheet — self-contained, print-friendly.
+       Tested with WeasyPrint 60+. No external resources.
+    --------------------------------------------------------------- */
+
+    @page {
+      size: A4;
+      margin: 22mm 18mm 22mm 18mm;
+      @top-left   { content: "{{ group_name|title }} — Technical Analysis"; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; font-size: 8pt; color: #888; vertical-align: middle; }
+      @top-right  { content: "RansomLook"; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; font-size: 8pt; color: #888; vertical-align: middle; }
+      @bottom-center { content: counter(page) " / " counter(pages); font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; font-size: 8pt; color: #888; }
+      @bottom-left   { content: "Generated {{ analysis_mtime }}"; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; font-size: 8pt; color: #888; }
+    }
+    @page :first {
+      margin-top: 30mm;
+      @top-left { content: ""; }
+      @top-right { content: ""; }
+    }
+
+    html, body {
+      margin: 0; padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI",
+                   Roboto, "Helvetica Neue", Arial, sans-serif;
+      font-size: 9.5pt;
+      line-height: 1.45;
+      color: #1a1a1a;
+      background: #fff;
+    }
+
+    .cover {
+      page-break-after: always;
+      padding-top: 18mm;
+      text-align: center;
+    }
+    .cover h1 {
+      font-size: 32pt; margin: 0 0 6mm 0; color: #111; letter-spacing: -0.02em;
+    }
+    .cover .subtitle { font-size: 13pt; color: #555; margin-bottom: 10mm; }
+    .cover .badge {
+      display: inline-block; padding: 5mm 11mm;
+      border: 1.5pt solid #c84031; color: #c84031;
+      font-weight: bold; font-size: 11pt;
+      letter-spacing: 0.05em; text-transform: uppercase;
+      margin-bottom: 14mm;
+    }
+    .cover .source {
+      margin-top: 14mm; font-size: 9pt; color: #777; line-height: 1.45;
+    }
+    .cover .source code {
+      font-size: 8.5pt; background: #f4f4f4; padding: 1mm 2mm; border-radius: 1mm;
+    }
+
+    h1, h2, h3, h4, h5, h6 {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      font-weight: 600; color: #111;
+      margin-top: 1.4em; margin-bottom: 0.5em;
+      page-break-after: avoid;
+    }
+    h1 { font-size: 18pt; border-bottom: 1pt solid #ccc; padding-bottom: 0.2em; page-break-before: always; }
+    .cover h1 { page-break-before: avoid; border: none; padding-bottom: 0; }
+    h2 { font-size: 14pt; border-bottom: 0.5pt solid #ddd; padding-bottom: 0.15em; }
+    h3 { font-size: 11.5pt; }
+    h4 { font-size: 10.5pt; }
+    h5, h6 { font-size: 10pt; color: #444; }
+
+    p { margin: 0.5em 0; orphans: 3; widows: 3; }
+
+    code, pre, kbd, samp, tt {
+      font-family: "JetBrains Mono", "Fira Code", "SF Mono", Menlo,
+                   Consolas, "Liberation Mono", monospace;
+      font-size: 8.5pt;
+    }
+    code {
+      background: #f4f4f4; padding: 0.5mm 1.2mm; border-radius: 1mm;
+      color: #c0341d; word-wrap: break-word;
+    }
+    pre {
+      background: #f8f8f8;
+      border: 0.5pt solid #ddd;
+      border-left: 2pt solid #888;
+      border-radius: 1mm;
+      padding: 3mm 4mm;
+      margin: 0.6em 0;
+      overflow-x: hidden;
+      white-space: pre-wrap;
+      word-break: break-all;
+      page-break-inside: avoid;
+    }
+    pre code { background: transparent; padding: 0; color: #333; font-size: 8pt; }
+
+    /* codehilite minimal palette (no external Pygments CSS) */
+    .codehilite .k, .codehilite .kd, .codehilite .kn, .codehilite .kp,
+    .codehilite .kr, .codehilite .kt { color: #0033b3; }
+    .codehilite .s, .codehilite .s1, .codehilite .s2, .codehilite .sb,
+    .codehilite .sc, .codehilite .sd, .codehilite .se, .codehilite .sh,
+    .codehilite .si, .codehilite .sx, .codehilite .ss { color: #067d17; }
+    .codehilite .c, .codehilite .c1, .codehilite .cm, .codehilite .cs,
+    .codehilite .cp, .codehilite .cpf { color: #888; font-style: italic; }
+    .codehilite .n  { color: #1a1a1a; }
+    .codehilite .nc, .codehilite .nf, .codehilite .nn { color: #006e8a; }
+    .codehilite .o, .codehilite .ow { color: #000; }
+    .codehilite .mi, .codehilite .mf, .codehilite .mh,
+    .codehilite .mo, .codehilite .il { color: #1750eb; }
+
+    table {
+      border-collapse: collapse; width: 100%;
+      margin: 0.6em 0 1em 0; font-size: 8.5pt;
+      page-break-inside: avoid;
+      table-layout: auto;
+    }
+    th, td {
+      border: 0.5pt solid #d0d0d0; padding: 1.2mm 2mm;
+      text-align: left; vertical-align: top;
+      /* Only break at natural word boundaries — never mid-token.
+         "T1486" / function names / addresses stay on one line.
+         Long hashes (SHA-256, MD5) only break if the column is too narrow,
+         which the auto layout avoids by widening the value column. */
+      overflow-wrap: break-word;
+      word-break: normal;
+    }
+    th { background: #f4f4f4; font-weight: 600; white-space: nowrap; }
+    table tr { page-break-inside: avoid; }
+    /* Long hashes inside <code> may need to break to stay inside their cell. */
+    td code, th code { word-break: break-all; }
+
+    ul, ol { margin: 0.4em 0 0.4em 4mm; padding-left: 4mm; }
+    li { margin: 0.15em 0; }
+
+    blockquote {
+      border-left: 2pt solid #c0c0c0;
+      padding: 0.3em 0 0.3em 4mm;
+      color: #555; margin: 0.6em 0; font-style: italic;
+    }
+
+    hr { border: none; border-top: 0.5pt solid #ddd; margin: 1.2em 0; }
+    a { color: #0d47a1; text-decoration: none; }
+
+    .toc {
+      background: #f8f8f8; border: 0.5pt solid #ddd;
+      padding: 4mm 5mm; margin: 0 0 8mm 0;
+      page-break-inside: avoid;
+    }
+    .toc > ul { margin: 0; padding-left: 4mm; }
+    .toc ul ul { font-size: 9pt; }
+    .toc a { color: #1a1a1a; }
+
+    img { max-width: 100%; height: auto; }
+    h1, h2, h3 { break-after: avoid-page; }
+  </style>
+</head>
+<body>
+
+<section class="cover">
+  {% if logo_svg_url %}
+  <img src="{{ logo_svg_url }}" alt="RansomLook" style="width:60mm;height:auto;margin-bottom:14mm;" />
+  {% endif %}
+  <h1>{{ group_name|title }}</h1>
+  <div class="subtitle">Technical Analysis{% if variant_label and variant_label != 'Default' %} — {{ variant_label }}{% endif %}</div>
+  <div class="badge">Reverse-Engineered Report</div>
+  <div class="source">
+    <strong>RansomLook</strong> &middot;
+    <a href="https://www.ransomlook.io">ransomlook.io</a><br/>
+    File last modified: {{ analysis_mtime }}<br/>
+    <br/>
+    {% if meta and meta.get('author') %}Analyst: {{ meta['author'] }}<br/>{% endif %}
+    {% if meta and meta.get('date') %}Analysis date: {{ meta['date'] }}<br/>{% endif %}
+    {% if meta and meta.get('sha256') %}Sample SHA-256: <code>{{ meta['sha256'] }}</code><br/>{% endif %}
+  </div>
+</section>
+
+<main>
+  {{ content | safe }}
+</main>
+
+</body>
+</html>

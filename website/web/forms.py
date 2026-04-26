@@ -1,5 +1,5 @@
 from flask_wtf import FlaskForm  # type: ignore
-from flask_wtf.file import FileField  # type: ignore
+from flask_wtf.file import FileAllowed, FileField  # type: ignore
 from wtforms import (  # type: ignore
     BooleanField,
     FieldList,
@@ -13,6 +13,49 @@ from wtforms import (  # type: ignore
     TextAreaField,
 )
 from wtforms.validators import DataRequired, Optional  # type: ignore
+
+
+class AnalysisSelectForm(FlaskForm):  # type: ignore[misc]
+    """Selector for the group whose Markdown analysis we want to edit/add."""
+    group = SelectField("Group", coerce=str, validate_choice=True, validators=[DataRequired()])
+    submit = SubmitField("Edit analysis")
+
+
+class AnalysisForm(FlaskForm):  # type: ignore[misc]
+    """Upload or paste a Markdown technical analysis for a group.
+
+    Either ``upload`` (a .md file) or ``content`` (textarea body) must be set;
+    if both are provided, the uploaded file wins.
+    """
+    content = TextAreaField(
+        "Markdown content",
+        render_kw={"cols": 100, "rows": 30, "spellcheck": "false"},
+        validators=[Optional()],
+    )
+    upload = FileField(
+        "or upload a .md file",
+        validators=[
+            Optional(),
+            FileAllowed(["md", "markdown", "txt"], "Markdown files only"),
+        ],
+    )
+    sha256 = StringField(
+        "Sample SHA-256",
+        validators=[Optional()],
+        render_kw={"placeholder": "64 hex chars (optional)", "spellcheck": "false", "autocomplete": "off"},
+    )
+    author = StringField(
+        "Analyst",
+        validators=[Optional()],
+        render_kw={"placeholder": "e.g. fkz, John Doe…"},
+    )
+    analysis_date = StringField(
+        "Analysis date (YYYY-MM-DD)",
+        validators=[Optional()],
+        render_kw={"placeholder": "2026-04-25"},
+    )
+    private = BooleanField("Private (visible to authenticated users only)", default=False)
+    submit = SubmitField("Save")
 
 
 class AddForm(FlaskForm):  # type: ignore[misc]

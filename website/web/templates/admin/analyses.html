@@ -1,0 +1,64 @@
+{% extends "base.html" %}
+{% from 'bootstrap5/utils.html' import render_messages %}
+{% block title %}Admin · {{ _('Analyses') }}{% endblock %}
+
+{% block content %}
+{{ render_messages(container=True, dismissible=True) }}
+
+<section class="hero">
+  <div class="container">
+    <h1>{{ _('Technical Analyses') }}</h1>
+    <p class="lead">
+      {{ _('Pick a group to add or edit its in-house Markdown analysis.') }}
+      <strong>{{ have }}</strong> / {{ total }} {{ _('groups currently have one attached.') }}
+    </p>
+  </div>
+</section>
+
+<section class="metrics-section">
+  <div class="container">
+
+    <div class="table-card p-12 mb-14">
+      <label class="label" for="picker-search">{{ _('Search') }}</label>
+      <input id="picker-search" class="input" type="search" placeholder="{{ _('Filter groups…') }}">
+      <div class="muted mt-6" style="font-size:.85em">
+        <code>✓</code> {{ _('analysis already attached') }} · <code>+</code> {{ _('no analysis yet') }}
+      </div>
+    </div>
+
+    <form action="" method="post" novalidate class="table-card admin-form p-16">
+      {{ form.hidden_tag() }}
+      <div class="picker-row">
+        <div>
+          <label class="label" for="{{ form.group.id }}">{{ form.group.label }}</label>
+          {{ form.group(class="input w-full") }}
+          {% for error in form.group.errors %}<div class="field-error">[{{ error }}]</div>{% endfor %}
+        </div>
+        <div class="self-end">
+          {{ form.submit(class="btn btn-primary") }}
+        </div>
+      </div>
+    </form>
+
+  </div>
+</section>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  const searchBox = document.getElementById('picker-search');
+  const select = document.querySelector('form select');
+  if (!searchBox || !select) return;
+
+  searchBox.addEventListener('input', () => {
+    const q = searchBox.value.toLowerCase().trim();
+    for (const opt of select.options){
+      opt.hidden = q && !(opt.textContent || '').toLowerCase().includes(q);
+    }
+    if (select.selectedOptions.length && select.selectedOptions[0].hidden){
+      const first = [...select.options].find(o => !o.hidden);
+      if (first) first.selected = true;
+    }
+  });
+});
+</script>
+{% endblock %}

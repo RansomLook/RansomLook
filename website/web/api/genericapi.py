@@ -22,7 +22,7 @@ from ransomlook.default import (
     get_homedir,
     get_socket_path,
 )
-from ransomlook.sharedutils import createfile, striptld
+from ransomlook.sharedutils import createfile, get_private_entity_names, striptld
 
 api = Namespace("GenericAPI", description="Generic Ransomlook API", path="/api")
 
@@ -121,11 +121,15 @@ class RecentPost(Resource):  # type: ignore[misc]
     @api.response(200, "List of posts", [post_model])  # type: ignore[untyped-decorator]
     def get(self, number: int = 100) -> list[str]:
         posts = []
+        private_names = get_private_entity_names()
         red = Valkey(unix_socket_path=get_socket_path("cache"), db=DB_POSTS)
         for key in red.keys():  # type: ignore[union-attr]
+            group_name = key.decode()
+            if group_name.lower() in private_names:
+                continue
             entries = json.loads(red.get(key))  # type: ignore[arg-type]
             for entry in entries:
-                entry["group_name"] = key.decode()
+                entry["group_name"] = group_name
                 posts.append(entry)
         sorted_posts = sorted(posts, key=lambda x: x["discovered"], reverse=True)
         recentposts = []
@@ -146,8 +150,12 @@ class LastPost(Resource):  # type: ignore[misc]
     def get(self, number: int = 1) -> list[dict[str, Any]]:
         posts = []
         actualdate = datetime.now() + timedelta(days=-number)
+        private_names = get_private_entity_names()
         red = Valkey(unix_socket_path=get_socket_path("cache"), db=DB_POSTS)
         for key in red.keys():  # type: ignore[union-attr]
+            group_name = key.decode()
+            if group_name.lower() in private_names:
+                continue
             entries = json.loads(red.get(key))  # type: ignore[arg-type]
             for entry in entries:
                 try:
@@ -155,7 +163,7 @@ class LastPost(Resource):  # type: ignore[misc]
                 except Exception:
                     datetime_object = datetime.strptime(entry["discovered"], "%Y-%m-%d %H:%M:%S")
                 if datetime_object > actualdate:
-                    entry["group_name"] = key.decode()
+                    entry["group_name"] = group_name
                     posts.append(entry)
         sorted_posts = sorted(posts, key=lambda x: x["discovered"], reverse=True)
         return sorted_posts
@@ -251,6 +259,8 @@ class GroupPost(Resource):  # type: ignore[misc]
     @api.response(200, "Post object", post_model)  # type: ignore[untyped-decorator]
     @api.response(404, "Post not found (returns {})")  # type: ignore[untyped-decorator]
     def get(self, name: str, postname: str) -> dict[str, Any]:
+        if name.lower() in get_private_entity_names():
+            return {}
         red = Valkey(unix_socket_path=get_socket_path("cache"), db=DB_POSTS)
         for key in red.keys():  # type: ignore[union-attr]
             if key.decode().lower() == name.lower():
@@ -368,7 +378,15 @@ class Exportdb(Resource):  # type: ignore[misc]
             )
         red = Valkey(unix_socket_path=get_socket_path("cache"), db=database)
         dump = {}
+        # For DBs keyed by entity name (POSTS) or entity-derived keys (HEALTH),
+        # cross-lookup DB_GROUPS/DB_MARKETS so private entities are excluded.
+        private_names = (
+            get_private_entity_names()
+            if str(database) in (str(DB_POSTS), str(DB_HEALTH))
+            else set()
+        )
         for key in red.keys():  # type: ignore[union-attr]
+            key_str = key.decode()
             if str(database) in _EXPORT_FILTER_PRIVATE:
                 temp = json.loads(red.get(key))  # type: ignore[arg-type]
                 if "private" in temp and temp["private"] is True:
@@ -379,9 +397,19 @@ class Exportdb(Resource):  # type: ignore[misc]
                         for location in temp["locations"]
                         if not ("private" in location and location["private"] is True)
                     ]
-                dump[key.decode()] = temp
+                dump[key_str] = temp
+            elif str(database) == str(DB_POSTS):
+                if key_str.lower() in private_names:
+                    continue
+                dump[key_str] = json.loads(red.get(key))  # type: ignore[arg-type]
+            elif str(database) == str(DB_HEALTH):
+                # DB_HEALTH keys are "health:<group>:<slug>" (+ ":cnt:", ":lastday:" variants).
+                parts = key_str.split(":", 2)
+                if len(parts) >= 2 and parts[1].lower() in private_names:
+                    continue
+                dump[key_str] = json.loads(red.get(key))  # type: ignore[arg-type]
             else:
-                dump[key.decode()] = json.loads(red.get(key))  # type: ignore[arg-type]
+                dump[key_str] = json.loads(red.get(key))  # type: ignore[arg-type]
         return dump
 
 
@@ -457,10 +485,13 @@ class Posts(Resource):  # type: ignore[misc]
 
         # --- Read Redis db=2 as in your script ---
         red = Valkey(unix_socket_path=get_socket_path("cache"), db=DB_POSTS)
+        private_names = get_private_entity_names()
 
         out: list[dict[str, Any]] = []
         for key in red.keys():  # type: ignore[union-attr]
             group_name = key.decode()
+            if group_name.lower() in private_names:
+                continue
             if groups_wanted and group_name not in groups_wanted:
                 continue
 
@@ -501,6 +532,7 @@ class Posts(Resource):  # type: ignore[misc]
 class GroupFirstSeen(Resource):  # type: ignore[misc]
     def get(self) -> dict[str, str]:
         red_posts = Valkey(unix_socket_path=get_socket_path("cache"), db=DB_POSTS)
+        private_names = get_private_entity_names()
         out: dict[str, str] = {}
 
         def _parse_ts(s: str) -> Any:
@@ -512,11 +544,13 @@ class GroupFirstSeen(Resource):  # type: ignore[misc]
             return None
 
         for key in red_posts.keys():  # type: ignore[union-attr]
+            gname = key.decode() if isinstance(key, (bytes, bytearray)) else str(key)
+            if gname.lower() in private_names:
+                continue
             try:
                 entries = json.loads(red_posts.get(key))  # type: ignore[arg-type]
             except Exception:
                 continue
-            gname = key.decode() if isinstance(key, (bytes, bytearray)) else str(key)
             earliest: Any = None
             for entry in entries:
                 ts = _parse_ts(entry.get("discovered") or "")
@@ -543,12 +577,16 @@ class PostPerMonth(Resource):  # type: ignore[misc]
             date = str(year) + "-" + str(month)
         else:
             date = str(year) + "-"
+        private_names = get_private_entity_names()
         red = Valkey(unix_socket_path=get_socket_path("cache"), db=DB_POSTS)
         for key in red.keys():  # type: ignore[union-attr]
+            group_name = key.decode()
+            if group_name.lower() in private_names:
+                continue
             entries = json.loads(red.get(key))  # type: ignore[arg-type]
             for entry in entries:
                 if entry["discovered"].startswith(date):
-                    entry["group_name"] = key.decode()
+                    entry["group_name"] = group_name
                     posts.append(entry)
         sorted_posts = sorted(posts, key=lambda x: x["discovered"], reverse=True)
         return sorted_posts
@@ -563,12 +601,16 @@ class PostPerPeriod(Resource):  # type: ignore[misc]
     @api.response(200, "List of posts", [post_model])  # type: ignore[untyped-decorator]
     def get(self, start_date: str, end_date: str) -> list[dict[str, Any]]:
         posts = []
+        private_names = get_private_entity_names()
         red = Valkey(unix_socket_path=get_socket_path("cache"), db=DB_POSTS)
         for key in red.keys():  # type: ignore[union-attr]
+            group_name = key.decode()
+            if group_name.lower() in private_names:
+                continue
             entries = json.loads(red.get(key))  # type: ignore[arg-type]
             for entry in entries:
                 if start_date <= entry["discovered"].split(" ")[0] <= end_date:
-                    entry["group_name"] = key.decode()
+                    entry["group_name"] = group_name
                     posts.append(entry)
         sorted_posts = sorted(posts, key=lambda x: x["discovered"], reverse=True)
         return sorted_posts

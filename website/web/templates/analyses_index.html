@@ -1,0 +1,86 @@
+{% extends "base.html" %}
+{% block title %}{{ _('Technical Analyses') }} · RansomLook{% endblock %}
+
+{% block content %}
+<section class="hero">
+  <div class="container">
+    <h1>{{ _('Technical Analyses') }}</h1>
+    <p class="lead">
+      {{ _('Reverse-engineered, in-house analyses of ransomware samples.') }}
+      <strong>{{ total }}</strong> {{ _('reports available.') }}
+    </p>
+  </div>
+</section>
+
+<section class="metrics-section">
+  <div class="container">
+
+    <div class="table-card p-12 mb-14">
+      <label class="label" for="analyses-search">{{ _('Search') }}</label>
+      <input id="analyses-search" class="input" type="search" placeholder="{{ _('Filter by group name…') }}">
+    </div>
+
+    {% if items %}
+    <div class="table-card overflow-visible">
+      <table class="rl-table" style="width:100%">
+        <thead>
+          <tr>
+            <th>{{ _('Group') }}</th>
+            <th>{{ _('Variant') }}</th>
+            <th>{{ _('Updated') }}</th>
+            <th>SHA-256</th>
+            <th style="text-align:right;">{{ _('Actions') }}</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for it in items %}
+          <tr data-row data-name="{{ it.name|lower }} {{ it.variant|lower }}">
+            <td>
+              <a href="{{ url_for('group', name=it.name) }}"><strong>{{ it.name|title }}</strong></a>
+              {% if it.private %}
+                <span class="badge-private" title="{{ _('Visible to authenticated users only') }}">private</span>
+              {% endif %}
+            </td>
+            <td>
+              {% if it.variant %}{{ it.variant_label }}{% else %}<span class="muted">—</span>{% endif %}
+            </td>
+            <td><time>{{ it.mtime }}</time></td>
+            <td>
+              {% if it.sha256 %}
+                <code style="font-size:.85em">{{ it.sha256[:16] }}…</code>
+              {% else %}
+                <span class="muted">—</span>
+              {% endif %}
+            </td>
+            <td style="text-align:right; white-space:nowrap;">
+              <a class="btn btn-sm btn-secondary" href="{{ it.view_url }}">{{ _('View') }}</a>
+              <a class="btn btn-sm btn-secondary" href="{{ it.pdf_url }}">PDF</a>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    {% else %}
+    <div class="table-card p-16">
+      <p class="muted">{{ _('No analyses are available yet.') }}</p>
+    </div>
+    {% endif %}
+
+  </div>
+</section>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  const q = document.getElementById('analyses-search');
+  if (!q) return;
+  q.addEventListener('input', () => {
+    const needle = q.value.toLowerCase().trim();
+    document.querySelectorAll('[data-row]').forEach(row => {
+      const name = row.getAttribute('data-name') || '';
+      row.style.display = (!needle || name.includes(needle)) ? '' : 'none';
+    });
+  });
+});
+</script>
+{% endblock %}

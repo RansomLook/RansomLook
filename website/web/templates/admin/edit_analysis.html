@@ -1,0 +1,222 @@
+{% extends "base.html" %}
+{% from 'bootstrap5/utils.html' import render_messages %}
+{% block title %}Admin · {{ _('Edit Analysis') }} · {{ group_name|title }}{% endblock %}
+
+{% block content %}
+{{ render_messages(container=True, dismissible=True) }}
+
+<section class="hero">
+  <div class="container">
+    <h1>
+      {% if has_existing %}{{ _('Edit analysis') }}{% else %}{{ _('Add analysis') }}{% endif %}
+      — {{ group_name|title }}{% if variant %} <small style="color:var(--muted); font-weight:500;">/ {{ variant_label }}</small>{% endif %}
+    </h1>
+    <p class="lead">
+      {{ _('Markdown source stored at') }}
+      <code>data/analyses/{{ group_name|lower }}{% if variant %}/{{ variant }}{% endif %}/FULL_ANALYSIS.md</code>.
+      {{ _('Rendered as HTML on the public group page and exported as PDF on demand.') }}
+    </p>
+  </div>
+</section>
+
+<section class="metrics-section">
+  <div class="container">
+
+    {# View/PDF URLs depend on whether we're editing the legacy root MD or a named variant. #}
+    {% if variant %}
+      {% set view_url = url_for('group_analysis_variant', name=group_name, variant=variant) %}
+      {% set pdf_url  = url_for('group_analysis_variant_pdf', name=group_name, variant=variant) %}
+    {% else %}
+      {% set view_url = url_for('group_analysis', name=group_name) %}
+      {% set pdf_url  = url_for('group_analysis_pdf', name=group_name) %}
+    {% endif %}
+
+    <!-- Toolbar -->
+    <div class="table-card p-12 mb-14" style="display:flex; gap:8px; flex-wrap:wrap; align-items:center;">
+      <a href="{{ url_for('admin_group_analyses', name=group_name) }}" class="btn btn-secondary btn-sm">← {{ _('Back to variants') }}</a>
+      {% if has_existing %}
+        <a class="btn btn-secondary btn-sm" href="{{ view_url }}" target="_blank" rel="noopener">
+          ↗ {{ _('Preview HTML') }}
+        </a>
+        <a class="btn btn-secondary btn-sm" href="{{ pdf_url }}" target="_blank" rel="noopener">
+          ⬇ {{ _('Download PDF') }}
+        </a>
+        <form method="POST" action="{{ url_for('admin_delete_analysis_variant', name=group_name, variant_url=variant_url) }}"
+              style="margin:0;"
+              onsubmit="return confirm('{{ _('Delete this analysis?') }}');">
+          {{ delete_form.hidden_tag() }}
+          <button type="submit" class="btn btn-danger btn-sm">🗑 {{ _('Delete') }}</button>
+        </form>
+        <span class="ml-auto muted" style="font-size:.85em">{{ _('Status:') }} <strong>{{ _('attached') }}</strong></span>
+      {% else %}
+        <span class="ml-auto muted" style="font-size:.85em">{{ _('Status:') }} <strong>{{ _('no analysis yet') }}</strong></span>
+      {% endif %}
+    </div>
+
+    <form method="POST" enctype="multipart/form-data" novalidate class="table-card admin-form p-16">
+      {{ form.hidden_tag() }}
+
+      <div class="mb-3">
+        <label class="label" for="{{ form.upload.id }}">{{ form.upload.label.text }}</label>
+        {{ form.upload(class="input") }}
+        <div class="muted mt-6" style="font-size:.85em">
+          {{ _('If a file is uploaded, it overrides the textarea content below.') }}
+        </div>
+        {% for error in form.upload.errors %}<div class="field-error">[{{ error }}]</div>{% endfor %}
+      </div>
+
+      <hr style="margin: 14px 0; opacity:.4"/>
+
+      {# ---- Sample / report metadata (persisted in meta.json) ---- #}
+      <div class="mb-3">
+        <label class="label">{{ _('Metadata') }}</label>
+        <div style="display:grid; grid-template-columns: 2fr 1fr 1fr; gap:10px;">
+          <div>
+            <label class="label" style="font-size:.8em" for="{{ form.sha256.id }}">{{ form.sha256.label.text }}</label>
+            {{ form.sha256(class="input w-full", style="font-family: 'JetBrains Mono', Menlo, Consolas, monospace; font-size:12px;") }}
+            {% for error in form.sha256.errors %}<div class="field-error">[{{ error }}]</div>{% endfor %}
+          </div>
+          <div>
+            <label class="label" style="font-size:.8em" for="{{ form.author.id }}">{{ form.author.label.text }}</label>
+            {{ form.author(class="input w-full") }}
+            {% for error in form.author.errors %}<div class="field-error">[{{ error }}]</div>{% endfor %}
+          </div>
+          <div>
+            <label class="label" style="font-size:.8em" for="{{ form.analysis_date.id }}">{{ form.analysis_date.label.text }}</label>
+            {{ form.analysis_date(class="input w-full") }}
+            {% for error in form.analysis_date.errors %}<div class="field-error">[{{ error }}]</div>{% endfor %}
+          </div>
+        </div>
+        <div class="muted mt-6" style="font-size:.8em">
+          {{ _('Used on the cover page of the PDF. SHA-256 must be 64 hex chars; date must be YYYY-MM-DD.') }}
+        </div>
+      </div>
+
+      <hr style="margin: 14px 0; opacity:.4"/>
+
+      <div class="mb-3" style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
+        <label class="label" style="margin-bottom:0;" for="{{ form.content.id }}">{{ form.content.label.text }}</label>
+        <span class="muted" style="font-size:.8em">
+          {{ _('Drag-and-drop or paste an image to upload it as an asset.') }}
+        </span>
+        <button type="button" id="btn-render-server" class="btn btn-secondary btn-sm" style="margin-left:auto">
+          ↗ {{ _('Preview unsaved (server-rendered)') }}
+        </button>
+      </div>
+
+      <div>
+        {{ form.content(class="input w-full", style="font-family: 'JetBrains Mono', Menlo, Consolas, monospace; font-size: 13px; min-height: 560px;") }}
+        {% for error in form.content.errors %}<div class="field-error">[{{ error }}]</div>{% endfor %}
+      </div>
+
+      <div class="form-check mb-3" style="display:flex; align-items:center; gap:8px;">
+        {{ form.private() }}
+        <label for="{{ form.private.id }}">{{ form.private.label.text }}</label>
+      </div>
+
+      <div class="picker-row" style="margin-top: 12px;">
+        <div style="display:flex; gap:8px; flex-wrap:wrap;">
+          {{ form.submit(class="btn btn-primary") }}
+          <a href="{{ url_for('admin_analyses') }}" class="btn btn-secondary">{{ _('Cancel') }}</a>
+        </div>
+      </div>
+    </form>
+
+  </div>
+</section>
+
+{# Server-side preview + drag/paste image upload.
+   No external JS dependency — all vanilla, all served from this server. #}
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  const ta = document.getElementById('{{ form.content.id }}');
+  const btn = document.getElementById('btn-render-server');
+  const csrfInput = document.querySelector('input[name="csrf_token"]');
+  if (!ta) return;
+
+  // ── Server-side rendered preview (opens in a new tab) ────────────────────
+  if (btn) {
+    btn.addEventListener('click', () => {
+      const csrf = csrfInput ? csrfInput.value : '';
+      const f = document.createElement('form');
+      f.method = 'POST';
+      f.action = '{{ url_for("admin_preview_analysis_variant", name=group_name, variant_url=variant_url) }}';
+      f.target = '_blank';
+      f.style.display = 'none';
+      for (const [k, v] of Object.entries({ csrf_token: csrf, content: ta.value })) {
+        const input = document.createElement('input');
+        input.type = 'hidden'; input.name = k; input.value = v;
+        f.appendChild(input);
+      }
+      document.body.appendChild(f);
+      f.submit();
+      setTimeout(() => f.remove(), 0);
+    });
+  }
+
+  // ── Drag-and-drop / paste image upload ───────────────────────────────────
+  const UPLOAD_URL = '{{ url_for("admin_upload_asset_variant", name=group_name, variant_url=variant_url) }}';
+
+  function insertAtCursor(text) {
+    const start = ta.selectionStart;
+    const end   = ta.selectionEnd;
+    ta.value = ta.value.slice(0, start) + text + ta.value.slice(end);
+    ta.selectionStart = ta.selectionEnd = start + text.length;
+    ta.focus();
+  }
+
+  function replaceFirst(needle, replacement) {
+    const idx = ta.value.indexOf(needle);
+    if (idx >= 0) {
+      ta.value = ta.value.slice(0, idx) + replacement + ta.value.slice(idx + needle.length);
+    }
+  }
+
+  async function uploadFile(file) {
+    if (!file || !(file.type || '').startsWith('image/')) return;
+    const placeholder = `![](uploading ${file.name}…)`;
+    insertAtCursor(placeholder);
+    try {
+      const fd = new FormData();
+      fd.append('file', file);
+      if (csrfInput) fd.append('csrf_token', csrfInput.value);
+      const r = await fetch(UPLOAD_URL, { method: 'POST', body: fd });
+      const data = await r.json();
+      if (data && data.ok && data.snippet) {
+        replaceFirst(placeholder, data.snippet);
+      } else {
+        replaceFirst(placeholder, `![](upload failed: ${(data && data.error) || 'unknown'})`);
+      }
+    } catch (e) {
+      replaceFirst(placeholder, `![](upload error: ${e.message})`);
+    }
+  }
+
+  // Visual cue while dragging.
+  const origOutline = ta.style.outline;
+  ['dragenter', 'dragover'].forEach(ev =>
+    ta.addEventListener(ev, e => { e.preventDefault(); ta.style.outline = '2px dashed #6aa9ff'; })
+  );
+  ['dragleave', 'drop'].forEach(ev =>
+    ta.addEventListener(ev, () => { ta.style.outline = origOutline; })
+  );
+
+  ta.addEventListener('drop', async e => {
+    e.preventDefault();
+    const files = [...(e.dataTransfer && e.dataTransfer.files || [])];
+    for (const f of files) await uploadFile(f);
+  });
+
+  ta.addEventListener('paste', async e => {
+    const items = [...((e.clipboardData && e.clipboardData.items) || [])];
+    for (const it of items) {
+      if (it.kind === 'file' && (it.type || '').startsWith('image/')) {
+        e.preventDefault();
+        const f = it.getAsFile();
+        if (f) await uploadFile(f);
+      }
+    }
+  });
+});
+</script>
+{% endblock %}

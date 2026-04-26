@@ -80,10 +80,11 @@
       <div class="nav-group">
         <h3 class="nav-group-title">{{ _('Intel') }}</h3>
         <ul>
-          {{ nav_link('/urls',   _('URLs'),   ic_urls,   title=_('All tracked mirrors')) }}
-          {{ nav_link('/crypto', _('Crypto'), ic_crypto, title=_('Cryptocurrencies')) }}
-          {{ nav_link('/leaks',  _('Leaks'),  ic_leaks) }}
-          {{ nav_link('/notes',  _('Notes'),  ic_notes,  title=_('Ransomware Notes')) }}
+          {{ nav_link('/urls',     _('URLs'),     ic_urls,   title=_('All tracked mirrors')) }}
+          {{ nav_link('/crypto',   _('Crypto'),   ic_crypto, title=_('Cryptocurrencies')) }}
+          {{ nav_link('/leaks',    _('Leaks'),    ic_leaks) }}
+          {{ nav_link('/notes',    _('Notes'),    ic_notes,  title=_('Ransomware Notes')) }}
+          {{ nav_link('/analyses', _('Analyses'), ic_docs,   title=_('In-house technical analyses')) }}
           {% if activatedRF %}
           {{ nav_link(url_for('rf'), _('RF Dumps'), ic_rf, match='/RF') }}
           {% endif %}
