@@ -11,7 +11,7 @@ from urllib.parse import urlparse, urlsplit
 import tldextract
 import valkey
 
-from ransomlook.default import DB_ACTORS, DB_CRYPTO, DB_GROUPS, DB_LEAKS, DB_NOTES, DB_POSTS, DB_RF
+from ransomlook.default import DB_ACTORS, DB_CRYPTO, DB_GROUPS, DB_LEAKS, DB_MARKETS, DB_NOTES, DB_POSTS, DB_RF
 from ransomlook.default.config import get_homedir, get_socket_path
 from ransomlook.default.logging import get_logger
 
