@@ -29,7 +29,8 @@ class AnalysisForm(FlaskForm):  # type: ignore[misc]
     """
     content = TextAreaField(
         "Markdown content",
-        render_kw={"cols": 100, "rows": 30, "spellcheck": "false"},
+        # Explicit id avoids collision with base.html's <main id="content">.
+        render_kw={"id": "md-content", "cols": 100, "rows": 30, "spellcheck": "false"},
         validators=[Optional()],
     )
     upload = FileField(

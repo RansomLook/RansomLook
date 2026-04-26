@@ -95,7 +95,7 @@
       <hr style="margin: 14px 0; opacity:.4"/>
 
       <div class="mb-3" style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
-        <label class="label" style="margin-bottom:0;" for="{{ form.content.id }}">{{ form.content.label.text }}</label>
+        <label class="label" style="margin-bottom:0;" for="md-content">{{ form.content.label.text }}</label>
         <span class="muted" style="font-size:.8em">
           {{ _('Drag-and-drop or paste an image to upload it as an asset.') }}
         </span>
@@ -129,7 +129,9 @@
    No external JS dependency — all vanilla, all served from this server. #}
 <script>
 document.addEventListener('DOMContentLoaded', () => {
-  const ta = document.getElementById('{{ form.content.id }}');
+  // base.html has <main id="content">, which shadows getElementById on the textarea.
+  // Always select the textarea explicitly by tag+name to avoid that collision.
+  const ta = document.querySelector('textarea[name="{{ form.content.name }}"]');
   const btn = document.getElementById('btn-render-server');
   const csrfInput = document.querySelector('input[name="csrf_token"]');
   if (!ta) return;
