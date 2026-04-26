@@ -11,7 +11,7 @@ logger = get_logger(__name__)
 def main() -> list[dict[str, str]]:
     list_div = []
     for filename in os.listdir("source"):
-        if filename.startswith(__name__.split(".")[-1] + "-"):
+        if filename.startswith(__name__.split(".")[-1] + "-") and "cards.json" in filename:
             html_doc = "source/" + filename
             file = open(html_doc, encoding="utf-8")
             soup = BeautifulSoup(file, "html.parser")
