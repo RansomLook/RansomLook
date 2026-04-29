@@ -34,10 +34,10 @@ ROOT = HERE.parent
 sys.path.insert(0, str(ROOT))
 
 try:
-    from ransomlook.default.config import get_homedir  # type: ignore
+    from ransomlook.default.config import get_homedir
 except Exception as e:
     print(f"warning: could not import ransomlook.default.config ({e}); falling back to PWD")
-    def get_homedir() -> Path:  # type: ignore
+    def get_homedir() -> Path:
         return ROOT
 
 

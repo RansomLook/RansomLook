@@ -1853,7 +1853,7 @@ def _read_meta_json(path: str) -> Dict[str, Any]:
         return {}
 
 
-def _list_variants(name: str) -> list:
+def _list_variants(name: str) -> list[dict[str, Any]]:
     """Return all analysis variants for a group, ordered alphabetically.
 
     A legacy root-level ``FULL_ANALYSIS.md`` is exposed with id="" (empty
@@ -1933,7 +1933,7 @@ def _analysis_meta(name: str, variant: Optional[str] = None) -> Dict[str, Any]:
 
 def _render_markdown_text(text: str) -> str:
     """Render raw Markdown to HTML5 with our standard extension set."""
-    import markdown  # type: ignore[import-not-found]
+    import markdown  # type: ignore[import-untyped]
 
     return markdown.markdown(
         text,
@@ -1961,7 +1961,7 @@ def _render_analysis_html(md_path: str) -> str:
         return _render_markdown_text(f.read())
 
 
-def _list_groups_with_analysis_status() -> list:
+def _list_groups_with_analysis_status() -> list[dict[str, Any]]:
     """Build a list of all known groups + a flag indicating whether they have an analysis."""
     red = Valkey(unix_socket_path=get_socket_path("cache"), db=DB_GROUPS)
     out = []
@@ -1980,7 +1980,9 @@ def _list_groups_with_analysis_status() -> list:
 def _is_analysis_public(name: str, variant: Optional[str] = None) -> bool:
     """True if an analysis variant exists on disk *and* is not flagged private."""
     v = _resolve_variant(name, variant)
-    return bool(v) and not v["meta"].get("private", False)
+    if not v:
+        return False
+    return not v["meta"].get("private", False)
 
 
 def _public_analyses_count() -> int:
@@ -2086,7 +2088,7 @@ def analyses_index():  # type: ignore[no-untyped-def]
     return render_template("analyses_index.html", items=items, total=len(items))
 
 
-def _visible_variants(name: str) -> list:
+def _visible_variants(name: str) -> list[dict[str, Any]]:
     """Return variants for this group filtered for the current viewer (drops privates if anon)."""
     out = []
     for v in _list_variants(name):
@@ -2156,7 +2158,7 @@ def _do_render_analysis_pdf(name: str, variant: Optional[str]):  # type: ignore[
         logo_svg_url=logo_svg_url,
     )
     try:
-        from weasyprint import HTML  # type: ignore[import-not-found]
+        from weasyprint import HTML  # type: ignore[import-untyped]
     except ImportError:
         return Response(
             page,
@@ -2222,7 +2224,7 @@ def admin_analyses():  # type: ignore[no-untyped-def]
 
 
 @app.route("/admin/analysis/<name>", methods=["GET", "POST"])
-@flask_login.login_required
+@flask_login.login_required  # type: ignore[untyped-decorator]
 def admin_group_analyses(name: str):  # type: ignore[no-untyped-def]
     """Variants management page: list existing variants + form to create a new one."""
     safe = _safe_group_name(name)
@@ -2301,7 +2303,7 @@ def _admin_check_group(name: str):  # type: ignore[no-untyped-def]
 
 
 @app.route("/admin/analysis/<name>/<variant_url>", methods=["GET", "POST"])
-@flask_login.login_required
+@flask_login.login_required  # type: ignore[untyped-decorator]
 def admin_edit_analysis_variant(name: str, variant_url: str):  # type: ignore[no-untyped-def]
     # Reserved suffixes (preview/delete/upload-asset) are handled by their own routes;
     # if Werkzeug routed something like 'preview' here, it means there's no more specific
@@ -2427,7 +2429,7 @@ def admin_edit_analysis_variant(name: str, variant_url: str):  # type: ignore[no
 
 
 @app.route("/admin/analysis/<name>/<variant_url>/preview", methods=["POST"])
-@flask_login.login_required
+@flask_login.login_required  # type: ignore[untyped-decorator]
 def admin_preview_analysis_variant(name: str, variant_url: str):  # type: ignore[no-untyped-def]
     """Render an unsaved Markdown body via the production pipeline (variant-aware)."""
     if not _safe_group_name(name):
@@ -2480,7 +2482,7 @@ def group_analysis_variant_asset(name: str, variant: str, filename: str):  # typ
 
 
 @app.route("/admin/analysis/<name>/<variant_url>/upload-asset", methods=["POST"])
-@flask_login.login_required
+@flask_login.login_required  # type: ignore[untyped-decorator]
 def admin_upload_asset_variant(name: str, variant_url: str):  # type: ignore[no-untyped-def]
     """Receive an image dragged/pasted into the editor (variant-aware)."""
     if not _safe_group_name(name):
@@ -2521,7 +2523,7 @@ def admin_upload_asset_variant(name: str, variant_url: str):  # type: ignore[no-
 
 
 @app.route("/admin/analysis/<name>/<variant_url>/delete", methods=["POST"])
-@flask_login.login_required
+@flask_login.login_required  # type: ignore[untyped-decorator]
 def admin_delete_analysis_variant(name: str, variant_url: str):  # type: ignore[no-untyped-def]
     chk = _admin_check_group(name)
     if chk:
