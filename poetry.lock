@@ -3748,19 +3748,19 @@ tests = ["coverage[toml] (==7.10.7)", "pytest (>=8.4.2,<9.0.0)"]
 
 [[package]]
 name = "pylacus"
-version = "1.24.1"
+version = "1.24.2"
 description = "Python CLI and module for lacus"
 optional = false
 python-versions = "<3.15,>=3.10"
 groups = ["main"]
 files = [
-    {file = "pylacus-1.24.1-py3-none-any.whl", hash = "sha256:196256708968f0b9e6aba11002ea02724c943c65d4378585a1206f5bfb3bed48"},
-    {file = "pylacus-1.24.1.tar.gz", hash = "sha256:18f350e4da2ad3493ec8da890cae31ed45082a9bb9790d1514b4876846e760d3"},
+    {file = "pylacus-1.24.2-py3-none-any.whl", hash = "sha256:a4b994720b27aaa6804aa37f91c31b59073ed432dde77d9581543bf425308ebd"},
+    {file = "pylacus-1.24.2.tar.gz", hash = "sha256:6dcfe01e0a24d120540ccb1fe02685eacac1ecaed789b8a694ba4886c91c909b"},
 ]
 
 [package.dependencies]
 deprecated = {version = ">=1.3.1,<2.0.0", markers = "python_version < \"3.13\""}
-lookyloo-models = ">=0.2.2"
+lookyloo-models = ">=0.2.4"
 pydantic = ">=2.12.5,<3.0.0"
 requests = ">=2.33.1"
 urllib3 = ">=2.6.3,<3.0.0"
@@ -5334,4 +5334,4 @@ test = ["pytest"]
 [metadata]
 lock-version = "2.1"
 python-versions = ">=3.10,<3.15"
-content-hash = "51c37393ac5d661019b5a8a13dc7281c0e0bc71508e52c6786be519bca7552a5"
+content-hash = "cf5c599d5265c7f62e4631e2fe599e49abba1ac2362b43d26fc1ccf2d2b7d22a"
