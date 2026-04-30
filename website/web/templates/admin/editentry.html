@@ -1,14 +1,14 @@
 {% extends "base.html" %}
 {% from 'bootstrap5/utils.html' import render_messages %}
-{% block title %}Edit {{ form.groupname.data or 'group' }}{% endblock %}
+{% block title %}{{ _('Edit') }} {{ form.groupname.data or _('group') }}{% endblock %}
 
 {% block content %}
 {{ render_messages(container=True, dismissible=True) }}
 
 <section class="hero">
   <div class="container" style="display:flex;align-items:center;gap:12px;flex-wrap:wrap">
-    <h1 class="m-0">Edit {{ form.groupname.data or 'group' }}</h1>
-    <a href="/admin/edit" class="btn btn-secondary" style="margin-left:auto">Back</a>
+    <h1 class="m-0">{{ _('Edit') }} {{ form.groupname.data or _('group') }}</h1>
+    <a href="/admin/edit" class="btn btn-secondary" style="margin-left:auto">{{ _('Back') }}</a>
   </div>
 </section>
 
@@ -20,122 +20,122 @@
 
       <!-- ===== Card: Meta ===== -->
       <div class="table-card admin-card">
-        <div class="card-toolbar"><span>Identity</span></div>
+        <div class="card-toolbar"><span>{{ _('Identity') }}</span></div>
 
         <div class="form-grid">
-          <label>Group name</label>
+          <label>{{ _('Group name') }}</label>
           <div>{{ form.groupname(class_="input") }}</div>
 
-          <label>Galaxy name</label>
+          <label>{{ _('Galaxy name') }}</label>
           <div>{{ form.galaxy(class_="input") }}</div>
         </div>
 
         <div class="switch-row">
-          <label class="switch">{{ form.raas() }} <span>RaaS ?</span></label>
-          <label class="switch">{{ form.captcha() }} <span>Captcha protected ?</span></label>
-          <label class="switch">{{ form.private() }} <span>Private group ?</span></label>
+          <label class="switch">{{ form.raas() }} <span>{{ _('RaaS ?') }}</span></label>
+          <label class="switch">{{ form.captcha() }} <span>{{ _('Captcha protected ?') }}</span></label>
+          <label class="switch">{{ form.private() }} <span>{{ _('Private group ?') }}</span></label>
         </div>
 
-        <label class="block-label">Description</label>
+        <label class="block-label">{{ _('Description') }}</label>
         {{ form.description(class_="textarea auto-ta", rows="3") }}
       </div>
 
       <!-- ===== Card: References & contacts (tabs) ===== -->
       <div class="table-card admin-card">
         <div class="card-toolbar">
-          <span>References &amp; contacts</span>
-          <small class="muted">Compteurs = nb de lignes (ou entrées séparées)</small>
+          <span>{{ _('References & contacts') }}</span>
+          <small class="muted">{{ _('Counts = number of lines (or separated entries)') }}</small>
         </div>
 
         <div class="tabs">
           <div class="tabs-nav" role="tablist">
-            <button type="button" class="tab active" data-tab="profiles">Profiles <span class="badge" data-count="profiles">0</span></button>
-            <button type="button" class="tab" data-tab="hash">Hash <span class="badge" data-count="hash">0</span></button>
-            <button type="button" class="tab" data-tab="jabber">Jabber <span class="badge" data-count="jabber">0</span></button>
-            <button type="button" class="tab" data-tab="mail">Mail <span class="badge" data-count="mail">0</span></button>
-            <button type="button" class="tab" data-tab="pgp">PGP <span class="badge" data-count="pgp">0</span></button>
-            <button type="button" class="tab" data-tab="matrix">Matrix <span class="badge" data-count="matrix">0</span></button>
-            <button type="button" class="tab" data-tab="session">Session <span class="badge" data-count="session">0</span></button>
-            <button type="button" class="tab" data-tab="telegram">Telegram <span class="badge" data-count="telegram">0</span></button>
-            <button type="button" class="tab" data-tab="tox">Tox <span class="badge" data-count="tox">0</span></button>
-            <button type="button" class="tab" data-tab="simplex">Simplex <span class="badge" data-count="simplex">0</span></button>
-            <button type="button" class="tab" data-tab="max">Max <span class="badge" data-count="max">0</span></button>
-            <button type="button" class="tab" data-tab="sonar">Sonar <span class="badge" data-count="sonar">0</span></button>
-            <button type="button" class="tab" data-tab="affiliates">Affiliates <span class="badge" data-count="affiliates">0</span></button>
-            <button type="button" class="tab" data-tab="other">Other <span class="badge" data-count="other">0</span></button>
+            <button type="button" class="tab active" data-tab="profiles">{{ _('Profiles') }} <span class="badge" data-count="profiles">0</span></button>
+            <button type="button" class="tab" data-tab="hash">{{ _('Hash') }} <span class="badge" data-count="hash">0</span></button>
+            <button type="button" class="tab" data-tab="jabber">{{ _('Jabber') }} <span class="badge" data-count="jabber">0</span></button>
+            <button type="button" class="tab" data-tab="mail">{{ _('Mail') }} <span class="badge" data-count="mail">0</span></button>
+            <button type="button" class="tab" data-tab="pgp">{{ _('PGP') }} <span class="badge" data-count="pgp">0</span></button>
+            <button type="button" class="tab" data-tab="matrix">{{ _('Matrix') }} <span class="badge" data-count="matrix">0</span></button>
+            <button type="button" class="tab" data-tab="session">{{ _('Session') }} <span class="badge" data-count="session">0</span></button>
+            <button type="button" class="tab" data-tab="telegram">{{ _('Telegram') }} <span class="badge" data-count="telegram">0</span></button>
+            <button type="button" class="tab" data-tab="tox">{{ _('Tox') }} <span class="badge" data-count="tox">0</span></button>
+            <button type="button" class="tab" data-tab="simplex">{{ _('Simplex') }} <span class="badge" data-count="simplex">0</span></button>
+            <button type="button" class="tab" data-tab="max">{{ _('Max') }} <span class="badge" data-count="max">0</span></button>
+            <button type="button" class="tab" data-tab="sonar">{{ _('Sonar') }} <span class="badge" data-count="sonar">0</span></button>
+            <button type="button" class="tab" data-tab="affiliates">{{ _('Affiliates') }} <span class="badge" data-count="affiliates">0</span></button>
+            <button type="button" class="tab" data-tab="other">{{ _('Other') }} <span class="badge" data-count="other">0</span></button>
           </div>
 
           <div class="tabs-body">
             <div class="tab-pane active" id="pane-profiles">
               <div class="pane-head">
-                <strong>Profiles (one per line)</strong>
+                <strong>{{ _('Profiles (one per line)') }}</strong>
               </div>
               {{ form.profiles(class_="textarea auto-ta", rows="7") }}
             </div>
 
             <div class="tab-pane" id="pane-hash">
-              <div class="pane-head"><strong>Hash (one per line)</strong></div>
+              <div class="pane-head"><strong>{{ _('Hash (one per line)') }}</strong></div>
               {{ form.hash(class_="textarea auto-ta", rows="6") }}
             </div>
 
             <div class="tab-pane" id="pane-jabber">
-              <div class="pane-head"><strong>Jabber (one per line)</strong></div>
+              <div class="pane-head"><strong>{{ _('Jabber (one per line)') }}</strong></div>
               {{ form.jabber(class_="textarea auto-ta", rows="5") }}
             </div>
 
             <div class="tab-pane" id="pane-mail">
-              <div class="pane-head"><strong>Mail (one per line)</strong></div>
+              <div class="pane-head"><strong>{{ _('Mail (one per line)') }}</strong></div>
               {{ form.mail(class_="textarea auto-ta", rows="5") }}
             </div>
 
             <div class="tab-pane" id="pane-pgp">
-              <div class="pane-head"><strong>PGP (separator “|”)</strong></div>
+              <div class="pane-head"><strong>{{ _('PGP (separator “|”)') }}</strong></div>
               {{ form.pgp(class_="textarea auto-ta", rows="5") }}
-              <small class="muted">Astuce : une clé = une ligne ; plusieurs blocs dans la même ligne séparés par “|”.</small>
+              <small class="muted">{{ _('Tip: one key = one line; multiple blocks on the same line separated by “|”.') }}</small>
             </div>
 
             <div class="tab-pane" id="pane-matrix">
-              <div class="pane-head"><strong>Matrix (one per line)</strong></div>
+              <div class="pane-head"><strong>{{ _('Matrix (one per line)') }}</strong></div>
               {{ form.matrix(class_="textarea auto-ta", rows="5") }}
             </div>
 
             <div class="tab-pane" id="pane-session">
-              <div class="pane-head"><strong>Session (one per line)</strong></div>
+              <div class="pane-head"><strong>{{ _('Session (one per line)') }}</strong></div>
               {{ form.session(class_="textarea auto-ta", rows="5") }}
             </div>
 
             <div class="tab-pane" id="pane-telegram">
-              <div class="pane-head"><strong>Telegram (one per line)</strong></div>
+              <div class="pane-head"><strong>{{ _('Telegram (one per line)') }}</strong></div>
               {{ form.telegram(class_="textarea auto-ta", rows="5") }}
             </div>
 
             <div class="tab-pane" id="pane-tox">
-              <div class="pane-head"><strong>Tox (one per line)</strong></div>
+              <div class="pane-head"><strong>{{ _('Tox (one per line)') }}</strong></div>
               {{ form.tox(class_="textarea auto-ta", rows="5") }}
             </div>
 
             <div class="tab-pane" id="pane-simplex">
-              <div class="pane-head"><strong>Simplex (one per line)</strong></div>
+              <div class="pane-head"><strong>{{ _('Simplex (one per line)') }}</strong></div>
               {{ form.simplex(class_="textarea auto-ta", rows="5") }}
             </div>
 
             <div class="tab-pane" id="pane-max">
-              <div class="pane-head"><strong>Max (one per line)</strong></div>
+              <div class="pane-head"><strong>{{ _('Max (one per line)') }}</strong></div>
               {{ form.max(class_="textarea auto-ta", rows="5") }}
             </div>
 
             <div class="tab-pane" id="pane-sonar">
-              <div class="pane-head"><strong>Sonar (one per line)</strong></div>
+              <div class="pane-head"><strong>{{ _('Sonar (one per line)') }}</strong></div>
               {{ form.sonar(class_="textarea auto-ta", rows="5") }}
             </div>
 
             <div class="tab-pane" id="pane-affiliates">
-              <div class="pane-head"><strong>Affiliates (one per line)</strong></div>
+              <div class="pane-head"><strong>{{ _('Affiliates (one per line)') }}</strong></div>
               {{ form.affiliates(class_="textarea auto-ta", rows="5") }}
             </div>
 
             <div class="tab-pane" id="pane-other">
-              <div class="pane-head"><strong>Other (one per line)</strong></div>
+              <div class="pane-head"><strong>{{ _('Other (one per line)') }}</strong></div>
               {{ form.other(class_="textarea auto-ta", rows="5") }}
             </div>
           </div>
@@ -144,69 +144,69 @@
 
       <!-- ===== Card: Links (nested form) ===== -->
       <div class="table-card admin-card">
-        <div class="card-toolbar"><span>Links</span></div>
+        <div class="card-toolbar"><span>{{ _('Links') }}</span></div>
 
         {% for nested in form.links %}
         <fieldset class="link-block">
           <legend>
-            Link #{{ loop.index }}
+            {{ _('Link') }} #{{ loop.index }}
             {% if nested.title.data %}<span class="pill">{{ nested.title.data }}</span>{% endif %}
           </legend>
 
           <div class="form-grid two">
-            <label>Slug / URL</label>
+            <label>{{ _('Slug / URL') }}</label>
             <div>{{ nested.slug(class_="input") }}</div>
 
-            <label>FQDN</label>
+            <label>{{ _('FQDN') }}</label>
             <div>{{ nested.fqdn(class_="input") }}</div>
 
-            <label>Page title</label>
+            <label>{{ _('Page title') }}</label>
             <div>{{ nested.title(class_="input") }}</div>
           </div>
 
           <div class="switch-row wrap">
-            <label class="switch">{{ nested.fs() }} <span>File Server</span></label>
-            <label class="switch">{{ nested.chat() }} <span>Chat</span></label>
-            <label class="switch">{{ nested.admin() }} <span>Admin</span></label>
-            <label class="switch">{{ nested.private() }} <span>Private link</span></label>
-            <label class="switch">{{ nested.available() }} <span>Available</span></label>
-            <label class="switch">{{ nested.fixedfile() }} <span>Don't update screen</span></label>
-            <label class="switch danger-switch">{{ nested.delete() }} <span>Delete this link</span></label>
+            <label class="switch">{{ nested.fs() }} <span>{{ _('File Server') }}</span></label>
+            <label class="switch">{{ nested.chat() }} <span>{{ _('Chat') }}</span></label>
+            <label class="switch">{{ nested.admin() }} <span>{{ _('Admin') }}</span></label>
+            <label class="switch">{{ nested.private() }} <span>{{ _('Private link') }}</span></label>
+            <label class="switch">{{ nested.available() }} <span>{{ _('Available') }}</span></label>
+            <label class="switch">{{ nested.fixedfile() }} <span>{{ _("Don't update screen") }}</span></label>
+            <label class="switch danger-switch">{{ nested.delete() }} <span>{{ _('Delete this link') }}</span></label>
           </div>
 
           <div class="form-grid three">
-            <label>Timeout (s)</label>
+            <label>{{ _('Timeout (s)') }}</label>
             <div>{{ nested.timeout(class_="input") }}</div>
 
-            <label>Delay (s)</label>
+            <label>{{ _('Delay (s)') }}</label>
             <div>{{ nested.delay(class_="input") }}</div>
 
-            <label>Browser</label>
+            <label>{{ _('Browser') }}</label>
             <div>{{ nested.browser(class_="input") }}</div>
           </div>
 
           <div class="form-grid two">
-            <label>Header</label>
+            <label>{{ _('Header') }}</label>
             <div>{{ nested.header(class_="input") }}</div>
 
-            <label>Version</label>
+            <label>{{ _('Version') }}</label>
             <div>{{ nested.version(class_="input") }}</div>
           </div>
 
-          <label class="block-label">Init script</label>
+          <label class="block-label">{{ _('Init script') }}</label>
           {{ nested.init_script(class_="textarea auto-ta", rows="2") }}
 
           <div class="meta-row">
             <div>
-              <label class="block-label">File (screenshot)</label>
+              <label class="block-label">{{ _('File (screenshot)') }}</label>
               {{ nested.file() }}
             </div>
             <div>
-              <label class="block-label">Updated</label>
+              <label class="block-label">{{ _('Updated') }}</label>
               {{ nested.updated(class_="input", readonly=true) }}
             </div>
             <div>
-              <label class="block-label">Last scrape</label>
+              <label class="block-label">{{ _('Last scrape') }}</label>
               {{ nested.lastscrape(class_="input", readonly=true) }}
             </div>
           </div>
@@ -224,7 +224,7 @@
     <form action="" method="post" novalidate class="mt-12">
       {{ deleteform.hidden_tag() }}
       <div class="danger-row">
-        <label class="switch danger-switch">{{ deleteform.delete() }} <span>Check to delete</span></label>
+        <label class="switch danger-switch">{{ deleteform.delete() }} <span>{{ _('Check to delete') }}</span></label>
         {{ deleteform.submit(class_="btn btn-danger") }}
       </div>
     </form>

@@ -168,10 +168,10 @@
 <script>
 (() => {
   function renderPeers(peers) {
-    if (!peers || !peers.length) return '<p class="muted" style="padding:8px">No peers in this scan.</p>';
+    if (!peers || !peers.length) return '<p class="muted" style="padding:8px">{{ _('No peers in this scan.') }}</p>';
     const rows = peers.map(p => `
       <tr data-ip="${p.ip}">
-        <td class="mono"><a href="/torrent-health/ip/${encodeURIComponent(p.ip)}" title="Pivot on this IP">${p.ip}</a></td>
+        <td class="mono"><a href="/torrent-health/ip/${encodeURIComponent(p.ip)}" title="{{ _('Pivot on this IP') }}">${p.ip}</a></td>
         <td><center>${p.port}</center></td>
         <td><center>${p.progress}%</center></td>
         <td>${p.client ? p.client.replace(/</g,'&lt;') : ''}</td>
@@ -184,11 +184,11 @@
     return `
       <div class="table-scroll"><table class="rl-table th-peers th-peers-inline">
         <thead><tr>
-          <th style="width:13%">IP</th><th style="width:6%"><center>Port</center></th>
-          <th style="width:7%"><center>Progress</center></th><th style="width:14%">Client</th>
-          <th style="width:10%">ASN</th><th style="width:18%">Org</th>
-          <th style="width:5%"><center>CC</center></th><th style="width:15%">PTR</th>
-          <th>Flags</th>
+          <th style="width:13%">{{ _('IP') }}</th><th style="width:6%"><center>{{ _('Port') }}</center></th>
+          <th style="width:7%"><center>{{ _('Progress') }}</center></th><th style="width:14%">{{ _('Client') }}</th>
+          <th style="width:10%">{{ _('ASN') }}</th><th style="width:18%">{{ _('Org') }}</th>
+          <th style="width:5%"><center>{{ _('CC') }}</center></th><th style="width:15%">{{ _('PTR') }}</th>
+          <th>{{ _('Flags') }}</th>
         </tr></thead>
         <tbody>${rows}</tbody>
       </table></div>`;
@@ -213,7 +213,7 @@
         if (!info) return;
         const fmt = v => v ? String(v).replace(/</g,'&lt;') : '<span class="muted">—</span>';
         const asnLink = info.asn
-          ? `<a href="/torrent-health/asn/${encodeURIComponent(info.asn)}" title="Pivot on this ASN">AS${info.asn}</a>`
+          ? `<a href="/torrent-health/asn/${encodeURIComponent(info.asn)}" title="{{ _('Pivot on this ASN') }}">AS${info.asn}</a>`
           : '<span class="muted">—</span>';
         const asn = r.querySelector('.enrich-asn'); if (asn) asn.innerHTML = asnLink;
         const org = r.querySelector('.enrich-org'); if (org) org.innerHTML = fmt(info.asn_org);
@@ -241,7 +241,7 @@
             body.dataset.loaded = '1';
             // Enrich the freshly rendered table
             body.querySelectorAll('.th-peers').forEach(enrichTable);
-          } catch (e) { body.innerHTML = '<p class="muted">Parse error</p>'; }
+          } catch (e) { body.innerHTML = '<p class="muted">{{ _('Parse error') }}</p>'; }
         }
         next.hidden = false;
         if (caret) caret.textContent = '▾';
@@ -265,22 +265,22 @@ document.querySelector('.th-refresh')?.addEventListener('click', async (ev) => {
   const ih = btn.dataset.ih;
   btn.disabled = true;
   const prev = btn.textContent;
-  btn.textContent = 'Queuing…';
+  btn.textContent = '{{ _('Queuing…') }}';
   try {
     const resp = await fetch(`/api/torrent/refresh/${ih}`, { method: 'POST' });
     if (resp.status === 202) {
-      btn.textContent = `Scanning (≈${SCAN_DURATION}s) — page will reload`;
+      btn.textContent = `{{ _('Scanning (≈') }}${SCAN_DURATION}{{ _('s) — page will reload') }}`;
       setTimeout(() => location.reload(), SCAN_DURATION * 1000);
     } else if (resp.ok) {
-      btn.textContent = 'Done — reload';
+      btn.textContent = '{{ _('Done — reload') }}';
       setTimeout(() => location.reload(), 800);
     } else {
       const msg = (await resp.json().catch(() => ({}))).error || resp.status;
-      btn.textContent = 'Err: ' + msg;
+      btn.textContent = '{{ _('Err:') }} ' + msg;
       setTimeout(() => { btn.textContent = prev; btn.disabled = false; }, 3000);
     }
   } catch (e) {
-    btn.textContent = 'Err';
+    btn.textContent = '{{ _('Err') }}';
     setTimeout(() => { btn.textContent = prev; btn.disabled = false; }, 2000);
   }
 });

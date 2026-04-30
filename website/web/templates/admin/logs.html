@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 {% from 'bootstrap5/utils.html' import render_messages %}
-{% block title %}Admin · Audit log{% endblock %}
+{% block title %}{{ _('Admin · Audit log') }}{% endblock %}
 
 {% block content %}
 
@@ -8,9 +8,9 @@
 
 <section class="hero">
   <div class="container">
-    <h1>Audit log</h1>
-    <p class="lead">{{ total }} entries (1-year retention).
-      {% if legacy_count %}<span class="muted">{{ legacy_count }} legacy entries pending migration.</span>{% endif %}
+    <h1>{{ _('Audit log') }}</h1>
+    <p class="lead">{{ _('%(total)s entries (1-year retention).', total=total) }}
+      {% if legacy_count %}<span class="muted">{{ _('%(n)s legacy entries pending migration.', n=legacy_count) }}</span>{% endif %}
     </p>
   </div>
 </section>
@@ -20,22 +20,22 @@
 
     <!-- Filters -->
     <div class="table-card" style="padding:12px; margin-bottom:16px;">
-      <form id="log-filters" onsubmit="return false" aria-label="Filters">
+      <form id="log-filters" onsubmit="return false" aria-label="{{ _('Filters') }}">
         <div style="display:flex; flex-wrap:wrap; gap:12px; align-items:end;">
 
           <div>
-            <label class="label" for="from-date">From</label>
+            <label class="label" for="from-date">{{ _('From') }}</label>
             <input id="from-date" type="date" class="input">
           </div>
           <div>
-            <label class="label" for="to-date">To</label>
+            <label class="label" for="to-date">{{ _('To') }}</label>
             <input id="to-date" type="date" class="input">
           </div>
 
           <div>
-            <label class="label" for="action-filter">Action</label>
+            <label class="label" for="action-filter">{{ _('Action') }}</label>
             <select id="action-filter" class="input">
-              <option value="">All</option>
+              <option value="">{{ _('All') }}</option>
               {% for a in actions %}
                 <option value="{{ a }}">{{ a }}</option>
               {% endfor %}
@@ -43,9 +43,9 @@
           </div>
 
           <div>
-            <label class="label" for="user-filter">User</label>
+            <label class="label" for="user-filter">{{ _('User') }}</label>
             <select id="user-filter" class="input">
-              <option value="">All</option>
+              <option value="">{{ _('All') }}</option>
               {% for u in users %}
                 <option value="{{ u }}">{{ u }}</option>
               {% endfor %}
@@ -53,13 +53,13 @@
           </div>
 
           <div style="flex:1 1 280px; min-width:200px;">
-            <label class="label" for="log-search">Search</label>
-            <input id="log-search" class="input" type="search" placeholder="target, details…">
+            <label class="label" for="log-search">{{ _('Search') }}</label>
+            <input id="log-search" class="input" type="search" placeholder="{{ _('target, details…') }}">
           </div>
 
           <div style="margin-left:auto; display:flex; gap:8px;">
-            <button id="export-csv" class="btn btn-secondary" type="button">Export CSV</button>
-            <button id="reset-filters" class="btn btn-secondary" type="button">Reset</button>
+            <button id="export-csv" class="btn btn-secondary" type="button">{{ _('Export CSV') }}</button>
+            <button id="reset-filters" class="btn btn-secondary" type="button">{{ _('Reset') }}</button>
           </div>
         </div>
       </form>
@@ -68,14 +68,14 @@
     <!-- Table -->
     <div class="table-card">
       <div class="table-scroll">
-        <table class="rl-table" aria-label="Audit log">
+        <table class="rl-table" aria-label="{{ _('Audit log') }}">
           <thead>
             <tr>
-              <th style="width:170px; position:sticky; top:0;">Date (local)</th>
-              <th style="width:150px; position:sticky; top:0;">User</th>
-              <th style="width:170px; position:sticky; top:0;">Action</th>
-              <th style="width:200px; position:sticky; top:0;">Target</th>
-              <th style="position:sticky; top:0;">Details</th>
+              <th style="width:170px; position:sticky; top:0;">{{ _('Date (local)') }}</th>
+              <th style="width:150px; position:sticky; top:0;">{{ _('User') }}</th>
+              <th style="width:170px; position:sticky; top:0;">{{ _('Action') }}</th>
+              <th style="width:200px; position:sticky; top:0;">{{ _('Target') }}</th>
+              <th style="position:sticky; top:0;">{{ _('Details') }}</th>
             </tr>
           </thead>
           <tbody id="log-body">
@@ -97,11 +97,11 @@
     {% if total_pages > 1 %}
     <div style="display:flex; justify-content:center; gap:8px; margin-top:16px;">
       {% if page > 1 %}
-        <a class="btn btn-secondary btn-sm" href="{{ url_for('logs', page=page-1) }}">← Previous</a>
+        <a class="btn btn-secondary btn-sm" href="{{ url_for('logs', page=page-1) }}">← {{ _('Previous') }}</a>
       {% endif %}
-      <span class="muted" style="padding:6px 12px;">Page {{ page }} / {{ total_pages }}</span>
+      <span class="muted" style="padding:6px 12px;">{{ _('Page %(page)s / %(total)s', page=page, total=total_pages) }}</span>
       {% if page < total_pages %}
-        <a class="btn btn-secondary btn-sm" href="{{ url_for('logs', page=page+1) }}">Next →</a>
+        <a class="btn btn-secondary btn-sm" href="{{ url_for('logs', page=page+1) }}">{{ _('Next') }} →</a>
       {% endif %}
     </div>
     {% endif %}

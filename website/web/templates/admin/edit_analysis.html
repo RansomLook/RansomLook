@@ -70,7 +70,7 @@
       {# ---- Sample / report metadata (persisted in meta.json) ---- #}
       <div class="mb-3">
         <label class="label">{{ _('Metadata') }}</label>
-        <div style="display:grid; grid-template-columns: 2fr 1fr 1fr; gap:10px;">
+        <div style="display:grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap:10px;">
           <div>
             <label class="label" style="font-size:.8em" for="{{ form.sha256.id }}">{{ form.sha256.label.text }}</label>
             {{ form.sha256(class="input w-full", style="font-family: 'JetBrains Mono', Menlo, Consolas, monospace; font-size:12px;") }}
@@ -86,9 +86,14 @@
             {{ form.analysis_date(class="input w-full") }}
             {% for error in form.analysis_date.errors %}<div class="field-error">[{{ error }}]</div>{% endfor %}
           </div>
+          <div>
+            <label class="label" style="font-size:.8em" for="{{ form.analysis_type.id }}">{{ _('Document type') }}</label>
+            {{ form.analysis_type(class="input w-full") }}
+            {% for error in form.analysis_type.errors %}<div class="field-error">[{{ error }}]</div>{% endfor %}
+          </div>
         </div>
         <div class="muted mt-6" style="font-size:.8em">
-          {{ _('Used on the cover page of the PDF. SHA-256 must be 64 hex chars; date must be YYYY-MM-DD.') }}
+          {{ _('Used on the cover page of the PDF. SHA-256 must be 64 hex chars; date must be YYYY-MM-DD. Document type distinguishes a full technical analysis from a CTI report.') }}
         </div>
       </div>
 

@@ -1,14 +1,14 @@
 {% extends "base.html" %}
 {% from 'bootstrap5/utils.html' import render_messages %}
-{% block title %}Admin · URL Manager{% endblock %}
+{% block title %}{{ _('Admin · URL Manager') }}{% endblock %}
 
 {% block content %}
 {{ render_messages(container=True, dismissible=True) }}
 
 <section class="hero">
   <div class="container">
-    <h1>URL Manager</h1>
-    <p class="lead">Add one or many URLs to an existing group or market/forum.</p>
+    <h1>{{ _('URL Manager') }}</h1>
+    <p class="lead">{{ _('Add one or many URLs to an existing group or market/forum.') }}</p>
   </div>
 </section>
 
@@ -19,15 +19,15 @@
       <!-- Database + Name -->
       <div style="display:grid;grid-template-columns:1fr 2fr;gap:12px;margin-bottom:12px;">
         <div>
-          <label class="label" for="database">Database</label>
+          <label class="label" for="database">{{ _('Database') }}</label>
           <select id="database" name="database" class="input">
-            <option value="0">Group</option>
-            <option value="3">Market / Forum</option>
+            <option value="0">{{ _('Group') }}</option>
+            <option value="3">{{ _('Market / Forum') }}</option>
           </select>
         </div>
         <div style="position:relative;">
-          <label class="label" for="name-search">Name</label>
-          <input id="name-search" class="input" placeholder="Search…" autocomplete="off">
+          <label class="label" for="name-search">{{ _('Name') }}</label>
+          <input id="name-search" class="input" placeholder="{{ _('Search…') }}" autocomplete="off">
           <input id="name" name="name" type="hidden" required>
           <div id="name-dropdown" class="search-dropdown" hidden>
             <div id="name-results"></div>
@@ -39,18 +39,18 @@
       <!-- Type + Browser -->
       <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:12px;">
         <div>
-          <label class="label" for="url_type">URL type</label>
+          <label class="label" for="url_type">{{ _('URL type') }}</label>
           <select id="url_type" name="url_type" class="input">
-            <option value="dls">DLS (leak site)</option>
-            <option value="fs">File server</option>
-            <option value="chat">Chat</option>
-            <option value="admin">Admin panel</option>
+            <option value="dls">{{ _('DLS (leak site)') }}</option>
+            <option value="fs">{{ _('File server') }}</option>
+            <option value="chat">{{ _('Chat') }}</option>
+            <option value="admin">{{ _('Admin panel') }}</option>
           </select>
         </div>
         <div>
-          <label class="label" for="browser">Browser</label>
+          <label class="label" for="browser">{{ _('Browser') }}</label>
           <select id="browser" name="browser" class="input">
-            <option value="">Default</option>
+            <option value="">{{ _('Default') }}</option>
             <option value="chrome">Chrome</option>
             <option value="firefox">Firefox</option>
             <option value="webkit">WebKit</option>
@@ -58,29 +58,29 @@
         </div>
         <div style="display:flex;align-items:end;gap:12px;padding-bottom:6px;">
           <label style="display:flex;align-items:center;gap:6px;cursor:pointer;">
-            <input type="checkbox" name="private"> Private
+            <input type="checkbox" name="private"> {{ _('Private') }}
           </label>
         </div>
       </div>
 
       <!-- Init script (collapsed) -->
       <details style="margin-bottom:12px;">
-        <summary class="label" style="cursor:pointer;">Init script (optional)</summary>
-        <textarea name="init_script" class="input" rows="4" placeholder="JavaScript to run before capture…" style="margin-top:6px;width:100%;"></textarea>
+        <summary class="label" style="cursor:pointer;">{{ _('Init script (optional)') }}</summary>
+        <textarea name="init_script" class="input" rows="4" placeholder="{{ _('JavaScript to run before capture…') }}" style="margin-top:6px;width:100%;"></textarea>
       </details>
 
       <!-- URLs -->
       <div style="margin-bottom:12px;">
-        <label class="label" for="urls">URLs <span class="muted">(one per line — bulk supported)</span></label>
+        <label class="label" for="urls">{{ _('URLs') }} <span class="muted">{{ _('(one per line — bulk supported)') }}</span></label>
         <textarea id="urls" name="urls" class="input" rows="6" placeholder="http://example1.onion&#10;http://example2.onion&#10;http://example3.onion" required style="width:100%;font-family:monospace;"></textarea>
         <div style="display:flex;justify-content:space-between;margin-top:4px;">
-          <span class="muted" style="font-size:.85rem;">Group/market must exist. <a href="{{ url_for('addgroup') }}">Create a new one here</a>.</span>
-          <span class="muted" style="font-size:.85rem;" id="url-count">0 URLs</span>
+          <span class="muted" style="font-size:.85rem;">{{ _('Group/market must exist.') }} <a href="{{ url_for('addgroup') }}">{{ _('Create a new one here') }}</a>.</span>
+          <span class="muted" style="font-size:.85rem;" id="url-count">{{ _('0 URLs') }}</span>
         </div>
       </div>
 
       <div style="display:flex;justify-content:flex-end;">
-        <button class="btn btn-primary" type="submit">Add URLs</button>
+        <button class="btn btn-primary" type="submit">{{ _('Add URLs') }}</button>
       </div>
     </form>
 
@@ -88,14 +88,14 @@
     {% if results %}
     <div class="table-card mt-14">
       <div class="card-toolbar bb">
-        <span class="fw-600">Results</span>
+        <span class="fw-600">{{ _('Results') }}</span>
       </div>
       <div class="table-scroll">
         <table class="rl-table">
           <thead>
             <tr>
-              <th style="width:60px;">Status</th>
-              <th>URL</th>
+              <th style="width:60px;">{{ _('Status') }}</th>
+              <th>{{ _('URL') }}</th>
             </tr>
           </thead>
           <tbody>
@@ -103,9 +103,9 @@
               <tr>
                 <td>
                   {% if r.ok %}
-                    <span class="badge badge-ok">OK</span>
+                    <span class="badge badge-ok">{{ _('OK') }}</span>
                   {% else %}
-                    <span class="badge badge-warn">Exists</span>
+                    <span class="badge badge-warn">{{ _('Exists') }}</span>
                   {% endif %}
                 </td>
                 <td class="monospace">{{ r.url }}</td>

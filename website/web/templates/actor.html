@@ -180,9 +180,9 @@
               {% for img in images %}
                 <a href="/logo/actor/{{ actor['name']|urlencode }}/{{ img|urlencode }}"
                    class="thumb-link" data-img="/logo/actor/{{ actor['name']|urlencode }}/{{ img|urlencode }}"
-                   aria-label="Open image {{ img }}">
+                   aria-label="{{ _('Open image %(img)s', img=img) }}">
                   <img src="/logo/actor/{{ actor['name']|urlencode }}/{{ img|urlencode }}"
-                       alt="{{ actor['name'] }} image {{ loop.index }}" loading="lazy">
+                       alt="{{ _('%(actor)s image %(idx)s', actor=actor['name'], idx=loop.index) }}" loading="lazy">
                 </a>
               {% endfor %}
             </div>
@@ -242,15 +242,15 @@
 </section>
 
 <!-- Lightbox with navigation -->
-<div id="ta-lightbox" class="ta-lightbox" hidden role="dialog" aria-modal="true" aria-label="Image viewer">
+<div id="ta-lightbox" class="ta-lightbox" hidden role="dialog" aria-modal="true" aria-label="{{ _('Image viewer') }}">
   <div class="lb-backdrop" data-close></div>
   <figure class="lb-figure">
-    <button class="lb-nav lb-prev" type="button" aria-label="Previous image">‹</button>
+    <button class="lb-nav lb-prev" type="button" aria-label="{{ _('Previous image') }}">‹</button>
     <img id="lb-img" alt="">
     <figcaption id="lb-cap" class="muted"></figcaption>
     <div id="lb-count" class="lb-count">0/0</div>
-    <button class="lb-nav lb-next" type="button" aria-label="Next image">›</button>
-    <button class="lb-close" type="button" aria-label="Close" data-close>×</button>
+    <button class="lb-nav lb-next" type="button" aria-label="{{ _('Next image') }}">›</button>
+    <button class="lb-close" type="button" aria-label="{{ _('Close') }}" data-close>×</button>
   </figure>
 </div>
 

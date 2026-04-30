@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 {% from 'bootstrap5/utils.html' import render_messages %}
-{% block title %}🦕 RansomLook — Edit posts 🦖{% endblock %}
+{% block title %}🦕 RansomLook — {{ _('Edit posts') }} 🦖{% endblock %}
 
 {% block content %}
 {{ render_messages(container=True, dismissible=True) }}
@@ -47,8 +47,8 @@
 
 <section class="hero">
   <div class="container">
-    <h1>Edit posts</h1>
-    <p class="lead">Search, date filter, screen preview, quick delete — then save changes.</p>
+    <h1>{{ _('Edit posts') }}</h1>
+    <p class="lead">{{ _('Search, date filter, screen preview, quick delete — then save changes.') }}</p>
   </div>
 </section>
 
@@ -62,22 +62,22 @@
       <div class="table-card pad-mb">
         <div class="filters">
           <div>
-            <label class="label" for="flt-q">Search</label>
-            <input id="flt-q" class="input" type="search" placeholder="Title, description…">
+            <label class="label" for="flt-q">{{ _('Search') }}</label>
+            <input id="flt-q" class="input" type="search" placeholder="{{ _('Title, description…') }}">
           </div>
           <div>
-            <label class="label" for="flt-from">From</label>
+            <label class="label" for="flt-from">{{ _('From') }}</label>
             <input id="flt-from" class="input" type="date">
           </div>
           <div>
-            <label class="label" for="flt-to">To</label>
+            <label class="label" for="flt-to">{{ _('To') }}</label>
             <input id="flt-to" class="input" type="date">
           </div>
 
           <div style="margin-left:auto; display:flex; gap:8px">
-            <button class="btn btn-secondary btn-sm" type="button" id="btn-open-all">Expand all</button>
-            <button class="btn btn-secondary btn-sm" type="button" id="btn-close-all">Collapse all</button>
-            <button class="btn btn-secondary btn-sm" type="button" id="flt-reset">Reset filters</button>
+            <button class="btn btn-secondary btn-sm" type="button" id="btn-open-all">{{ _('Expand all') }}</button>
+            <button class="btn btn-secondary btn-sm" type="button" id="btn-close-all">{{ _('Collapse all') }}</button>
+            <button class="btn btn-secondary btn-sm" type="button" id="flt-reset">{{ _('Reset filters') }}</button>
           </div>
         </div>
       </div>
@@ -99,7 +99,7 @@
         <summary class="post-head">
           <span class="dot" aria-hidden="true"></span>
           <span class="pill" data-date>{{ disc_txt or '—' }}</span>
-          <strong class="title">{{ title_txt or '(untitled)' }}</strong>
+          <strong class="title">{{ title_txt or _('(untitled)') }}</strong>
           <span class="badge-id">{{ (f.post_title.name if f.post_title is defined and f.post_title.__call__ is defined else 'postslist-' ~ idx ~ '-post_title') }}</span>
           <svg class="chev" width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M8 10l4 4 4-4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
         </summary>
@@ -108,47 +108,47 @@
           <div class="post-grid">
             <!-- Left column -->
             <div class="post-main">
-              <label class="label">Title</label>
+              <label class="label">{{ _('Title') }}</label>
               {{ f.post_title }}
 
-              <label class="label">Description</label>
+              <label class="label">{{ _('Description') }}</label>
               {{ f.description }}
 
               <div class="row2">
                 <div>
-                  <label class="label">Discovered (ISO 8601 or YYYY‑MM‑DD)</label>
+                  <label class="label">{{ _('Discovered (ISO 8601 or YYYY‑MM‑DD)') }}</label>
                   {{ f.discovered }}
                 </div>
                 <div>
-                  <label class="label">Screen URL</label>
+                  <label class="label">{{ _('Screen URL') }}</label>
                   {{ f.screen }}
                 </div>
               </div>
 
-              <label class="label">Link</label>
+              <label class="label">{{ _('Link') }}</label>
               {{ f.link }}
 
-              <label class="label">Magnet</label>
+              <label class="label">{{ _('Magnet') }}</label>
               {{ f.magnet }}
             </div>
 
             <!-- Right column -->
             <aside class="post-aside">
-              <label class="label">Preview</label>
+              <label class="label">{{ _('Preview') }}</label>
               <div class="preview-box">
                 {% if f.screen and f.screen.data %}
-                  <img src="/{{ f.screen.data }}" alt="Preview">
-                {% else %} No preview {% endif %}
+                  <img src="/{{ f.screen.data }}" alt="{{ _('Preview') }}">
+                {% else %} {{ _('No preview') }} {% endif %}
               </div>
 
               <div class="aside-row mt-10">
                 <div>
-                  <label class="label">Upload new screen (optional)</label><br>
+                  <label class="label">{{ _('Upload new screen (optional)') }}</label><br>
                   {{ f.file }}
                 </div>
                 <div class="spacer"></div>
                 <div>
-                  <label class="label">Delete</label><br>
+                  <label class="label">{{ _('Delete') }}</label><br>
                   {{ f.delete }}
                 </div>
               </div>
@@ -161,7 +161,7 @@
       <!-- Floating action buttons -->
       <div class="edit-actions">
         <button class="btn btn-primary" type="submit">
-          {{ form.submit.label.text if form.submit and form.submit.label else 'Save changes' }}
+          {{ form.submit.label.text if form.submit and form.submit.label else _('Save changes') }}
         </button>
       </div>
     </form>

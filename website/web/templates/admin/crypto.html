@@ -1,13 +1,13 @@
 {% extends "base.html" %}
 {% from 'bootstrap5/utils.html' import render_messages %}
-{% block title %}Admin · Crypto{% endblock %}
+{% block title %}{{ _('Admin · Crypto') }}{% endblock %}
 {% block content %}
 {{ render_messages(container=True, dismissible=True) }}
 
 <section class="hero">
   <div class="container">
-    <h1>Crypto — Select or Create Group</h1>
-    <p class="lead">Choose a group to manage its wallets, or create a new one (DB=7 only).</p>
+    <h1>{{ _('Crypto — Select or Create Group') }}</h1>
+    <p class="lead">{{ _('Choose a group to manage its wallets, or create a new one (DB=7 only).') }}</p>
   </div>
 </section>
 
@@ -16,20 +16,20 @@
 
     <div class="table-card" style="padding:12px;">
       <div style="display:flex;gap:12px;align-items:center;flex-wrap:wrap;">
-        <input id="search" type="search" placeholder="Search group…" style="flex:1;min-width:240px;padding:8px;">
-        <a class="btn" href="{{ url_for('admin_crypto_group_new') }}" title="Create group in DB=7">Create group</a>
-        <a class="btn" href="{{ url_for('admin_crypto_aliases') }}" title="Manage crypto aliases (DB=7)">Aliases</a>
+        <input id="search" type="search" placeholder="{{ _('Search group…') }}" style="flex:1;min-width:240px;padding:8px;">
+        <a class="btn" href="{{ url_for('admin_crypto_group_new') }}" title="{{ _('Create group in DB=7') }}">{{ _('Create group') }}</a>
+        <a class="btn" href="{{ url_for('admin_crypto_aliases') }}" title="{{ _('Manage crypto aliases (DB=7)') }}">{{ _('Aliases') }}</a>
       </div>
     </div>
 
     <div class="table-card" style="margin-top:12px;">
       <div class="table-scroll">
-        <table class="rl-table" id="groups-table" aria-label="Groups">
+        <table class="rl-table" id="groups-table" aria-label="{{ _('Groups') }}">
           <thead>
             <tr>
-              <th>Group</th>
-              <th style="width:15%;text-align:right">Addresses</th>
-              <th style="width:20%;text-align:center">Actions</th>
+              <th>{{ _('Group') }}</th>
+              <th style="width:15%;text-align:right">{{ _('Addresses') }}</th>
+              <th style="width:20%;text-align:center">{{ _('Actions') }}</th>
             </tr>
           </thead>
           <tbody>
@@ -38,12 +38,12 @@
               <td>
                 <strong>{{ row.name }}</strong>
                 {% if row.aliases and row.aliases|length %}
-                  <small class="muted">— aliases: {{ row.aliases|join(', ') }}</small>
+                  <small class="muted">— {{ _('aliases:') }} {{ row.aliases|join(', ') }}</small>
                 {% endif %}
               </td>
               <td class="text-right">{{ row.count }}</td>
               <td class="text-center">
-                <a class="btn" href="{{ url_for('admin_crypto_group', group=row.name) }}">Manage</a>
+                <a class="btn" href="{{ url_for('admin_crypto_group', group=row.name) }}">{{ _('Manage') }}</a>
               </td>
             </tr>
           {% endfor %}

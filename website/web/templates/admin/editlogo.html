@@ -1,14 +1,14 @@
 {% extends "base.html" %}
 {% from 'bootstrap5/utils.html' import render_messages %}
-{% block title %}🦕 RansomLook — Manage Logo{% endblock %}
+{% block title %}🦕 RansomLook — {{ _('Manage Logo') }}{% endblock %}
 
 {% block content %}
 {{ render_messages(container=True, dismissible=True) }}
 
 <section class="hero">
   <div class="container">
-    <h1>Manage Logos</h1>
-    <p class="lead">Preview existing logos, remove the ones you don’t need, and upload new ones.</p>
+    <h1>{{ _('Manage Logos') }}</h1>
+    <p class="lead">{{ _('Preview existing logos, remove the ones you don’t need, and upload new ones.') }}</p>
   </div>
 </section>
 
@@ -19,14 +19,14 @@
 
       <!-- Logos existants -->
       <div class="table-card" style="margin-bottom:16px;">
-        <div class="card-toolbar"><span>Current logos</span></div>
+        <div class="card-toolbar"><span>{{ _('Current logos') }}</span></div>
 
         {% if form.logos and form.logos|length > 0 %}
           <div class="logo-grid">
             {% for nested in form.logos %}
               <div class="logo-card">
                 <div class="logo-imgwrap">
-                  <img src="{{ nested.link.data }}" alt="Logo" loading="lazy">
+                  <img src="{{ nested.link.data }}" alt="{{ _('Logo') }}" loading="lazy">
                 </div>
                 <div class="logo-fields">
                   {{ nested }}
@@ -35,17 +35,17 @@
             {% endfor %}
           </div>
         {% else %}
-          <div class="empty-note">No logo yet for this entity.</div>
+          <div class="empty-note">{{ _('No logo yet for this entity.') }}</div>
         {% endif %}
       </div>
 
       <!-- Upload -->
       <div class="table-card mb-14">
-        <div class="card-toolbar"><span>Add logo</span></div>
+        <div class="card-toolbar"><span>{{ _('Add logo') }}</span></div>
         <div class="uploader">
           <label for="{{ form.file.id }}" class="dropzone" id="dropzone">
-            <strong>Drop an image here</strong>
-            <span>or click to browse</span>
+            <strong>{{ _('Drop an image here') }}</strong>
+            <span>{{ _('or click to browse') }}</span>
           </label>
           {{ form.file(class_="input-file", style="display:none;") }}
         </div>

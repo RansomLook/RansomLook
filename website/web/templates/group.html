@@ -27,18 +27,18 @@
         </h1>
         <div class="profile-badges">
           {% if mirrors_total == 0 %}
-            <span class="badge-neutral" title="No mirrors registered">no mirrors</span>
+            <span class="badge-neutral" title="{{ _('No mirrors registered') }}">{{ _('no mirrors') }}</span>
           {% elif mirrors_up == 0 %}
-            <span class="badge-status badge-down" title="All mirrors offline">{{ mirrors_up }}/{{ mirrors_total }} offline</span>
+            <span class="badge-status badge-down" title="{{ _('All mirrors offline') }}">{{ mirrors_up }}/{{ mirrors_total }} {{ _('offline') }}</span>
           {% elif (mirrors_up / mirrors_total) >= 0.5 %}
-            <span class="badge-status badge-up">{{ mirrors_up }}/{{ mirrors_total }} up</span>
+            <span class="badge-status badge-up">{{ mirrors_up }}/{{ mirrors_total }} {{ _('up') }}</span>
           {% else %}
-            <span class="badge-status badge-degraded">{{ mirrors_up }}/{{ mirrors_total }} degraded</span>
+            <span class="badge-status badge-degraded">{{ mirrors_up }}/{{ mirrors_total }} {{ _('degraded') }}</span>
           {% endif %}
-          {% if group['name'].lower() in parser %}<span class="badge-neutral">parser</span>{% endif %}
-          {% if group.get('raas') %}<span class="badge-neutral">RaaS</span>{% endif %}
-          {% if group.get('captcha') %}<span class="badge-neutral">captcha</span>{% endif %}
-          {% if group.get('private') %}<span class="badge-private">private</span>{% endif %}
+          {% if group['name'].lower() in parser %}<span class="badge-neutral">{{ _('parser') }}</span>{% endif %}
+          {% if group.get('raas') %}<span class="badge-neutral">{{ _('RaaS') }}</span>{% endif %}
+          {% if group.get('captcha') %}<span class="badge-neutral">{{ _('captcha') }}</span>{% endif %}
+          {% if group.get('private') %}<span class="badge-private">{{ _('private') }}</span>{% endif %}
         </div>
       </div>
 
@@ -49,18 +49,12 @@
         {% endif %}
         {% set _vs = group.get('analysis_variants', []) %}
         {% if _vs %}
-          {% if _vs|length == 1 %}
-            <a class="btn-hero btn-sm" href="{{ _vs[0].view_url }}" title="{{ _('In-house technical analysis') }}">{{ _('View analysis') }}</a>
-            <a class="btn-hero btn-hero--ghost btn-sm" href="{{ _vs[0].pdf_url }}" title="{{ _('Download analysis as PDF') }}">PDF</a>
-          {% else %}
-            {% for v in _vs %}
-              <a class="btn-hero btn-sm" href="{{ v.view_url }}" title="{{ _('In-house technical analysis') }} — {{ v.label }}">{{ _('View') }} {{ v.label }}</a>
-              <a class="btn-hero btn-hero--ghost btn-sm" href="{{ v.pdf_url }}" title="{{ _('PDF') }} — {{ v.label }}">{{ v.label }} PDF</a>
-            {% endfor %}
-          {% endif %}
+          <button class="btn-hero btn-hero--ghost btn-sm" onclick="openAnalysesModal()" title="{{ _('View technical analyses') }}">
+            📊 {{ _('View Analyses') }} ({{ _vs|length }})
+          </button>
         {% endif %}
         <a class="btn-hero btn-hero--ghost btn-sm" href="{{ url_for('compare') }}">{{ _('Compare') }}</a>
-        {% if crypto_link %}<a class="btn-hero btn-hero--ghost btn-sm" href="{{ crypto_link }}" title="View crypto">Crypto</a>{% endif %}
+        {% if crypto_link %}<a class="btn-hero btn-hero--ghost btn-sm" href="{{ crypto_link }}" title="{{ _('View crypto') }}">{{ _('Crypto') }}</a>{% endif %}
       </div>
     </div>
 
@@ -82,7 +76,7 @@
           <span class="activity-label">{{ _('Activity · last 30 days') }}</span>
           {% if first_seen or last_seen %}
             <span class="activity-meta">
-              {% if last_seen %}last post <time datetime="{{ last_seen }}" data-ts="{{ last_seen }}">{{ last_seen }}</time>{% endif %}
+              {% if last_seen %}{{ _('last post') }} <time datetime="{{ last_seen }}" data-ts="{{ last_seen }}">{{ last_seen }}</time>{% endif %}
             </span>
           {% endif %}
         </div>
@@ -116,10 +110,10 @@
 
     {# ===== Badges infos ===== #}
     <div class="profile-badges mb-14">
-      {% if group['name'].lower() in parser %}<span class="badge-neutral">Parsing: enabled</span>{% endif %}
-      {% if group.get('raas') %}<span class="badge-neutral">Known RaaS</span>{% endif %}
-      {% if group.get('captcha') %}<span class="badge-neutral">Captcha in place</span>{% endif %}
-      {% if group.get('private') %}<span class="badge-private">Private</span>{% endif %}
+      {% if group['name'].lower() in parser %}<span class="badge-neutral">{{ _('Parsing: enabled') }}</span>{% endif %}
+      {% if group.get('raas') %}<span class="badge-neutral">{{ _('Known RaaS') }}</span>{% endif %}
+      {% if group.get('captcha') %}<span class="badge-neutral">{{ _('Captcha in place') }}</span>{% endif %}
+      {% if group.get('private') %}<span class="badge-private">{{ _('Private') }}</span>{% endif %}
     </div>
 
     
@@ -156,8 +150,8 @@
 
 {% if crypto_link %}
   <p class="lead" style="margin-top: .5rem">
-    <a class="btn" href="{{ crypto_link }}" title="View crypto">
-      View crypto
+    <a class="btn" href="{{ crypto_link }}" title="{{ _('View crypto') }}">
+      {{ _('View crypto') }}
     </a>
   </p>
 {% endif %}
@@ -466,10 +460,10 @@
             <thead>
               <tr>
                 <th>{{ _('Url') }}</th>
-                <th style="width:12%"><center>Status</center></th>
-                <th style="width:12%"><center>Screen</center></th>
-                <th style="width:10%"><center>Uptime 30d</center></th>
-                <th style="width:18%"><center>Health</center></th>
+                <th style="width:12%"><center>{{ _('Status') }}</center></th>
+                <th style="width:12%"><center>{{ _('Screen') }}</center></th>
+                <th style="width:10%"><center>{{ _('Uptime 30d') }}</center></th>
+                <th style="width:18%"><center>{{ _('Health') }}</center></th>
               </tr>
 </thead>
             <tbody>
@@ -478,17 +472,17 @@
                   <td class="url-cell {% if location.get('private') %}is-private{% endif %}">{{ location['slug'] }}</td>
                   <td>
                     {% if location.get('available') %}
-                      <span class="badge-status badge-up">Up</span>
+                      <span class="badge-status badge-up">{{ _('Up') }}</span>
                     {% elif location.get('available') is not none %}
-                      <span class="badge-status badge-down">Down</span>
+                      <span class="badge-status badge-down">{{ _('Down') }}</span>
                     {% else %}
-                      <span class="badge-status badge-unknown">Unknown</span>
+                      <span class="badge-status badge-unknown">{{ _('Unknown') }}</span>
                     {% endif %}
                   </td>
                   <td class="thumb-cell">
                     {% if location.get('screen') %}
                       <a href="{{ location['screen'] }}" class="open-shot" data-caption="{{ location['slug'] }}">
-                        <img class="thumb" src="/screenshots/thumb/{{ location['screen'][13:] }}" alt="Screen" loading="lazy" decoding="async">
+                        <img class="thumb" src="/screenshots/thumb/{{ location['screen'][13:] }}" alt="{{ _('Screen') }}" loading="lazy" decoding="async">
                       </a>
                     {% endif %}
                   </td>
@@ -521,10 +515,10 @@
             <thead>
               <tr>
                 <th>{{ _('Url') }}</th>
-                <th style="width:12%"><center>Status</center></th>
-                <th style="width:12%"><center>Screen</center></th>
-                <th style="width:10%"><center>Uptime 30d</center></th>
-                <th style="width:18%"><center>Health</center></th>
+                <th style="width:12%"><center>{{ _('Status') }}</center></th>
+                <th style="width:12%"><center>{{ _('Screen') }}</center></th>
+                <th style="width:10%"><center>{{ _('Uptime 30d') }}</center></th>
+                <th style="width:18%"><center>{{ _('Health') }}</center></th>
               </tr>
 </thead>
             <tbody>
@@ -533,17 +527,17 @@
                   <td class="url-cell {% if location.get('private') %}is-private{% endif %}">{{ location['slug'] }}</td>
                   <td>
                     {% if location.get('available') %}
-                      <span class="badge-status badge-up">Up</span>
+                      <span class="badge-status badge-up">{{ _('Up') }}</span>
                     {% elif location.get('available') is not none %}
-                      <span class="badge-status badge-down">Down</span>
+                      <span class="badge-status badge-down">{{ _('Down') }}</span>
                     {% else %}
-                      <span class="badge-status badge-unknown">Unknown</span>
+                      <span class="badge-status badge-unknown">{{ _('Unknown') }}</span>
                     {% endif %}
                   </td>
                   <td class="thumb-cell">
                     {% if location.get('screen') %}
                       <a href="{{ location['screen'] }}" class="open-shot" data-caption="{{ location['slug'] }}">
-                        <img class="thumb" src="/screenshots/thumb/{{ location['screen'][13:] }}" alt="Screen" loading="lazy" decoding="async">
+                        <img class="thumb" src="/screenshots/thumb/{{ location['screen'][13:] }}" alt="{{ _('Screen') }}" loading="lazy" decoding="async">
                       </a>
                     {% endif %}
                   </td>
@@ -576,10 +570,10 @@
             <thead>
               <tr>
                 <th>{{ _('Url') }}</th>
-                <th style="width:12%"><center>Status</center></th>
-                <th style="width:12%"><center>Screen</center></th>
-                <th style="width:10%"><center>Uptime 30d</center></th>
-                <th style="width:18%"><center>Health</center></th>
+                <th style="width:12%"><center>{{ _('Status') }}</center></th>
+                <th style="width:12%"><center>{{ _('Screen') }}</center></th>
+                <th style="width:10%"><center>{{ _('Uptime 30d') }}</center></th>
+                <th style="width:18%"><center>{{ _('Health') }}</center></th>
               </tr>
 </thead>
             <tbody>
@@ -588,17 +582,17 @@
                   <td class="url-cell {% if location.get('private') %}is-private{% endif %}">{{ location['slug'] }}</td>
                   <td>
                     {% if location.get('available') %}
-                      <span class="badge-status badge-up">Up</span>
+                      <span class="badge-status badge-up">{{ _('Up') }}</span>
                     {% elif location.get('available') is not none %}
-                      <span class="badge-status badge-down">Down</span>
+                      <span class="badge-status badge-down">{{ _('Down') }}</span>
                     {% else %}
-                      <span class="badge-status badge-unknown">Unknown</span>
+                      <span class="badge-status badge-unknown">{{ _('Unknown') }}</span>
                     {% endif %}
                   </td>
                   <td class="thumb-cell">
                     {% if location.get('screen') %}
                       <a href="{{ location['screen'] }}" class="open-shot" data-caption="{{ location['slug'] }}">
-                        <img class="thumb" src="/screenshots/thumb/{{ location['screen'][13:] }}" alt="Screen" loading="lazy" decoding="async">
+                        <img class="thumb" src="/screenshots/thumb/{{ location['screen'][13:] }}" alt="{{ _('Screen') }}" loading="lazy" decoding="async">
                       </a>
                     {% endif %}
                   </td>
@@ -631,10 +625,10 @@
             <thead>
               <tr>
                 <th>{{ _('Url') }}</th>
-                <th style="width:12%"><center>Status</center></th>
-                <th style="width:12%"><center>Screen</center></th>
-                <th style="width:10%"><center>Uptime 30d</center></th>
-                <th style="width:18%"><center>Health</center></th>
+                <th style="width:12%"><center>{{ _('Status') }}</center></th>
+                <th style="width:12%"><center>{{ _('Screen') }}</center></th>
+                <th style="width:10%"><center>{{ _('Uptime 30d') }}</center></th>
+                <th style="width:18%"><center>{{ _('Health') }}</center></th>
               </tr>
 </thead>
             <tbody>
@@ -643,17 +637,17 @@
                   <td class="url-cell {% if location.get('private') %}is-private{% endif %}">{{ location['slug'] }}</td>
                   <td>
                     {% if location.get('available') %}
-                      <span class="badge-status badge-up">Up</span>
+                      <span class="badge-status badge-up">{{ _('Up') }}</span>
                     {% elif location.get('available') is not none %}
-                      <span class="badge-status badge-down">Down</span>
+                      <span class="badge-status badge-down">{{ _('Down') }}</span>
                     {% else %}
-                      <span class="badge-status badge-unknown">Unknown</span>
+                      <span class="badge-status badge-unknown">{{ _('Unknown') }}</span>
                     {% endif %}
                   </td>
                   <td class="thumb-cell">
                     {% if location.get('screen') %}
                       <a href="{{ location['screen'] }}" class="open-shot" data-caption="{{ location['slug'] }}">
-                        <img class="thumb" src="/screenshots/thumb/{{ location['screen'][13:] }}" alt="Screen" loading="lazy" decoding="async">
+                        <img class="thumb" src="/screenshots/thumb/{{ location['screen'][13:] }}" alt="{{ _('Screen') }}" loading="lazy" decoding="async">
                       </a>
                     {% endif %}
                   </td>
@@ -684,7 +678,7 @@
 
       <div class="table-card">
         <div class="card-toolbar" style="display:flex;justify-content:space-between;align-items:center;padding:8px 10px;border-bottom:1px solid var(--border)">
-          <span class="card-title" style="font-weight:600;opacity:.9;cursor:pointer" title="Open large view">{{ _('Activity charts') }}</span>
+          <span class="card-title" style="font-weight:600;opacity:.9;cursor:pointer" title="{{ _('Open large view') }}">{{ _('Activity charts') }}</span>
           <div style="display:flex;gap:10px;align-items:center">
             <label for="grp-bucket" class="label m-0">{{ _('Aggregation') }}</label>
             <select id="grp-bucket" class="input" style="padding:6px 8px">
@@ -698,7 +692,7 @@
               <option value="7">7</option>
               <option value="14">14</option>
             </select>
-            <button data-dl="grp-bar" class="btn btn-secondary btn-sm" type="button" title="Download PNG">PNG</button>
+            <button data-dl="grp-bar" class="btn btn-secondary btn-sm" type="button" title="{{ _('Download PNG') }}">PNG</button>
           </div>
         </div>
         <div id="grp-bar" style="height:360px"></div>
@@ -741,7 +735,7 @@
                   <td class="thumb-cell">
                     {% if entry.get('screen') %}
                       <a href="/{{ entry['screen']|replace(' ', '%20') }}" class="open-shot" data-caption="{{ entry['post_title']|default('') }}">
-                        <img class="thumb" src="/screenshots/thumb/{{ entry['screen'][12:]|replace(' ', '%20') }}" alt="Screen" loading="lazy" decoding="async">
+                        <img class="thumb" src="/screenshots/thumb/{{ entry['screen'][12:]|replace(' ', '%20') }}" alt="{{ _('Screen') }}" loading="lazy" decoding="async">
                       </a>
                     {% endif %}
                   </td>
@@ -806,6 +800,134 @@
     </div>
   </div>
 </div>
+
+<!-- ===== ANALYSES MODAL ===== -->
+{% set _vs = group.get('analysis_variants', []) %}
+{% if _vs %}
+<div id="analysesModal" class="rl-modal" role="dialog" aria-modal="true" aria-labelledby="analysesModalTitle" hidden>
+  <div class="rl-modal__backdrop" onclick="closeAnalysesModal()"></div>
+  <div class="rl-modal__panel" role="document" style="max-width: 600px;">
+    <h3 id="analysesModalTitle" class="rl-modal__title">{{ group['name']|title }} — {{ _('Technical Analyses') }}</h3>
+    <button class="rl-modal__close" aria-label="{{ _('Close') }}" onclick="closeAnalysesModal()">&times;</button>
+
+    <div class="analyses-list">
+      {% for v in _vs %}
+      {% set _vt = (v.type if v.type is defined else 'full') %}
+      <div class="analysis-item">
+        <div class="analysis-info">
+          <h4 class="analysis-title">
+            {{ group['name']|title }} {{ v.label }}
+            {% if _vt == 'cti' %}
+              <span class="badge-info" style="margin-left:6px" title="{{ _('Cyber Threat Intelligence report') }}">{{ _('CTI') }}</span>
+            {% else %}
+              <span class="badge-neutral" style="margin-left:6px" title="{{ _('Full technical analysis') }}">{{ _('Full') }}</span>
+            {% endif %}
+          </h4>
+          <span class="analysis-meta">
+            {% if _vt == 'cti' %}{{ _('Cyber Threat Intelligence report') }}{% else %}{{ _('In-house technical analysis') }}{% endif %}
+          </span>
+        </div>
+        <div class="analysis-actions">
+          <a href="{{ v.view_url }}" class="btn btn-primary btn-sm">{{ _('View HTML') }}</a>
+          <a href="{{ v.pdf_url }}" class="btn btn-secondary btn-sm">{{ _('Download PDF') }}</a>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+
+    <div class="analyses-summary">
+      <span class="summary-text">{{ _('Total:') }} {{ _vs|length }} {{ _('report' if _vs|length == 1 else 'reports') }}</span>
+    </div>
+  </div>
+</div>
+
+<script>
+function openAnalysesModal() {
+  const modal = document.getElementById('analysesModal');
+  modal.removeAttribute('hidden');
+  modal.setAttribute('aria-hidden', 'false');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeAnalysesModal() {
+  const modal = document.getElementById('analysesModal');
+  modal.setAttribute('hidden', '');
+  modal.setAttribute('aria-hidden', 'true');
+  document.body.style.overflow = '';
+}
+
+// Close modal on Escape key
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'Escape') {
+    closeAnalysesModal();
+  }
+});
+</script>
+
+<style>
+.analyses-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin-bottom: 20px;
+}
+
+.analysis-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px;
+  border: 1px solid var(--border-card, var(--border));
+  border-radius: 8px;
+  background: var(--card);
+}
+
+.analysis-info h4 {
+  margin: 0 0 4px 0;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.analysis-meta {
+  font-size: 12px;
+  color: var(--muted);
+}
+
+.analysis-actions {
+  display: flex;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.analyses-summary {
+  padding: 12px 16px;
+  background: var(--surface-menu);
+  border: 1px solid var(--border-card, var(--border));
+  border-radius: 6px;
+  text-align: center;
+}
+
+.summary-text {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--muted);
+}
+
+@media (max-width: 640px) {
+  .analysis-item {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+
+  .analysis-actions {
+    width: 100%;
+    justify-content: flex-end;
+  }
+}
+</style>
+{% endif %}
 
 
 {% endblock %}

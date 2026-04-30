@@ -33,7 +33,7 @@
     {# Sparkline: posts per hour, last 24h #}
     {% set maxv = (activity|max) if activity|length else 0 %}
     {% set total24 = activity|sum %}
-    <div class="spark-band" aria-label="Posts per hour, last 24 hours">
+    <div class="spark-band" aria-label="{{ _('Posts per hour, last 24 hours') }}">
       <div class="activity-head">
         <span class="live-dot" aria-hidden="true"></span>
         <span class="activity-label">{{ _('Activity · last 24h') }}</span>
@@ -54,9 +54,9 @@
         {% endfor %}
       </svg>
       <div class="spark-axis">
-        <span>-24h</span>
-        <span>-12h</span>
-        <span>now</span>
+        <span>{{ _('-24h') }}</span>
+        <span>{{ _('-12h') }}</span>
+        <span>{{ _('now') }}</span>
       </div>
     </div>
   </div>

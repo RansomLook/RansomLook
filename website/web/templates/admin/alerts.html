@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 {% from 'bootstrap5/utils.html' import render_messages %}
-{% block title %}Alerts · Keywords{% endblock %}
+{% block title %}{{ _('Alerts · Keywords') }}{% endblock %}
 
 {% block content %}
 {{ render_messages(container=True, dismissible=True) }}
@@ -8,8 +8,8 @@
 
 <section class="hero">
   <div class="container">
-    <h1>Alerts – Keywords</h1>
-    <p class="lead">Manage alert keywords (one per line). Use tools to clean, deduplicate, and test quickly.</p>
+    <h1>{{ _('Alerts – Keywords') }}</h1>
+    <p class="lead">{{ _('Manage alert keywords (one per line). Use tools to clean, deduplicate, and test quickly.') }}</p>
   </div>
 </section>
 
@@ -23,26 +23,26 @@
         <!-- Keywords panel -->
         <div class="panel">
           <div class="panel-hd">
-            <strong>Keywords</strong>
-            <span class="pill"><span id="line-count">0</span> lines</span>
+            <strong>{{ _('Keywords') }}</strong>
+            <span class="pill"><span id="line-count">0</span> {{ _('lines') }}</span>
           </div>
           <div class="panel-bd">
             <div class="toolbar mb-8">
-              <button class="btn btn-secondary btn-sm" type="button" id="btn-trim">Trim</button>
-              <button class="btn btn-secondary btn-sm" type="button" id="btn-dedupe">Deduplicate</button>
-              <button class="btn btn-secondary btn-sm" type="button" id="btn-sort">Sort</button>
-              <button class="btn btn-secondary btn-sm" type="button" id="btn-lower">lowercase</button>
-              <button class="btn btn-secondary btn-sm" type="button" id="btn-upper">UPPERCASE</button>
+              <button class="btn btn-secondary btn-sm" type="button" id="btn-trim">{{ _('Trim') }}</button>
+              <button class="btn btn-secondary btn-sm" type="button" id="btn-dedupe">{{ _('Deduplicate') }}</button>
+              <button class="btn btn-secondary btn-sm" type="button" id="btn-sort">{{ _('Sort') }}</button>
+              <button class="btn btn-secondary btn-sm" type="button" id="btn-lower">{{ _('lowercase') }}</button>
+              <button class="btn btn-secondary btn-sm" type="button" id="btn-upper">{{ _('UPPERCASE') }}</button>
 
               <span class="toolbar-right">
-                <button class="btn btn-secondary btn-sm" type="button" id="btn-import">Import .txt</button>
-                <button class="btn btn-secondary btn-sm" type="button" id="btn-export">Export .txt</button>
+                <button class="btn btn-secondary btn-sm" type="button" id="btn-import">{{ _('Import .txt') }}</button>
+                <button class="btn btn-secondary btn-sm" type="button" id="btn-export">{{ _('Export .txt') }}</button>
               </span>
             </div>
 
             {{ form.keywords(class_="textarea", id="kw") }}
             <div class="counter mt-6">
-              Empty lines are ignored. Matching is case-insensitive by default.
+              {{ _('Empty lines are ignored. Matching is case-insensitive by default.') }}
             </div>
 
             <div class="toolbar" style="margin-top:12px;justify-content:flex-end">
@@ -54,22 +54,22 @@
         <!-- Tester panel -->
         <aside class="panel" style="margin-top:0;">
           <div class="panel-hd">
-            <strong>Quick tester</strong>
-            <span class="muted">Paste some text to see matches</span>
+            <strong>{{ _('Quick tester') }}</strong>
+            <span class="muted">{{ _('Paste some text to see matches') }}</span>
           </div>
           <div class="panel-bd">
-            <label class="label" for="t-input">Sample text</label>
-            <textarea id="t-input" class="input" rows="6" placeholder="Paste a log line, title, description…"></textarea>
+            <label class="label" for="t-input">{{ _('Sample text') }}</label>
+            <textarea id="t-input" class="input" rows="6" placeholder="{{ _('Paste a log line, title, description…') }}"></textarea>
 
             <div class="toolbar" style="margin:10px 0 8px">
               <label class="btn btn-secondary btn-sm" style="display:inline-flex;align-items:center;gap:8px;cursor:pointer">
-                <input type="checkbox" id="t-case" style="transform:scale(1.1)"> Case sensitive
+                <input type="checkbox" id="t-case" style="transform:scale(1.1)"> {{ _('Case sensitive') }}
               </label>
-              <button class="btn btn-secondary btn-sm" type="button" id="t-run">Test</button>
-              <button class="btn btn-secondary btn-sm" type="button" id="t-clear">Clear</button>
+              <button class="btn btn-secondary btn-sm" type="button" id="t-run">{{ _('Test') }}</button>
+              <button class="btn btn-secondary btn-sm" type="button" id="t-clear">{{ _('Clear') }}</button>
             </div>
 
-            <div class="hint">Matches:</div>
+            <div class="hint">{{ _('Matches:') }}</div>
             <div id="t-matches" class="result" aria-live="polite">—</div>
           </div>
         </aside>

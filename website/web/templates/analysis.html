@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% block title %}{{ group_name|title }}{% if variant %} / {{ variant_label }}{% endif %} — Technical Analysis · RansomLook{% endblock %}
+{% block title %}{{ group_name|title }}{% if variant %} / {{ variant_label }}{% endif %} — {{ _('Technical Analysis') }} · RansomLook{% endblock %}
 
 {% block content %}
 <section class="container">
@@ -15,14 +15,22 @@
   <header style="display:flex;justify-content:space-between;align-items:flex-start;gap:16px;flex-wrap:wrap;margin-bottom:16px;">
     <div>
       <h1 style="margin:0">
-        {{ group_name|title }} — Technical Analysis
+        {{ group_name|title }} — {{ _('Technical Analysis') }}
         {% if variant_label and variant_label != 'Default' %}
           <small style="color:var(--muted); font-weight:500;">/ {{ variant_label }}</small>
         {% endif %}
       </h1>
-      {% if meta and meta.get('private') %}
-        <small style="color:#888;"><span class="badge-private">private</span></small>
-      {% endif %}
+      {% set _t = (meta.get('type') if meta else 'full') or 'full' %}
+      <div style="margin-top:6px;display:flex;gap:6px;flex-wrap:wrap">
+        {% if _t == 'cti' %}
+          <span class="badge-info" title="{{ _('Cyber Threat Intelligence report') }}">{{ _('CTI report') }}</span>
+        {% else %}
+          <span class="badge-neutral" title="{{ _('Full technical analysis') }}">{{ _('Full analysis') }}</span>
+        {% endif %}
+        {% if meta and meta.get('private') %}
+          <span class="badge-private">{{ _('private') }}</span>
+        {% endif %}
+      </div>
     </div>
     <div>
       <a href="{% if variant %}{{ url_for('group_analysis_variant_pdf', name=group_name, variant=variant) }}{% else %}{{ url_for('group_analysis_pdf', name=group_name) }}{% endif %}" class="btn btn-secondary">⬇ PDF</a>
@@ -37,11 +45,13 @@
   <div class="variant-switcher" style="display:flex; gap:6px; flex-wrap:wrap; align-items:center; margin-bottom:14px; padding:8px 12px; background:var(--panel); border:1px solid var(--border); border-radius:6px;">
     <span class="muted" style="font-size:.85em">{{ _('Variants:') }}</span>
     {% for v in variants %}
+      {% set _vt = (v.type if v.type is defined else 'full') %}
+      {% set _suffix %}{% if _vt == 'cti' %} <small style="opacity:.7">· CTI</small>{% endif %}{% endset %}
       {% if v.is_current %}
-        <span class="btn btn-sm btn-primary" aria-current="page">{{ v.label }}</span>
+        <span class="btn btn-sm btn-primary" aria-current="page">{{ v.label }}{{ _suffix|safe }}</span>
       {% else %}
         <a class="btn btn-sm btn-secondary"
-           href="{% if v.id %}{{ url_for('group_analysis_variant', name=group_name, variant=v.id) }}{% else %}{{ url_for('group_analysis', name=group_name) }}{% endif %}">{{ v.label }}</a>
+           href="{% if v.id %}{{ url_for('group_analysis_variant', name=group_name, variant=v.id) }}{% else %}{{ url_for('group_analysis', name=group_name) }}{% endif %}">{{ v.label }}{{ _suffix|safe }}</a>
       {% endif %}
     {% endfor %}
   </div>

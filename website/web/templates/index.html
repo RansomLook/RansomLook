@@ -36,7 +36,7 @@
     <div class="home-hero__split">
       {% if logo %}
         <div class="home-hero__logo">
-          <img src="{{ url_for('static', filename=logo) }}" alt="RansomLook logo" loading="eager" decoding="async">
+          <img src="{{ url_for('static', filename=logo) }}" alt="{{ _('RansomLook logo') }}" loading="eager" decoding="async">
         </div>
       {% endif %}
 

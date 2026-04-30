@@ -1,15 +1,15 @@
 {% extends "base.html" %}
 {% from 'bootstrap5/utils.html' import render_messages %}
-{% block title %}Admin · {{ actor_name }}{% endblock %}
+{% block title %}{{ _('Admin · %(actor_name)s', actor_name=actor_name) }}{% endblock %}
 
 {% block content %}
 {{ render_messages(container=True, dismissible=True) }}
 
 <section class="hero">
   <div class="container">
-    <h1>Edit {{ actor_name }}</h1>
-    <p class="lead">Update identity, contacts, sources and relations.</p>
-    <p><a class="btn btn-secondary" href="{{ images_link }}">Manage images</a></p>
+    <h1>{{ _('Edit %(actor_name)s', actor_name=actor_name) }}</h1>
+    <p class="lead">{{ _('Update identity, contacts, sources and relations.') }}</p>
+    <p><a class="btn btn-secondary" href="{{ images_link }}">{{ _('Manage images') }}</a></p>
   </div>
 </section>
 
@@ -23,57 +23,57 @@
         <div>
           <div class="split-2">
             <div class="full">
-              <label class="label" for="{{ form.name.id }}">Primary pseudonym</label>
+              <label class="label" for="{{ form.name.id }}">{{ _('Primary pseudonym') }}</label>
               {{ form.name(class="input", readonly=True, disabled=True) }}
             </div>
 
             <div class="full">
-              <label class="label" for="{{ form.aliases.id }}">Alternate aliases (comma-separated)</label>
+              <label class="label" for="{{ form.aliases.id }}">{{ _('Alternate aliases (comma-separated)') }}</label>
               {{ form.aliases(class="input") }}
             </div>
 
             <div class="full">
-              <label class="label" for="{{ form.bio.id }}">General description</label>
+              <label class="label" for="{{ form.bio.id }}">{{ _('General description') }}</label>
               {{ form.bio(class="input", rows="8") }}
             </div>
 
             <div class="full">
-              <label class="label" for="{{ form.tags.id }}">Tags (comma-separated)</label>
+              <label class="label" for="{{ form.tags.id }}">{{ _('Tags (comma-separated)') }}</label>
               {{ form.tags(class="input") }}
             </div>
 
             <div class="full mt-6">
-              <label class="chk"><span>No active</span> {{ form.noactive() }}</label>
+              <label class="chk"><span>{{ _('No active') }}</span> {{ form.noactive() }}</label>
             </div>
             <div class="full mt-6">
-              <label class="chk"><span>Private</span> {{ form.private() }}</label>
+              <label class="chk"><span>{{ _('Private') }}</span> {{ form.private() }}</label>
             </div>
           </div>
         </div>
 
         <aside>
           <div class="table-card">
-            <div class="card-toolbar"><span>Personal information</span></div>
+            <div class="card-toolbar"><span>{{ _('Personal information') }}</span></div>
             <div class="prose pad">
               <div class="stack">
-                {{ form.first_name(class="input", placeholder="First name") }}
-                {{ form.last_name(class="input", placeholder="Last name") }}
-                {{ form.age(class="input", placeholder="Age") }}
+                {{ form.first_name(class="input", placeholder=_('First name')) }}
+                {{ form.last_name(class="input", placeholder=_('Last name')) }}
+                {{ form.age(class="input", placeholder=_('Age')) }}
                 {{ form.dob(class="input", placeholder="YYYY-MM-DD") }}
-                {{ form.nationality(class="input", placeholder="Nationality") }}
-                {{ form.location(class="input", placeholder="Location") }}
-                {{ form.id_notes(class="input", placeholder="Notes") }}
+                {{ form.nationality(class="input", placeholder=_('Nationality')) }}
+                {{ form.location(class="input", placeholder=_('Location')) }}
+                {{ form.id_notes(class="input", placeholder=_('Notes')) }}
               </div>
             </div>
           </div>
 
           <div class="table-card mt-12">
-            <div class="card-toolbar"><span>Wanted</span></div>
+            <div class="card-toolbar"><span>{{ _('Wanted') }}</span></div>
             <div class="prose pad">
               <div class="stack">
-                {{ form.fbi_url(class="input", placeholder="FBI Most Wanted URL") }}
-                {{ form.europol_url(class="input", placeholder="Europol URL") }}
-                {{ form.interpol_url(class="input", placeholder="INTERPOL URL") }}
+                {{ form.fbi_url(class="input", placeholder=_('FBI Most Wanted URL')) }}
+                {{ form.europol_url(class="input", placeholder=_('Europol URL')) }}
+                {{ form.interpol_url(class="input", placeholder=_('INTERPOL URL')) }}
               </div>
             </div>
           </div>
@@ -81,85 +81,85 @@
       </div>
 
       <div class="table-card mt-12">
-        <div class="card-toolbar"><span>Contacts / Social</span></div>
+        <div class="card-toolbar"><span>{{ _('Contacts / Social') }}</span></div>
         <div class="prose pad">
-          {{ form.jabber(class="input", rows="2", placeholder="Jabber — one per line") }}
-          {{ form.email(class="input", rows="2", placeholder="Email — one per line") }}
-          {{ form.pgp(class="input", rows="2", placeholder="PGP — one key per line") }}
-          {{ form.matrix(class="input", rows="2", placeholder="Matrix — one per line") }}
-          {{ form.session(class="input", rows="2", placeholder="Session — one per line") }}
-          {{ form.telegram(class="input", rows="2", placeholder="Telegram — @handle or URL (one per line)") }}
-          {{ form.tox(class="input", rows="2", placeholder="Tox — one per line (full ID)") }}
-          {{ form.simplex(class="input", rows="2", placeholder="Simplex — one per line") }}
-          {{ form.max(class="input", rows="2", placeholder="Max — one per line") }}
-          {{ form.sonar(class="input", rows="2", placeholder="Sonar — one per line") }}
-          {{ form.x(class="input", rows="2", placeholder="X/Twitter — @handle or URL (one per line)") }}
-          {{ form.bluesky(class="input", rows="2", placeholder="Bluesky — @handle.bsky.social or URL (one per line)") }}
+          {{ form.jabber(class="input", rows="2", placeholder=_('Jabber — one per line')) }}
+          {{ form.email(class="input", rows="2", placeholder=_('Email — one per line')) }}
+          {{ form.pgp(class="input", rows="2", placeholder=_('PGP — one key per line')) }}
+          {{ form.matrix(class="input", rows="2", placeholder=_('Matrix — one per line')) }}
+          {{ form.session(class="input", rows="2", placeholder=_('Session — one per line')) }}
+          {{ form.telegram(class="input", rows="2", placeholder=_('Telegram — @handle or URL (one per line)')) }}
+          {{ form.tox(class="input", rows="2", placeholder=_('Tox — one per line (full ID)')) }}
+          {{ form.simplex(class="input", rows="2", placeholder=_('Simplex — one per line')) }}
+          {{ form.max(class="input", rows="2", placeholder=_('Max — one per line')) }}
+          {{ form.sonar(class="input", rows="2", placeholder=_('Sonar — one per line')) }}
+          {{ form.x(class="input", rows="2", placeholder=_('X/Twitter — @handle or URL (one per line)')) }}
+          {{ form.bluesky(class="input", rows="2", placeholder=_('Bluesky — @handle.bsky.social or URL (one per line)')) }}
         </div>
       </div>
 
       <!-- RELATIONS — chips + search (3 independent lists) -->
       <div class="table-card mt-12">
-        <div class="card-toolbar"><span>Relations</span></div>
+        <div class="card-toolbar"><span>{{ _('Relations') }}</span></div>
         <div class="prose pad">
 
           <!-- GROUPS -->
           <div class="rel-widget mb-12">
-            <label class="label">Groups</label>
-            <input id="groups-add" type="search" placeholder="Search & add…" list="groups-datalist"
-                   class="input max-w-520" autocomplete="off" aria-label="Add a group">
+            <label class="label">{{ _('Groups') }}</label>
+            <input id="groups-add" type="search" placeholder="{{ _('Search & add…') }}" list="groups-datalist"
+                   class="input max-w-520" autocomplete="off" aria-label="{{ _('Add a group') }}">
             <datalist id="groups-datalist">
               {% for g in groups_all %}<option value="{{ g }}">{% endfor %}
             </datalist>
             <div id="groups-tokens" class="tokens"></div>
             <input type="hidden" name="groups" id="groups-hidden" value="{{ form.groups.data or '' }}">
-            <small class="help">Type then Enter to add. Remove with “×”.</small>
+            <small class="help">{{ _('Type then Enter to add. Remove with “×”.') }}</small>
           </div>
 
           <hr class="light-divider">
 
           <!-- MARKETS / FORUMS -->
           <div class="rel-widget mb-12">
-            <label class="label">Forums / Markets</label>
-            <input id="markets-add" type="search" placeholder="Search & add…" list="markets-datalist"
-                   class="input max-w-520" autocomplete="off" aria-label="Add a market/forum">
+            <label class="label">{{ _('Forums / Markets') }}</label>
+            <input id="markets-add" type="search" placeholder="{{ _('Search & add…') }}" list="markets-datalist"
+                   class="input max-w-520" autocomplete="off" aria-label="{{ _('Add a market/forum') }}">
             <datalist id="markets-datalist">
               {% for m in markets_all %}<option value="{{ m }}">{% endfor %}
             </datalist>
             <div id="markets-tokens" class="tokens"></div>
             <input type="hidden" name="forums" id="markets-hidden" value="{{ form.forums.data or '' }}">
-            <small class="help">Pick from suggestions or type.</small>
+            <small class="help">{{ _('Pick from suggestions or type.') }}</small>
           </div>
 
           <hr class="light-divider">
 
           <!-- PEERS (OTHER ACTORS) -->
           <div class="rel-widget">
-            <label class="label">Peers (other actors)</label>
-            <input id="peers-add" type="search" placeholder="Search & add…" list="peers-datalist"
-                   class="input max-w-520" autocomplete="off" aria-label="Add a peer">
+            <label class="label">{{ _('Peers (other actors)') }}</label>
+            <input id="peers-add" type="search" placeholder="{{ _('Search & add…') }}" list="peers-datalist"
+                   class="input max-w-520" autocomplete="off" aria-label="{{ _('Add a peer') }}">
             <datalist id="peers-datalist">
               {% for a in peers_all %}<option value="{{ a }}">{% endfor %}
             </datalist>
             <div id="peers-tokens" class="tokens"></div>
             <input type="hidden" name="peers" id="peers-hidden" value="{{ form.peers.data or '' }}">
-            <small class="help">E.g., <code>actorA, actorB</code> or select from the list (db=5).</small>
+            <small class="help">{{ _('E.g.,') }} <code>actorA, actorB</code> {{ _('or select from the list (db=5).') }}</small>
           </div>
 
         </div>
       </div>
 
       <div class="table-card mt-12">
-        <div class="card-toolbar"><span>Sources</span></div>
+        <div class="card-toolbar"><span>{{ _('Sources') }}</span></div>
         <div class="prose pad">
-          {{ form.sources(class="input", rows="5", placeholder="One URL per line (or “Title — URL”)") }}
+          {{ form.sources(class="input", rows="5", placeholder=_('One URL per line (or “Title — URL”)')) }}
         </div>
       </div>
 
       <!-- Floating action buttons -->
       <div class="edit-actions">
         {{ form.submit(class="btn btn-primary") }}
-        <a class="btn btn-secondary" href="/actor/{{ actor_name|urlencode }}">View public page</a>
+        <a class="btn btn-secondary" href="/actor/{{ actor_name|urlencode }}">{{ _('View public page') }}</a>
       </div>
     </form>
   </div>

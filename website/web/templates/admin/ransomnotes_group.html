@@ -1,14 +1,14 @@
 {% extends "base.html" %}
 {% from 'bootstrap5/utils.html' import render_messages %}
-{% block title %}Admin · Ransom notes · {{ slug }}{% endblock %}
+{% block title %}{{ _('Admin · Ransom notes · %(slug)s', slug=slug) }}{% endblock %}
 
 {% block content %}
 {{ render_messages(container=True, dismissible=True) }}
 
 <section class="hero">
   <div class="container text-center">
-    <h1>Ransom notes · {{ slug }}</h1>
-    <p class="lead">Manage <strong>aliases</strong> for this group and its <strong>notes</strong> (add · edit · remove).</p>
+    <h1>{{ _('Ransom notes · %(slug)s', slug=slug) }}</h1>
+    <p class="lead">{{ _('Manage') }} <strong>{{ _('aliases') }}</strong> {{ _('for this group and its') }} <strong>{{ _('notes') }}</strong> {{ _('(add · edit · remove).') }}</p>
   </div>
 </section>
 
@@ -17,7 +17,7 @@
 
     <!-- =========== Aliases =========== -->
     <div id="aliases-card" class="table-card p-16 mb-14">
-      <h3 class="section-title" style="margin:0 0 10px">Aliases</h3>
+      <h3 class="section-title" style="margin:0 0 10px">{{ _('Aliases') }}</h3>
 
       {% if aliases %}
         <div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:10px;">
@@ -26,23 +26,23 @@
               <span class="chip" style="padding:6px 8px; border-radius:999px;">
                 <span class="monospace">{{ a }}</span>
                 <button class="btn btn-sm" type="submit" style="margin-left:6px"
-                        onclick="return confirm('Remove alias “{{ a }}”?')">✕</button>
+                        onclick="return confirm('{{ _('Remove alias “%(a)s”?', a=a) }}')">✕</button>
               </span>
             </form>
           {% endfor %}
         </div>
       {% else %}
-        <p class="muted" style="margin:0 0 10px">No aliases yet.</p>
+        <p class="muted" style="margin:0 0 10px">{{ _('No aliases yet.') }}</p>
       {% endif %}
 
       <form class="admin-form" method="post" action="{{ url_for('admin_ransomnotes_alias_add', slug=slug) }}">
         <div class="picker-row">
           <div>
-            <label class="label" for="alias-input">New alias</label>
-            <input id="alias-input" class="input" name="alias" placeholder="e.g., 0mega" required>
+            <label class="label" for="alias-input">{{ _('New alias') }}</label>
+            <input id="alias-input" class="input" name="alias" placeholder="{{ _('e.g., 0mega') }}" required>
           </div>
           <div class="self-end">
-            <button class="btn btn-primary" type="submit">Add alias</button>
+            <button class="btn btn-primary" type="submit">{{ _('Add alias') }}</button>
           </div>
         </div>
       </form>
@@ -51,7 +51,7 @@
     <!-- =========== Notes toolbar =========== -->
     <div id="notes-card" class="table-card p-16 mb-14">
       <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;">
-        <h3 class="section-title m-0">Notes</h3>
+        <h3 class="section-title m-0">{{ _('Notes') }}</h3>
         <a href="#"
            class="btn btn-primary js-open-note-modal"
            data-action="{{ url_for('admin_ransomnotes_note_create', slug=slug) }}"
@@ -61,7 +61,7 @@
            data-status="active"
            data-local="1"
            data-new="1">
-          + New note
+          + {{ _('New note') }}
         </a>
       </div>
 
@@ -70,12 +70,12 @@
         <table class="rl-table">
           <thead>
             <tr>
-              <th>Title</th>
-              <th>Format</th>
-              <th>Status</th>
-              <th>Local override</th>
-              <th>Updated</th>
-              <th width="180">Actions</th>
+              <th>{{ _('Title') }}</th>
+              <th>{{ _('Format') }}</th>
+              <th>{{ _('Status') }}</th>
+              <th>{{ _('Local override') }}</th>
+              <th>{{ _('Updated') }}</th>
+              <th width="180">{{ _('Actions') }}</th>
             </tr>
           </thead>
           <tbody>
@@ -84,7 +84,7 @@
               <td class="monospace">{{ n.title }}</td>
               <td><code>{{ n.format }}</code></td>
               <td>{{ n.status }}</td>
-              <td>{{ 'yes' if n.local_override else 'no' }}</td>
+              <td>{{ _('yes') if n.local_override else _('no') }}</td>
               <td><small class="muted">{{ n.updated_at }}</small></td>
               <td>
                 <a href="#"
@@ -95,18 +95,18 @@
                    data-format="{{ n.format }}"
                    data-status="{{ n.status }}"
                    data-local="{{ '1' if n.local_override else '0' }}">
-                  Edit
+                  {{ _('Edit') }}
                 </a>
                 <form method="post" action="{{ url_for('admin_ransomnotes_note_delete', slug=slug, nid=n.id) }}"
-                      style="display:inline" onsubmit="return confirm('Delete this note?');">
-                  <button class="btn btn-sm" type="submit">Delete</button>
+                      style="display:inline" onsubmit="return confirm('{{ _('Delete this note?') }}');">
+                  <button class="btn btn-sm" type="submit">{{ _('Delete') }}</button>
                 </form>
                 <!-- Hidden raw content for prefill -->
                 <textarea id="note-content-{{ n.id }}" hidden>{{ n.content }}</textarea>
               </td>
             </tr>
           {% else %}
-            <tr><td colspan="6" class="muted">No notes yet.</td></tr>
+            <tr><td colspan="6" class="muted">{{ _('No notes yet.') }}</td></tr>
           {% endfor %}
           </tbody>
         </table>
@@ -121,18 +121,18 @@
   <div class="adm-modal__backdrop" data-close></div>
   <div class="adm-modal__panel table-card" role="dialog" aria-modal="true" aria-labelledby="adm-note-title">
     <div class="adm-modal__header">
-      <h3 id="adm-note-title" class="section-title m-0">Edit note</h3>
-      <button class="adm-modal__close" type="button" aria-label="Close" data-close>×</button>
+      <h3 id="adm-note-title" class="section-title m-0">{{ _('Edit note') }}</h3>
+      <button class="adm-modal__close" type="button" aria-label="{{ _('Close') }}" data-close>×</button>
     </div>
 
     <form id="adm-note-form" class="admin-form" method="post" action="">
       <div class="picker-row">
         <div>
-          <label class="label" for="adm-title">Title</label>
+          <label class="label" for="adm-title">{{ _('Title') }}</label>
           <input id="adm-title" class="input" name="title" placeholder="README.txt" style="width:97%">
         </div>
         <div>
-          <label class="label" for="adm-format">Format</label>
+          <label class="label" for="adm-format">{{ _('Format') }}</label>
           <select id="adm-format" class="input" name="format">
             <option value="txt">txt</option>
             <option value="md">md</option>
@@ -141,27 +141,27 @@
           </select>
         </div>
         <div>
-          <label class="label" for="adm-status">Status</label>
+          <label class="label" for="adm-status">{{ _('Status') }}</label>
           <select id="adm-status" class="input" name="status">
-            <option value="active">active</option>
-            <option value="archived">archived</option>
+            <option value="active">{{ _('active') }}</option>
+            <option value="archived">{{ _('archived') }}</option>
           </select>
         </div>
       </div>
 
       <div style="margin-top:10px">
-        <label class="label" for="adm-content">Content</label>
-        <textarea id="adm-content" class="input" name="content" rows="10" placeholder="Raw note content…" style="width:97%;"></textarea>
+        <label class="label" for="adm-content">{{ _('Content') }}</label>
+        <textarea id="adm-content" class="input" name="content" rows="10" placeholder="{{ _('Raw note content…') }}" style="width:97%;"></textarea>
       </div>
 
       <div style="margin-top:10px; display:flex; align-items:center; gap:8px;">
         <input type="checkbox" id="adm-local" name="local_override">
-        <label for="adm-local">Protect against import overwrite (<code>local_override</code>)</label>
+        <label for="adm-local">{{ _('Protect against import overwrite (') }}<code>local_override</code>{{ _(')') }}</label>
       </div>
 
       <div class="adm-modal__footer">
-        <button class="btn btn-primary" type="submit">Save</button>
-        <button class="btn btn-secondary" type="button" data-close>Cancel</button>
+        <button class="btn btn-primary" type="submit">{{ _('Save') }}</button>
+        <button class="btn btn-secondary" type="button" data-close>{{ _('Cancel') }}</button>
       </div>
     </form>
   </div>
@@ -207,7 +207,7 @@
     const isNew  = btn.getAttribute('data-new') === '1';
 
     form.action   = action;
-    hdr.textContent = isNew ? 'Create note' : 'Edit note';
+    hdr.textContent = isNew ? '{{ _('Create note') }}' : '{{ _('Edit note') }}';
 
     titleEl.value = title;
     fmtEl.value   = ['txt','md','html','rtf'].includes(format) ? format : 'txt';

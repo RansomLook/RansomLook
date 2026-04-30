@@ -1,14 +1,14 @@
 {% extends "base.html" %}
 {% from 'bootstrap5/utils.html' import render_messages %}
-{% block title %}Admin · Crypto{% endblock %}
+{% block title %}{{ _('Admin · Crypto') }}{% endblock %}
 
 {% block content %}
 {{ render_messages(container=True, dismissible=True) }}
 
 <section class="hero">
   <div class="container">
-    <h1>Admin · Cryptocurrencies</h1>
-    <p class="lead">Create/read alias mappings for crypto (stored in DB=7 only).</p>
+    <h1>{{ _('Admin · Cryptocurrencies') }}</h1>
+    <p class="lead">{{ _('Create/read alias mappings for crypto (stored in DB=7 only).') }}</p>
   </div>
 </section>
 
@@ -18,28 +18,28 @@
     <div class="table-card">
       <div class="card-toolbar bb">
         <div style="display:flex;align-items:center;gap:8px;justify-content:space-between;">
-          <span class="fw-600">Add / Update alias</span>
+          <span class="fw-600">{{ _('Add / Update alias') }}</span>
         </div>
       </div>
       <form action="" method="post" class="p-12">
         <div class="grid" style="grid-template-columns:1fr 1fr auto; gap:8px;">
-          <input class="input" type="text" name="alias" placeholder="Alias (e.g. Conti)" required>
-          <input class="input" type="text" name="target" placeholder="Target canonical (e.g. conti)" required>
-          <button class="btn" type="submit">Save</button>
+          <input class="input" type="text" name="alias" placeholder="{{ _('Alias (e.g. Conti)') }}" required>
+          <input class="input" type="text" name="target" placeholder="{{ _('Target canonical (e.g. conti)') }}" required>
+          <button class="btn" type="submit">{{ _('Save') }}</button>
         </div>
-        <p class="help mt-8">Target must correspond to an existing key in DB=7 (family). No writes are made to DB=0.</p>
+        <p class="help mt-8">{{ _('Target must correspond to an existing key in DB=7 (family). No writes are made to DB=0.') }}</p>
       </form>
     </div>
 
     <div class="table-card mt-12">
       <div class="card-toolbar bb">
         <div style="display:flex;align-items:center;gap:8px;justify-content:space-between;">
-          <span class="fw-600">Existing aliases</span>
+          <span class="fw-600">{{ _('Existing aliases') }}</span>
         </div>
       </div>
       <div class="table-scroll">
         <table class="rl-table">
-          <thead><tr><th>Alias</th><th>→ Target</th><th></th></tr></thead>
+          <thead><tr><th>{{ _('Alias') }}</th><th>{{ _('→ Target') }}</th><th></th></tr></thead>
           <tbody>
             {% for row in aliases %}
               <tr>
@@ -49,7 +49,7 @@
                   <form action="" method="post" style="display:inline">
                     <input type="hidden" name="alias" value="{{ row.alias }}">
                     <input type="hidden" name="target" value="__DELETE__">
-                    <button class="btn btn-sm btn-danger" type="submit">Delete</button>
+                    <button class="btn btn-sm btn-danger" type="submit">{{ _('Delete') }}</button>
                   </form>
                 </td>
               </tr>

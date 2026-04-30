@@ -1,21 +1,21 @@
 {% extends "base.html" %}
 {% from 'bootstrap5/utils.html' import render_messages %}
-{% block title %}Admin · Edit Actor{% endblock %}
+{% block title %}{{ _('Admin · Edit Actor') }}{% endblock %}
 {% block content %}
 {{ render_messages(container=True, dismissible=True) }}
 
 <section class="hero">
   <div class="container">
-    <h1>Edit Threat Actor</h1>
-    <p class="lead">Select the actor to edit.</p>
+    <h1>{{ _('Edit Threat Actor') }}</h1>
+    <p class="lead">{{ _('Select the actor to edit.') }}</p>
   </div>
 </section>
 
 <section class="metrics-section">
   <div class="container">
     <div class="table-card p-12 mb-14">
-      <label class="label" for="picker-search">Search</label>
-      <input id="picker-search" class="input" type="search" placeholder="Filter actors…">
+      <label class="label" for="picker-search">{{ _('Search') }}</label>
+      <input id="picker-search" class="input" type="search" placeholder="{{ _('Filter actors…') }}">
     </div>
 
     <form action="" method="post" novalidate class="table-card admin-form p-16">

@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2026-04-25 13:30+0200\n"
+"POT-Creation-Date: 2026-04-30 13:32+0200\n"
 "PO-Revision-Date: 2026-04-21 13:39+0200\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: en\n"
@@ -17,6 +17,331 @@ msgstr ""
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 2.18.0\n"
+
+#: website/web/__init__.py:736 website/web/__init__.py:747
+#, python-format
+msgid "Logged in as: %(user)s"
+msgstr ""
+
+#: website/web/__init__.py:740 website/web/__init__.py:751
+#, python-format
+msgid "Unable to login as: %(username)s"
+msgstr ""
+
+#: website/web/__init__.py:761
+msgid "Successfully logged out."
+msgstr ""
+
+#: website/web/__init__.py:2241 website/web/__init__.py:2305
+#, python-format
+msgid "No such group: %(name)s"
+msgstr ""
+
+#: website/web/__init__.py:2247
+msgid "Invalid variant id (use [a-z0-9_-], 1–64 chars; not 'assets'/'pdf')."
+msgstr ""
+
+#: website/web/__init__.py:2251
+#, python-format
+msgid "Variant '%(new_id)s' already exists."
+msgstr ""
+
+#: website/web/__init__.py:2323 website/web/__init__.py:2543
+msgid "Invalid variant id"
+msgstr ""
+
+#: website/web/__init__.py:2358
+msgid "Invalid form submission"
+msgstr ""
+
+#: website/web/__init__.py:2376
+msgid "Could not read uploaded file as UTF-8 text"
+msgstr ""
+
+#: website/web/__init__.py:2382
+msgid "Empty content — nothing saved"
+msgstr ""
+
+#: website/web/__init__.py:2386
+msgid "Warning: no Markdown heading found — saving anyway"
+msgstr ""
+
+#: website/web/__init__.py:2401
+msgid "SHA-256 ignored: must be 64 hex chars"
+msgstr ""
+
+#: website/web/__init__.py:2407
+#, python-format
+msgid "SHA-256 auto-extracted from Markdown: %(prefix)s…"
+msgstr ""
+
+#: website/web/__init__.py:2422
+msgid "Analysis date ignored: expected YYYY-MM-DD"
+msgstr ""
+
+#: website/web/__init__.py:2437
+#, python-format
+msgid "Saved analysis for %(name)s%(variant_suffix)s (%(size)s bytes)"
+msgstr ""
+
+#: website/web/__init__.py:2547
+msgid "Nothing to delete for that variant"
+msgstr ""
+
+#: website/web/__init__.py:2567
+#, python-format
+msgid "Delete failed: %(error)s"
+msgstr ""
+
+#: website/web/__init__.py:2572
+#, python-format
+msgid "Deleted analysis for %(name)s%(variant_suffix)s"
+msgstr ""
+
+#: website/web/__init__.py:3517
+msgid "Unknown infohash"
+msgstr ""
+
+#: website/web/__init__.py:3571
+#, python-format
+msgid "No data for IP %(ip)r"
+msgstr ""
+
+#: website/web/__init__.py:3583
+#, python-format
+msgid "No data for ASN %(asn)r"
+msgstr ""
+
+#: website/web/__init__.py:3622
+#, python-format
+msgid "Removed %(count)s torrent(s)."
+msgstr ""
+
+#: website/web/__init__.py:3628
+msgid "Pick a group."
+msgstr ""
+
+#: website/web/__init__.py:3693
+msgid "No input."
+msgstr ""
+
+#: website/web/__init__.py:3751
+#, python-format
+msgid "URL already exists for %(group)s: %(url)s"
+msgstr ""
+
+#: website/web/__init__.py:3754
+#, python-format
+msgid "URL added to existing group %(group)s: %(url)s"
+msgstr ""
+
+#: website/web/__init__.py:3758
+#, python-format
+msgid "New group created: %(group)s with URL %(url)s"
+msgstr ""
+
+#: website/web/__init__.py:3878
+#, python-format
+msgid "Success to delete : %(name)s"
+msgstr ""
+
+#: website/web/__init__.py:3948 website/web/__init__.py:4077
+#: website/web/__init__.py:4144 website/web/__init__.py:4241
+#, python-format
+msgid "Error to add post to : %(name)s - Screen should be a PNG"
+msgstr ""
+
+#: website/web/__init__.py:4013
+#, python-format
+msgid "Success to edit : %(name)s"
+msgstr ""
+
+#: website/web/__init__.py:4135
+#, python-format
+msgid ""
+"Error to add post to : %(name)s - You should select Magnet or Link not "
+"both"
+msgstr ""
+
+#: website/web/__init__.py:4157
+#, python-format
+msgid "Error to add post to : %(name)s - The entry already exists"
+msgstr ""
+
+#: website/web/__init__.py:4166 website/web/__init__.py:4270
+#, python-format
+msgid "Success to add post to : %(name)s"
+msgstr ""
+
+#: website/web/__init__.py:4247
+#, python-format
+msgid "Invalid path: %(name)s"
+msgstr ""
+
+#: website/web/__init__.py:4279
+msgid "You are not allowed to dump this DataBase"
+msgstr ""
+
+#: website/web/__init__.py:4315
+msgid "Name required"
+msgstr ""
+
+#: website/web/__init__.py:4322
+msgid "This actor already exists."
+msgstr ""
+
+#: website/web/__init__.py:4400
+msgid "Image invalide (png/jpg/svg/gif)"
+msgstr ""
+
+#: website/web/__init__.py:4416
+msgid "Actor created."
+msgstr ""
+
+#: website/web/__init__.py:4447
+msgid "Actor not found"
+msgstr ""
+
+#: website/web/__init__.py:4629
+msgid "Actor updated."
+msgstr ""
+
+#: website/web/__init__.py:4688
+msgid "Please select a group name."
+msgstr ""
+
+#: website/web/__init__.py:4745
+msgid "Alias invalide."
+msgstr ""
+
+#: website/web/__init__.py:4750
+#, python-format
+msgid "Alias '%(alias)s' added."
+msgstr ""
+
+#: website/web/__init__.py:4763
+#, python-format
+msgid "Alias '%(alias)s' deleted."
+msgstr ""
+
+#: website/web/__init__.py:4801
+msgid "Note created."
+msgstr ""
+
+#: website/web/__init__.py:4813 website/web/__init__.py:4869
+msgid "Note not found."
+msgstr ""
+
+#: website/web/__init__.py:4857
+msgid "Note updated."
+msgstr ""
+
+#: website/web/__init__.py:4874
+msgid "Note deleted."
+msgstr ""
+
+#: website/web/__init__.py:4972
+msgid "Canonical name is required."
+msgstr ""
+
+#: website/web/__init__.py:4986
+msgid "Group created in DB=7."
+msgstr ""
+
+#: website/web/__init__.py:5009
+msgid "Address is required."
+msgstr ""
+
+#: website/web/__init__.py:5020 website/web/__init__.py:5101
+#, python-format
+msgid "Invalid transactions JSON: %(error)s"
+msgstr ""
+
+#: website/web/__init__.py:5048
+msgid "Address created."
+msgstr ""
+
+#: website/web/__init__.py:5086
+msgid "Address deleted."
+msgstr ""
+
+#: website/web/__init__.py:5143
+msgid "Address updated."
+msgstr ""
+
+#: website/web/__init__.py:5162
+msgid "Alias is required."
+msgstr ""
+
+#: website/web/__init__.py:5170
+msgid "Alias deleted."
+msgstr ""
+
+#: website/web/__init__.py:5174
+msgid "Canonical slug is required."
+msgstr ""
+
+#: website/web/__init__.py:5179
+msgid "Alias saved."
+msgstr ""
+
+#: website/web/__init__.py:5225
+msgid "Group/market name is required."
+msgstr ""
+
+#: website/web/__init__.py:5230
+#, python-format
+msgid "\"%(name)s\" does not exist. Create it first."
+msgstr ""
+
+#: website/web/__init__.py:5235
+msgid "At least one URL is required."
+msgstr ""
+
+#: website/web/__init__.py:5249
+#, python-format
+msgid "%(count)s URL(s) added to %(name)s."
+msgstr ""
+
+#: website/web/__init__.py:5251
+#, python-format
+msgid "%(count)s URL(s) already existed (skipped)."
+msgstr ""
+
+#: website/web/__init__.py:5363
+msgid "Configuration saved."
+msgstr ""
+
+#: website/web/__init__.py:5406
+msgid "A name / comment is required."
+msgstr ""
+
+#: website/web/__init__.py:5419
+#, python-format
+msgid "API key created. Token (copy it now, it won't be shown again): %(token)s"
+msgstr ""
+
+#: website/web/__init__.py:5428 website/web/__init__.py:5449
+msgid "Missing token."
+msgstr ""
+
+#: website/web/__init__.py:5433
+msgid "Key not found."
+msgstr ""
+
+#: website/web/__init__.py:5440
+#, python-format
+msgid "Key \"%(name)s\" %(state)s."
+msgstr ""
+
+#: website/web/__init__.py:5461
+#, python-format
+msgid "Key \"%(name)s\" deleted."
+msgstr ""
+
+#: website/web/__init__.py:5532
+msgid "Success to update keywords"
+msgstr ""
 
 #: website/web/templates/40x.html:9
 msgid "Page not found"
@@ -58,7 +383,7 @@ msgstr ""
 msgid "Retry"
 msgstr ""
 
-#: website/web/templates/RF.html:3 website/web/templates/base.html:88
+#: website/web/templates/RF.html:3 website/web/templates/base.html:89
 #: website/web/templates/glossary.html:114
 msgid "RF Dumps"
 msgstr ""
@@ -83,9 +408,11 @@ msgstr ""
 msgid "Dump name or description…"
 msgstr ""
 
-#: website/web/templates/RF.html:29 website/web/templates/browse.html:43
-#: website/web/templates/crypto.html:26 website/web/templates/leaks.html:27
-#: website/web/templates/notes.html:26 website/web/templates/urls.html:55
+#: website/web/templates/RF.html:29 website/web/templates/actors.html:26
+#: website/web/templates/admin/ransomnotes_index.html:39
+#: website/web/templates/browse.html:43 website/web/templates/crypto.html:26
+#: website/web/templates/groups.html:46 website/web/templates/leaks.html:27
+#: website/web/templates/notes.html:26 website/web/templates/urls.html:54
 msgid "Clear search"
 msgstr ""
 
@@ -93,8 +420,12 @@ msgstr ""
 msgid "Dump"
 msgstr ""
 
-#: website/web/templates/RF.html:45 website/web/templates/group.html:161
-#: website/web/templates/group.html:723 website/web/templates/search.html:18
+#: website/web/templates/RF.html:45
+#: website/web/templates/admin/addpostentry.html:33
+#: website/web/templates/admin/editentry.html:39
+#: website/web/templates/admin/editpost.html:114
+#: website/web/templates/group.html:163 website/web/templates/group.html:725
+#: website/web/templates/groups.html:133 website/web/templates/search.html:18
 #: website/web/templates/search.html:43 website/web/templates/search.html:68
 msgid "Description"
 msgstr ""
@@ -111,10 +442,13 @@ msgstr ""
 msgid "RF dump"
 msgstr ""
 
-#: website/web/templates/RF.html:81 website/web/templates/base.html:174
-#: website/web/templates/group.html:756 website/web/templates/group.html:765
-#: website/web/templates/group.html:792 website/web/templates/leaks.html:74
-#: website/web/templates/stats.html:162
+#: website/web/templates/RF.html:81 website/web/templates/actor.html:253
+#: website/web/templates/admin/crypto_addr_form.html:100
+#: website/web/templates/admin/ransomnotes_group.html:125
+#: website/web/templates/base.html:175 website/web/templates/group.html:758
+#: website/web/templates/group.html:767 website/web/templates/group.html:794
+#: website/web/templates/group.html:811 website/web/templates/groups.html:200
+#: website/web/templates/leaks.html:74 website/web/templates/stats.html:162
 msgid "Close"
 msgstr ""
 
@@ -122,7 +456,12 @@ msgstr ""
 msgid "RF head"
 msgstr ""
 
-#: website/web/templates/RF.html:91 website/web/templates/cryptodetail.html:129
+#: website/web/templates/RF.html:91
+#: website/web/templates/admin/crypto_addr_form.html:46
+#: website/web/templates/admin/crypto_addr_form.html:75
+#: website/web/templates/admin/crypto_addr_form.html:138
+#: website/web/templates/admin/crypto_group.html:36
+#: website/web/templates/cryptodetail.html:129
 msgid "Source"
 msgstr ""
 
@@ -167,8 +506,12 @@ msgstr ""
 msgid "Value"
 msgstr ""
 
-#: website/web/templates/about.html:3 website/web/templates/base.html:99
+#: website/web/templates/about.html:3 website/web/templates/base.html:100
 msgid "About"
+msgstr ""
+
+#: website/web/templates/about.html:11 website/web/templates/index.html:39
+msgid "RansomLook logo"
 msgstr ""
 
 #: website/web/templates/about.html:13
@@ -181,117 +524,117 @@ msgid ""
 "groups, posts, mirrors, forums, and more."
 msgstr ""
 
-#: website/web/templates/about.html:26
+#: website/web/templates/about.html:25
 msgid "What is RansomLook?"
 msgstr ""
 
-#: website/web/templates/about.html:28
+#: website/web/templates/about.html:27
 msgid ""
 "RansomLook is an open‑source project aimed at assisting users in tracking"
 " ransomware‑related posts and activities across various sites and forums."
 msgstr ""
 
-#: website/web/templates/about.html:31
+#: website/web/templates/about.html:29
 msgid "The main components include:"
 msgstr ""
 
-#: website/web/templates/about.html:33
+#: website/web/templates/about.html:31
 msgid "Blog monitoring and victim extraction"
 msgstr ""
 
-#: website/web/templates/about.html:34
+#: website/web/templates/about.html:32
 msgid "Forum monitoring (parsing is not available)"
 msgstr ""
 
-#: website/web/templates/about.html:35
+#: website/web/templates/about.html:33
 msgid "Overview of Ransomware Notes"
 msgstr ""
 
-#: website/web/templates/about.html:36
+#: website/web/templates/about.html:34
 msgid "Tracking leaks from public sources"
 msgstr ""
 
-#: website/web/templates/about.html:37
+#: website/web/templates/about.html:35
 msgid "Leak tracking from RecordedFuture provider (private API required)"
 msgstr ""
 
-#: website/web/templates/about.html:38
+#: website/web/templates/about.html:36
 msgid "Monitoring of various known Bitcoin wallets"
 msgstr ""
 
-#: website/web/templates/about.html:46
+#: website/web/templates/about.html:44
 msgid "Who uses RansomLook?"
 msgstr ""
 
-#: website/web/templates/about.html:47
+#: website/web/templates/about.html:45
 msgid "RansomLook is built for, and used by:"
 msgstr ""
 
-#: website/web/templates/about.html:49
+#: website/web/templates/about.html:47
 msgid ""
 "<strong>SOC / IR teams</strong> — spotting victims in real time, "
 "correlating outbound traffic with known ransomware mirrors during "
 "incident response."
 msgstr ""
 
-#: website/web/templates/about.html:50
+#: website/web/templates/about.html:48
 msgid ""
 "<strong>CTI analysts</strong> — tracking group activity, emergence of new"
 " actors, infrastructure churn, and producing trend reports."
 msgstr ""
 
-#: website/web/templates/about.html:51
+#: website/web/templates/about.html:49
 msgid ""
 "<strong>CSIRTs / national CERTs</strong> — building situational awareness"
 " and notifying constituents when they appear in a leak post."
 msgstr ""
 
-#: website/web/templates/about.html:52
+#: website/web/templates/about.html:50
 msgid ""
 "<strong>Security researchers</strong> — studying the ransomware ecosystem"
 " over time via open data and the API."
 msgstr ""
 
-#: website/web/templates/about.html:53
+#: website/web/templates/about.html:51
 msgid ""
 "<strong>Journalists</strong> — verifying claims, confirming victim "
 "disclosures, and grounding reporting in public evidence."
 msgstr ""
 
-#: website/web/templates/about.html:61
+#: website/web/templates/about.html:59
 msgid "Getting started"
 msgstr ""
 
-#: website/web/templates/about.html:62
+#: website/web/templates/about.html:60
 msgid "Start from the page that matches your use case:"
 msgstr ""
 
-#: website/web/templates/about.html:64
+#: website/web/templates/about.html:62
 msgid ""
 "<strong>Incident response</strong> → <a href=\"/recent\">/recent</a> "
 "&nbsp;·&nbsp; <a href=\"/urls\">/urls</a> (check if a URL you observed "
 "matches a tracked mirror)."
 msgstr ""
 
-#: website/web/templates/about.html:65
+#: website/web/templates/about.html:63
 msgid ""
 "<strong>CTI / trend analysis</strong> → <a href=\"/stats\">/stats</a> "
 "&nbsp;·&nbsp; <a href=\"/hot\">/hot</a> (trending groups)."
 msgstr ""
 
-#: website/web/templates/about.html:66
+#: website/web/templates/about.html:64
 msgid ""
 "<strong>Directory / lookup</strong> → <a href=\"/browse\">/browse</a> "
 "(all groups, markets, actors)."
 msgstr ""
 
-#: website/web/templates/about.html:67
+#: website/web/templates/about.html:65
 msgid ""
 "<strong>Automation / integration</strong> → <a href=\"/doc/\">API "
 "documentation</a> &nbsp;·&nbsp; <a href=\"/rss.xml\">RSS feed</a>."
 msgstr ""
 
-#: website/web/templates/about.html:68
+#: website/web/templates/about.html:66
 msgid ""
 "<strong>Self-hosting</strong> → <a "
 "href=\"https://github.com/RansomLook/RansomLook\" target=\"_blank\" "
@@ -299,11 +642,11 @@ msgid ""
 "instructions in the README)."
 msgstr ""
 
-#: website/web/templates/about.html:76
+#: website/web/templates/about.html:74
 msgid "Data freshness"
 msgstr ""
 
-#: website/web/templates/about.html:78
+#: website/web/templates/about.html:76
 msgid ""
 "RansomLook scrapes tracked DLS / forums on a continuous loop — mirror "
 "availability, post lists and screenshots are refreshed multiple times per"
@@ -312,7 +655,7 @@ msgid ""
 "href=\"/stats\">/stats</a> exposes the full aggregation controls."
 msgstr ""
 
-#: website/web/templates/about.html:81
+#: website/web/templates/about.html:79
 msgid ""
 "Sources are open-by-design: we track what is publicly claimed on leak "
 "sites. Claims from operators are <strong>not</strong> independently "
@@ -320,120 +663,166 @@ msgid ""
 "<em>claim</em> until corroborated elsewhere."
 msgstr ""
 
-#: website/web/templates/about.html:89
+#: website/web/templates/about.html:87
 msgid "Is it free?"
 msgstr ""
 
-#: website/web/templates/about.html:91
+#: website/web/templates/about.html:89
 msgid "Yes, it is free—and more importantly, it is open‑source."
 msgstr ""
 
-#: website/web/templates/about.html:95
+#: website/web/templates/about.html:92
 msgid ""
 "RansomLook is licensed under the GNU Affero General Public License (AGPL)"
 " v3.0."
 msgstr ""
 
-#: website/web/templates/about.html:104
+#: website/web/templates/about.html:100
 msgid "How can I follow new posts?"
 msgstr ""
 
-#: website/web/templates/about.html:105
+#: website/web/templates/about.html:101
 msgid "There are various ways to stay updated with new posts:"
 msgstr ""
 
-#: website/web/templates/about.html:107
+#: website/web/templates/about.html:103
 msgid "Run your own instance and enable RocketChat and/or email notifications"
 msgstr ""
 
-#: website/web/templates/about.html:109
+#: website/web/templates/about.html:105
 msgid "Check the public instance"
 msgstr ""
 
-#: website/web/templates/about.html:113
+#: website/web/templates/about.html:109
 msgid "Access the API"
 msgstr ""
 
-#: website/web/templates/about.html:114
+#: website/web/templates/about.html:110
 msgid "Documentation"
 msgstr ""
 
-#: website/web/templates/about.html:117
+#: website/web/templates/about.html:113
 msgid "Follow us on Mastodon"
 msgstr ""
 
-#: website/web/templates/about.html:121
+#: website/web/templates/about.html:117
 msgid "There is NO official Telegram Channel!"
 msgstr ""
 
-#: website/web/templates/about.html:128
+#: website/web/templates/about.html:124
 msgid "Want to be part of the RansomLook community?"
 msgstr ""
 
-#: website/web/templates/about.html:129
+#: website/web/templates/about.html:125
 msgid "Join us in making RansomLook even better! Here's how you can contribute:"
 msgstr ""
 
-#: website/web/templates/about.html:132
+#: website/web/templates/about.html:128
 msgid "Create an issue on our GitHub repository"
 msgstr ""
 
-#: website/web/templates/about.html:135
+#: website/web/templates/about.html:131
 msgid "Submit pull requests with new features or improvements"
 msgstr ""
 
-#: website/web/templates/about.html:136
+#: website/web/templates/about.html:132
 msgid "Share new sources of DLS (Darknet Leak Sites)"
 msgstr ""
 
-#: website/web/templates/about.html:137
+#: website/web/templates/about.html:133
 msgid "Report any bugs you come across"
 msgstr ""
 
-#: website/web/templates/about.html:138
+#: website/web/templates/about.html:134
 msgid "Suggest new functionalities that could enhance RansomLook"
 msgstr ""
 
-#: website/web/templates/about.html:139
+#: website/web/templates/about.html:135
 msgid "Follow us on LinkedIn and be part of the community"
 msgstr ""
 
-#: website/web/templates/about.html:147
+#: website/web/templates/about.html:135
+msgid "Here !"
+msgstr ""
+
+#: website/web/templates/about.html:143
 msgid "Credits & Thanks"
 msgstr ""
 
-#: website/web/templates/about.html:158
+#: website/web/templates/about.html:150
+msgid ""
+"We warmly thank <a href=\"https://ecrime.ch\" target=\"_blank\" "
+"rel=\"noopener\">Ecrime.ch</a> for its feedback and sharing on the group."
+msgstr ""
+
+#: website/web/templates/about.html:151
+msgid ""
+"We sincerely thank <a href=\"https://onyphe.io\" target=\"_blank\" "
+"rel=\"noopener\">Onyphe.io</a> for providing to us a CTIScan API key to "
+"hunt new servers and new groups."
+msgstr ""
+
+#: website/web/templates/about.html:152
+msgid ""
+"We also thank <a href=\"https://ransom-isac.com/\" target=\"_blank\" "
+"rel=\"noopener\">Ransom-ISAC</a>. Ransom-ISAC takes a left-field, unique "
+"approach to threat intelligence by building a community-driven, vendor-"
+"neutral ecosystem focused on openness and collaboration. It connects "
+"defenders of all sizes to share actionable ransomware insights in a "
+"trusted, transparent space, strengthening global resilience through "
+"collective knowledge and shared purpose."
+msgstr ""
+
+#: website/web/templates/about.html:153
+msgid ""
+"Main members of RansomLook have an opportunity to earn a <a href=\"https"
+"://ransom-isac.com/lockstar-members/\" target=\"_blank\" "
+"rel=\"noopener\">LOCKSTAR</a>. The LOCK STAR Initiative empowers "
+"researchers, cybersecurity professionals, and enthusiasts to share their "
+"knowledge and intelligence through blogs, conference presentations, and "
+"active community contributions. By creating space for open collaboration "
+"and knowledge exchange, the initiative encourages diverse voices to "
+"contribute insights, tools, and real-world experiences — strengthening "
+"collective understanding and resilience against ransomware and other "
+"evolving cyber threats."
+msgstr ""
+
+#: website/web/templates/about.html:154
 msgid "The original code was based on RansomWatch."
 msgstr ""
 
-#: website/web/templates/about.html:165
+#: website/web/templates/about.html:161
 msgid "External data sources"
 msgstr ""
 
-#: website/web/templates/about.html:168
+#: website/web/templates/about.html:163
+msgid "for cryptocurrency transaction enrichment"
+msgstr ""
+
+#: website/web/templates/about.html:164
 msgid "Ransomwhe.re for cryptocurrency addresses"
 msgstr ""
 
-#: website/web/templates/about.html:169
+#: website/web/templates/about.html:165
 msgid "ThreatLabz for the RansomNotes"
 msgstr ""
 
-#: website/web/templates/about.html:170
+#: website/web/templates/about.html:166
 msgid "leak-lookup for public leaks"
 msgstr ""
 
-#: website/web/templates/about.html:178
+#: website/web/templates/about.html:174
 msgid "Usage of the API and License"
 msgstr ""
 
-#: website/web/templates/about.html:180
+#: website/web/templates/about.html:176
 msgid ""
 "All content provided by ransomlook.io — including the website, API "
 "responses, and datasets — is made available under the Creative Commons "
 "Attribution 4.0 International (CC BY 4.0) license."
 msgstr ""
 
-#: website/web/templates/about.html:184
+#: website/web/templates/about.html:179
 msgid ""
 "You are free to share and adapt the material for any purpose, even "
 "commercially, provided that appropriate credit is given."
@@ -447,11 +836,16 @@ msgstr ""
 msgid "WANTED"
 msgstr ""
 
-#: website/web/templates/actor.html:34 website/web/templates/group.html:129
+#: website/web/templates/actor.html:34 website/web/templates/group.html:131
+#: website/web/templates/groups.html:69
 msgid "Inactive"
 msgstr ""
 
 #: website/web/templates/actor.html:35
+#: website/web/templates/admin/addactor.html:45
+#: website/web/templates/admin/editactor.html:49
+#: website/web/templates/admin/urls.html:61
+#: website/web/templates/group.html:116 website/web/templates/groups.html:126
 msgid "Private"
 msgstr ""
 
@@ -470,8 +864,15 @@ msgstr[0] ""
 msgstr[1] ""
 
 #: website/web/templates/actor.html:43
-#: website/web/templates/admin/analyses.html:44
-#: website/web/templates/analysis.html:31 website/web/templates/group.html:47
+#: website/web/templates/admin/admin.html:45
+#: website/web/templates/admin/analysis_variants.html:73
+#: website/web/templates/admin/config.html:11
+#: website/web/templates/admin/crypto_addr_form.html:197
+#: website/web/templates/admin/crypto_group.html:49
+#: website/web/templates/admin/editentry.html:3
+#: website/web/templates/admin/editentry.html:10
+#: website/web/templates/admin/ransomnotes_group.html:98
+#: website/web/templates/analysis.html:39 website/web/templates/group.html:47
 msgid "Edit"
 msgstr ""
 
@@ -488,9 +889,11 @@ msgid "This actor"
 msgstr ""
 
 #: website/web/templates/actor.html:79
-#: website/web/templates/admin/analyses.html:23
+#: website/web/templates/admin/crypto.html:30
 #: website/web/templates/admin/torrent_manage.html:31
 #: website/web/templates/admin/torrent_manage.html:56
+#: website/web/templates/admin/urls.html:24
+#: website/web/templates/analyses_index.html:47
 #: website/web/templates/glossary.html:34 website/web/templates/hot.html:128
 #: website/web/templates/recent.html:94 website/web/templates/recent.html:107
 #: website/web/templates/search.html:17 website/web/templates/search.html:42
@@ -498,7 +901,7 @@ msgstr ""
 msgid "Group"
 msgstr ""
 
-#: website/web/templates/actor.html:80
+#: website/web/templates/actor.html:80 website/web/templates/admin/urls.html:25
 msgid "Market / Forum"
 msgstr ""
 
@@ -511,6 +914,8 @@ msgid "Unknown (not in DB)"
 msgstr ""
 
 #: website/web/templates/actor.html:99
+#: website/web/templates/admin/addactor.html:35
+#: website/web/templates/admin/editactor.html:36
 msgid "General description"
 msgstr ""
 
@@ -527,23 +932,32 @@ msgid "No public sources."
 msgstr ""
 
 #: website/web/templates/actor.html:128
+#: website/web/templates/admin/addactor.html:95
+#: website/web/templates/admin/editactor.html:103
 msgid "Relations"
 msgstr ""
 
 #: website/web/templates/actor.html:132
+#: website/web/templates/admin/addactor.html:100
+#: website/web/templates/admin/addpost.html:22
+#: website/web/templates/admin/crypto.html:27
+#: website/web/templates/admin/edit.html:22
+#: website/web/templates/admin/editactor.html:108
+#: website/web/templates/admin/logo.html:22
 #: website/web/templates/admin/torrent_asn.html:67
 #: website/web/templates/admin/torrent_health.html:76
 #: website/web/templates/admin/torrent_ip.html:82
 #: website/web/templates/admin/torrent_manage.html:82
 #: website/web/templates/admin/torrent_pivot.html:193
 #: website/web/templates/analysis.html:8 website/web/templates/browse.html:53
-#: website/web/templates/compare.html:32 website/web/templates/search.html:11
-#: website/web/templates/search.html:14 website/web/templates/stats.html:89
+#: website/web/templates/compare.html:32 website/web/templates/groups.html:3
+#: website/web/templates/search.html:11 website/web/templates/search.html:14
+#: website/web/templates/stats.html:89
 #: website/web/templates/torrent_asn.html:67
 #: website/web/templates/torrent_health.html:76
 #: website/web/templates/torrent_ip.html:82
 #: website/web/templates/torrent_pivot.html:201
-#: website/web/templates/urls.html:65
+#: website/web/templates/urls.html:64
 msgid "Groups"
 msgstr ""
 
@@ -552,6 +966,8 @@ msgid "No known group links."
 msgstr ""
 
 #: website/web/templates/actor.html:145
+#: website/web/templates/admin/addactor.html:115
+#: website/web/templates/admin/editactor.html:123
 msgid "Forums / Markets"
 msgstr ""
 
@@ -571,19 +987,37 @@ msgstr ""
 msgid "Images / Documents"
 msgstr ""
 
+#: website/web/templates/actor.html:183
+#, python-format
+msgid "Open image %(img)s"
+msgstr ""
+
+#: website/web/templates/actor.html:185
+#, python-format
+msgid "%(actor)s image %(idx)s"
+msgstr ""
+
 #: website/web/templates/actor.html:199
+#: website/web/templates/admin/addactor.html:52
+#: website/web/templates/admin/editactor.html:56
 msgid "Personal information"
 msgstr ""
 
 #: website/web/templates/actor.html:203
+#: website/web/templates/admin/addactor.html:54
+#: website/web/templates/admin/editactor.html:59
 msgid "First name"
 msgstr ""
 
 #: website/web/templates/actor.html:204
+#: website/web/templates/admin/addactor.html:55
+#: website/web/templates/admin/editactor.html:60
 msgid "Last name"
 msgstr ""
 
 #: website/web/templates/actor.html:205
+#: website/web/templates/admin/addactor.html:56
+#: website/web/templates/admin/editactor.html:61
 msgid "Age"
 msgstr ""
 
@@ -592,14 +1026,20 @@ msgid "DOB"
 msgstr ""
 
 #: website/web/templates/actor.html:207
+#: website/web/templates/admin/addactor.html:58
+#: website/web/templates/admin/editactor.html:63
 msgid "Nationality"
 msgstr ""
 
 #: website/web/templates/actor.html:208
+#: website/web/templates/admin/addactor.html:59
+#: website/web/templates/admin/editactor.html:64
 msgid "Location"
 msgstr ""
 
 #: website/web/templates/actor.html:216
+#: website/web/templates/admin/addactor.html:76
+#: website/web/templates/admin/editactor.html:84
 msgid "Contacts / Social"
 msgstr ""
 
@@ -607,26 +1047,232 @@ msgstr ""
 msgid "No contacts listed."
 msgstr ""
 
-#: website/web/templates/analysis.html:12
+#: website/web/templates/actor.html:245
+msgid "Image viewer"
+msgstr ""
+
+#: website/web/templates/actor.html:248
+msgid "Previous image"
+msgstr ""
+
+#: website/web/templates/actor.html:252
+msgid "Next image"
+msgstr ""
+
+#: website/web/templates/actors.html:3
+msgid "Threat Actors / Affiliates"
+msgstr ""
+
+#: website/web/templates/actors.html:9 website/web/templates/admin/logo.html:28
+#: website/web/templates/browse.html:59
+msgid "Actors"
+msgstr ""
+
+#: website/web/templates/actors.html:10
+msgid "Browse threat actors / affiliates."
+msgstr ""
+
+#: website/web/templates/actors.html:22
+#: website/web/templates/admin/addpost.html:30
+#: website/web/templates/admin/analyses.html:22
+#: website/web/templates/admin/edit.html:30
+#: website/web/templates/admin/editactor_select.html:17
+#: website/web/templates/admin/editpost.html:65
+#: website/web/templates/admin/logo.html:33
+#: website/web/templates/admin/logs.html:56
+#: website/web/templates/admin/ransomnotes_index.html:35
+#: website/web/templates/analyses_index.html:21
+#: website/web/templates/base.html:144 website/web/templates/base.html:176
+#: website/web/templates/base.html:179 website/web/templates/browse.html:37
+#: website/web/templates/crypto.html:22 website/web/templates/groups.html:42
+#: website/web/templates/groups.html:44 website/web/templates/leaks.html:23
+#: website/web/templates/leaks.html:25 website/web/templates/notes.html:22
+#: website/web/templates/recent.html:71 website/web/templates/search.html:3
+#: website/web/templates/urls.html:48
+msgid "Search"
+msgstr ""
+
+#: website/web/templates/actors.html:24
+msgid "Filter actors"
+msgstr ""
+
+#: website/web/templates/actors.html:25
+msgid "Actor name or alias…"
+msgstr ""
+
+#: website/web/templates/admin/analyses.html:10
+#: website/web/templates/admin/analysis_variants.html:10
+#: website/web/templates/analyses_index.html:2
+#: website/web/templates/analyses_index.html:7
+#: website/web/templates/group.html:810
+msgid "Technical Analyses"
+msgstr ""
+
+#: website/web/templates/analyses_index.html:9
+msgid "Reverse-engineered, in-house analyses of ransomware samples."
+msgstr ""
+
+#: website/web/templates/analyses_index.html:10
+msgid "reports available."
+msgstr ""
+
+#: website/web/templates/analyses_index.html:23
+msgid "Filter by group, variant or SHA-256…"
+msgstr ""
+
+#: website/web/templates/admin/edit_analysis.html:90
+#: website/web/templates/analyses_index.html:25
+msgid "Document type"
+msgstr ""
+
+#: website/web/templates/admin/logs.html:38
+#: website/web/templates/admin/logs.html:48
+#: website/web/templates/analyses_index.html:27
+#: website/web/templates/browse.html:50 website/web/templates/browse.html:83
+#: website/web/templates/cryptodetail.html:97
+#: website/web/templates/stats.html:66 website/web/templates/stats.html:92
+#: website/web/templates/urls.html:61 website/web/templates/urls.html:73
+msgid "All"
+msgstr ""
+
+#: website/web/templates/analyses_index.html:30
+#: website/web/templates/analysis.html:28
+msgid "Full analysis"
+msgstr ""
+
+#: website/web/templates/analyses_index.html:33
+#: website/web/templates/analysis.html:26
+msgid "CTI report"
+msgstr ""
+
+#: website/web/templates/analyses_index.html:48
+msgid "Type"
+msgstr ""
+
+#: website/web/templates/admin/analysis_variants.html:31
+#: website/web/templates/analyses_index.html:49
+msgid "Variant"
+msgstr ""
+
+#: website/web/templates/admin/analysis_variants.html:34
+#: website/web/templates/admin/editentry.html:205
+#: website/web/templates/admin/ransomnotes_group.html:77
+#: website/web/templates/analyses_index.html:50
+msgid "Updated"
+msgstr ""
+
+#: website/web/templates/admin/analysis_variants.html:35
+#: website/web/templates/admin/apikeys.html:49
+#: website/web/templates/admin/crypto.html:32
+#: website/web/templates/admin/crypto_aliases.html:36
+#: website/web/templates/admin/crypto_group.html:38
+#: website/web/templates/admin/ransomnotes_group.html:78
+#: website/web/templates/admin/torrent_health.html:81
+#: website/web/templates/admin/torrent_manage.html:87
+#: website/web/templates/analyses_index.html:52
+#: website/web/templates/torrent_health.html:81
+msgid "Actions"
+msgstr ""
+
+#: website/web/templates/analyses_index.html:67
+msgid "Visible to authenticated users only"
+msgstr ""
+
+#: website/web/templates/analyses_index.html:67
+#: website/web/templates/analysis.html:31 website/web/templates/browse.html:135
+#: website/web/templates/group.html:41
+#: website/web/templates/torrent_health_detail.html:122
+#: website/web/templates/urls.html:124 website/web/templates/urls.html:128
+msgid "private"
+msgstr ""
+
+#: website/web/templates/analyses_index.html:72
+#: website/web/templates/analysis.html:26 website/web/templates/group.html:821
+#: website/web/templates/group.html:827
+msgid "Cyber Threat Intelligence report"
+msgstr ""
+
+#: website/web/templates/analyses_index.html:72
+#: website/web/templates/group.html:821
+msgid "CTI"
+msgstr ""
+
+#: website/web/templates/analyses_index.html:74
+#: website/web/templates/analysis.html:28 website/web/templates/group.html:823
+msgid "Full technical analysis"
+msgstr ""
+
+#: website/web/templates/analyses_index.html:74
+#: website/web/templates/group.html:823
+msgid "Full"
+msgstr ""
+
+#: website/web/templates/admin/urls.html:53
+#: website/web/templates/analyses_index.html:81
+msgid "Default"
+msgstr ""
+
+#: website/web/templates/analyses_index.html:90
+msgid "click to copy"
+msgstr ""
+
+#: website/web/templates/admin/analysis_variants.html:71
+#: website/web/templates/analyses_index.html:97
+msgid "View"
+msgstr ""
+
+#: website/web/templates/analyses_index.html:107
+msgid "No analyses are available yet."
+msgstr ""
+
+#: website/web/templates/analyses_index.html:161
+msgid "reports"
+msgstr ""
+
+#: website/web/templates/analyses_index.html:161
+#, fuzzy
+msgid "report"
+msgstr ""
+
+#: website/web/templates/analysis.html:2 website/web/templates/analysis.html:12
+#: website/web/templates/analysis.html:18
+#: website/web/templates/analysis_pdf.html:5
+#: website/web/templates/analysis_pdf.html:15
+#: website/web/templates/analysis_pdf.html:164
 msgid "Technical Analysis"
 msgstr ""
 
-#: website/web/templates/analysis.html:19
-msgid "Reverse-engineered analysis · rendered from"
-msgstr ""
-
-#: website/web/templates/analysis.html:21
-msgid "updated"
-msgstr ""
-
-#: website/web/templates/analysis.html:29
+#: website/web/templates/analysis.html:37
 msgid "back to group"
 msgstr ""
 
-#: website/web/templates/analysis.html:44
-msgid ""
-"Source: RansomLook in-house technical analysis. Reverse-engineered "
-"directly from the binary; no third-party threat-intel sources."
+#: website/web/templates/analysis.html:46
+msgid "Variants:"
+msgstr ""
+
+#: website/web/templates/analysis_pdf.html:18
+#, python-format
+msgid "Generated %(mtime)s"
+msgstr ""
+
+#: website/web/templates/analysis_pdf.html:165
+msgid "Reverse-Engineered Report"
+msgstr ""
+
+#: website/web/templates/analysis_pdf.html:169
+msgid "File last modified:"
+msgstr ""
+
+#: website/web/templates/analysis_pdf.html:171
+msgid "Analyst:"
+msgstr ""
+
+#: website/web/templates/analysis_pdf.html:172
+msgid "Analysis date:"
+msgstr ""
+
+#: website/web/templates/analysis_pdf.html:173
+msgid "Sample SHA-256:"
 msgstr ""
 
 #: website/web/templates/base.html:6
@@ -637,6 +1283,26 @@ msgstr ""
 msgid ""
 "Open, searchable ransomware group intelligence with live stats, posts and"
 " an API."
+msgstr ""
+
+#: website/web/templates/base.html:30
+msgid "RansomLook — Recent posts"
+msgstr ""
+
+#: website/web/templates/base.html:60
+msgid "RansomLook home"
+msgstr ""
+
+#: website/web/templates/base.html:64
+msgid "Collapse sidebar"
+msgstr ""
+
+#: website/web/templates/base.html:64
+msgid "Collapse / expand"
+msgstr ""
+
+#: website/web/templates/base.html:69
+msgid "Primary"
 msgstr ""
 
 #: website/web/templates/base.html:71
@@ -660,7 +1326,10 @@ msgstr ""
 msgid "Intel"
 msgstr ""
 
-#: website/web/templates/base.html:83 website/web/templates/group.html:457
+#: website/web/templates/admin/admin.html:35
+#: website/web/templates/admin/urls.html:74 website/web/templates/base.html:83
+#: website/web/templates/group.html:459 website/web/templates/urls.html:3
+#: website/web/templates/urls.html:34 website/web/templates/urls.html:96
 msgid "URLs"
 msgstr ""
 
@@ -668,10 +1337,11 @@ msgstr ""
 msgid "All tracked mirrors"
 msgstr ""
 
-#: website/web/templates/base.html:84
+#: website/web/templates/base.html:84 website/web/templates/group.html:57
 msgid "Crypto"
 msgstr ""
 
+#: website/web/templates/admin/admin.html:137
 #: website/web/templates/base.html:84 website/web/templates/cryptodetail.html:3
 #: website/web/templates/search.html:146 website/web/templates/search.html:149
 msgid "Cryptocurrencies"
@@ -683,6 +1353,9 @@ msgstr ""
 msgid "Leaks"
 msgstr ""
 
+#: website/web/templates/admin/addactor.html:60
+#: website/web/templates/admin/editactor.html:65
+#: website/web/templates/admin/ransomnotes_group.html:54
 #: website/web/templates/base.html:86 website/web/templates/search.html:118
 #: website/web/templates/search.html:121
 msgid "Notes"
@@ -692,10 +1365,22 @@ msgstr ""
 msgid "Ransomware Notes"
 msgstr ""
 
+#: website/web/templates/admin/admin.html:65
+#: website/web/templates/admin/analyses.html:3
+#: website/web/templates/admin/analysis_variants.html:3
+#: website/web/templates/base.html:87
+msgid "Analyses"
+msgstr ""
+
+#: website/web/templates/base.html:87
+msgid "In-house technical analyses"
+msgstr ""
+
+#: website/web/templates/admin/admin.html:171
 #: website/web/templates/admin/torrent_pivot.html:66
 #: website/web/templates/admin/torrent_pivot.html:130
 #: website/web/templates/admin/torrent_pivot.html:195
-#: website/web/templates/base.html:90
+#: website/web/templates/base.html:91
 #: website/web/templates/torrent_pivot.html:66
 #: website/web/templates/torrent_pivot.html:130
 #: website/web/templates/torrent_pivot.html:203
@@ -703,73 +1388,86 @@ msgid "Torrents"
 msgstr ""
 
 #: website/web/templates/admin/torrent_health.html:11
-#: website/web/templates/base.html:90
+#: website/web/templates/base.html:91
 #: website/web/templates/torrent_health.html:11
 msgid "Torrent swarm health"
 msgstr ""
 
-#: website/web/templates/base.html:95
+#: website/web/templates/base.html:96
 msgid "Info"
 msgstr ""
 
-#: website/web/templates/base.html:97 website/web/templates/index.html:55
+#: website/web/templates/base.html:98 website/web/templates/index.html:55
 msgid "API"
 msgstr ""
 
-#: website/web/templates/base.html:97
+#: website/web/templates/base.html:98
 msgid "API documentation (Swagger)"
 msgstr ""
 
-#: website/web/templates/base.html:98 website/web/templates/glossary.html:2
+#: website/web/templates/base.html:99 website/web/templates/glossary.html:2
 #: website/web/templates/glossary.html:7
 msgid "Glossary"
 msgstr ""
 
-#: website/web/templates/base.html:105
+#: website/web/templates/base.html:106
 msgid "RSS feed — Recent posts"
 msgstr ""
 
-#: website/web/templates/admin/analyses.html:7
-#: website/web/templates/admin/edit_analysis.html:7
-#: website/web/templates/base.html:134
+#: website/web/templates/base.html:115
+msgid "Open navigation"
+msgstr ""
+
+#: website/web/templates/base.html:121
+msgid "Language"
+msgstr ""
+
+#: website/web/templates/admin/editentry.html:170
+#: website/web/templates/base.html:135
 msgid "Admin"
 msgstr ""
 
-#: website/web/templates/base.html:136 website/web/templates/login.html:3
+#: website/web/templates/base.html:137 website/web/templates/login.html:3
 #: website/web/templates/login.html:10
 msgid "Login"
 msgstr ""
 
-#: website/web/templates/base.html:139
+#: website/web/templates/base.html:140
 msgid "Search (Ctrl/Cmd+K)"
 msgstr ""
 
-#: website/web/templates/base.html:143 website/web/templates/base.html:175
-#: website/web/templates/base.html:178 website/web/templates/browse.html:37
-#: website/web/templates/crypto.html:22 website/web/templates/leaks.html:23
-#: website/web/templates/leaks.html:25 website/web/templates/notes.html:22
-#: website/web/templates/recent.html:71 website/web/templates/search.html:3
-msgid "Search"
-msgstr ""
-
-#: website/web/templates/base.html:146
+#: website/web/templates/base.html:147
 msgid "Toggle dark/light mode"
 msgstr ""
 
-#: website/web/templates/base.html:146
+#: website/web/templates/base.html:147
 msgid "Toggle theme"
 msgstr ""
 
-#: website/web/templates/base.html:162
+#: website/web/templates/base.html:163
 msgid "Contribute on"
 msgstr ""
 
-#: website/web/templates/base.html:177
+#: website/web/templates/base.html:178
 msgid "type to search"
 msgstr ""
 
-#: website/web/templates/base.html:177
+#: website/web/templates/base.html:178
 msgid "Search text"
+msgstr ""
+
+#: website/web/templates/browse.html:8 website/web/templates/group.html:32
+msgid "All mirrors offline"
+msgstr ""
+
+#: website/web/templates/browse.html:10
+#, python-format
+msgid "%(pct)s%% mirrors up"
+msgstr ""
+
+#: website/web/templates/browse.html:12
+#, python-format
+msgid "%(pct)s%% mirrors up — degraded"
 msgstr ""
 
 #: website/web/templates/browse.html:27
@@ -784,24 +1482,13 @@ msgstr ""
 msgid "Search name or alias… (Ctrl/Cmd+K)"
 msgstr ""
 
-#: website/web/templates/browse.html:48 website/web/templates/urls.html:60
+#: website/web/templates/browse.html:48 website/web/templates/urls.html:59
 msgid "Entity type"
 msgstr ""
 
-#: website/web/templates/browse.html:50 website/web/templates/browse.html:83
-#: website/web/templates/cryptodetail.html:97
-#: website/web/templates/stats.html:66 website/web/templates/stats.html:92
-#: website/web/templates/urls.html:62 website/web/templates/urls.html:74
-msgid "All"
-msgstr ""
-
 #: website/web/templates/browse.html:56 website/web/templates/search.html:36
-#: website/web/templates/search.html:39 website/web/templates/urls.html:68
+#: website/web/templates/search.html:39 website/web/templates/urls.html:67
 msgid "Markets"
-msgstr ""
-
-#: website/web/templates/browse.html:59
-msgid "Actors"
 msgstr ""
 
 #: website/web/templates/browse.html:63
@@ -830,11 +1517,12 @@ msgstr ""
 msgid "No mirror up"
 msgstr ""
 
-#: website/web/templates/browse.html:71 website/web/templates/urls.html:82
+#: website/web/templates/browse.html:71 website/web/templates/groups.html:118
+#: website/web/templates/urls.html:81
 msgid "Offline"
 msgstr ""
 
-#: website/web/templates/browse.html:77
+#: website/web/templates/browse.html:77 website/web/templates/groups.html:49
 msgid "Alphabet filter"
 msgstr ""
 
@@ -850,7 +1538,7 @@ msgstr ""
 msgid "Parser enabled"
 msgstr ""
 
-#: website/web/templates/browse.html:130
+#: website/web/templates/browse.html:130 website/web/templates/group.html:38
 msgid "parser"
 msgstr ""
 
@@ -873,18 +1561,13 @@ msgid_plural "%(n)s aliases"
 msgstr[0] ""
 msgstr[1] ""
 
-#: website/web/templates/browse.html:135
-#: website/web/templates/torrent_health_detail.html:122
-msgid "private"
-msgstr ""
-
 #: website/web/templates/browse.html:147 website/web/templates/hot.html:166
-#: website/web/templates/recent.html:133 website/web/templates/urls.html:171
+#: website/web/templates/recent.html:133 website/web/templates/urls.html:170
 msgid "No matches."
 msgstr ""
 
 #: website/web/templates/compare.html:3 website/web/templates/compare.html:75
-#: website/web/templates/compare.html:115 website/web/templates/group.html:54
+#: website/web/templates/compare.html:115 website/web/templates/group.html:56
 msgid "Compare"
 msgstr ""
 
@@ -897,6 +1580,7 @@ msgstr ""
 msgid "Pick two %(kind)s to compare (posts 7/30/365, mirrors up, 30-day uptime)."
 msgstr ""
 
+#: website/web/templates/admin/ransomnotes_index.html:79
 #: website/web/templates/compare.html:21 website/web/templates/index.html:208
 msgid "groups"
 msgstr ""
@@ -909,6 +1593,9 @@ msgstr ""
 msgid "Choose type to compare"
 msgstr ""
 
+#: website/web/templates/admin/addpost.html:25
+#: website/web/templates/admin/edit.html:25
+#: website/web/templates/admin/logo.html:25
 #: website/web/templates/compare.html:35
 #: website/web/templates/glossary.html:110
 msgid "Markets / Forums"
@@ -966,7 +1653,9 @@ msgstr ""
 msgid "Mirrors up"
 msgstr ""
 
-#: website/web/templates/compare.html:160 website/web/templates/urls.html:104
+#: website/web/templates/compare.html:160 website/web/templates/group.html:465
+#: website/web/templates/group.html:520 website/web/templates/group.html:575
+#: website/web/templates/group.html:630 website/web/templates/urls.html:103
 msgid "Uptime 30d"
 msgstr ""
 
@@ -989,7 +1678,7 @@ msgid "No"
 msgstr ""
 
 #: website/web/templates/compare.html:167
-#: website/web/templates/glossary.html:46
+#: website/web/templates/glossary.html:46 website/web/templates/group.html:39
 msgid "RaaS"
 msgstr ""
 
@@ -1005,10 +1694,12 @@ msgstr ""
 msgid "Browse cryptocurrency wallets grouped by actor."
 msgstr ""
 
+#: website/web/templates/admin/ransomnotes_index.html:37
 #: website/web/templates/crypto.html:24 website/web/templates/notes.html:24
 msgid "Filter groups"
 msgstr ""
 
+#: website/web/templates/admin/ransomnotes_index.html:38
 #: website/web/templates/crypto.html:25 website/web/templates/notes.html:25
 msgid "Group name or alias…"
 msgstr ""
@@ -1064,6 +1755,7 @@ msgid_plural "%(n)s txs"
 msgstr[0] ""
 msgstr[1] ""
 
+#: website/web/templates/admin/logs.html:61
 #: website/web/templates/admin/torrent_pivot.html:59
 #: website/web/templates/admin/torrent_pivot.html:92
 #: website/web/templates/admin/torrent_pivot.html:123
@@ -1080,15 +1772,21 @@ msgid "Export CSV"
 msgstr ""
 
 #: website/web/templates/cryptodetail.html:71
-#: website/web/templates/group.html:131 website/web/templates/group.html:142
+#: website/web/templates/group.html:133 website/web/templates/group.html:144
 msgid "CSV"
 msgstr ""
 
+#: website/web/templates/admin/crypto_addr_form.html:109
+#: website/web/templates/admin/editpost.html:69
+#: website/web/templates/admin/logs.html:27
 #: website/web/templates/cryptodetail.html:79
 #: website/web/templates/stats.html:35
 msgid "From"
 msgstr ""
 
+#: website/web/templates/admin/crypto_addr_form.html:113
+#: website/web/templates/admin/editpost.html:73
+#: website/web/templates/admin/logs.html:31
 #: website/web/templates/cryptodetail.html:83
 #: website/web/templates/stats.html:39
 msgid "To"
@@ -1112,6 +1810,7 @@ msgstr ""
 msgid "Filter"
 msgstr ""
 
+#: website/web/templates/admin/alerts.html:69
 #: website/web/templates/admin/torrent_health.html:52
 #: website/web/templates/cryptodetail.html:103
 #: website/web/templates/hot.html:116 website/web/templates/recent.html:76
@@ -1119,16 +1818,22 @@ msgstr ""
 msgid "Clear"
 msgstr ""
 
+#: website/web/templates/admin/crypto_addr_form.html:64
+#: website/web/templates/admin/crypto_addr_form.html:69
 #: website/web/templates/cryptodetail.html:106
 msgid "Transactions"
 msgstr ""
 
+#: website/web/templates/admin/crypto_addr_form.html:101
 #: website/web/templates/cryptodetail.html:123
 msgid "Transaction"
 msgstr ""
 
+#: website/web/templates/admin/addpostentry.html:39
+#: website/web/templates/admin/crypto_addr_form.html:73
+#: website/web/templates/admin/crypto_addr_form.html:129
 #: website/web/templates/cryptodetail.html:124
-#: website/web/templates/group.html:721 website/web/templates/recent.html:92
+#: website/web/templates/group.html:723 website/web/templates/recent.html:92
 #: website/web/templates/recent.html:105 website/web/templates/search.html:94
 msgid "Date"
 msgstr ""
@@ -1137,6 +1842,8 @@ msgstr ""
 msgid "Counterpart"
 msgstr ""
 
+#: website/web/templates/admin/crypto_addr_form.html:74
+#: website/web/templates/admin/crypto_addr_form.html:119
 #: website/web/templates/cryptodetail.html:127
 msgid "Amount"
 msgstr ""
@@ -1255,6 +1962,8 @@ msgid ""
 "stolen data (archives, samples, full dumps)."
 msgstr ""
 
+#: website/web/templates/admin/editentry.html:169
+#: website/web/templates/admin/urls.html:46
 #: website/web/templates/glossary.html:62
 msgid "Chat"
 msgstr ""
@@ -1339,7 +2048,7 @@ msgid ""
 "enrichment."
 msgstr ""
 
-#: website/web/templates/glossary.html:98 website/web/templates/group.html:209
+#: website/web/templates/glossary.html:98 website/web/templates/group.html:211
 msgid "Ransom notes"
 msgstr ""
 
@@ -1393,8 +2102,9 @@ msgid ""
 "infrastructure changes."
 msgstr ""
 
-#: website/web/templates/glossary.html:130 website/web/templates/group.html:421
-#: website/web/templates/group.html:424 website/web/templates/group.html:425
+#: website/web/templates/admin/editentry.html:64
+#: website/web/templates/glossary.html:130 website/web/templates/group.html:423
+#: website/web/templates/group.html:426 website/web/templates/group.html:427
 msgid "Affiliates"
 msgstr ""
 
@@ -1432,233 +2142,432 @@ msgid ""
 " these so users can explore which actors operate across which ecosystems."
 msgstr ""
 
+#: website/web/templates/group.html:30
+msgid "No mirrors registered"
+msgstr ""
+
+#: website/web/templates/group.html:30
+msgid "no mirrors"
+msgstr ""
+
+#: website/web/templates/group.html:32
+msgid "offline"
+msgstr ""
+
+#: website/web/templates/group.html:34
+msgid "up"
+msgstr ""
+
+#: website/web/templates/group.html:36
+msgid "degraded"
+msgstr ""
+
+#: website/web/templates/group.html:40
+msgid "captcha"
+msgstr ""
+
 #: website/web/templates/group.html:48
-msgid "Edit technical analysis (Markdown)"
+msgid "Manage technical analyses (Markdown)"
 msgstr ""
 
-#: website/web/templates/admin/edit_analysis.html:15
 #: website/web/templates/group.html:48
-msgid "Edit analysis"
-msgstr ""
-
-#: website/web/templates/group.html:51
-msgid "In-house technical analysis"
-msgstr ""
-
-#: website/web/templates/group.html:51
-msgid "View analysis"
+msgid "Edit analyses"
 msgstr ""
 
 #: website/web/templates/group.html:52
-msgid "Download analysis as PDF"
+msgid "View technical analyses"
 msgstr ""
 
-#: website/web/templates/group.html:60
-msgid "posts (all time)"
+#: website/web/templates/group.html:53
+msgid "View Analyses"
 msgstr ""
 
-#: website/web/templates/group.html:61
-msgid "last 30 days"
+#: website/web/templates/group.html:57 website/web/templates/group.html:153
+#: website/web/templates/group.html:154
+msgid "View crypto"
 msgstr ""
 
 #: website/web/templates/group.html:62
+msgid "posts (all time)"
+msgstr ""
+
+#: website/web/templates/group.html:63
+msgid "last 30 days"
+msgstr ""
+
+#: website/web/templates/group.html:64
 msgid "last 7 days"
 msgstr ""
 
-#: website/web/templates/group.html:65
+#: website/web/templates/group.html:67
 msgid "avg uptime 30d"
 msgstr ""
 
-#: website/web/templates/group.html:74 website/web/templates/index.html:63
+#: website/web/templates/group.html:76 website/web/templates/index.html:63
 msgid "Activity · last 30 days"
 msgstr ""
 
-#: website/web/templates/group.html:125
-msgid "Export URLs (CSV)"
+#: website/web/templates/group.html:79
+msgid "last post"
+msgstr ""
+
+#: website/web/templates/group.html:113 website/web/templates/groups.html:122
+msgid "Parsing: enabled"
+msgstr ""
+
+#: website/web/templates/group.html:114
+msgid "Known RaaS"
+msgstr ""
+
+#: website/web/templates/group.html:115
+msgid "Captcha in place"
 msgstr ""
 
 #: website/web/templates/group.html:127
+msgid "Export URLs (CSV)"
+msgstr ""
+
+#: website/web/templates/group.html:129 website/web/templates/groups.html:67
 msgid "All statuses"
 msgstr ""
 
-#: website/web/templates/group.html:128
+#: website/web/templates/group.html:130 website/web/templates/groups.html:68
 msgid "Active"
 msgstr ""
 
-#: website/web/templates/group.html:138
+#: website/web/templates/group.html:140
 msgid "Export Posts (CSV)"
 msgstr ""
 
-#: website/web/templates/group.html:139
+#: website/web/templates/group.html:141
 msgid "From date"
 msgstr ""
 
-#: website/web/templates/group.html:141
+#: website/web/templates/group.html:143
 msgid "To date"
 msgstr ""
 
-#: website/web/templates/group.html:188 website/web/templates/group.html:193
+#: website/web/templates/group.html:190 website/web/templates/group.html:195
 msgid "External Analysis"
 msgstr ""
 
-#: website/web/templates/group.html:192
+#: website/web/templates/group.html:194
 msgid "External analysis"
 msgstr ""
 
-#: website/web/templates/group.html:225
+#: website/web/templates/group.html:227
 msgid "View all notes"
 msgstr ""
 
-#: website/web/templates/group.html:228
+#: website/web/templates/group.html:230
 msgid "No note linked."
 msgstr ""
 
-#: website/web/templates/group.html:239 website/web/templates/group.html:243
+#: website/web/templates/group.html:241 website/web/templates/group.html:245
 msgid "Known hashes"
 msgstr ""
 
-#: website/web/templates/group.html:244
+#: website/web/templates/admin/crypto_addr_form.html:72
+#: website/web/templates/admin/crypto_addr_form.html:104
+#: website/web/templates/admin/editentry.html:53
+#: website/web/templates/group.html:246
 msgid "Hash"
 msgstr ""
 
-#: website/web/templates/group.html:261 website/web/templates/group.html:264
-#: website/web/templates/group.html:265
+#: website/web/templates/admin/editentry.html:54
+#: website/web/templates/group.html:263 website/web/templates/group.html:266
+#: website/web/templates/group.html:267
 msgid "Jabber"
 msgstr ""
 
-#: website/web/templates/group.html:277 website/web/templates/group.html:280
-#: website/web/templates/group.html:281
+#: website/web/templates/admin/editentry.html:55
+#: website/web/templates/group.html:279 website/web/templates/group.html:282
+#: website/web/templates/group.html:283
 msgid "Mail"
 msgstr ""
 
-#: website/web/templates/group.html:293 website/web/templates/group.html:296
-#: website/web/templates/group.html:297
+#: website/web/templates/admin/editentry.html:56
+#: website/web/templates/group.html:295 website/web/templates/group.html:298
+#: website/web/templates/group.html:299
 msgid "PGP"
 msgstr ""
 
-#: website/web/templates/group.html:309 website/web/templates/group.html:312
-#: website/web/templates/group.html:313
+#: website/web/templates/admin/editentry.html:57
+#: website/web/templates/group.html:311 website/web/templates/group.html:314
+#: website/web/templates/group.html:315
 msgid "Matrix"
 msgstr ""
 
-#: website/web/templates/group.html:325 website/web/templates/group.html:328
-#: website/web/templates/group.html:329
+#: website/web/templates/admin/editentry.html:58
+#: website/web/templates/group.html:327 website/web/templates/group.html:330
+#: website/web/templates/group.html:331
 msgid "Session"
 msgstr ""
 
-#: website/web/templates/group.html:341 website/web/templates/group.html:344
-#: website/web/templates/group.html:345
+#: website/web/templates/admin/editentry.html:59
+#: website/web/templates/group.html:343 website/web/templates/group.html:346
+#: website/web/templates/group.html:347
 msgid "Telegram"
 msgstr ""
 
-#: website/web/templates/group.html:357 website/web/templates/group.html:360
-#: website/web/templates/group.html:361
+#: website/web/templates/admin/editentry.html:60
+#: website/web/templates/group.html:359 website/web/templates/group.html:362
+#: website/web/templates/group.html:363
 msgid "Tox"
 msgstr ""
 
-#: website/web/templates/group.html:373 website/web/templates/group.html:376
-#: website/web/templates/group.html:377
+#: website/web/templates/admin/editentry.html:61
+#: website/web/templates/group.html:375 website/web/templates/group.html:378
+#: website/web/templates/group.html:379
 msgid "Simplex"
 msgstr ""
 
-#: website/web/templates/group.html:389 website/web/templates/group.html:392
-#: website/web/templates/group.html:393
+#: website/web/templates/admin/editentry.html:62
+#: website/web/templates/group.html:391 website/web/templates/group.html:394
+#: website/web/templates/group.html:395
 msgid "Max"
 msgstr ""
 
-#: website/web/templates/group.html:405 website/web/templates/group.html:408
-#: website/web/templates/group.html:409
+#: website/web/templates/admin/editentry.html:63
+#: website/web/templates/group.html:407 website/web/templates/group.html:410
+#: website/web/templates/group.html:411
 msgid "Sonar"
 msgstr ""
 
-#: website/web/templates/group.html:438 website/web/templates/group.html:441
-#: website/web/templates/group.html:442
+#: website/web/templates/admin/admin.html:205
+#: website/web/templates/admin/editentry.html:65
+#: website/web/templates/group.html:440 website/web/templates/group.html:443
+#: website/web/templates/group.html:444
 msgid "Other"
 msgstr ""
 
-#: website/web/templates/group.html:453
+#: website/web/templates/group.html:455
 msgid "Urls"
 msgstr ""
 
-#: website/web/templates/group.html:460 website/web/templates/group.html:515
-#: website/web/templates/group.html:570 website/web/templates/group.html:625
+#: website/web/templates/group.html:462 website/web/templates/group.html:517
+#: website/web/templates/group.html:572 website/web/templates/group.html:627
 msgid "Url"
 msgstr ""
 
-#: website/web/templates/group.html:508 website/web/templates/group.html:512
+#: website/web/templates/admin/analysis_variants.html:32
+#: website/web/templates/admin/apikeys.html:48
+#: website/web/templates/admin/ransomnotes_group.html:75
+#: website/web/templates/admin/ransomnotes_group.html:144
+#: website/web/templates/admin/urls.html:97
+#: website/web/templates/group.html:463 website/web/templates/group.html:518
+#: website/web/templates/group.html:573 website/web/templates/group.html:628
+#: website/web/templates/groups.html:144 website/web/templates/urls.html:101
+msgid "Status"
+msgstr ""
+
+#: website/web/templates/group.html:464 website/web/templates/group.html:485
+#: website/web/templates/group.html:519 website/web/templates/group.html:540
+#: website/web/templates/group.html:574 website/web/templates/group.html:595
+#: website/web/templates/group.html:629 website/web/templates/group.html:650
+#: website/web/templates/group.html:726 website/web/templates/group.html:738
+#: website/web/templates/groups.html:147 website/web/templates/groups.html:179
+msgid "Screen"
+msgstr ""
+
+#: website/web/templates/group.html:466 website/web/templates/group.html:521
+#: website/web/templates/group.html:576 website/web/templates/group.html:631
+#: website/web/templates/urls.html:104
+msgid "Health"
+msgstr ""
+
+#: website/web/templates/group.html:475 website/web/templates/group.html:530
+#: website/web/templates/group.html:585 website/web/templates/group.html:640
+#: website/web/templates/groups.html:158 website/web/templates/urls.html:133
+msgid "Up"
+msgstr ""
+
+#: website/web/templates/group.html:477 website/web/templates/group.html:532
+#: website/web/templates/group.html:587 website/web/templates/group.html:642
+#: website/web/templates/groups.html:160 website/web/templates/urls.html:135
+msgid "Down"
+msgstr ""
+
+#: website/web/templates/group.html:479 website/web/templates/group.html:534
+#: website/web/templates/group.html:589 website/web/templates/group.html:644
+msgid "Unknown"
+msgstr ""
+
+#: website/web/templates/group.html:510 website/web/templates/group.html:514
 msgid "File servers"
 msgstr ""
 
-#: website/web/templates/group.html:563 website/web/templates/group.html:567
+#: website/web/templates/group.html:565 website/web/templates/group.html:569
 msgid "Chat servers"
 msgstr ""
 
-#: website/web/templates/group.html:618 website/web/templates/group.html:622
+#: website/web/templates/group.html:620 website/web/templates/group.html:624
 msgid "Admin servers"
 msgstr ""
 
-#: website/web/templates/group.html:673
+#: website/web/templates/group.html:675
 msgid "Activity (interactive)"
 msgstr ""
 
-#: website/web/templates/group.html:679
+#: website/web/templates/group.html:681
+msgid "Open large view"
+msgstr ""
+
+#: website/web/templates/group.html:681
 msgid "Activity charts"
 msgstr ""
 
-#: website/web/templates/group.html:681 website/web/templates/stats.html:45
+#: website/web/templates/group.html:683 website/web/templates/stats.html:45
 msgid "Aggregation"
 msgstr ""
 
-#: website/web/templates/group.html:683 website/web/templates/stats.html:48
+#: website/web/templates/group.html:685 website/web/templates/stats.html:48
 msgid "Daily"
 msgstr ""
 
-#: website/web/templates/group.html:684 website/web/templates/stats.html:49
+#: website/web/templates/group.html:686 website/web/templates/stats.html:49
 msgid "Weekly"
 msgstr ""
 
-#: website/web/templates/group.html:686 website/web/templates/stats.html:54
+#: website/web/templates/group.html:688 website/web/templates/stats.html:54
 msgid "Rolling avg."
 msgstr ""
 
-#: website/web/templates/group.html:688 website/web/templates/stats.html:56
+#: website/web/templates/group.html:690 website/web/templates/stats.html:56
 msgid "Off"
 msgstr ""
 
-#: website/web/templates/group.html:713 website/web/templates/group.html:718
+#: website/web/templates/group.html:695
+msgid "Download PNG"
+msgstr ""
+
+#: website/web/templates/group.html:715 website/web/templates/group.html:720
 #: website/web/templates/hot.html:129 website/web/templates/search.html:86
 #: website/web/templates/search.html:89 website/web/templates/stats.html:103
 msgid "Posts"
 msgstr ""
 
-#: website/web/templates/group.html:722 website/web/templates/recent.html:93
+#: website/web/templates/admin/editpost.html:111
+#: website/web/templates/admin/ransomnotes_group.html:73
+#: website/web/templates/admin/ransomnotes_group.html:131
+#: website/web/templates/group.html:724 website/web/templates/recent.html:93
 #: website/web/templates/recent.html:106 website/web/templates/search.html:93
 msgid "Title"
 msgstr ""
 
-#: website/web/templates/group.html:724
-msgid "Screen"
-msgstr ""
-
-#: website/web/templates/group.html:755 website/web/templates/stats.html:161
+#: website/web/templates/group.html:757 website/web/templates/stats.html:161
 msgid "Enlarged chart"
 msgstr ""
 
-#: website/web/templates/group.html:767
+#: website/web/templates/admin/logs.html:100
+#: website/web/templates/group.html:769 website/web/templates/groups.html:202
 msgid "Previous"
 msgstr ""
 
-#: website/web/templates/group.html:771
+#: website/web/templates/admin/logs.html:104
+#: website/web/templates/group.html:773 website/web/templates/groups.html:206
 msgid "Next"
+msgstr ""
+
+#: website/web/templates/group.html:827
+msgid "In-house technical analysis"
+msgstr ""
+
+#: website/web/templates/group.html:831
+msgid "View HTML"
+msgstr ""
+
+#: website/web/templates/admin/edit_analysis.html:42
+#: website/web/templates/group.html:832
+msgid "Download PDF"
+msgstr ""
+
+#: website/web/templates/group.html:839
+msgid "Total:"
+msgstr ""
+
+#: website/web/templates/groups.html:3
+msgid "Markets/Forums"
+msgstr ""
+
+#: website/web/templates/groups.html:27
+msgid "Group profiles"
+msgstr ""
+
+#: website/web/templates/groups.html:27
+msgid "Market / Forum profiles"
 msgstr ""
 
 #: website/web/templates/groups.html:29
 msgid "Availability, mirrors, last visit & quick links."
 msgstr ""
 
+#: website/web/templates/groups.html:45 website/web/templates/leaks.html:26
+msgid "Name, description, URL, page title…"
+msgstr ""
+
+#: website/web/templates/groups.html:64
+msgid "Download URLs (CSV)"
+msgstr ""
+
+#: website/web/templates/groups.html:71
+msgid "Download"
+msgstr ""
+
+#: website/web/templates/groups.html:97 website/web/templates/groups.html:110
+msgid "Edit group"
+msgstr ""
+
+#: website/web/templates/admin/editentry.html:172
+#: website/web/templates/groups.html:116
+msgid "Available"
+msgstr ""
+
+#: website/web/templates/groups.html:140
+#, python-format
+msgid "Links for %(name)s"
+msgstr ""
+
+#: website/web/templates/admin/editentry.html:163
+#: website/web/templates/groups.html:143 website/web/templates/leaks.html:40
+msgid "Page title"
+msgstr ""
+
+#: website/web/templates/groups.html:145
+msgid "Last visit"
+msgstr ""
+
+#: website/web/templates/admin/urls.html:98
+#: website/web/templates/groups.html:146 website/web/templates/urls.html:100
+msgid "URL"
+msgstr ""
+
 #: website/web/templates/hot.html:3
 #, python-format
 msgid "Trending (last %(n)s days)"
+msgstr ""
+
+#: website/web/templates/hot.html:7
+msgid "First seen in current window"
+msgstr ""
+
+#: website/web/templates/hot.html:7 website/web/templates/index.html:102
+msgid "NEW"
+msgstr ""
+
+#: website/web/templates/hot.html:9
+msgid "No activity in previous window"
+msgstr ""
+
+#: website/web/templates/hot.html:11 website/web/templates/hot.html:13
+#: website/web/templates/hot.html:15 website/web/templates/hot.html:17
+#, python-format
+msgid "%(raw)s vs previous %(d)sd"
+msgstr ""
+
+#: website/web/templates/hot.html:19
+#, python-format
+msgid "Stable vs previous %(d)sd"
 msgstr ""
 
 #: website/web/templates/hot.html:42
@@ -1682,6 +2591,10 @@ msgstr ""
 msgid "flat"
 msgstr ""
 
+#: website/web/templates/hot.html:56
+msgid "Global posts per day"
+msgstr ""
+
 #: website/web/templates/hot.html:59
 #, python-format
 msgid "Activity · last %(n)s days"
@@ -1696,6 +2609,17 @@ msgid_plural "%(n)s posts"
 msgstr[0] ""
 msgstr[1] ""
 
+#: website/web/templates/hot.html:71
+#, python-format
+msgid "%(d)sd ago · %(n)s post"
+msgid_plural "%(d)sd ago · %(n)s posts"
+msgstr[0] ""
+msgstr[1] ""
+
+#: website/web/templates/hot.html:78
+msgid "today"
+msgstr ""
+
 #: website/web/templates/hot.html:92
 msgid "Window"
 msgstr ""
@@ -1705,7 +2629,7 @@ msgstr ""
 msgid "Last %(n)sd"
 msgstr ""
 
-#: website/web/templates/hot.html:98
+#: website/web/templates/admin/alerts.html:33 website/web/templates/hot.html:98
 msgid "Sort"
 msgstr ""
 
@@ -1806,11 +2730,6 @@ msgid "new groups this week"
 msgstr ""
 
 #: website/web/templates/index.html:102
-msgid "NEW"
-msgstr ""
-
-#: website/web/templates/admin/analyses.html:38
-#: website/web/templates/index.html:102
 msgid "none"
 msgstr ""
 
@@ -1872,6 +2791,7 @@ msgstr ""
 msgid "pivot signal"
 msgstr ""
 
+#: website/web/templates/admin/admin.html:175
 #: website/web/templates/index.html:197
 msgid "Swarm health"
 msgstr ""
@@ -1900,20 +2820,16 @@ msgstr ""
 msgid "crypto addrs"
 msgstr ""
 
+#: website/web/templates/index.html:221
+msgid "in-house analyses"
+msgstr ""
+
 #: website/web/templates/leaks.html:10
 msgid "Leaks listing"
 msgstr ""
 
 #: website/web/templates/leaks.html:11
 msgid "Browse known public leaks. Click a leak to view details."
-msgstr ""
-
-#: website/web/templates/leaks.html:26
-msgid "Name, description, URL, page title…"
-msgstr ""
-
-#: website/web/templates/leaks.html:40
-msgid "Page title"
 msgstr ""
 
 #: website/web/templates/leaks.html:41
@@ -1940,10 +2856,12 @@ msgstr ""
 msgid "Notes from Groups"
 msgstr ""
 
+#: website/web/templates/admin/ransomnotes_index.html:27
 #: website/web/templates/notes.html:9
 msgid "Groups with notes"
 msgstr ""
 
+#: website/web/templates/admin/ransomnotes_index.html:28
 #: website/web/templates/notes.html:10
 msgid "Browse ransomware note samples grouped by actor."
 msgstr ""
@@ -1962,10 +2880,13 @@ msgstr[1] ""
 msgid "Note content"
 msgstr ""
 
+#: website/web/templates/admin/ransomnotes_group.html:153
 #: website/web/templates/notesdetails.html:38
 msgid "Content"
 msgstr ""
 
+#: website/web/templates/admin/logs.html:36
+#: website/web/templates/admin/logs.html:76
 #: website/web/templates/notesdetails.html:39
 msgid "Action"
 msgstr ""
@@ -2005,12 +2926,24 @@ msgid_plural "%(n)s days"
 msgstr[0] ""
 msgstr[1] ""
 
+#: website/web/templates/recent.html:36
+msgid "Posts per hour, last 24 hours"
+msgstr ""
+
 #: website/web/templates/recent.html:39
 msgid "Activity · last 24h"
 msgstr ""
 
-#: website/web/templates/recent.html:52
+#: website/web/templates/recent.html:52 website/web/templates/recent.html:59
 msgid "now"
+msgstr ""
+
+#: website/web/templates/recent.html:57
+msgid "-24h"
+msgstr ""
+
+#: website/web/templates/recent.html:58
+msgid "-12h"
 msgstr ""
 
 #: website/web/templates/recent.html:74
@@ -2065,10 +2998,14 @@ msgstr ""
 msgid "Name of Ransom note"
 msgstr ""
 
+#: website/web/templates/admin/crypto_addr_form.html:22
+#: website/web/templates/admin/crypto_group.html:34
 #: website/web/templates/search.html:152
 msgid "Blockchain"
 msgstr ""
 
+#: website/web/templates/admin/crypto_addr_form.html:43
+#: website/web/templates/admin/crypto_group.html:35
 #: website/web/templates/search.html:153
 msgid "Address"
 msgstr ""
@@ -2091,7 +3028,7 @@ msgid ""
 "interactive."
 msgstr ""
 
-#: website/web/templates/stats.html:18
+#: website/web/templates/admin/logs.html:23 website/web/templates/stats.html:18
 msgid "Filters"
 msgstr ""
 
@@ -2213,6 +3150,42 @@ msgstr ""
 msgid "Timeline (scatter)"
 msgstr ""
 
+#: website/web/templates/swagger.html:6
+msgid "API Documentation"
+msgstr ""
+
+#: website/web/templates/swagger.html:188
+msgid "Back to site"
+msgstr ""
+
+#: website/web/templates/swagger.html:194
+msgid "Python 3 examples (requests)"
+msgstr ""
+
+#: website/web/templates/swagger.html:198
+msgid "List recent posts (last 7 days)"
+msgstr ""
+
+#: website/web/templates/swagger.html:211
+msgid "Get a specific group's details"
+msgstr ""
+
+#: website/web/templates/swagger.html:227
+msgid "Search across all posts"
+msgstr ""
+
+#: website/web/templates/swagger.html:240
+msgid "Export full database (requires API key)"
+msgstr ""
+
+#: website/web/templates/swagger.html:258
+msgid "Get threat actor profile"
+msgstr ""
+
+#: website/web/templates/swagger.html:274
+msgid "Crypto addresses for a group"
+msgstr ""
+
 #: website/web/templates/torrent_asn.html:3
 #, python-format
 msgid "AS%(asn)s"
@@ -2253,11 +3226,13 @@ msgstr ""
 
 #: website/web/templates/admin/torrent_asn.html:47
 #: website/web/templates/admin/torrent_health_detail.html:97
+#: website/web/templates/admin/torrent_health_detail.html:187
 #: website/web/templates/admin/torrent_pivot.html:64
 #: website/web/templates/admin/torrent_pivot.html:97
 #: website/web/templates/admin/torrent_pivot.html:192
 #: website/web/templates/torrent_asn.html:47
 #: website/web/templates/torrent_health_detail.html:226
+#: website/web/templates/torrent_health_detail.html:316
 #: website/web/templates/torrent_pivot.html:64
 #: website/web/templates/torrent_pivot.html:97
 #: website/web/templates/torrent_pivot.html:199
@@ -2269,10 +3244,12 @@ msgstr ""
 msgid "No IP indexed for this ASN."
 msgstr ""
 
+#: website/web/templates/admin/apikeys.html:44
 #: website/web/templates/admin/torrent_asn.html:66
 #: website/web/templates/admin/torrent_health.html:74
 #: website/web/templates/admin/torrent_ip.html:81
 #: website/web/templates/admin/torrent_manage.html:81
+#: website/web/templates/admin/urls.html:29
 #: website/web/templates/torrent_asn.html:66
 #: website/web/templates/torrent_health.html:74
 #: website/web/templates/torrent_ip.html:81
@@ -2395,13 +3372,6 @@ msgstr ""
 msgid "Seed / Leech"
 msgstr ""
 
-#: website/web/templates/admin/analyses.html:25
-#: website/web/templates/admin/torrent_health.html:81
-#: website/web/templates/admin/torrent_manage.html:87
-#: website/web/templates/torrent_health.html:81
-msgid "Actions"
-msgstr ""
-
 #: website/web/templates/admin/torrent_health.html:132
 #: website/web/templates/admin/torrent_health_detail.html:45
 #: website/web/templates/torrent_health.html:132
@@ -2419,11 +3389,56 @@ msgstr ""
 msgid "No torrent swarms scanned yet. Run poetry run torrent-health to populate."
 msgstr ""
 
+#: website/web/templates/admin/torrent_health.html:183
+#: website/web/templates/torrent_health.html:183
+msgid "swarm"
+msgstr ""
+
+#: website/web/templates/admin/torrent_health.html:183
+#: website/web/templates/torrent_health.html:183
+msgid "swarms"
+msgstr ""
+
+#: website/web/templates/admin/torrent_health.html:253
+#: website/web/templates/admin/torrent_health_detail.html:268
+#: website/web/templates/torrent_health.html:253
+#: website/web/templates/torrent_health_detail.html:405
+msgid "Queuing…"
+msgstr ""
+
+#: website/web/templates/torrent_health.html:257
+#, python-format
+msgid "Scanning (%(s)ss)…"
+msgstr ""
+
+#: website/web/templates/admin/torrent_health.html:260
+#: website/web/templates/admin/torrent_health_detail.html:275
+#: website/web/templates/torrent_health.html:260
+#: website/web/templates/torrent_health_detail.html:412
+msgid "Done — reload"
+msgstr ""
+
+#: website/web/templates/admin/torrent_health.html:264
+#: website/web/templates/admin/torrent_health_detail.html:279
+#: website/web/templates/torrent_health.html:264
+#: website/web/templates/torrent_health_detail.html:416
+msgid "Err:"
+msgstr ""
+
+#: website/web/templates/admin/torrent_health.html:268
+#: website/web/templates/admin/torrent_health_detail.html:283
+#: website/web/templates/torrent_health.html:268
+#: website/web/templates/torrent_health_detail.html:420
+msgid "Err"
+msgstr ""
+
 #: website/web/templates/torrent_health_detail.html:3
 #, python-format
 msgid "Torrent · %(ih)s…"
 msgstr ""
 
+#: website/web/templates/admin/crypto_addr_form.html:10
+#: website/web/templates/admin/editentry.html:11
 #: website/web/templates/admin/torrent_health_detail.html:14
 #: website/web/templates/torrent_health_detail.html:14
 msgid "Back"
@@ -2534,6 +3549,15 @@ msgstr ""
 msgid "Last check:"
 msgstr ""
 
+#: website/web/templates/torrent_health_detail.html:155
+#, python-format
+msgid "code=%(code)s · %(rtt)sms"
+msgstr ""
+
+#: website/web/templates/torrent_health_detail.html:158
+msgid "not checked yet"
+msgstr ""
+
 #: website/web/templates/torrent_health_detail.html:168
 msgid "File tree"
 msgstr ""
@@ -2567,51 +3591,69 @@ msgstr[0] ""
 msgstr[1] ""
 
 #: website/web/templates/admin/torrent_health_detail.html:98
+#: website/web/templates/admin/torrent_health_detail.html:187
 #: website/web/templates/torrent_health_detail.html:227
+#: website/web/templates/torrent_health_detail.html:316
 msgid "Port"
 msgstr ""
 
 #: website/web/templates/admin/torrent_health_detail.html:99
+#: website/web/templates/admin/torrent_health_detail.html:188
 #: website/web/templates/torrent_health_detail.html:228
+#: website/web/templates/torrent_health_detail.html:317
 msgid "Progress"
 msgstr ""
 
 #: website/web/templates/admin/torrent_health_detail.html:100
+#: website/web/templates/admin/torrent_health_detail.html:188
 #: website/web/templates/torrent_health_detail.html:229
+#: website/web/templates/torrent_health_detail.html:317
 msgid "Client"
 msgstr ""
 
 #: website/web/templates/admin/torrent_health_detail.html:101
+#: website/web/templates/admin/torrent_health_detail.html:189
 #: website/web/templates/admin/torrent_pivot.html:128
 #: website/web/templates/admin/torrent_pivot.html:161
 #: website/web/templates/torrent_health_detail.html:230
+#: website/web/templates/torrent_health_detail.html:318
 #: website/web/templates/torrent_pivot.html:128
 #: website/web/templates/torrent_pivot.html:161
 msgid "ASN"
 msgstr ""
 
 #: website/web/templates/admin/torrent_health_detail.html:102
+#: website/web/templates/admin/torrent_health_detail.html:189
 #: website/web/templates/torrent_health_detail.html:231
+#: website/web/templates/torrent_health_detail.html:318
 msgid "Org"
 msgstr ""
 
 #: website/web/templates/admin/torrent_health_detail.html:103
+#: website/web/templates/admin/torrent_health_detail.html:190
 #: website/web/templates/torrent_health_detail.html:232
+#: website/web/templates/torrent_health_detail.html:319
 msgid "CC"
 msgstr ""
 
 #: website/web/templates/admin/torrent_health_detail.html:104
+#: website/web/templates/admin/torrent_health_detail.html:190
 #: website/web/templates/torrent_health_detail.html:233
+#: website/web/templates/torrent_health_detail.html:319
 msgid "PTR"
 msgstr ""
 
 #: website/web/templates/admin/torrent_health_detail.html:105
+#: website/web/templates/admin/torrent_health_detail.html:191
 #: website/web/templates/torrent_health_detail.html:234
+#: website/web/templates/torrent_health_detail.html:320
 msgid "Flags"
 msgstr ""
 
 #: website/web/templates/admin/torrent_health_detail.html:111
+#: website/web/templates/admin/torrent_health_detail.html:174
 #: website/web/templates/torrent_health_detail.html:240
+#: website/web/templates/torrent_health_detail.html:303
 msgid "Pivot on this IP"
 msgstr ""
 
@@ -2643,6 +3685,26 @@ msgstr ""
 #: website/web/templates/admin/torrent_health_detail.html:144
 #: website/web/templates/torrent_health_detail.html:273
 msgid "Leechers"
+msgstr ""
+
+#: website/web/templates/admin/torrent_health_detail.html:171
+#: website/web/templates/torrent_health_detail.html:300
+msgid "No peers in this scan."
+msgstr ""
+
+#: website/web/templates/admin/torrent_health_detail.html:216
+#: website/web/templates/torrent_health_detail.html:345
+msgid "Pivot on this ASN"
+msgstr ""
+
+#: website/web/templates/admin/torrent_health_detail.html:244
+#: website/web/templates/torrent_health_detail.html:381
+msgid "Parse error"
+msgstr ""
+
+#: website/web/templates/torrent_health_detail.html:409
+#, python-format
+msgid "Scanning (≈%(s)ss) — page will reload"
 msgstr ""
 
 #: website/web/templates/torrent_ip.html:3
@@ -2689,6 +3751,10 @@ msgstr ""
 #: website/web/templates/torrent_ip.html:56
 #: website/web/templates/torrent_ip.html:100
 msgid "seeder"
+msgstr ""
+
+#: website/web/templates/torrent_ip.html:68
+msgid "seeder:"
 msgstr ""
 
 #: website/web/templates/admin/torrent_ip.html:77
@@ -2862,116 +3928,1675 @@ msgid ""
 "30-day health."
 msgstr ""
 
-#: website/web/templates/urls.html:52
+#: website/web/templates/urls.html:51
 msgid "Search by group, market or URL"
 msgstr ""
 
-#: website/web/templates/urls.html:53
+#: website/web/templates/urls.html:52
 msgid "Group, market or URL substring… (Ctrl/Cmd+K)"
 msgstr ""
 
-#: website/web/templates/urls.html:72
+#: website/web/templates/urls.html:71
 msgid "Availability"
 msgstr ""
 
-#: website/web/templates/urls.html:78
+#: website/web/templates/urls.html:77
 msgid "Online"
 msgstr ""
 
-#: website/web/templates/urls.html:87
+#: website/web/templates/urls.html:86
 msgid "Download current view as CSV"
 msgstr ""
 
-#: website/web/templates/urls.html:87
+#: website/web/templates/urls.html:86
 msgid "Download CSV"
 msgstr ""
 
-#: website/web/templates/urls.html:100
+#: website/web/templates/urls.html:99
 msgid "Group / Market"
 msgstr ""
 
-#: website/web/templates/admin/analyses.html:24
+#: website/web/templates/admin/editentry.html:209
 #: website/web/templates/urls.html:102
-msgid "Status"
-msgstr ""
-
-#: website/web/templates/urls.html:103
 msgid "Last scrape"
 msgstr ""
 
-#: website/web/templates/urls.html:105
-msgid "Health"
+#: website/web/templates/admin/add.html:3
+msgid "Add group"
 msgstr ""
 
-#: website/web/templates/admin/analyses.html:2
-msgid "Manage Analyses"
+#: website/web/templates/admin/add.html:10
+msgid "Add a new group"
 msgstr ""
 
-#: website/web/templates/admin/analyses.html:8
-#: website/web/templates/admin/edit_analysis.html:8
-msgid "Analyses"
+#: website/web/templates/admin/add.html:11
+msgid "Fill in the details to add a group to monitoring."
 msgstr ""
 
-#: website/web/templates/admin/analyses.html:13
-msgid "Technical Analyses"
+#: website/web/templates/admin/addactor.html:3
+msgid "Admin · Add Actor"
 msgstr ""
 
-#: website/web/templates/admin/analyses.html:15
-msgid "groups have an in-house analysis attached."
+#: website/web/templates/admin/addactor.html:10
+msgid "Add Threat Actor / Affiliate"
 msgstr ""
 
-#: website/web/templates/admin/analyses.html:36
-msgid "present"
+#: website/web/templates/admin/addactor.html:11
+msgid "Create a new actor profile (db=5)."
 msgstr ""
 
-#: website/web/templates/admin/analyses.html:43
-msgid "View"
+#: website/web/templates/admin/addactor.html:25
+#: website/web/templates/admin/editactor.html:26
+msgid "Primary pseudonym"
 msgstr ""
 
-#: website/web/templates/admin/analyses.html:47
-msgid "Delete analysis for"
+#: website/web/templates/admin/addactor.html:30
+#: website/web/templates/admin/editactor.html:31
+msgid "Alternate aliases (comma-separated)"
 msgstr ""
 
-#: website/web/templates/admin/analyses.html:48
-#: website/web/templates/admin/torrent_manage.html:112
-msgid "Delete"
+#: website/web/templates/admin/addactor.html:40
+#: website/web/templates/admin/editactor.html:41
+msgid "Tags (comma-separated)"
 msgstr ""
 
-#: website/web/templates/admin/analyses.html:51
+#: website/web/templates/admin/addactor.html:65
+#: website/web/templates/admin/editactor.html:71
+msgid "Wanted"
+msgstr ""
+
+#: website/web/templates/admin/addactor.html:67
+#: website/web/templates/admin/editactor.html:74
+msgid "FBI Most Wanted URL"
+msgstr ""
+
+#: website/web/templates/admin/addactor.html:68
+#: website/web/templates/admin/editactor.html:75
+msgid "Europol URL"
+msgstr ""
+
+#: website/web/templates/admin/addactor.html:69
+#: website/web/templates/admin/editactor.html:76
+msgid "INTERPOL URL"
+msgstr ""
+
+#: website/web/templates/admin/addactor.html:78
+#: website/web/templates/admin/editactor.html:86
+msgid "Jabber — one per line"
+msgstr ""
+
+#: website/web/templates/admin/addactor.html:79
+#: website/web/templates/admin/editactor.html:87
+msgid "Email — one per line"
+msgstr ""
+
+#: website/web/templates/admin/addactor.html:80
+#: website/web/templates/admin/editactor.html:88
+msgid "PGP — one key per line"
+msgstr ""
+
+#: website/web/templates/admin/addactor.html:81
+#: website/web/templates/admin/editactor.html:89
+msgid "Matrix — one per line"
+msgstr ""
+
+#: website/web/templates/admin/addactor.html:82
+#: website/web/templates/admin/editactor.html:90
+msgid "Session — one per line"
+msgstr ""
+
+#: website/web/templates/admin/addactor.html:83
+#: website/web/templates/admin/editactor.html:91
+msgid "Telegram — @handle or URL (one per line)"
+msgstr ""
+
+#: website/web/templates/admin/addactor.html:84
+#: website/web/templates/admin/editactor.html:92
+msgid "Tox — one per line (full ID)"
+msgstr ""
+
+#: website/web/templates/admin/addactor.html:85
+#: website/web/templates/admin/editactor.html:93
+msgid "Simplex — one per line"
+msgstr ""
+
+#: website/web/templates/admin/addactor.html:86
+#: website/web/templates/admin/editactor.html:94
+msgid "Max — one per line"
+msgstr ""
+
+#: website/web/templates/admin/addactor.html:87
+#: website/web/templates/admin/editactor.html:95
+msgid "Sonar — one per line"
+msgstr ""
+
+#: website/web/templates/admin/addactor.html:88
+#: website/web/templates/admin/editactor.html:96
+msgid "X/Twitter — @handle or URL (one per line)"
+msgstr ""
+
+#: website/web/templates/admin/addactor.html:89
+#: website/web/templates/admin/editactor.html:97
+msgid "Bluesky — @handle.bsky.social or URL (one per line)"
+msgstr ""
+
+#: website/web/templates/admin/addactor.html:101
+#: website/web/templates/admin/addactor.html:116
+#: website/web/templates/admin/addactor.html:131
+#: website/web/templates/admin/editactor.html:109
+#: website/web/templates/admin/editactor.html:124
+#: website/web/templates/admin/editactor.html:139
+msgid "Search & add…"
+msgstr ""
+
+#: website/web/templates/admin/addactor.html:102
+#: website/web/templates/admin/editactor.html:110
+msgid "Add a group"
+msgstr ""
+
+#: website/web/templates/admin/addactor.html:108
+#: website/web/templates/admin/editactor.html:116
+msgid "Type then Enter to add. Remove with “×”."
+msgstr ""
+
+#: website/web/templates/admin/addactor.html:117
+#: website/web/templates/admin/editactor.html:125
+msgid "Add a market/forum"
+msgstr ""
+
+#: website/web/templates/admin/addactor.html:123
+#: website/web/templates/admin/addactor.html:138
+#: website/web/templates/admin/editactor.html:146
+msgid "E.g.,"
+msgstr ""
+
+#: website/web/templates/admin/addactor.html:123
+msgid "or pick a suggestion."
+msgstr ""
+
+#: website/web/templates/admin/addactor.html:130
+#: website/web/templates/admin/editactor.html:138
+msgid "Peers (other actors)"
+msgstr ""
+
+#: website/web/templates/admin/addactor.html:132
+#: website/web/templates/admin/editactor.html:140
+msgid "Add a peer"
+msgstr ""
+
+#: website/web/templates/admin/addactor.html:138
+#: website/web/templates/admin/editactor.html:146
+msgid "or select from the list (db=5)."
+msgstr ""
+
+#: website/web/templates/admin/addactor.html:145
+#: website/web/templates/admin/editactor.html:153
+msgid "Sources"
+msgstr ""
+
+#: website/web/templates/admin/addactor.html:147
+msgid "One URL per line"
+msgstr ""
+
+#: website/web/templates/admin/addactor.html:152
+msgid "Image (optional)"
+msgstr ""
+
+#: website/web/templates/admin/addactor.html:155
+msgid "png / jpg / svg / gif. You can add/remove more from the “Logo” page."
+msgstr ""
+
+#: website/web/templates/admin/addpost.html:3
+msgid "Admin · Add post"
+msgstr ""
+
+#: website/web/templates/admin/addpost.html:10
+msgid "Add post to Group or Market"
+msgstr ""
+
+#: website/web/templates/admin/addpost.html:11
+msgid "Pick the type, search, then confirm to add post."
+msgstr ""
+
+#: website/web/templates/admin/addpost.html:20
+#: website/web/templates/admin/edit.html:20
+#: website/web/templates/admin/logo.html:20
+msgid "Choose type to edit"
+msgstr ""
+
+#: website/web/templates/admin/addpost.html:31
+#: website/web/templates/admin/edit.html:31
+#: website/web/templates/admin/logo.html:34
+msgid "Filter options…"
+msgstr ""
+
+#: website/web/templates/admin/addpostentry.html:3
+msgid "Add post · Admin"
+msgstr ""
+
+#: website/web/templates/admin/addpostentry.html:11
+#: website/web/templates/admin/admin.html:79
+msgid "Add post"
+msgstr ""
+
+#: website/web/templates/admin/addpostentry.html:12
+msgid "Create a new post with optional screenshot, custom date, link and magnet."
+msgstr ""
+
+#: website/web/templates/admin/addpostentry.html:25
+msgid "New post"
+msgstr ""
+
+#: website/web/templates/admin/addpostentry.html:26
+msgid "Fields marked * are required"
+msgstr ""
+
+#: website/web/templates/admin/addpostentry.html:30
+msgid "Post title *"
+msgstr ""
+
+#: website/web/templates/admin/addpostentry.html:31
+msgid "e.g. New victim on blog…"
+msgstr ""
+
+#: website/web/templates/admin/addpostentry.html:34
+msgid "Summary, key points, etc."
+msgstr ""
+
+#: website/web/templates/admin/addpostentry.html:35
+msgid "characters"
+msgstr ""
+
+#: website/web/templates/admin/addpostentry.html:42
+msgid "Now"
+msgstr ""
+
+#: website/web/templates/admin/addpostentry.html:43
+msgid "Fills the current UTC timestamp."
+msgstr ""
+
+#: website/web/templates/admin/addpostentry.html:47
+msgid "Link (relative or full)"
+msgstr ""
+
+#: website/web/templates/admin/addpostentry.html:52
+#: website/web/templates/admin/editpost.html:131
+msgid "Magnet"
+msgstr ""
+
+#: website/web/templates/admin/addpostentry.html:60
+#: website/web/templates/admin/editpost.html:137
+#: website/web/templates/admin/editpost.html:140
+msgid "Preview"
+msgstr ""
+
+#: website/web/templates/admin/addpostentry.html:63
+msgid "No image selected"
+msgstr ""
+
+#: website/web/templates/admin/addpostentry.html:67
+msgid "Title:"
+msgstr ""
+
+#: website/web/templates/admin/addpostentry.html:68
+msgid "Date:"
+msgstr ""
+
+#: website/web/templates/admin/addpostentry.html:69
+msgid "Link:"
+msgstr ""
+
+#: website/web/templates/admin/addpostentry.html:73
+msgid "Upload screenshot (optional)"
+msgstr ""
+
+#: website/web/templates/admin/addpostentry.html:76
+msgid "PNG/JPG/WebP recommended (reasonable size)."
+msgstr ""
+
+#: website/web/templates/admin/admin.html:3
+msgid "Admin — RansomLook"
+msgstr ""
+
+#: website/web/templates/admin/admin.html:11
+msgid "Admin zone"
+msgstr ""
+
+#: website/web/templates/admin/admin.html:12
+msgid "Welcome back,"
+msgstr ""
+
+#: website/web/templates/admin/admin.html:12
+msgid "Manage groups, posts, alerts and more."
+msgstr ""
+
+#: website/web/templates/admin/admin.html:21
+msgid "Group & Monitoring"
+msgstr ""
+
+#: website/web/templates/admin/admin.html:25
+#: website/web/templates/admin/crypto_addr_form.html:65
 #: website/web/templates/admin/torrent_manage.html:45
 msgid "Add"
 msgstr ""
 
-#: website/web/templates/admin/edit_analysis.html:2
-msgid "Edit Analysis"
+#: website/web/templates/admin/admin.html:29
+msgid "Create a new group/market entry and configure its locations."
 msgstr ""
 
-#: website/web/templates/admin/edit_analysis.html:15
-msgid "Add analysis"
+#: website/web/templates/admin/admin.html:39
+msgid "Add URLs (DLS, FS, Chat, Admin) to groups or markets — single or bulk."
 msgstr ""
 
-#: website/web/templates/admin/edit_analysis.html:19
-msgid "Stored at"
+#: website/web/templates/admin/admin.html:49
+msgid "Update metadata, descriptions, links and flags (FS/Chat/Admin)."
 msgstr ""
 
-#: website/web/templates/admin/edit_analysis.html:24
-msgid "Preview"
+#: website/web/templates/admin/admin.html:55
+#: website/web/templates/admin/editlogo.html:29
+msgid "Logo"
 msgstr ""
 
-#: website/web/templates/admin/edit_analysis.html:36
-msgid "If a file is uploaded, it overrides the textarea content below."
+#: website/web/templates/admin/admin.html:59
+msgid "Upload or change logos associated with groups/markets."
 msgstr ""
 
-#: website/web/templates/admin/edit_analysis.html:54
+#: website/web/templates/admin/admin.html:69
+msgid ""
+"Attach an in-house technical analysis (Markdown) to a group; rendered as "
+"HTML and PDF on its profile."
+msgstr ""
+
+#: website/web/templates/admin/admin.html:75
+msgid "Post actions"
+msgstr ""
+
+#: website/web/templates/admin/admin.html:83
+msgid "Manually insert a new post entry (title, date, description, screen)."
+msgstr ""
+
+#: website/web/templates/admin/admin.html:89
+msgid "Edit post"
+msgstr ""
+
+#: website/web/templates/admin/admin.html:93
+msgid "Search and modify existing posts (fix typos, attach screenshots, etc.)."
+msgstr ""
+
+#: website/web/templates/admin/admin.html:99
+msgid "Actor actions"
+msgstr ""
+
+#: website/web/templates/admin/admin.html:103
+msgid "Add actor"
+msgstr ""
+
+#: website/web/templates/admin/admin.html:107
+msgid "Create a new T.A."
+msgstr ""
+
+#: website/web/templates/admin/admin.html:113
+msgid "Edit Actor"
+msgstr ""
+
+#: website/web/templates/admin/admin.html:117
+msgid "Search and modify existing actors (fix typos, attach screenshots, etc.)."
+msgstr ""
+
+#: website/web/templates/admin/admin.html:123
+msgid "Notes actions"
+msgstr ""
+
+#: website/web/templates/admin/admin.html:127
+msgid "Edit ransomnotes"
+msgstr ""
+
+#: website/web/templates/admin/admin.html:131
+msgid "Edit ransomnotes, manage aliases..."
+msgstr ""
+
+#: website/web/templates/admin/admin.html:141
+msgid "Manage crypto"
+msgstr ""
+
+#: website/web/templates/admin/admin.html:145
+msgid "Browse, add and edit cryptocurrency wallets by group."
+msgstr ""
+
+#: website/web/templates/admin/admin.html:151
+msgid "New crypto group"
+msgstr ""
+
+#: website/web/templates/admin/admin.html:155
+msgid "Create a new cryptocurrency group entry."
+msgstr ""
+
+#: website/web/templates/admin/admin.html:161
+#: website/web/templates/admin/crypto.html:21
+#: website/web/templates/admin/crypto_aliases.html:31
+#: website/web/templates/admin/ransomnotes_group.html:20
+msgid "Aliases"
+msgstr ""
+
+#: website/web/templates/admin/admin.html:165
+msgid "Manage crypto group aliases."
+msgstr ""
+
+#: website/web/templates/admin/admin.html:179
+msgid ""
+"Peer counts, seeders/leechers and last-scan status for every tracked "
+"magnet."
+msgstr ""
+
+#: website/web/templates/admin/admin.html:179
+#: website/web/templates/admin/admin.html:189
+msgid "(public)"
+msgstr ""
+
+#: website/web/templates/admin/admin.html:185
+msgid "Pivot intel"
+msgstr ""
+
+#: website/web/templates/admin/admin.html:189
+msgid "Top IPs / ASN, cross-group correlations and CSV exports."
+msgstr ""
+
+#: website/web/templates/admin/admin.html:195
+#: website/web/templates/admin/torrent_manage.html:11
+msgid "Manage torrents"
+msgstr ""
+
+#: website/web/templates/admin/admin.html:199
+msgid "Attach magnets or .torrent files to a group. Unit and bulk add/delete."
+msgstr ""
+
+#: website/web/templates/admin/admin.html:199
+msgid "(admin)"
+msgstr ""
+
+#: website/web/templates/admin/admin.html:209
+#: website/web/templates/admin/config.html:10
+msgid "Configuration"
+msgstr ""
+
+#: website/web/templates/admin/admin.html:213
+msgid "Edit notifications, LDAP, SMTP and general settings."
+msgstr ""
+
+#: website/web/templates/admin/admin.html:219
+msgid "Alerting"
+msgstr ""
+
+#: website/web/templates/admin/admin.html:223
+msgid "Manage alert keywords and test matching rules."
+msgstr ""
+
+#: website/web/templates/admin/admin.html:229
+#: website/web/templates/admin/apikeys.html:10
+msgid "API Keys"
+msgstr ""
+
+#: website/web/templates/admin/admin.html:233
+msgid "Manage API keys for programmatic access (export, integrations)."
+msgstr ""
+
+#: website/web/templates/admin/admin.html:239
+msgid "Logs"
+msgstr ""
+
+#: website/web/templates/admin/admin.html:243
+msgid "Inspect recent activities, parser runs and system messages."
+msgstr ""
+
+#: website/web/templates/admin/admin.html:249
+msgid "Logout"
+msgstr ""
+
+#: website/web/templates/admin/admin.html:253
+msgid "Sign out from the administration interface."
+msgstr ""
+
+#: website/web/templates/admin/admin_crypto.html:3
+#: website/web/templates/admin/crypto.html:3
+msgid "Admin · Crypto"
+msgstr ""
+
+#: website/web/templates/admin/admin_crypto.html:10
+msgid "Admin · Cryptocurrencies"
+msgstr ""
+
+#: website/web/templates/admin/admin_crypto.html:11
+msgid "Create/read alias mappings for crypto (stored in DB=7 only)."
+msgstr ""
+
+#: website/web/templates/admin/admin_crypto.html:21
+msgid "Add / Update alias"
+msgstr ""
+
+#: website/web/templates/admin/admin_crypto.html:26
+msgid "Alias (e.g. Conti)"
+msgstr ""
+
+#: website/web/templates/admin/admin_crypto.html:27
+msgid "Target canonical (e.g. conti)"
+msgstr ""
+
+#: website/web/templates/admin/admin_crypto.html:28
+#: website/web/templates/admin/crypto_addr_form.html:93
+#: website/web/templates/admin/crypto_aliases.html:24
+#: website/web/templates/admin/ransomnotes_group.html:163
+msgid "Save"
+msgstr ""
+
+#: website/web/templates/admin/admin_crypto.html:30
+msgid ""
+"Target must correspond to an existing key in DB=7 (family). No writes are"
+" made to DB=0."
+msgstr ""
+
+#: website/web/templates/admin/admin_crypto.html:37
+msgid "Existing aliases"
+msgstr ""
+
+#: website/web/templates/admin/admin_crypto.html:42
+#: website/web/templates/admin/crypto_aliases.html:20
+#: website/web/templates/admin/crypto_aliases.html:34
+msgid "Alias"
+msgstr ""
+
+#: website/web/templates/admin/admin_crypto.html:42
+msgid "→ Target"
+msgstr ""
+
+#: website/web/templates/admin/admin_crypto.html:52
+#: website/web/templates/admin/analysis_variants.html:78
+#: website/web/templates/admin/apikeys.html:77
+#: website/web/templates/admin/crypto_aliases.html:48
+#: website/web/templates/admin/crypto_group.html:52
+#: website/web/templates/admin/edit_analysis.html:48
+#: website/web/templates/admin/editpost.html:151
+#: website/web/templates/admin/ransomnotes_group.html:102
+#: website/web/templates/admin/torrent_manage.html:112
+msgid "Delete"
+msgstr ""
+
+#: website/web/templates/admin/alerts.html:3
+msgid "Alerts · Keywords"
+msgstr ""
+
+#: website/web/templates/admin/alerts.html:11
+msgid "Alerts – Keywords"
+msgstr ""
+
+#: website/web/templates/admin/alerts.html:12
+msgid ""
+"Manage alert keywords (one per line). Use tools to clean, deduplicate, "
+"and test quickly."
+msgstr ""
+
+#: website/web/templates/admin/alerts.html:26
+msgid "Keywords"
+msgstr ""
+
+#: website/web/templates/admin/alerts.html:27
+msgid "lines"
+msgstr ""
+
+#: website/web/templates/admin/alerts.html:31
+msgid "Trim"
+msgstr ""
+
+#: website/web/templates/admin/alerts.html:32
+msgid "Deduplicate"
+msgstr ""
+
+#: website/web/templates/admin/alerts.html:34
+msgid "lowercase"
+msgstr ""
+
+#: website/web/templates/admin/alerts.html:35
+msgid "UPPERCASE"
+msgstr ""
+
+#: website/web/templates/admin/alerts.html:38
+msgid "Import .txt"
+msgstr ""
+
+#: website/web/templates/admin/alerts.html:39
+msgid "Export .txt"
+msgstr ""
+
+#: website/web/templates/admin/alerts.html:45
+msgid "Empty lines are ignored. Matching is case-insensitive by default."
+msgstr ""
+
+#: website/web/templates/admin/alerts.html:57
+msgid "Quick tester"
+msgstr ""
+
+#: website/web/templates/admin/alerts.html:58
+msgid "Paste some text to see matches"
+msgstr ""
+
+#: website/web/templates/admin/alerts.html:61
+msgid "Sample text"
+msgstr ""
+
+#: website/web/templates/admin/alerts.html:62
+msgid "Paste a log line, title, description…"
+msgstr ""
+
+#: website/web/templates/admin/alerts.html:66
+msgid "Case sensitive"
+msgstr ""
+
+#: website/web/templates/admin/alerts.html:68
+msgid "Test"
+msgstr ""
+
+#: website/web/templates/admin/alerts.html:72
+msgid "Matches:"
+msgstr ""
+
+#: website/web/templates/admin/analyses.html:12
+msgid "Pick a group to add or edit its in-house Markdown analysis."
+msgstr ""
+
+#: website/web/templates/admin/analyses.html:13
+msgid "groups currently have one attached."
+msgstr ""
+
+#: website/web/templates/admin/analyses.html:23
+msgid "Filter groups…"
+msgstr ""
+
+#: website/web/templates/admin/analyses.html:25
+msgid "analysis already attached"
+msgstr ""
+
+#: website/web/templates/admin/analyses.html:25
+#: website/web/templates/admin/edit_analysis.html:52
+msgid "no analysis yet"
+msgstr ""
+
+#: website/web/templates/admin/analysis_variants.html:12
+msgid ""
+"Manage analysis variants for this group. Each variant gets its own "
+"Markdown source, metadata and assets."
+msgstr ""
+
+#: website/web/templates/admin/analysis_variants.html:21
+msgid "Back to selector"
+msgstr ""
+
+#: website/web/templates/admin/analysis_variants.html:22
+msgid "Group page"
+msgstr ""
+
+#: website/web/templates/admin/analysis_variants.html:44
+msgid "Default (legacy)"
+msgstr ""
+
+#: website/web/templates/admin/analysis_variants.html:76
+msgid "Delete this analysis variant?"
+msgstr ""
+
+#: website/web/templates/admin/analysis_variants.html:88
+msgid "No analyses attached to this group yet."
+msgstr ""
+
+#: website/web/templates/admin/analysis_variants.html:95
+msgid "Add a new variant"
+msgstr ""
+
+#: website/web/templates/admin/analysis_variants.html:97
+msgid "Examples:"
+msgstr ""
+
+#: website/web/templates/admin/analysis_variants.html:98
+msgid "Allowed: lowercase letters, digits, dash and underscore (max 64 chars)."
+msgstr ""
+
+#: website/web/templates/admin/analysis_variants.html:102
+msgid "Variant id"
+msgstr ""
+
+#: website/web/templates/admin/analysis_variants.html:104
+msgid "e.g. windows"
+msgstr ""
+
+#: website/web/templates/admin/analysis_variants.html:107
+msgid "Create variant"
+msgstr ""
+
+#: website/web/templates/admin/analysis_variants.html:112
+msgid ""
+"Tip: leaving variant empty in the URL still works for legacy single-"
+"analysis groups — but new analyses are best created as named variants."
+msgstr ""
+
+#: website/web/templates/admin/apikeys.html:3
+msgid "Admin · API Keys"
+msgstr ""
+
+#: website/web/templates/admin/apikeys.html:11
+msgid "Manage API keys for programmatic access (export, etc.)."
+msgstr ""
+
+#: website/web/templates/admin/apikeys.html:21
+msgid "New API key"
+msgstr ""
+
+#: website/web/templates/admin/apikeys.html:25
+msgid "Name / comment"
+msgstr ""
+
+#: website/web/templates/admin/apikeys.html:26
+msgid "e.g. MISP sync, partner feed, CI/CD…"
+msgstr ""
+
+#: website/web/templates/admin/apikeys.html:28
+msgid "Generate key"
+msgstr ""
+
+#: website/web/templates/admin/apikeys.html:37
+#, python-format
+msgid "%(num)s key"
+msgid_plural "%(num)s keys"
+msgstr[0] ""
+msgstr[1] ""
+
+#: website/web/templates/admin/apikeys.html:45
+msgid "Token"
+msgstr ""
+
+#: website/web/templates/admin/apikeys.html:46
+msgid "Created"
+msgstr ""
+
+#: website/web/templates/admin/apikeys.html:47
+msgid "Last used"
+msgstr ""
+
+#: website/web/templates/admin/apikeys.html:61
+#: website/web/templates/admin/ransomnotes_group.html:146
+msgid "active"
+msgstr ""
+
+#: website/web/templates/admin/apikeys.html:63
+#: website/web/templates/admin/config.html:32
+msgid "disabled"
+msgstr ""
+
+#: website/web/templates/admin/apikeys.html:71
+msgid "Disable"
+msgstr ""
+
+#: website/web/templates/admin/apikeys.html:71
+msgid "Enable"
+msgstr ""
+
+#: website/web/templates/admin/apikeys.html:75
+#, python-format
+msgid "Delete key « %(name)s »?"
+msgstr ""
+
+#: website/web/templates/admin/apikeys.html:88
+msgid "No API keys yet. Create one above."
+msgstr ""
+
+#: website/web/templates/admin/config.html:3
+msgid "Admin · Configuration"
+msgstr ""
+
+#: website/web/templates/admin/config.html:11
+msgid "settings."
+msgstr ""
+
+#: website/web/templates/admin/config.html:12
+msgid "Using sample — no generic.json found, changes will create one."
+msgstr ""
+
+#: website/web/templates/admin/config.html:30
+msgid "enabled"
+msgstr ""
+
+#: website/web/templates/admin/config.html:53
+msgid "comma-separated"
+msgstr ""
+
+#: website/web/templates/admin/config.html:67
+#: website/web/templates/admin/config.html:107
+msgid "Show"
+msgstr ""
+
+#: website/web/templates/admin/config.html:87
+msgid "General"
+msgstr ""
+
+#: website/web/templates/admin/config.html:122
+msgid "Save configuration"
+msgstr ""
+
+#: website/web/templates/admin/crypto.html:9
+msgid "Crypto — Select or Create Group"
+msgstr ""
+
+#: website/web/templates/admin/crypto.html:10
+msgid "Choose a group to manage its wallets, or create a new one (DB=7 only)."
+msgstr ""
+
+#: website/web/templates/admin/crypto.html:19
+msgid "Search group…"
+msgstr ""
+
+#: website/web/templates/admin/crypto.html:20
+msgid "Create group in DB=7"
+msgstr ""
+
+#: website/web/templates/admin/crypto.html:20
+msgid "Create group"
+msgstr ""
+
+#: website/web/templates/admin/crypto.html:21
+msgid "Manage crypto aliases (DB=7)"
+msgstr ""
+
+#: website/web/templates/admin/crypto.html:31
+msgid "Addresses"
+msgstr ""
+
+#: website/web/templates/admin/crypto.html:41
+msgid "aliases:"
+msgstr ""
+
+#: website/web/templates/admin/crypto.html:46
+#: website/web/templates/admin/ransomnotes_group.html:11
+msgid "Manage"
+msgstr ""
+
+#: website/web/templates/admin/crypto_addr_form.html:3
+#, python-format
+msgid "Admin · %(mode)s address — %(group)s"
+msgstr ""
+
+#: website/web/templates/admin/crypto_addr_form.html:9
+#, python-format
+msgid "%(mode)s address — %(group)s"
+msgstr ""
+
+#: website/web/templates/admin/crypto_addr_form.html:20
+msgid "Wallet details"
+msgstr ""
+
+#: website/web/templates/admin/crypto_addr_form.html:26
+msgid "Select a blockchain"
+msgstr ""
+
+#: website/web/templates/admin/crypto_addr_form.html:27
+msgid "Bitcoin"
+msgstr ""
+
+#: website/web/templates/admin/crypto_addr_form.html:28
+msgid "Ethereum"
+msgstr ""
+
+#: website/web/templates/admin/crypto_addr_form.html:29
+msgid "Litecoin"
+msgstr ""
+
+#: website/web/templates/admin/crypto_addr_form.html:30
+msgid "Bitcoin Cash"
+msgstr ""
+
+#: website/web/templates/admin/crypto_addr_form.html:31
+msgid "Dash"
+msgstr ""
+
+#: website/web/templates/admin/crypto_addr_form.html:32
+msgid "Dogecoin"
+msgstr ""
+
+#: website/web/templates/admin/crypto_addr_form.html:33
+msgid "Zcash"
+msgstr ""
+
+#: website/web/templates/admin/crypto_addr_form.html:34
+msgid "Monero"
+msgstr ""
+
+#: website/web/templates/admin/crypto_addr_form.html:35
+msgid "Tron"
+msgstr ""
+
+#: website/web/templates/admin/crypto_addr_form.html:36
+msgid "Ripple (XRP)"
+msgstr ""
+
+#: website/web/templates/admin/crypto_addr_form.html:52
+#: website/web/templates/admin/crypto_addr_form.html:143
+msgid "manual"
+msgstr ""
+
+#: website/web/templates/admin/crypto_addr_form.html:56
+msgid "Label"
+msgstr ""
+
+#: website/web/templates/admin/crypto_addr_form.html:56
+msgid "(optional)"
+msgstr ""
+
+#: website/web/templates/admin/crypto_addr_form.html:57
+msgid "e.g. main wallet, seized by FBI..."
+msgstr ""
+
+#: website/web/templates/admin/crypto_addr_form.html:92
+msgid "Unsaved changes"
+msgstr ""
+
+#: website/web/templates/admin/crypto_addr_form.html:105
+msgid "Transaction hash"
+msgstr ""
+
+#: website/web/templates/admin/crypto_addr_form.html:110
+msgid "Sender address"
+msgstr ""
+
+#: website/web/templates/admin/crypto_addr_form.html:114
+msgid "Receiver address"
+msgstr ""
+
+#: website/web/templates/admin/crypto_addr_form.html:120
+msgid "e.g. 0.5"
+msgstr ""
+
+#: website/web/templates/admin/crypto_addr_form.html:123
+msgid "Amount USD"
+msgstr ""
+
+#: website/web/templates/admin/crypto_addr_form.html:124
+msgid "e.g. 15000"
+msgstr ""
+
+#: website/web/templates/admin/crypto_addr_form.html:133
+msgid "Block"
+msgstr ""
+
+#: website/web/templates/admin/crypto_addr_form.html:134
+msgid "Block number"
+msgstr ""
+
+#: website/web/templates/admin/crypto_addr_form.html:140
+msgid "(inherit from wallet)"
+msgstr ""
+
+#: website/web/templates/admin/crypto_addr_form.html:147
+#: website/web/templates/admin/crypto_group_new.html:34
+#: website/web/templates/admin/edit_analysis.html:125
+#: website/web/templates/admin/ransomnotes_group.html:164
 msgid "Cancel"
 msgstr ""
 
-#: website/web/templates/admin/edit_analysis.html:58
+#: website/web/templates/admin/crypto_addr_form.html:148
+msgid "Save transaction"
+msgstr ""
+
+#: website/web/templates/admin/crypto_addr_form.html:224
+msgid "Edit transaction"
+msgstr ""
+
+#: website/web/templates/admin/crypto_addr_form.html:224
+msgid "New transaction"
+msgstr ""
+
+#: website/web/templates/admin/crypto_aliases.html:3
+msgid "Admin · Crypto aliases"
+msgstr ""
+
+#: website/web/templates/admin/crypto_aliases.html:9
+msgid "Crypto — Aliases"
+msgstr ""
+
+#: website/web/templates/admin/crypto_aliases.html:10
+msgid "Manage alias → canonical group resolution (DB=7 only)."
+msgstr ""
+
+#: website/web/templates/admin/crypto_aliases.html:21
+msgid "Canonical slug"
+msgstr ""
+
+#: website/web/templates/admin/crypto_aliases.html:35
+msgid "Canonical"
+msgstr ""
+
+#: website/web/templates/admin/crypto_group.html:3
+#, python-format
+msgid "Admin · Crypto — %(group)s"
+msgstr ""
+
+#: website/web/templates/admin/crypto_group.html:9
+#, python-format
+msgid "Manage wallets — %(group)s"
+msgstr ""
+
+#: website/web/templates/admin/crypto_group.html:10
+msgid "Add, edit or remove addresses for this group."
+msgstr ""
+
+#: website/web/templates/admin/crypto_group.html:18
+msgid "Add address"
+msgstr ""
+
+#: website/web/templates/admin/crypto_group.html:19
+msgid "Back to groups"
+msgstr ""
+
+#: website/web/templates/admin/crypto_group.html:31
+msgid "Wallets"
+msgstr ""
+
+#: website/web/templates/admin/crypto_group.html:37
+msgid "Tx count"
+msgstr ""
+
+#: website/web/templates/admin/crypto_group.html:46
+msgid "unknown"
+msgstr ""
+
+#: website/web/templates/admin/crypto_group.html:50
+msgid "Delete this address?"
+msgstr ""
+
+#: website/web/templates/admin/crypto_group.html:63
+msgid "No address yet for this group."
+msgstr ""
+
+#: website/web/templates/admin/crypto_group_new.html:3
+msgid "Admin · New crypto group"
+msgstr ""
+
+#: website/web/templates/admin/crypto_group_new.html:9
+msgid "Create crypto group"
+msgstr ""
+
+#: website/web/templates/admin/crypto_group_new.html:10
+msgid ""
+"Create a group in DB=7 only. You can add aliases to point to this "
+"canonical slug."
+msgstr ""
+
+#: website/web/templates/admin/crypto_group_new.html:19
+msgid "Canonical slug (lowercase, dashes)"
+msgstr ""
+
+#: website/web/templates/admin/crypto_group_new.html:24
+msgid "Display name (optional)"
+msgstr ""
+
+#: website/web/templates/admin/crypto_group_new.html:29
+msgid "Aliases (optional, comma-separated)"
+msgstr ""
+
+#: website/web/templates/admin/crypto_group_new.html:40
+msgid "Create"
+msgstr ""
+
+#: website/web/templates/admin/edit.html:3
+#: website/web/templates/admin/logo.html:3
+msgid "Admin · Edit"
+msgstr ""
+
+#: website/web/templates/admin/edit.html:10
+msgid "Edit Group or Market"
+msgstr ""
+
+#: website/web/templates/admin/edit.html:11
+#: website/web/templates/admin/logo.html:11
+msgid "Pick the type, search, then confirm to edit."
+msgstr ""
+
+#: website/web/templates/admin/edit_analysis.html:3
+msgid "Edit Analysis"
+msgstr ""
+
+#: website/web/templates/admin/edit_analysis.html:11
+msgid "Edit analysis"
+msgstr ""
+
+#: website/web/templates/admin/edit_analysis.html:11
+msgid "Add analysis"
+msgstr ""
+
+#: website/web/templates/admin/edit_analysis.html:15
+msgid "Markdown source stored at"
+msgstr ""
+
+#: website/web/templates/admin/edit_analysis.html:17
+msgid "Rendered as HTML on the public group page and exported as PDF on demand."
+msgstr ""
+
+#: website/web/templates/admin/edit_analysis.html:36
+msgid "Back to variants"
+msgstr ""
+
+#: website/web/templates/admin/edit_analysis.html:39
+msgid "Preview HTML"
+msgstr ""
+
+#: website/web/templates/admin/edit_analysis.html:46
 msgid "Delete this analysis?"
 msgstr ""
 
-#: website/web/templates/admin/edit_analysis.html:59
-msgid "Delete analysis"
+#: website/web/templates/admin/edit_analysis.html:50
+#: website/web/templates/admin/edit_analysis.html:52
+msgid "Status:"
+msgstr ""
+
+#: website/web/templates/admin/edit_analysis.html:50
+msgid "attached"
+msgstr ""
+
+#: website/web/templates/admin/edit_analysis.html:63
+msgid "If a file is uploaded, it overrides the textarea content below."
+msgstr ""
+
+#: website/web/templates/admin/edit_analysis.html:72
+msgid "Metadata"
+msgstr ""
+
+#: website/web/templates/admin/edit_analysis.html:96
+msgid ""
+"Used on the cover page of the PDF. SHA-256 must be 64 hex chars; date "
+"must be YYYY-MM-DD. Document type distinguishes a full technical analysis"
+" from a CTI report."
+msgstr ""
+
+#: website/web/templates/admin/edit_analysis.html:105
+msgid "Drag-and-drop or paste an image to upload it as an asset."
+msgstr ""
+
+#: website/web/templates/admin/edit_analysis.html:108
+msgid "Preview unsaved (server-rendered)"
+msgstr ""
+
+#: website/web/templates/admin/editactor.html:3
+#, python-format
+msgid "Admin · %(actor_name)s"
+msgstr ""
+
+#: website/web/templates/admin/editactor.html:10
+#, python-format
+msgid "Edit %(actor_name)s"
+msgstr ""
+
+#: website/web/templates/admin/editactor.html:11
+msgid "Update identity, contacts, sources and relations."
+msgstr ""
+
+#: website/web/templates/admin/editactor.html:12
+msgid "Manage images"
+msgstr ""
+
+#: website/web/templates/admin/editactor.html:46
+msgid "No active"
+msgstr ""
+
+#: website/web/templates/admin/editactor.html:131
+msgid "Pick from suggestions or type."
+msgstr ""
+
+#: website/web/templates/admin/editactor.html:155
+msgid "One URL per line (or “Title — URL”)"
+msgstr ""
+
+#: website/web/templates/admin/editactor.html:162
+msgid "View public page"
+msgstr ""
+
+#: website/web/templates/admin/editactor_select.html:3
+msgid "Admin · Edit Actor"
+msgstr ""
+
+#: website/web/templates/admin/editactor_select.html:9
+msgid "Edit Threat Actor"
+msgstr ""
+
+#: website/web/templates/admin/editactor_select.html:10
+msgid "Select the actor to edit."
+msgstr ""
+
+#: website/web/templates/admin/editactor_select.html:18
+msgid "Filter actors…"
+msgstr ""
+
+#: website/web/templates/admin/editentry.html:3
+#: website/web/templates/admin/editentry.html:10
+msgid "group"
+msgstr ""
+
+#: website/web/templates/admin/editentry.html:23
+msgid "Identity"
+msgstr ""
+
+#: website/web/templates/admin/editentry.html:26
+msgid "Group name"
+msgstr ""
+
+#: website/web/templates/admin/editentry.html:29
+msgid "Galaxy name"
+msgstr ""
+
+#: website/web/templates/admin/editentry.html:34
+msgid "RaaS ?"
+msgstr ""
+
+#: website/web/templates/admin/editentry.html:35
+msgid "Captcha protected ?"
+msgstr ""
+
+#: website/web/templates/admin/editentry.html:36
+msgid "Private group ?"
+msgstr ""
+
+#: website/web/templates/admin/editentry.html:46
+msgid "References & contacts"
+msgstr ""
+
+#: website/web/templates/admin/editentry.html:47
+msgid "Counts = number of lines (or separated entries)"
+msgstr ""
+
+#: website/web/templates/admin/editentry.html:52
+msgid "Profiles"
+msgstr ""
+
+#: website/web/templates/admin/editentry.html:71
+msgid "Profiles (one per line)"
+msgstr ""
+
+#: website/web/templates/admin/editentry.html:77
+msgid "Hash (one per line)"
+msgstr ""
+
+#: website/web/templates/admin/editentry.html:82
+msgid "Jabber (one per line)"
+msgstr ""
+
+#: website/web/templates/admin/editentry.html:87
+msgid "Mail (one per line)"
+msgstr ""
+
+#: website/web/templates/admin/editentry.html:92
+msgid "PGP (separator “|”)"
+msgstr ""
+
+#: website/web/templates/admin/editentry.html:94
+msgid ""
+"Tip: one key = one line; multiple blocks on the same line separated by "
+"“|”."
+msgstr ""
+
+#: website/web/templates/admin/editentry.html:98
+msgid "Matrix (one per line)"
+msgstr ""
+
+#: website/web/templates/admin/editentry.html:103
+msgid "Session (one per line)"
+msgstr ""
+
+#: website/web/templates/admin/editentry.html:108
+msgid "Telegram (one per line)"
+msgstr ""
+
+#: website/web/templates/admin/editentry.html:113
+msgid "Tox (one per line)"
+msgstr ""
+
+#: website/web/templates/admin/editentry.html:118
+msgid "Simplex (one per line)"
+msgstr ""
+
+#: website/web/templates/admin/editentry.html:123
+msgid "Max (one per line)"
+msgstr ""
+
+#: website/web/templates/admin/editentry.html:128
+msgid "Sonar (one per line)"
+msgstr ""
+
+#: website/web/templates/admin/editentry.html:133
+msgid "Affiliates (one per line)"
+msgstr ""
+
+#: website/web/templates/admin/editentry.html:138
+msgid "Other (one per line)"
+msgstr ""
+
+#: website/web/templates/admin/editentry.html:147
+msgid "Links"
+msgstr ""
+
+#: website/web/templates/admin/editentry.html:152
+#: website/web/templates/admin/editpost.html:128
+msgid "Link"
+msgstr ""
+
+#: website/web/templates/admin/editentry.html:157
+msgid "Slug / URL"
+msgstr ""
+
+#: website/web/templates/admin/editentry.html:160
+msgid "FQDN"
+msgstr ""
+
+#: website/web/templates/admin/editentry.html:168
+msgid "File Server"
+msgstr ""
+
+#: website/web/templates/admin/editentry.html:171
+msgid "Private link"
+msgstr ""
+
+#: website/web/templates/admin/editentry.html:173
+msgid "Don't update screen"
+msgstr ""
+
+#: website/web/templates/admin/editentry.html:174
+msgid "Delete this link"
+msgstr ""
+
+#: website/web/templates/admin/editentry.html:178
+msgid "Timeout (s)"
+msgstr ""
+
+#: website/web/templates/admin/editentry.html:181
+msgid "Delay (s)"
+msgstr ""
+
+#: website/web/templates/admin/editentry.html:184
+#: website/web/templates/admin/urls.html:51
+msgid "Browser"
+msgstr ""
+
+#: website/web/templates/admin/editentry.html:189
+msgid "Header"
+msgstr ""
+
+#: website/web/templates/admin/editentry.html:192
+msgid "Version"
+msgstr ""
+
+#: website/web/templates/admin/editentry.html:196
+msgid "Init script"
+msgstr ""
+
+#: website/web/templates/admin/editentry.html:201
+msgid "File (screenshot)"
+msgstr ""
+
+#: website/web/templates/admin/editentry.html:227
+msgid "Check to delete"
+msgstr ""
+
+#: website/web/templates/admin/editlogo.html:3
+msgid "Manage Logo"
+msgstr ""
+
+#: website/web/templates/admin/editlogo.html:10
+msgid "Manage Logos"
+msgstr ""
+
+#: website/web/templates/admin/editlogo.html:11
+msgid ""
+"Preview existing logos, remove the ones you don’t need, and upload new "
+"ones."
+msgstr ""
+
+#: website/web/templates/admin/editlogo.html:22
+msgid "Current logos"
+msgstr ""
+
+#: website/web/templates/admin/editlogo.html:38
+msgid "No logo yet for this entity."
+msgstr ""
+
+#: website/web/templates/admin/editlogo.html:44
+msgid "Add logo"
+msgstr ""
+
+#: website/web/templates/admin/editlogo.html:47
+msgid "Drop an image here"
+msgstr ""
+
+#: website/web/templates/admin/editlogo.html:48
+msgid "or click to browse"
+msgstr ""
+
+#: website/web/templates/admin/editpost.html:3
+#: website/web/templates/admin/editpost.html:50
+msgid "Edit posts"
+msgstr ""
+
+#: website/web/templates/admin/editpost.html:51
+msgid "Search, date filter, screen preview, quick delete — then save changes."
+msgstr ""
+
+#: website/web/templates/admin/editpost.html:66
+msgid "Title, description…"
+msgstr ""
+
+#: website/web/templates/admin/editpost.html:78
+msgid "Expand all"
+msgstr ""
+
+#: website/web/templates/admin/editpost.html:79
+msgid "Collapse all"
+msgstr ""
+
+#: website/web/templates/admin/editpost.html:80
+msgid "Reset filters"
+msgstr ""
+
+#: website/web/templates/admin/editpost.html:102
+msgid "(untitled)"
+msgstr ""
+
+#: website/web/templates/admin/editpost.html:119
+msgid "Discovered (ISO 8601 or YYYY‑MM‑DD)"
+msgstr ""
+
+#: website/web/templates/admin/editpost.html:123
+msgid "Screen URL"
+msgstr ""
+
+#: website/web/templates/admin/editpost.html:141
+msgid "No preview"
+msgstr ""
+
+#: website/web/templates/admin/editpost.html:146
+msgid "Upload new screen (optional)"
+msgstr ""
+
+#: website/web/templates/admin/editpost.html:164
+msgid "Save changes"
+msgstr ""
+
+#: website/web/templates/admin/logo.html:10
+msgid "Edit Logo"
+msgstr ""
+
+#: website/web/templates/admin/logs.html:3
+msgid "Admin · Audit log"
+msgstr ""
+
+#: website/web/templates/admin/logs.html:11
+#: website/web/templates/admin/logs.html:71
+msgid "Audit log"
+msgstr ""
+
+#: website/web/templates/admin/logs.html:12
+#, python-format
+msgid "%(total)s entries (1-year retention)."
+msgstr ""
+
+#: website/web/templates/admin/logs.html:13
+#, python-format
+msgid "%(n)s legacy entries pending migration."
+msgstr ""
+
+#: website/web/templates/admin/logs.html:46
+#: website/web/templates/admin/logs.html:75
+msgid "User"
+msgstr ""
+
+#: website/web/templates/admin/logs.html:57
+msgid "target, details…"
+msgstr ""
+
+#: website/web/templates/admin/logs.html:62
+msgid "Reset"
+msgstr ""
+
+#: website/web/templates/admin/logs.html:74
+msgid "Date (local)"
+msgstr ""
+
+#: website/web/templates/admin/logs.html:77
+msgid "Target"
+msgstr ""
+
+#: website/web/templates/admin/logs.html:78
+msgid "Details"
+msgstr ""
+
+#: website/web/templates/admin/logs.html:102
+#, python-format
+msgid "Page %(page)s / %(total)s"
+msgstr ""
+
+#: website/web/templates/admin/ransomnotes_group.html:3
+#, python-format
+msgid "Admin · Ransom notes · %(slug)s"
+msgstr ""
+
+#: website/web/templates/admin/ransomnotes_group.html:10
+#, python-format
+msgid "Ransom notes · %(slug)s"
+msgstr ""
+
+#: website/web/templates/admin/ransomnotes_group.html:11
+msgid "aliases"
+msgstr ""
+
+#: website/web/templates/admin/ransomnotes_group.html:11
+msgid "for this group and its"
+msgstr ""
+
+#: website/web/templates/admin/ransomnotes_group.html:11
+msgid "notes"
+msgstr ""
+
+#: website/web/templates/admin/ransomnotes_group.html:11
+msgid "(add · edit · remove)."
+msgstr ""
+
+#: website/web/templates/admin/ransomnotes_group.html:29
+#, python-format
+msgid "Remove alias “%(a)s”?"
+msgstr ""
+
+#: website/web/templates/admin/ransomnotes_group.html:35
+msgid "No aliases yet."
+msgstr ""
+
+#: website/web/templates/admin/ransomnotes_group.html:41
+msgid "New alias"
+msgstr ""
+
+#: website/web/templates/admin/ransomnotes_group.html:42
+msgid "e.g., 0mega"
+msgstr ""
+
+#: website/web/templates/admin/ransomnotes_group.html:45
+msgid "Add alias"
+msgstr ""
+
+#: website/web/templates/admin/ransomnotes_group.html:64
+msgid "New note"
+msgstr ""
+
+#: website/web/templates/admin/ransomnotes_group.html:74
+#: website/web/templates/admin/ransomnotes_group.html:135
+msgid "Format"
+msgstr ""
+
+#: website/web/templates/admin/ransomnotes_group.html:76
+msgid "Local override"
+msgstr ""
+
+#: website/web/templates/admin/ransomnotes_group.html:87
+msgid "yes"
+msgstr ""
+
+#: website/web/templates/admin/ransomnotes_group.html:87
+msgid "no"
+msgstr ""
+
+#: website/web/templates/admin/ransomnotes_group.html:101
+msgid "Delete this note?"
+msgstr ""
+
+#: website/web/templates/admin/ransomnotes_group.html:109
+msgid "No notes yet."
+msgstr ""
+
+#: website/web/templates/admin/ransomnotes_group.html:124
+#: website/web/templates/admin/ransomnotes_group.html:210
+msgid "Edit note"
+msgstr ""
+
+#: website/web/templates/admin/ransomnotes_group.html:147
+msgid "archived"
+msgstr ""
+
+#: website/web/templates/admin/ransomnotes_group.html:154
+msgid "Raw note content…"
+msgstr ""
+
+#: website/web/templates/admin/ransomnotes_group.html:159
+msgid "Protect against import overwrite ("
+msgstr ""
+
+#: website/web/templates/admin/ransomnotes_group.html:159
+msgid ")"
+msgstr ""
+
+#: website/web/templates/admin/ransomnotes_group.html:210
+msgid "Create note"
+msgstr ""
+
+#: website/web/templates/admin/ransomnotes_index.html:3
+msgid "Notes from Groups (Admin)"
+msgstr ""
+
+#: website/web/templates/admin/ransomnotes_index.html:9
+msgid "Create a new group."
+msgstr ""
+
+#: website/web/templates/admin/ransomnotes_index.html:10
+msgid "Create a new group and its first ransomnote."
+msgstr ""
+
+#: website/web/templates/admin/ransomnotes_index.html:16
+msgid "Group slug"
+msgstr ""
+
+#: website/web/templates/admin/ransomnotes_index.html:17
+msgid "new-group-slug (ex: antefrigus)"
+msgstr ""
+
+#: website/web/templates/admin/ransomnotes_index.html:19
+msgid "Open / Create"
 msgstr ""
 
 #: website/web/templates/admin/torrent_asn.html:3
@@ -2983,9 +5608,25 @@ msgstr ""
 msgid "Admin · Torrent Health"
 msgstr ""
 
+#: website/web/templates/admin/torrent_health.html:257
+msgid "Scanning ("
+msgstr ""
+
+#: website/web/templates/admin/torrent_health.html:257
+msgid "s)…"
+msgstr ""
+
 #: website/web/templates/admin/torrent_health_detail.html:3
 #, python-format
 msgid "Admin · Torrent · %(ih)s…"
+msgstr ""
+
+#: website/web/templates/admin/torrent_health_detail.html:272
+msgid "Scanning (≈"
+msgstr ""
+
+#: website/web/templates/admin/torrent_health_detail.html:272
+msgid "s) — page will reload"
 msgstr ""
 
 #: website/web/templates/admin/torrent_ip.html:3
@@ -2995,10 +5636,6 @@ msgstr ""
 
 #: website/web/templates/admin/torrent_manage.html:3
 msgid "Admin · Manage Torrents"
-msgstr ""
-
-#: website/web/templates/admin/torrent_manage.html:11
-msgid "Manage torrents"
 msgstr ""
 
 #: website/web/templates/admin/torrent_manage.html:13
@@ -3014,6 +5651,7 @@ msgstr ""
 
 #: website/web/templates/admin/torrent_manage.html:32
 #: website/web/templates/admin/torrent_manage.html:57
+#: website/web/templates/admin/urls.html:30
 msgid "Search…"
 msgstr ""
 
@@ -3065,2002 +5703,75 @@ msgstr ""
 msgid "Admin · Torrent Pivot"
 msgstr ""
 
-#~ msgid "At least 50% of mirrors up"
-#~ msgstr ""
-
-#~ msgid "Fewer than 50% of mirrors up"
-#~ msgstr ""
-
-#~ msgid "Page not found"
-#~ msgstr ""
-
-#~ msgid "The page you’re looking for doesn’t exist or was moved."
-#~ msgstr ""
-
-#~ msgid "Home"
-#~ msgstr ""
-
-#~ msgid "Browse"
-#~ msgstr ""
-
-#~ msgid "Recent posts"
-#~ msgstr ""
-
-#~ msgid "Internal Server Error"
-#~ msgstr ""
-
-#~ msgid "Something went wrong"
-#~ msgstr ""
-
-#~ msgid ""
-#~ "An internal error occurred. The team "
-#~ "has been notified. You can try "
-#~ "again in a moment or head back "
-#~ "to the homepage."
-#~ msgstr ""
-
-#~ msgid "Retry"
-#~ msgstr ""
-
-#~ msgid "RF Dumps"
-#~ msgstr ""
-
-#~ msgid "RF dumps"
-#~ msgstr ""
-
-#~ msgid "Browse RF dumps. Click a dump to view details."
-#~ msgstr ""
-
-#~ msgid "Search RF dumps"
-#~ msgstr ""
-
-#~ msgid "Search RF dumps by name or description"
-#~ msgstr ""
-
-#~ msgid "Dump name or description…"
-#~ msgstr ""
-
-#~ msgid "Clear search"
-#~ msgstr ""
-
-#~ msgid "Dump"
-#~ msgstr ""
-
-#~ msgid "Description"
-#~ msgstr ""
-
-#~ msgid "Sort by date"
-#~ msgstr ""
-
-#~ msgid "Downloaded"
-#~ msgstr ""
-
-#~ msgid "RF dump"
-#~ msgstr ""
-
-#~ msgid "Close"
-#~ msgstr ""
-
-#~ msgid "RF head"
-#~ msgstr ""
-
-#~ msgid "Source"
-#~ msgstr ""
-
-#~ msgid "Loading…"
-#~ msgstr ""
-
-#~ msgid "RF extra"
-#~ msgstr ""
-
-#~ msgid "Size"
-#~ msgstr ""
-
-#~ msgid "Records"
-#~ msgstr ""
-
-#~ msgid "Detection"
-#~ msgstr ""
-
-#~ msgid "Columns"
-#~ msgstr ""
-
-#~ msgid "RF breaches"
-#~ msgstr ""
-
-#~ msgid "Key"
-#~ msgstr ""
-
-#~ msgid "Value"
-#~ msgstr ""
-
-#~ msgid "About"
-#~ msgstr ""
-
-#~ msgid "About RansomLook"
-#~ msgstr ""
-
-#~ msgid ""
-#~ "Open-source project providing real‑time "
-#~ "ransomware intelligence: tracked groups, "
-#~ "posts, mirrors, forums, and more."
-#~ msgstr ""
-
-#~ msgid "What is RansomLook?"
-#~ msgstr ""
-
-#~ msgid ""
-#~ "RansomLook is an open‑source project "
-#~ "aimed at assisting users in tracking "
-#~ "ransomware‑related posts and activities across"
-#~ " various sites and forums."
-#~ msgstr ""
-
-#~ msgid "The main components include:"
-#~ msgstr ""
-
-#~ msgid "Blog monitoring and victim extraction"
-#~ msgstr ""
-
-#~ msgid "Forum monitoring (parsing is not available)"
-#~ msgstr ""
-
-#~ msgid "Overview of Ransomware Notes"
-#~ msgstr ""
-
-#~ msgid "Tracking leaks from public sources"
-#~ msgstr ""
-
-#~ msgid "Leak tracking from RecordedFuture provider (private API required)"
-#~ msgstr ""
-
-#~ msgid "Monitoring of various known Bitcoin wallets"
-#~ msgstr ""
-
-#~ msgid "Who uses RansomLook?"
-#~ msgstr ""
-
-#~ msgid "RansomLook is built for, and used by:"
-#~ msgstr ""
-
-#~ msgid ""
-#~ "<strong>SOC / IR teams</strong> — "
-#~ "spotting victims in real time, "
-#~ "correlating outbound traffic with known "
-#~ "ransomware mirrors during incident response."
-#~ msgstr ""
-
-#~ msgid ""
-#~ "<strong>CTI analysts</strong> — tracking group"
-#~ " activity, emergence of new actors, "
-#~ "infrastructure churn, and producing trend "
-#~ "reports."
-#~ msgstr ""
-
-#~ msgid ""
-#~ "<strong>CSIRTs / national CERTs</strong> — "
-#~ "building situational awareness and notifying"
-#~ " constituents when they appear in a"
-#~ " leak post."
-#~ msgstr ""
-
-#~ msgid ""
-#~ "<strong>Security researchers</strong> — studying "
-#~ "the ransomware ecosystem over time via"
-#~ " open data and the API."
-#~ msgstr ""
-
-#~ msgid ""
-#~ "<strong>Journalists</strong> — verifying claims, "
-#~ "confirming victim disclosures, and grounding"
-#~ " reporting in public evidence."
-#~ msgstr ""
-
-#~ msgid "Getting started"
-#~ msgstr ""
-
-#~ msgid "Start from the page that matches your use case:"
-#~ msgstr ""
-
-#~ msgid ""
-#~ "<strong>Incident response</strong> → <a "
-#~ "href=\"/recent\">/recent</a> &nbsp;·&nbsp; <a "
-#~ "href=\"/urls\">/urls</a> (check if a URL "
-#~ "you observed matches a tracked mirror)."
-#~ msgstr ""
-
-#~ msgid ""
-#~ "<strong>CTI / trend analysis</strong> → "
-#~ "<a href=\"/stats\">/stats</a> &nbsp;·&nbsp; <a "
-#~ "href=\"/hot\">/hot</a> (trending groups)."
-#~ msgstr ""
-
-#~ msgid ""
-#~ "<strong>Directory / lookup</strong> → <a "
-#~ "href=\"/browse\">/browse</a> (all groups, markets,"
-#~ " actors)."
-#~ msgstr ""
-
-#~ msgid ""
-#~ "<strong>Automation / integration</strong> → <a"
-#~ " href=\"/doc/\">API documentation</a> &nbsp;·&nbsp; "
-#~ "<a href=\"/rss.xml\">RSS feed</a>."
-#~ msgstr ""
-
-#~ msgid ""
-#~ "<strong>Self-hosting</strong> → <a "
-#~ "href=\"https://github.com/RansomLook/RansomLook\" "
-#~ "target=\"_blank\" rel=\"noopener\">GitHub repository</a>"
-#~ " (Docker compose &amp; Poetry instructions"
-#~ " in the README)."
-#~ msgstr ""
-
-#~ msgid "Data freshness"
-#~ msgstr ""
-
-#~ msgid ""
-#~ "RansomLook scrapes tracked DLS / forums"
-#~ " on a continuous loop — mirror "
-#~ "availability, post lists and screenshots "
-#~ "are refreshed multiple times per day."
-#~ " The <a href=\"/\">homepage</a> shows the"
-#~ " live <em>last 7 days</em> delta so"
-#~ " you can judge activity at a "
-#~ "glance; <a href=\"/stats\">/stats</a> exposes "
-#~ "the full aggregation controls."
-#~ msgstr ""
-
-#~ msgid ""
-#~ "Sources are open-by-design: we "
-#~ "track what is publicly claimed on "
-#~ "leak sites. Claims from operators are"
-#~ " <strong>not</strong> independently verified "
-#~ "against victim confirmations — always "
-#~ "treat a post as a <em>claim</em> "
-#~ "until corroborated elsewhere."
-#~ msgstr ""
-
-#~ msgid "Is it free?"
-#~ msgstr ""
-
-#~ msgid "Yes, it is free—and more importantly, it is open‑source."
-#~ msgstr ""
-
-#~ msgid ""
-#~ "RansomLook is licensed under the GNU "
-#~ "Affero General Public License (AGPL) "
-#~ "v3.0."
-#~ msgstr ""
-
-#~ msgid "How can I follow new posts?"
-#~ msgstr ""
-
-#~ msgid "There are various ways to stay updated with new posts:"
-#~ msgstr ""
-
-#~ msgid "Run your own instance and enable RocketChat and/or email notifications"
-#~ msgstr ""
-
-#~ msgid "Check the public instance"
-#~ msgstr ""
-
-#~ msgid "Access the API"
-#~ msgstr ""
-
-#~ msgid "Documentation"
-#~ msgstr ""
-
-#~ msgid "Follow us on Mastodon"
-#~ msgstr ""
-
-#~ msgid "There is NO official Telegram Channel!"
-#~ msgstr ""
-
-#~ msgid "Want to be part of the RansomLook community?"
-#~ msgstr ""
-
-#~ msgid ""
-#~ "Join us in making RansomLook even "
-#~ "better! Here's how you can contribute:"
-#~ msgstr ""
-
-#~ msgid "Create an issue on our GitHub repository"
-#~ msgstr ""
-
-#~ msgid "Submit pull requests with new features or improvements"
-#~ msgstr ""
-
-#~ msgid "Share new sources of DLS (Darknet Leak Sites)"
-#~ msgstr ""
-
-#~ msgid "Report any bugs you come across"
-#~ msgstr ""
-
-#~ msgid "Suggest new functionalities that could enhance RansomLook"
-#~ msgstr ""
-
-#~ msgid "Follow us on LinkedIn and be part of the community"
-#~ msgstr ""
-
-#~ msgid "Credits & Thanks"
-#~ msgstr ""
-
-#~ msgid "The original code was based on RansomWatch."
-#~ msgstr ""
-
-#~ msgid "External data sources"
-#~ msgstr ""
-
-#~ msgid "Ransomwhe.re for cryptocurrency addresses"
-#~ msgstr ""
-
-#~ msgid "ThreatLabz for the RansomNotes"
-#~ msgstr ""
-
-#~ msgid "leak-lookup for public leaks"
-#~ msgstr ""
-
-#~ msgid "Usage of the API and License"
-#~ msgstr ""
-
-#~ msgid ""
-#~ "All content provided by ransomlook.io —"
-#~ " including the website, API responses, "
-#~ "and datasets — is made available "
-#~ "under the Creative Commons Attribution "
-#~ "4.0 International (CC BY 4.0) license."
-#~ msgstr ""
-
-#~ msgid ""
-#~ "You are free to share and adapt"
-#~ " the material for any purpose, even"
-#~ " commercially, provided that appropriate "
-#~ "credit is given."
-#~ msgstr ""
-
-#~ msgid "Threat Actor"
-#~ msgstr ""
-
-#~ msgid "WANTED"
-#~ msgstr ""
-
-#~ msgid "Inactive"
-#~ msgstr ""
-
-#~ msgid "Private"
-#~ msgstr ""
-
-#~ msgid "%(n)s group"
-#~ msgstr ""
-
-#~ msgid "%(n)s peer"
-#~ msgstr ""
-
-#~ msgid "Edit"
-#~ msgstr ""
-
-#~ msgid "AKA"
-#~ msgstr ""
-
-#~ msgid "Relation graph"
-#~ msgstr ""
-
-#~ msgid "This actor"
-#~ msgstr ""
-
-#~ msgid "Group"
-#~ msgstr ""
-
-#~ msgid "Market / Forum"
-#~ msgstr ""
-
-#~ msgid "Other actor"
-#~ msgstr ""
-
-#~ msgid "Unknown (not in DB)"
-#~ msgstr ""
-
-#~ msgid "General description"
-#~ msgstr ""
-
-#~ msgid "No description available."
-#~ msgstr ""
-
-#~ msgid "Documentation / Sources"
-#~ msgstr ""
-
-#~ msgid "No public sources."
-#~ msgstr ""
-
-#~ msgid "Relations"
-#~ msgstr ""
-
-#~ msgid "Groups"
-#~ msgstr ""
-
-#~ msgid "No known group links."
-#~ msgstr ""
-
-#~ msgid "Forums / Markets"
-#~ msgstr ""
-
-#~ msgid "No known forum links."
-#~ msgstr ""
-
-#~ msgid "Other actors"
-#~ msgstr ""
-
-#~ msgid "No peers documented."
-#~ msgstr ""
-
-#~ msgid "Images / Documents"
-#~ msgstr ""
-
-#~ msgid "Personal information"
-#~ msgstr ""
-
-#~ msgid "First name"
-#~ msgstr ""
-
-#~ msgid "Last name"
-#~ msgstr ""
-
-#~ msgid "Age"
-#~ msgstr ""
-
-#~ msgid "DOB"
-#~ msgstr ""
-
-#~ msgid "Nationality"
-#~ msgstr ""
-
-#~ msgid "Location"
-#~ msgstr ""
-
-#~ msgid "Contacts / Social"
-#~ msgstr ""
-
-#~ msgid "No contacts listed."
-#~ msgstr ""
-
-#~ msgid "Real‑time ransomware intelligence (open data)"
-#~ msgstr ""
-
-#~ msgid ""
-#~ "Open, searchable ransomware group intelligence"
-#~ " with live stats, posts and an "
-#~ "API."
-#~ msgstr ""
-
-#~ msgid "Data"
-#~ msgstr ""
-
-#~ msgid "Recent"
-#~ msgstr ""
-
-#~ msgid "Trending"
-#~ msgstr ""
-
-#~ msgid "Stats"
-#~ msgstr ""
-
-#~ msgid "Intel"
-#~ msgstr ""
-
-#~ msgid "URLs"
-#~ msgstr ""
-
-#~ msgid "All tracked mirrors"
-#~ msgstr ""
-
-#~ msgid "Crypto"
-#~ msgstr ""
-
-#~ msgid "Cryptocurrencies"
-#~ msgstr ""
-
-#~ msgid "Leaks"
-#~ msgstr ""
-
-#~ msgid "Notes"
-#~ msgstr ""
-
-#~ msgid "Ransomware Notes"
-#~ msgstr ""
-
-#~ msgid "Torrents"
-#~ msgstr ""
-
-#~ msgid "Torrent swarm health"
-#~ msgstr ""
-
-#~ msgid "Info"
-#~ msgstr ""
-
-#~ msgid "API"
-#~ msgstr ""
-
-#~ msgid "API documentation (Swagger)"
-#~ msgstr ""
-
-#~ msgid "Glossary"
-#~ msgstr ""
-
-#~ msgid "RSS feed — Recent posts"
-#~ msgstr ""
-
-#~ msgid "Admin"
-#~ msgstr ""
-
-#~ msgid "Login"
-#~ msgstr ""
-
-#~ msgid "Search (Ctrl/Cmd+K)"
-#~ msgstr ""
-
-#~ msgid "Search"
-#~ msgstr ""
-
-#~ msgid "Toggle dark/light mode"
-#~ msgstr ""
-
-#~ msgid "Toggle theme"
-#~ msgstr ""
-
-#~ msgid "Contribute on"
-#~ msgstr ""
-
-#~ msgid "type to search"
-#~ msgstr ""
-
-#~ msgid "Search text"
-#~ msgstr ""
-
-#~ msgid "Groups, markets/forums and threat actors in one place."
-#~ msgstr ""
-
-#~ msgid "Search across groups, markets and actors"
-#~ msgstr ""
-
-#~ msgid "Search name or alias… (Ctrl/Cmd+K)"
-#~ msgstr ""
-
-#~ msgid "Entity type"
-#~ msgstr ""
-
-#~ msgid "All"
-#~ msgstr ""
-
-#~ msgid "Markets"
-#~ msgstr ""
-
-#~ msgid "Actors"
-#~ msgstr ""
-
-#~ msgid "Filter by health"
-#~ msgstr ""
-
-#~ msgid "At least 50%% of mirrors up"
-#~ msgstr ""
-
-#~ msgid "Healthy"
-#~ msgstr ""
-
-#~ msgid "Fewer than 50%% of mirrors up"
-#~ msgstr ""
-
-#~ msgid "Degraded"
-#~ msgstr ""
-
-#~ msgid "No mirror up"
-#~ msgstr ""
-
-#~ msgid "Offline"
-#~ msgstr ""
-
-#~ msgid "Alphabet filter"
-#~ msgstr ""
-
-#~ msgid "Names starting with a digit"
-#~ msgstr ""
-
-#~ msgid "Other / symbols"
-#~ msgstr ""
-
-#~ msgid "Parser enabled"
-#~ msgstr ""
-
-#~ msgid "parser"
-#~ msgstr ""
-
-#~ msgid "Wanted listing (FBI/Europol/Interpol)"
-#~ msgstr ""
-
-#~ msgid "wanted"
-#~ msgstr ""
-
-#~ msgid "Known aliases"
-#~ msgstr ""
-
-#~ msgid "%(n)s alias"
-#~ msgstr ""
-
-#~ msgid "private"
-#~ msgstr ""
-
-#~ msgid "No matches."
-#~ msgstr ""
-
-#~ msgid "Compare"
-#~ msgstr ""
-
-#~ msgid "Compare two sources"
-#~ msgstr ""
-
-#~ msgid ""
-#~ "Pick two %(kind)s to compare (posts "
-#~ "7/30/365, mirrors up, 30-day uptime)."
-#~ msgstr ""
-
-#~ msgid "groups"
-#~ msgstr ""
-
-#~ msgid "markets/forums"
-#~ msgstr ""
-
-#~ msgid "Choose type to compare"
-#~ msgstr ""
-
-#~ msgid "Markets / Forums"
-#~ msgstr ""
-
-#~ msgid "Search A"
-#~ msgstr ""
-
-#~ msgid "Filter options for Source A…"
-#~ msgstr ""
-
-#~ msgid "Source A"
-#~ msgstr ""
-
-#~ msgid "Select a group…"
-#~ msgstr ""
-
-#~ msgid "Search B"
-#~ msgstr ""
-
-#~ msgid "Filter options for Source B…"
-#~ msgstr ""
-
-#~ msgid "Source B"
-#~ msgstr ""
-
-#~ msgid "Swap A ↔ B"
-#~ msgstr ""
-
-#~ msgid "Select a market/forum…"
-#~ msgstr ""
-
-#~ msgid "Posts 7d"
-#~ msgstr ""
-
-#~ msgid "Posts 30d"
-#~ msgstr ""
-
-#~ msgid "Posts 365d"
-#~ msgstr ""
-
-#~ msgid "Mirrors up"
-#~ msgstr ""
-
-#~ msgid "Uptime 30d"
-#~ msgstr ""
-
-#~ msgid "Captcha"
-#~ msgstr ""
-
-#~ msgid "Yes"
-#~ msgstr ""
-
-#~ msgid "No"
-#~ msgstr ""
-
-#~ msgid "RaaS"
-#~ msgstr ""
-
-#~ msgid "Cryptocurrencies from Groups"
-#~ msgstr ""
-
-#~ msgid "Groups with crypto"
-#~ msgstr ""
-
-#~ msgid "Browse cryptocurrency wallets grouped by actor."
-#~ msgstr ""
-
-#~ msgid "Filter groups"
-#~ msgstr ""
-
-#~ msgid "Group name or alias…"
-#~ msgstr ""
-
-#~ msgid "Observed wallets and transactions for this group."
-#~ msgstr ""
-
-#~ msgid "Aliases:"
-#~ msgstr ""
-
-#~ msgid "wallet"
-#~ msgstr ""
-
-#~ msgid "chain"
-#~ msgstr ""
-
-#~ msgid "Export all transactions for this group"
-#~ msgstr ""
-
-#~ msgid "Export all CSV"
-#~ msgstr ""
-
-#~ msgid "View group"
-#~ msgstr ""
-
-#~ msgid "%(n)s wallet"
-#~ msgstr ""
-
-#~ msgid "View on Breadcrumbs"
-#~ msgstr ""
-
-#~ msgid "%(n)s tx"
-#~ msgstr ""
-
-#~ msgid "Export CSV"
-#~ msgstr ""
-
-#~ msgid "CSV"
-#~ msgstr ""
-
-#~ msgid "From"
-#~ msgstr ""
-
-#~ msgid "To"
-#~ msgstr ""
-
-#~ msgid "Min amount"
-#~ msgstr ""
-
-#~ msgid "Max amount"
-#~ msgstr ""
-
-#~ msgid "Dir"
-#~ msgstr ""
-
-#~ msgid "Filter"
-#~ msgstr ""
-
-#~ msgid "Clear"
-#~ msgstr ""
-
-#~ msgid "Transactions"
-#~ msgstr ""
-
-#~ msgid "Transaction"
-#~ msgstr ""
-
-#~ msgid "Date"
-#~ msgstr ""
-
-#~ msgid "Counterpart"
-#~ msgstr ""
-
-#~ msgid "Amount"
-#~ msgstr ""
-
-#~ msgid "USD"
-#~ msgstr ""
-
-#~ msgid "Outgoing"
-#~ msgstr ""
-
-#~ msgid "Incoming"
-#~ msgstr ""
-
-#~ msgid "No transactions recorded."
-#~ msgstr ""
-
-#~ msgid "No wallet found for this group."
-#~ msgstr ""
-
-#~ msgid ""
-#~ "Technical terms used across RansomLook: "
-#~ "groups, actors, infrastructure types, metrics"
-#~ " and relationships."
-#~ msgstr ""
-
-#~ msgid "Table of contents"
-#~ msgstr ""
-
-#~ msgid "Sections"
-#~ msgstr ""
-
-#~ msgid "Core concepts"
-#~ msgstr ""
-
-#~ msgid "Infrastructure types"
-#~ msgstr ""
-
-#~ msgid "Data and metrics"
-#~ msgstr ""
-
-#~ msgid "Ecosystem and sources"
-#~ msgstr ""
-
-#~ msgid "Relationships"
-#~ msgstr ""
-
-#~ msgid ""
-#~ "A ransomware group or data-extortion "
-#~ "collective tracked by RansomLook. Groups "
-#~ "usually operate one or more leak "
-#~ "sites, file servers and communication "
-#~ "channels."
-#~ msgstr ""
-
-#~ msgid "Actor"
-#~ msgstr ""
-
-#~ msgid ""
-#~ "A named individual or pseudonym (threat"
-#~ " actor, developer, affiliate, broker, "
-#~ "admin, etc.) related to ransomware or"
-#~ " data-extortion activity."
-#~ msgstr ""
-
-#~ msgid "Victim / Post"
-#~ msgstr ""
-
-#~ msgid ""
-#~ "A single entry published by a "
-#~ "group about a targeted organisation. In"
-#~ " RansomLook this is usually stored as"
-#~ " a \"post\" and is associated with"
-#~ " one group and one discovery "
-#~ "timestamp."
-#~ msgstr ""
-
-#~ msgid ""
-#~ "Ransomware-as-a-Service. Operating model where"
-#~ " a core team develops the ransomware"
-#~ " and infrastructure, while affiliates "
-#~ "perform intrusions and share the "
-#~ "profits."
-#~ msgstr ""
-
-#~ msgid "DLS"
-#~ msgstr ""
-
-#~ msgid ""
-#~ "Dedicated Leak Site / Darknet Leak "
-#~ "Site. Tor-based website operated by "
-#~ "a group to list victims and "
-#~ "publish stolen data when ransoms are "
-#~ "not paid."
-#~ msgstr ""
-
-#~ msgid "FS"
-#~ msgstr ""
-
-#~ msgid ""
-#~ "File Server / File Storage. "
-#~ "Infrastructure used to host or "
-#~ "distribute stolen data (archives, samples, "
-#~ "full dumps)."
-#~ msgstr ""
-
-#~ msgid "Chat"
-#~ msgstr ""
-
-#~ msgid ""
-#~ "Communication endpoints used for negotiation"
-#~ " or contact with victims and "
-#~ "affiliates. Includes web-based chat, "
-#~ "Telegram, X/Twitter, email and other "
-#~ "messaging."
-#~ msgstr ""
-
-#~ msgid "Admin / Affiliates panel"
-#~ msgstr ""
-
-#~ msgid ""
-#~ "Administrative or affiliate-focused "
-#~ "infrastructure not intended for public "
-#~ "victim browsing. Recruitment panels, campaign"
-#~ " portals, status pages."
-#~ msgstr ""
-
-#~ msgid "Relay / Mirror"
-#~ msgstr ""
-
-#~ msgid ""
-#~ "A technical copy of a group's site"
-#~ " accessible at a different domain or"
-#~ " onion address. RansomLook tracks each "
-#~ "relay as a separate location with "
-#~ "its own status."
-#~ msgstr ""
-
-#~ msgid "Slug"
-#~ msgstr ""
-
-#~ msgid ""
-#~ "Normalised name used internally to build"
-#~ " URLs for a specific location of "
-#~ "a group. Used to create deterministic"
-#~ " filenames and links."
-#~ msgstr ""
-
-#~ msgid "Private location"
-#~ msgstr ""
-
-#~ msgid ""
-#~ "A location stored in the database "
-#~ "but not displayed to unauthenticated "
-#~ "visitors. Still used for scraping, "
-#~ "monitoring and metrics."
-#~ msgstr ""
-
-#~ msgid "Parser"
-#~ msgstr ""
-
-#~ msgid ""
-#~ "Piece of code dedicated to a "
-#~ "specific group or site. Extracts "
-#~ "structured data from HTML pages (victim"
-#~ " name, sector, country, dates, etc.)."
-#~ msgstr ""
-
-#~ msgid "Discovery date"
-#~ msgstr ""
-
-#~ msgid ""
-#~ "Timestamp at which RansomLook first "
-#~ "observed a victim post. May differ "
-#~ "from the original intrusion or "
-#~ "encryption date."
-#~ msgstr ""
-
-#~ msgid "Leak / Dataleak"
-#~ msgstr ""
-
-#~ msgid ""
-#~ "Public dataset containing credentials or "
-#~ "other information exposed in previous "
-#~ "breaches. RansomLook integrates external leak"
-#~ " databases for enrichment."
-#~ msgstr ""
-
-#~ msgid "Ransom notes"
-#~ msgstr ""
-
-#~ msgid ""
-#~ "Text files or HTML pages left on"
-#~ " compromised systems by ransomware "
-#~ "operators. RansomLook indexes ransom notes "
-#~ "to help identify families and "
-#~ "operations."
-#~ msgstr ""
-
-#~ msgid "Crypto address / Wallet"
-#~ msgstr ""
-
-#~ msgid ""
-#~ "Cryptocurrency address controlled or used "
-#~ "by a group or affiliate to receive"
-#~ " ransom payments. Monitored and correlated"
-#~ " with known activity."
-#~ msgstr ""
-
-#~ msgid ""
-#~ "Darknet or clearnet platforms where "
-#~ "actors trade access, data, tools or "
-#~ "services. Tracked as separate entities "
-#~ "from ransomware groups."
-#~ msgstr ""
-
-#~ msgid ""
-#~ "Optional Recorded Future integration providing"
-#~ " additional leak information and dumps. "
-#~ "Requires a private API key."
-#~ msgstr ""
-
-#~ msgid "Onion service (Tor)"
-#~ msgstr ""
-
-#~ msgid ""
-#~ "Hidden service accessible through the "
-#~ "Tor network. Most DLS, FS and "
-#~ "negotiation panels are onion services, "
-#~ "sometimes with multiple relays."
-#~ msgstr ""
-
-#~ msgid "v3 onion"
-#~ msgstr ""
-
-#~ msgid ""
-#~ "Current version of Tor hidden service"
-#~ " addresses (56-character <code>.onion</code> "
-#~ "domains). RansomLook tracks versions to "
-#~ "classify infrastructure changes."
-#~ msgstr ""
-
-#~ msgid "Affiliates"
-#~ msgstr ""
-
-#~ msgid ""
-#~ "External operators who work with a "
-#~ "core ransomware group. Perform intrusions, "
-#~ "deploy ransomware and share a percentage"
-#~ " of the ransom."
-#~ msgstr ""
-
-#~ msgid "Peers"
-#~ msgstr ""
-
-#~ msgid ""
-#~ "Other actors linked to a given "
-#~ "individual. Can represent collaboration, "
-#~ "shared infrastructure or repeated co-"
-#~ "appearance in operations."
-#~ msgstr ""
-
-#~ msgid "Groups / Forums relations"
-#~ msgstr ""
-
-#~ msgid ""
-#~ "Links between one actor and multiple "
-#~ "groups or markets. RansomLook stores "
-#~ "these so users can explore which "
-#~ "actors operate across which ecosystems."
-#~ msgstr ""
-
-#~ msgid "posts (all time)"
-#~ msgstr ""
-
-#~ msgid "last 30 days"
-#~ msgstr ""
-
-#~ msgid "last 7 days"
-#~ msgstr ""
-
-#~ msgid "avg uptime 30d"
-#~ msgstr ""
-
-#~ msgid "Activity · last 30 days"
-#~ msgstr ""
-
-#~ msgid "Export URLs (CSV)"
-#~ msgstr ""
-
-#~ msgid "All statuses"
-#~ msgstr ""
-
-#~ msgid "Active"
-#~ msgstr ""
-
-#~ msgid "Export Posts (CSV)"
-#~ msgstr ""
-
-#~ msgid "From date"
-#~ msgstr ""
-
-#~ msgid "To date"
-#~ msgstr ""
-
-#~ msgid "External Analysis"
-#~ msgstr ""
-
-#~ msgid "External analysis"
-#~ msgstr ""
-
-#~ msgid "View all notes"
-#~ msgstr ""
-
-#~ msgid "No note linked."
-#~ msgstr ""
-
-#~ msgid "Known hashes"
-#~ msgstr ""
-
-#~ msgid "Hash"
-#~ msgstr ""
-
-#~ msgid "Jabber"
-#~ msgstr ""
-
-#~ msgid "Mail"
-#~ msgstr ""
-
-#~ msgid "PGP"
-#~ msgstr ""
-
-#~ msgid "Matrix"
-#~ msgstr ""
-
-#~ msgid "Session"
-#~ msgstr ""
-
-#~ msgid "Telegram"
-#~ msgstr ""
-
-#~ msgid "Tox"
-#~ msgstr ""
-
-#~ msgid "Simplex"
-#~ msgstr ""
-
-#~ msgid "Max"
-#~ msgstr ""
-
-#~ msgid "Sonar"
-#~ msgstr ""
-
-#~ msgid "Other"
-#~ msgstr ""
-
-#~ msgid "Urls"
-#~ msgstr ""
-
-#~ msgid "Url"
-#~ msgstr ""
-
-#~ msgid "File servers"
-#~ msgstr ""
-
-#~ msgid "Chat servers"
-#~ msgstr ""
-
-#~ msgid "Admin servers"
-#~ msgstr ""
-
-#~ msgid "Activity (interactive)"
-#~ msgstr ""
-
-#~ msgid "Activity charts"
-#~ msgstr ""
-
-#~ msgid "Aggregation"
-#~ msgstr ""
-
-#~ msgid "Daily"
-#~ msgstr ""
-
-#~ msgid "Weekly"
-#~ msgstr ""
-
-#~ msgid "Rolling avg."
-#~ msgstr ""
-
-#~ msgid "Off"
-#~ msgstr ""
-
-#~ msgid "Posts"
-#~ msgstr ""
-
-#~ msgid "Title"
-#~ msgstr ""
-
-#~ msgid "Screen"
-#~ msgstr ""
-
-#~ msgid "Enlarged chart"
-#~ msgstr ""
-
-#~ msgid "Previous"
-#~ msgstr ""
-
-#~ msgid "Next"
-#~ msgstr ""
-
-#~ msgid "Availability, mirrors, last visit & quick links."
-#~ msgstr ""
-
-#~ msgid "Trending (last %(n)s days)"
-#~ msgstr ""
-
-#~ msgid "Groups actively posting in the last <strong>%(n)s</strong> day"
-#~ msgstr ""
-
-#~ msgid "posts"
-#~ msgstr ""
-
-#~ msgid "vs prev %(n)sd"
-#~ msgstr ""
-
-#~ msgid "flat"
-#~ msgstr ""
-
-#~ msgid "Activity · last %(n)s days"
-#~ msgstr ""
-
-#~ msgid "%(n)s post"
-#~ msgstr ""
-
-#~ msgid "Window"
-#~ msgstr ""
-
-#~ msgid "Last %(n)sd"
-#~ msgstr ""
-
-#~ msgid "Sort"
-#~ msgstr ""
-
-#~ msgid "Trending (Δ%%)"
-#~ msgstr ""
-
-#~ msgid "Volume"
-#~ msgstr ""
-
-#~ msgid "New entrants"
-#~ msgstr ""
-
-#~ msgid "Apply"
-#~ msgstr ""
-
-#~ msgid "Download as CSV"
-#~ msgstr ""
-
-#~ msgid "Filter group name…"
-#~ msgstr ""
-
-#~ msgid "Trending groups"
-#~ msgstr ""
-
-#~ msgid "Trend"
-#~ msgstr ""
-
-#~ msgid "Last post"
-#~ msgstr ""
-
-#~ msgid "No data for the selected window."
-#~ msgstr ""
-
-#~ msgid "Open ransomware intelligence"
-#~ msgstr ""
-
-#~ msgid "ransomware posts."
-#~ msgstr ""
-
-#~ msgid "Tracked in the open."
-#~ msgstr ""
-
-#~ msgid ""
-#~ "Open-source intelligence on %(n)s "
-#~ "ransomware groups, markets and threat "
-#~ "actors. Updated live since %(year)s."
-#~ msgstr ""
-
-#~ msgid "Explore"
-#~ msgstr ""
-
-#~ msgid "vs prev 7d"
-#~ msgstr ""
-
-#~ msgid "This week"
-#~ msgstr ""
-
-#~ msgid "posts · last 7 days"
-#~ msgstr ""
-
-#~ msgid "active groups"
-#~ msgstr ""
-
-#~ msgid "new groups this week"
-#~ msgstr ""
-
-#~ msgid "NEW"
-#~ msgstr ""
-
-#~ msgid "none"
-#~ msgstr ""
-
-#~ msgid "top group"
-#~ msgstr ""
-
-#~ msgid "Top movers"
-#~ msgstr ""
-
-#~ msgid "7d vs prev 7d"
-#~ msgstr ""
-
-#~ msgid "No movement this week."
-#~ msgstr ""
-
-#~ msgid "Latest posts"
-#~ msgstr ""
-
-#~ msgid "see more"
-#~ msgstr ""
-
-#~ msgid "No posts yet."
-#~ msgstr ""
-
-#~ msgid "markets"
-#~ msgstr ""
-
-#~ msgid "actors"
-#~ msgstr ""
-
-#~ msgid "leaks"
-#~ msgstr ""
-
-#~ msgid "ransom notes"
-#~ msgstr ""
-
-#~ msgid "crypto addrs"
-#~ msgstr ""
-
-#~ msgid "Leaks listing"
-#~ msgstr ""
-
-#~ msgid "Browse known public leaks. Click a leak to view details."
-#~ msgstr ""
-
-#~ msgid "Name, description, URL, page title…"
-#~ msgstr ""
-
-#~ msgid "Page title"
-#~ msgstr ""
-
-#~ msgid "Entries"
-#~ msgstr ""
-
-#~ msgid "Leak details"
-#~ msgstr ""
-
-#~ msgid "Leak data"
-#~ msgstr ""
-
-#~ msgid "Indexed"
-#~ msgstr ""
-
-#~ msgid "Sign in to access admin features."
-#~ msgstr ""
-
-#~ msgid "Notes from Groups"
-#~ msgstr ""
-
-#~ msgid "Groups with notes"
-#~ msgstr ""
-
-#~ msgid "Browse ransomware note samples grouped by actor."
-#~ msgstr ""
-
-#~ msgid "Original ransom notes collected for this group."
-#~ msgstr ""
-
-#~ msgid "note available."
-#~ msgstr ""
-
-#~ msgid "Note content"
-#~ msgstr ""
-
-#~ msgid "Content"
-#~ msgstr ""
-
-#~ msgid "Action"
-#~ msgstr ""
-
-#~ msgid "Copy"
-#~ msgstr ""
-
-#~ msgid "Last %(n)s day"
-#~ msgstr ""
-
-#~ msgid "showing most recent %(shown)s of %(total)s — older entries trimmed"
-#~ msgstr ""
-
-#~ msgid "Time window"
-#~ msgstr ""
-
-#~ msgid "Window:"
-#~ msgstr ""
-
-#~ msgid "%(n)s day"
-#~ msgstr ""
-
-#~ msgid "Activity · last 24h"
-#~ msgstr ""
-
-#~ msgid "Filter posts by title or group"
-#~ msgstr ""
-
-#~ msgid "Filter by title or group…"
-#~ msgstr ""
-
-#~ msgid "Filter by group"
-#~ msgstr ""
-
-#~ msgid "All groups (%(n)s)"
-#~ msgstr ""
-
-#~ msgid "No recent items found."
-#~ msgstr ""
-
-#~ msgid "Leak"
-#~ msgstr ""
-
-#~ msgid "Name of Ransom note"
-#~ msgstr ""
-
-#~ msgid "Blockchain"
-#~ msgstr ""
-
-#~ msgid "Address"
-#~ msgstr ""
-
-#~ msgid "Tx"
-#~ msgstr ""
-
-#~ msgid "No result"
-#~ msgstr ""
-
-#~ msgid "Interactive statistics"
-#~ msgstr ""
-
-#~ msgid ""
-#~ "Explore posts by period, groups, and "
-#~ "aggregation — fully client-side & "
-#~ "interactive."
-#~ msgstr ""
-
-#~ msgid "Filters"
-#~ msgstr ""
-
-#~ msgid "Period"
-#~ msgstr ""
-
-#~ msgid "Last 7 days"
-#~ msgstr ""
-
-#~ msgid "Last 14 days"
-#~ msgstr ""
-
-#~ msgid "Last 30 days"
-#~ msgstr ""
-
-#~ msgid "Last 90 days"
-#~ msgstr ""
-
-#~ msgid "Custom…"
-#~ msgstr ""
-
-#~ msgid "Hourly"
-#~ msgstr ""
-
-#~ msgid "Top-N groups"
-#~ msgstr ""
-
-#~ msgid "Top 5"
-#~ msgstr ""
-
-#~ msgid "Top 10"
-#~ msgstr ""
-
-#~ msgid "Top 20"
-#~ msgstr ""
-
-#~ msgid "Normalize (%%)"
-#~ msgstr ""
-
-#~ msgid "Reload from API"
-#~ msgstr ""
-
-#~ msgid "Refresh"
-#~ msgstr ""
-
-#~ msgid "Export filtered data to CSV"
-#~ msgstr ""
-
-#~ msgid "Copy shareable URL"
-#~ msgstr ""
-
-#~ msgid "Share URL"
-#~ msgstr ""
-
-#~ msgid "loading…"
-#~ msgstr ""
-
-#~ msgid "Search groups…"
-#~ msgstr ""
-
-#~ msgid "None"
-#~ msgstr ""
-
-#~ msgid "Active groups"
-#~ msgstr ""
-
-#~ msgid "Top group"
-#~ msgstr ""
-
-#~ msgid "Posts in second half of window vs first half"
-#~ msgstr ""
-
-#~ msgid "Top-N (bar)"
-#~ msgstr ""
-
-#~ msgid "Enlarge chart"
-#~ msgstr ""
-
-#~ msgid "Stacked area"
-#~ msgstr ""
-
-#~ msgid "Timeline (scatter)"
-#~ msgstr ""
-
-#~ msgid ""
-#~ "All tracked mirrors across groups and"
-#~ " markets, with live status and 30-day"
-#~ " health."
-#~ msgstr ""
-
-#~ msgid "Search by group, market or URL"
-#~ msgstr ""
-
-#~ msgid "Group, market or URL substring… (Ctrl/Cmd+K)"
-#~ msgstr ""
-
-#~ msgid "Availability"
-#~ msgstr ""
-
-#~ msgid "Online"
-#~ msgstr ""
-
-#~ msgid "Download current view as CSV"
-#~ msgstr ""
-
-#~ msgid "Download CSV"
-#~ msgstr ""
-
-#~ msgid "Group / Market"
-#~ msgstr ""
-
-#~ msgid "Status"
-#~ msgstr ""
-
-#~ msgid "Last scrape"
-#~ msgstr ""
-
-#~ msgid "Health"
-#~ msgstr ""
-
-#~ msgid "Admin · Torrent Health"
-#~ msgstr ""
-
-#~ msgid ""
-#~ "Peer counts, seeders/leechers and peer "
-#~ "samples for every magnet referenced by"
-#~ " a tracked post. Scans are driven "
-#~ "by the cron worker (poetry run "
-#~ "torrent-health); use Refresh to force "
-#~ "a live rescan for a specific "
-#~ "swarm."
-#~ msgstr ""
-
-#~ msgid "Infohash, name or group…"
-#~ msgstr ""
-
-#~ msgid "Search torrents"
-#~ msgstr ""
-
-#~ msgid "alive only (peers > 0)"
-#~ msgstr ""
-
-#~ msgid "Torrent swarms"
-#~ msgstr ""
-
-#~ msgid "Name"
-#~ msgstr ""
-
-#~ msgid "Infohash"
-#~ msgstr ""
-
-#~ msgid "Seed / Leech"
-#~ msgstr ""
-
-#~ msgid "Last scan"
-#~ msgstr ""
-
-#~ msgid "Actions"
-#~ msgstr ""
-
-#~ msgid "(unknown)"
-#~ msgstr ""
-
-#~ msgid "never"
-#~ msgstr ""
-
-#~ msgid "Detail"
-#~ msgstr ""
-
-#~ msgid ""
-#~ "No torrent swarms scanned yet. Run "
-#~ "poetry run torrent-health to populate."
-#~ msgstr ""
-
-#~ msgid "Admin · Torrent · %(ih)s…"
-#~ msgstr ""
-
-#~ msgid "Back"
-#~ msgstr ""
-
-#~ msgid "Refresh now"
-#~ msgstr ""
-
-#~ msgid "peers (last scan)"
-#~ msgstr ""
-
-#~ msgid "seed / leech"
-#~ msgstr ""
-
-#~ msgid "size"
-#~ msgstr ""
-
-#~ msgid "last seen alive"
-#~ msgstr ""
-
-#~ msgid "Groups:"
-#~ msgstr ""
-
-#~ msgid "Magnets:"
-#~ msgstr ""
-
-#~ msgid "Known since:"
-#~ msgstr ""
-
-#~ msgid "Last scan:"
-#~ msgstr ""
-
-#~ msgid "Peers over time (last 30 days)"
-#~ msgstr ""
-
-#~ msgid "Peer sample — %(ts)s"
-#~ msgstr ""
-
-#~ msgid "%(n)s peer · enrichment via CIRCL IP ASN History"
-#~ msgstr ""
-
-#~ msgid "IP"
-#~ msgstr ""
-
-#~ msgid "Port"
-#~ msgstr ""
-
-#~ msgid "Progress"
-#~ msgstr ""
-
-#~ msgid "Client"
-#~ msgstr ""
-
-#~ msgid "ASN"
-#~ msgstr ""
-
-#~ msgid "Org"
-#~ msgstr ""
-
-#~ msgid "CC"
-#~ msgstr ""
-
-#~ msgid "PTR"
-#~ msgstr ""
-
-#~ msgid "Flags"
-#~ msgstr ""
-
-#~ msgid "No peers observed on the last scan."
-#~ msgstr ""
-
-#~ msgid "All scans (click a row to show its peer sample)"
-#~ msgstr ""
-
-#~ msgid "History"
-#~ msgstr ""
-
-#~ msgid "Timestamp"
-#~ msgstr ""
-
-#~ msgid "Seeders"
-#~ msgstr ""
-
-#~ msgid "Leechers"
-#~ msgstr ""
-
-#~ msgid "Group was silent during the previous period and resumed activity."
-#~ msgstr ""
-
-#~ msgid "Admin · AS%(asn)s"
-#~ msgstr ""
-
-#~ msgid "Admin · IP %(ip)s"
-#~ msgstr ""
-
-#~ msgid "Admin · Torrent Pivot"
-#~ msgstr ""
-
-#~ msgid ""
-#~ "First posts ever observed for this "
-#~ "group (not seen before the current "
-#~ "period)."
-#~ msgstr ""
-
-#~ msgid "post"
-#~ msgstr ""
-
-#~ msgid "now"
-#~ msgstr ""
-
-#~ msgid "How to read this page"
-#~ msgstr ""
-
-#~ msgid ""
-#~ "when RansomLook first observed the post"
-#~ " (UTC, displayed in your local "
-#~ "timezone)."
-#~ msgstr ""
-
-#~ msgid ""
-#~ "victim name as published by the "
-#~ "group, kept verbatim. May include "
-#~ "domain, country code or short "
-#~ "description."
-#~ msgstr ""
-
-#~ msgid ""
-#~ "coloured dot is the group identity "
-#~ "(consistent across the site so you "
-#~ "can spot recurring actors faster). Click"
-#~ " it to open the group page with"
-#~ " all posts, mirrors and crypto "
-#~ "wallets."
-#~ msgstr ""
-
-#~ msgid "AS%(asn)s"
-#~ msgstr ""
-
-#~ msgid "Back to pivot"
-#~ msgstr ""
-
-#~ msgid "Distinct IPs"
-#~ msgstr ""
-
-#~ msgid "Torrents observed"
-#~ msgstr ""
-
-#~ msgid "With seeders"
-#~ msgstr ""
-
-#~ msgid "IPs in this ASN"
-#~ msgstr ""
-
-#~ msgid "No IP indexed for this ASN."
-#~ msgstr ""
-
-#~ msgid "Seeder?"
-#~ msgstr ""
-
-#~ msgid "No torrent observed for this ASN."
-#~ msgstr ""
-
-#~ msgid "Torrent Health"
-#~ msgstr ""
-
-#~ msgid "Pivot on IP / ASN →"
-#~ msgstr ""
-
-#~ msgid "Swarms tracked"
-#~ msgstr ""
-
-#~ msgid "Alive (peers > 0)"
-#~ msgstr ""
-
-#~ msgid "Dead (>%(d)s days)"
-#~ msgstr ""
-
-#~ msgid "Seeders total"
-#~ msgstr ""
-
-#~ msgid "Scans last 24 h"
-#~ msgstr ""
-
-#~ msgid "All groups"
-#~ msgstr ""
-
-#~ msgid "Torrent · %(ih)s…"
-#~ msgstr ""
-
-#~ msgid "Pivot on this IP"
-#~ msgstr ""
-
-#~ msgid "IP %(ip)s"
-#~ msgstr ""
-
-#~ msgid "No enrichment available"
-#~ msgstr ""
-
-#~ msgid "Scans seen"
-#~ msgstr ""
-
-#~ msgid "As seeder"
-#~ msgstr ""
-
-#~ msgid "Distinct torrents"
-#~ msgstr ""
-
-#~ msgid "Activity — last 30 days"
-#~ msgstr ""
-
-#~ msgid "seen"
-#~ msgstr ""
-
-#~ msgid "seeder"
-#~ msgstr ""
-
-#~ msgid "Torrent associations"
-#~ msgstr ""
-
-#~ msgid "Role"
-#~ msgstr ""
-
-#~ msgid "leecher"
-#~ msgstr ""
-
-#~ msgid "No torrent associations."
-#~ msgstr ""
-
-#~ msgid "Torrent Pivot"
-#~ msgstr ""
-
-#~ msgid "Torrent pivot intelligence"
-#~ msgstr ""
-
-#~ msgid ""
-#~ "Most-seen IPs and ASNs across all"
-#~ " tracked swarms. Click an IP or "
-#~ "ASN to see its torrent associations."
-#~ msgstr ""
-
-#~ msgid "Back to swarms"
-#~ msgstr ""
-
-#~ msgid "All time"
-#~ msgstr ""
-
-#~ msgid "Last 24h"
-#~ msgstr ""
-
-#~ msgid "Top IPs"
-#~ msgstr ""
-
-#~ msgid "Seeder IPs"
-#~ msgstr ""
-
-#~ msgid "Top ASN"
-#~ msgstr ""
-
-#~ msgid "Seeder ASN"
-#~ msgstr ""
-
-#~ msgid "Cross-group"
-#~ msgstr ""
-
-#~ msgid "Top IPs — all observations"
-#~ msgstr ""
-
-#~ msgid "Scans"
-#~ msgstr ""
-
-#~ msgid "No IP indexed yet — run poetry run tools/reindex_torrent_health.py"
-#~ msgstr ""
-
-#~ msgid "Top seeder IPs"
-#~ msgstr ""
-
-#~ msgid "Seed scans"
-#~ msgstr ""
-
-#~ msgid "Torrents seeded"
-#~ msgstr ""
-
-#~ msgid "No seeder recorded yet."
-#~ msgstr ""
-
-#~ msgid "Top ASN — all IPs"
-#~ msgstr ""
-
-#~ msgid ""
-#~ "No ASN indexed — run poetry run"
-#~ " enrich-ips then poetry run "
-#~ "tools/reindex_torrent_health.py"
-#~ msgstr ""
-
-#~ msgid "Top ASN — seeder IPs"
-#~ msgstr ""
-
-#~ msgid "No seeder ASN recorded yet."
-#~ msgstr ""
-
-#~ msgid "IPs spanning multiple ransomware groups"
-#~ msgstr ""
-
-#~ msgid "Filter by IP, ASN, org or group…"
-#~ msgstr ""
-
-#~ msgid "Filter cross-group table"
-#~ msgstr ""
-
-#~ msgid "ASN · Org"
-#~ msgstr ""
-
-#~ msgid "Group list"
-#~ msgstr ""
-
-#~ msgid "No IP has been observed across multiple groups yet."
-#~ msgstr ""
-
-#~ msgid "Admin · Manage Torrents"
-#~ msgstr ""
-
-#~ msgid "Manage torrents"
-#~ msgstr ""
-
-#~ msgid ""
-#~ "Attach magnets or .torrent files to "
-#~ "a ransomware group even when no "
-#~ "post references them. Orphan entries "
-#~ "listed below are managed independently "
-#~ "of the parser pipeline."
-#~ msgstr ""
-
-#~ msgid "Add a single torrent"
-#~ msgstr ""
-
-#~ msgid "— pick a group —"
-#~ msgstr ""
-
-#~ msgid "Magnet URI"
-#~ msgstr ""
-
-#~ msgid "…or .torrent file"
-#~ msgstr ""
-
-#~ msgid "Add"
-#~ msgstr ""
-
-#~ msgid "Bulk add (one magnet per line)"
-#~ msgstr ""
-
-#~ msgid "Magnets"
-#~ msgstr ""
-
-#~ msgid "Add all"
-#~ msgstr ""
-
-#~ msgid "Tracked torrents"
-#~ msgstr ""
-
-#~ msgid "Last peers"
-#~ msgstr ""
-
-#~ msgid "Delete this torrent from the tracker?"
-#~ msgstr ""
-
-#~ msgid "Delete"
-#~ msgstr ""
-
-#~ msgid "No tracked torrent yet."
-#~ msgstr ""
-
-#~ msgid "Delete the selected torrents?"
-#~ msgstr ""
-
-#~ msgid "Delete selected"
-#~ msgstr ""
+#: website/web/templates/admin/urls.html:3
+msgid "Admin · URL Manager"
+msgstr ""
+
+#: website/web/templates/admin/urls.html:10
+msgid "URL Manager"
+msgstr ""
+
+#: website/web/templates/admin/urls.html:11
+msgid "Add one or many URLs to an existing group or market/forum."
+msgstr ""
+
+#: website/web/templates/admin/urls.html:22
+msgid "Database"
+msgstr ""
+
+#: website/web/templates/admin/urls.html:42
+msgid "URL type"
+msgstr ""
+
+#: website/web/templates/admin/urls.html:44
+msgid "DLS (leak site)"
+msgstr ""
+
+#: website/web/templates/admin/urls.html:45
+msgid "File server"
+msgstr ""
+
+#: website/web/templates/admin/urls.html:47
+msgid "Admin panel"
+msgstr ""
+
+#: website/web/templates/admin/urls.html:68
+msgid "Init script (optional)"
+msgstr ""
+
+#: website/web/templates/admin/urls.html:69
+msgid "JavaScript to run before capture…"
+msgstr ""
+
+#: website/web/templates/admin/urls.html:74
+msgid "(one per line — bulk supported)"
+msgstr ""
+
+#: website/web/templates/admin/urls.html:77
+msgid "Group/market must exist."
+msgstr ""
+
+#: website/web/templates/admin/urls.html:77
+msgid "Create a new one here"
+msgstr ""
+
+#: website/web/templates/admin/urls.html:78
+msgid "0 URLs"
+msgstr ""
+
+#: website/web/templates/admin/urls.html:83
+msgid "Add URLs"
+msgstr ""
+
+#: website/web/templates/admin/urls.html:91
+msgid "Results"
+msgstr ""
+
+#: website/web/templates/admin/urls.html:106
+msgid "OK"
+msgstr ""
+
+#: website/web/templates/admin/urls.html:108
+msgid "Exists"
+msgstr ""
 

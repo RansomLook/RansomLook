@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>RansomLook — API Documentation</title>
+  <title>RansomLook — {{ _('API Documentation') }}</title>
   <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='favicon.ico') }}">
   <link rel="stylesheet" href="https://unpkg.com/swagger-ui-dist@5/swagger-ui.css">
   <style>
@@ -185,17 +185,17 @@
   <div class="rl-doc-bar">
     <img src="{{ url_for('static', filename='img/favicon-48.png') }}" alt="">
     <a href="/">RansomLook</a>
-    <a class="back" href="/">&larr; Back to site</a>
+    <a class="back" href="/">&larr; {{ _('Back to site') }}</a>
   </div>
 
   <div id="swagger-ui"></div>
 
   <details class="rl-examples" open>
-    <summary class="rl-examples__title">Python 3 examples (requests)</summary>
+    <summary class="rl-examples__title">{{ _('Python 3 examples (requests)') }}</summary>
     <div class="rl-examples__grid">
 
       <div class="rl-example">
-        <h4>List recent posts (last 7 days)</h4>
+        <h4>{{ _('List recent posts (last 7 days)') }}</h4>
 <pre><code class="language-python">import requests
 
 API = "https://www.ransomlook.io/api"
@@ -208,7 +208,7 @@ for post in resp.json():
       </div>
 
       <div class="rl-example">
-        <h4>Get a specific group's details</h4>
+        <h4>{{ _("Get a specific group's details") }}</h4>
 <pre><code class="language-python">import requests
 
 API = "https://www.ransomlook.io/api"
@@ -224,7 +224,7 @@ for loc in group[0].get("locations", []):
       </div>
 
       <div class="rl-example">
-        <h4>Search across all posts</h4>
+        <h4>{{ _('Search across all posts') }}</h4>
 <pre><code class="language-python">import requests
 
 API = "https://www.ransomlook.io/api"
@@ -237,7 +237,7 @@ for hit in resp.json():
       </div>
 
       <div class="rl-example">
-        <h4>Export full database (requires API key)</h4>
+        <h4>{{ _('Export full database (requires API key)') }}</h4>
 <pre><code class="language-python">import requests, json
 
 API = "https://www.ransomlook.io/api"
@@ -255,7 +255,7 @@ for db_num in [0, 2, 3, 5]:
       </div>
 
       <div class="rl-example">
-        <h4>Get threat actor profile</h4>
+        <h4>{{ _('Get threat actor profile') }}</h4>
 <pre><code class="language-python">import requests
 
 API = "https://www.ransomlook.io/api"
@@ -271,7 +271,7 @@ for g in actor.get("relations", {}).get("groups", []):
       </div>
 
       <div class="rl-example">
-        <h4>Crypto addresses for a group</h4>
+        <h4>{{ _('Crypto addresses for a group') }}</h4>
 <pre><code class="language-python">import requests
 
 API = "https://www.ransomlook.io/api"

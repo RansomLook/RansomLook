@@ -16,38 +16,79 @@
   <div class="container">
 
     <div class="table-card p-12 mb-14">
-      <label class="label" for="analyses-search">{{ _('Search') }}</label>
-      <input id="analyses-search" class="input" type="search" placeholder="{{ _('Filter by group name…') }}">
+      <div class="filters-wrap" style="display:flex;gap:12px;align-items:flex-end;flex-wrap:wrap">
+        <div class="field" style="flex:1 1 320px;min-width:240px">
+          <label class="label" for="analyses-search">{{ _('Search') }}</label>
+          <input id="analyses-search" class="input" type="search"
+                 placeholder="{{ _('Filter by group, variant or SHA-256…') }}">
+        </div>
+        <nav class="browse-tabs" role="tablist" aria-label="{{ _('Document type') }}">
+          <button class="tab-btn" role="tab" data-type-filter="all"  aria-selected="true">
+            {{ _('All') }} <span class="tab-count" id="cnt-all">{{ total }}</span>
+          </button>
+          <button class="tab-btn" role="tab" data-type-filter="full" aria-selected="false">
+            {{ _('Full analysis') }} <span class="tab-count" id="cnt-full"></span>
+          </button>
+          <button class="tab-btn" role="tab" data-type-filter="cti"  aria-selected="false">
+            {{ _('CTI report') }} <span class="tab-count" id="cnt-cti"></span>
+          </button>
+        </nav>
+      </div>
+      <div class="filters-meta" style="margin-top:8px">
+        <span id="analyses-count" class="muted"></span>
+      </div>
     </div>
 
     {% if items %}
     <div class="table-card overflow-visible">
-      <table class="rl-table" style="width:100%">
+      <table id="analyses-table" class="rl-table rl-table--sortable" style="width:100%">
         <thead>
           <tr>
-            <th>{{ _('Group') }}</th>
-            <th>{{ _('Variant') }}</th>
-            <th>{{ _('Updated') }}</th>
+            <th class="sortable" data-sort="name" data-type="text">{{ _('Group') }} <span class="sort-ind"></span></th>
+            <th class="sortable" data-sort="type" data-type="text">{{ _('Type') }} <span class="sort-ind"></span></th>
+            <th class="sortable" data-sort="variant" data-type="text">{{ _('Variant') }} <span class="sort-ind"></span></th>
+            <th class="sortable" data-sort="mtime" data-type="num" data-default-dir="desc">{{ _('Updated') }} <span class="sort-ind"></span></th>
             <th>SHA-256</th>
             <th style="text-align:right;">{{ _('Actions') }}</th>
           </tr>
         </thead>
         <tbody>
           {% for it in items %}
-          <tr data-row data-name="{{ it.name|lower }} {{ it.variant|lower }}">
-            <td>
+          {% set _t = (it.type if it.type is defined else 'full') %}
+          <tr data-row
+              data-name="{{ it.name|lower }}"
+              data-variant="{{ (it.variant_label if it.variant else 'default')|lower }}"
+              data-sha="{{ (it.sha256 or '')|lower }}"
+              data-type-row="{{ _t }}"
+              data-mtime="{{ it.mtime_ts if it.mtime_ts is defined else (it.mtime or '') }}">
+            <td data-sort-key="{{ it.name|lower }}">
               <a href="{{ url_for('group', name=it.name) }}"><strong>{{ it.name|title }}</strong></a>
               {% if it.private %}
-                <span class="badge-private" title="{{ _('Visible to authenticated users only') }}">private</span>
+                <span class="badge-private" title="{{ _('Visible to authenticated users only') }}">{{ _('private') }}</span>
               {% endif %}
             </td>
-            <td>
-              {% if it.variant %}{{ it.variant_label }}{% else %}<span class="muted">—</span>{% endif %}
+            <td data-sort-key="{{ _t }}">
+              {% if _t == 'cti' %}
+                <span class="badge-info" title="{{ _('Cyber Threat Intelligence report') }}">{{ _('CTI') }}</span>
+              {% else %}
+                <span class="badge-neutral" title="{{ _('Full technical analysis') }}">{{ _('Full') }}</span>
+              {% endif %}
             </td>
-            <td><time>{{ it.mtime }}</time></td>
+            <td data-sort-key="{{ (it.variant_label if it.variant else 'default')|lower }}">
+              {% if it.variant %}
+                {{ it.variant_label }}
+              {% else %}
+                <span class="badge-neutral">{{ _('Default') }}</span>
+              {% endif %}
+            </td>
+            <td data-sort-key="{{ it.mtime_ts if it.mtime_ts is defined else (it.mtime or '') }}">
+              <time>{{ it.mtime }}</time>
+            </td>
             <td>
               {% if it.sha256 %}
-                <code style="font-size:.85em">{{ it.sha256[:16] }}…</code>
+                <code class="sha-cell" data-full="{{ it.sha256 }}"
+                      title="{{ it.sha256 }} — {{ _('click to copy') }}"
+                      style="font-size:.85em;cursor:pointer;user-select:none">{{ it.sha256[:16] }}…</code>
               {% else %}
                 <span class="muted">—</span>
               {% endif %}
@@ -70,15 +111,123 @@
   </div>
 </section>
 
+<style>
+  .rl-table--sortable th.sortable{ cursor:pointer; user-select:none; }
+  .rl-table--sortable th.sortable:hover{ color: var(--pri); }
+  .rl-table--sortable th .sort-ind{ display:inline-block; width:.9em; opacity:.6; font-size:.85em; }
+  .rl-table--sortable th.sort-asc  .sort-ind::after{ content:"▲"; }
+  .rl-table--sortable th.sort-desc .sort-ind::after{ content:"▼"; }
+  .sha-cell.copied{ outline: 1px solid var(--success-border); background: var(--success-bg); }
+</style>
+
 <script>
 document.addEventListener('DOMContentLoaded', () => {
-  const q = document.getElementById('analyses-search');
-  if (!q) return;
-  q.addEventListener('input', () => {
-    const needle = q.value.toLowerCase().trim();
-    document.querySelectorAll('[data-row]').forEach(row => {
-      const name = row.getAttribute('data-name') || '';
-      row.style.display = (!needle || name.includes(needle)) ? '' : 'none';
+  const tbl   = document.getElementById('analyses-table');
+  const q     = document.getElementById('analyses-search');
+  const count = document.getElementById('analyses-count');
+  const typeBtns = document.querySelectorAll('[data-type-filter]');
+  const rows  = tbl ? Array.from(tbl.querySelectorAll('tbody [data-row]')) : [];
+  const total = rows.length;
+  let activeType = 'all';
+
+  // ---------- Type tab counts ----------
+  const cntFull = rows.filter(r => (r.dataset.typeRow || 'full') === 'full').length;
+  const cntCti  = rows.filter(r => (r.dataset.typeRow || 'full') === 'cti').length;
+  const elFull = document.getElementById('cnt-full');
+  const elCti  = document.getElementById('cnt-cti');
+  if (elFull) elFull.textContent = cntFull;
+  if (elCti)  elCti.textContent  = cntCti;
+
+  // ---------- Filter (group / variant / sha256 + type tab) ----------
+  function applyFilter() {
+    const needle = (q.value || '').toLowerCase().trim();
+    let shown = 0;
+    rows.forEach(r => {
+      const hay = [
+        r.dataset.name || '',
+        r.dataset.variant || '',
+        r.dataset.sha || ''
+      ].join(' ');
+      const typeMatch = activeType === 'all' || (r.dataset.typeRow || 'full') === activeType;
+      const textMatch = !needle || hay.includes(needle);
+      const match = typeMatch && textMatch;
+      r.style.display = match ? '' : 'none';
+      if (match) shown++;
+    });
+    if (count) {
+      const pool = activeType === 'all' ? total : (activeType === 'cti' ? cntCti : cntFull);
+      count.textContent = (needle || activeType !== 'all')
+        ? `${shown} / ${pool}`
+        : `${total} ${total > 1 ? '{{ _('reports') }}' : '{{ _('report') }}'}`;
+    }
+  }
+  if (q) q.addEventListener('input', applyFilter);
+  typeBtns.forEach(btn => btn.addEventListener('click', () => {
+    activeType = btn.dataset.typeFilter;
+    typeBtns.forEach(b => b.setAttribute('aria-selected', b === btn ? 'true' : 'false'));
+    applyFilter();
+  }));
+  applyFilter();
+
+  // ---------- Sort ----------
+  if (!tbl) return;
+  const tbody = tbl.querySelector('tbody');
+  const headers = tbl.querySelectorAll('th.sortable');
+  let curKey = null, curDir = null;
+
+  function getKey(row, idx, type) {
+    const cell = row.children[idx];
+    const v = cell?.dataset.sortKey ?? cell?.textContent.trim() ?? '';
+    if (type === 'num') {
+      const n = Number(v);
+      return Number.isFinite(n) ? n : (v ? Date.parse(v) || 0 : 0);
+    }
+    return v.toLowerCase();
+  }
+
+  function sortBy(th) {
+    const idx  = Array.from(th.parentNode.children).indexOf(th);
+    const key  = th.dataset.sort;
+    const type = th.dataset.type || 'text';
+    let dir;
+    if (curKey === key) {
+      dir = curDir === 'asc' ? 'desc' : 'asc';
+    } else {
+      dir = th.dataset.defaultDir || 'asc';
+    }
+    curKey = key; curDir = dir;
+
+    const sorted = rows.slice().sort((a, b) => {
+      const va = getKey(a, idx, type);
+      const vb = getKey(b, idx, type);
+      if (va < vb) return dir === 'asc' ? -1 : 1;
+      if (va > vb) return dir === 'asc' ?  1 : -1;
+      return 0;
+    });
+    sorted.forEach(r => tbody.appendChild(r));
+    headers.forEach(h => h.classList.remove('sort-asc', 'sort-desc'));
+    th.classList.add(dir === 'asc' ? 'sort-asc' : 'sort-desc');
+  }
+
+  headers.forEach(th => th.addEventListener('click', () => sortBy(th)));
+
+  // Default sort: most recently updated first
+  const defaultTh = tbl.querySelector('th[data-sort="mtime"]');
+  if (defaultTh) sortBy(defaultTh);
+
+  // ---------- SHA-256 click-to-copy ----------
+  tbl.querySelectorAll('.sha-cell').forEach(el => {
+    el.addEventListener('click', async () => {
+      const full = el.dataset.full || '';
+      try {
+        await navigator.clipboard.writeText(full);
+        el.classList.add('copied');
+        setTimeout(() => el.classList.remove('copied'), 700);
+      } catch {
+        // Fallback: select the text
+        const r = document.createRange(); r.selectNode(el);
+        const s = window.getSelection(); s.removeAllRanges(); s.addRange(r);
+      }
     });
   });
 });

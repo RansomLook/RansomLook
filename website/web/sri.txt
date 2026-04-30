@@ -15,7 +15,7 @@
     "leaks.js": "eZGTWBXQ7phFuDzc62PBdEWNx3JxIlvN7WKzS5hYm1+uWnQKAgwAevFYeEVh7F7Dmh4e47/nU2efeFy1dUQZzg==",
     "lightbox.js": "Tz7s5lWd3BoNADF5Sk0qGaoc8LLVVxpNg3x4I8JqerxlZRxuxRnPPcyzpy6rnrejmLS8+qXdgDofo7CVxhTe7A==",
     "logs.js": "vIfpGlpVjsaoIK5/EsjcdzdddVldL2u/PKxlpw+AdbmFIFicrv5xz6MskW5VkISWLoncJlqPQrdlFWcRqWzZog==",
-    "main.css": "8McxyaavFfRRu8ViICgV6Byd4GGYGpYLQjFEWMH7fMnCgWTp3y2tmTM+p8PDofSRbGqO/84y72XlUS1pyc6umg==",
+    "main.css": "C8BRM9fKAPNN+7IdVjOPE7Uc2InzJctB+hJ84GelkDEh3y94XRW7u8Ws3ejNkVIbiJda3OcjCgCujMHH0XV4aw==",
     "main.js": "AV9FHqSvTIa1vGwBbGbqoWmU1o2Av5ArTSLxrABbOA5Ln5FrWIiosvlXe9p57gDccmr/OeN8mdJ6XyTIK37eFA==",
     "notesdetails.js": "D12SeqNFNXDIzXYdN1qu0Uz8lA9MubYk3kq/d7XuGLPxoeXIOvDwIG39EU8RrOAfUd6cOpFLO43azYCClzyyyA==",
     "picker.js": "gWwYmdIOh5I4+H+Ia/h4nP+pJ5DSQzGm6eS7xgH9eZJaIZ1QrVXSRi5c33OA/8udIUGk0Qsn4dd8ToW+oV39Vw==",

@@ -593,7 +593,16 @@ html.light .hero::before{
 .badge-up{ background:var(--success-bg); border-color:var(--success-border); color:var(--success-text); }
 .badge-degraded{ background:var(--warn-bg); border-color:var(--warn-border); color:var(--warn-text); }
 .badge-down{ background:var(--danger-bg); border-color:var(--danger-border); color:var(--danger-text); }
+.badge-neutral,
+.badge-info,
+.badge-private,
+.badge-noactive{
+  display:inline-flex; align-items:center; gap:6px;
+  padding:2px 8px; border-radius:999px; font-size:12px;
+  border:1px solid var(--border);
+}
 .badge-neutral{ background:var(--surface-count); border-color:var(--border-hover); color:var(--info-text); }
+.badge-info{ background:var(--info-bg); border-color:var(--info-border); color:var(--info-text); }
 .badge-private{ background:var(--priv-bg); border-color:var(--priv-border); color:var(--priv-text); }
 .badge-noactive{ background:var(--muted); border-color:var(--priv-border); color:var(--bg); }
 .url-cell.is-private{ color:var(--danger-text); }

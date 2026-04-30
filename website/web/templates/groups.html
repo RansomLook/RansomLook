@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %}RansomLook — {{ 'Groups' if type == 'groups' else 'Markets/Forums' }}{% endblock %}
+{% block title %}RansomLook — {{ _('Groups') if type == 'groups' else _('Markets/Forums') }}{% endblock %}
 
 {# ===== Sommaire (ancre) réutilisant tes blocks ===== #}
 {% block groups %}
@@ -24,9 +24,9 @@
 <!-- Hero -->
 <section class="hero">
   <div class="container">
-    <h1>{{ 'Group profiles' if type == 'groups' else 'Market / Forum profiles' }}</h1>
+    <h1>{{ _('Group profiles') if type == 'groups' else _('Market / Forum profiles') }}</h1>
     <p class="lead">
-      {{ _('Availability, mirrors, last visit & quick links.') if _ else 'Availability, mirrors, last visit & quick links.' }}
+      {{ _('Availability, mirrors, last visit & quick links.') }}
     </p>
   </div>
 </section>
@@ -39,14 +39,14 @@
       <div class="filters-wrap">
         <div class="filters">
           <div class="field field--search">
-            <label class="sr-only" for="flt-q">Search</label>
+            <label class="sr-only" for="flt-q">{{ _('Search') }}</label>
             <input id="flt-q" class="input" type="search"
-                   aria-label="Search"
-                   placeholder="Name, description, URL, page title…">
-            <button class="input-clear" type="button" aria-label="Clear search">×</button>
+                   aria-label="{{ _('Search') }}"
+                   placeholder="{{ _('Name, description, URL, page title…') }}">
+            <button class="input-clear" type="button" aria-label="{{ _('Clear search') }}">×</button>
           </div>
         </div>
-      <div class="alpha-bar" aria-label="Alphabet filter">
+      <div class="alpha-bar" aria-label="{{ _('Alphabet filter') }}">
         <button class="alpha-btn" type="button" data-letter="A">A</button> <button class="alpha-btn" type="button" data-letter="B">B</button> <button class="alpha-btn" type="button" data-letter="C">C</button> <button class="alpha-btn" type="button" data-letter="D">D</button> <button class="alpha-btn" type="button" data-letter="E">E</button> <button class="alpha-btn" type="button" data-letter="F">F</button> <button class="alpha-btn" type="button" data-letter="G">G</button> <button class="alpha-btn" type="button" data-letter="H">H</button> <button class="alpha-btn" type="button" data-letter="I">I</button> <button class="alpha-btn" type="button" data-letter="J">J</button> <button class="alpha-btn" type="button" data-letter="K">K</button> <button class="alpha-btn" type="button" data-letter="L">L</button> <button class="alpha-btn" type="button" data-letter="M">M</button> <button class="alpha-btn" type="button" data-letter="N">N</button> <button class="alpha-btn" type="button" data-letter="O">O</button> <button class="alpha-btn" type="button" data-letter="P">P</button> <button class="alpha-btn" type="button" data-letter="Q">Q</button> <button class="alpha-btn" type="button" data-letter="R">R</button> <button class="alpha-btn" type="button" data-letter="S">S</button> <button class="alpha-btn" type="button" data-letter="T">T</button> <button class="alpha-btn" type="button" data-letter="U">U</button> <button class="alpha-btn" type="button" data-letter="V">V</button> <button class="alpha-btn" type="button" data-letter="W">W</button> <button class="alpha-btn" type="button" data-letter="X">X</button> <button class="alpha-btn" type="button" data-letter="Y">Y</button> <button class="alpha-btn" type="button" data-letter="Z">Z</button> <button class="alpha-btn" type="button" data-letter="#">#</button>
       </div>
 
@@ -61,14 +61,14 @@
         class="filters"
         style="display:flex;gap:12px;align-items:center;flex-wrap:wrap">
     <label for="csv-status" class="label m-0">
-      Download URLs (CSV)
+      {{ _('Download URLs (CSV)') }}
     </label>
     <select id="csv-status" name="status" class="input" style="padding:6px 8px">
-      <option value="all" selected>All statuses</option>
-      <option value="actif">Active</option>
-      <option value="inactif">Inactive</option>
+      <option value="all" selected>{{ _('All statuses') }}</option>
+      <option value="actif">{{ _('Active') }}</option>
+      <option value="inactif">{{ _('Inactive') }}</option>
     </select>
-    <button type="submit" class="btn btn-secondary">Download</button>
+    <button type="submit" class="btn btn-secondary">{{ _('Download') }}</button>
   </form>
 </div>
 {% endif %}
@@ -94,7 +94,7 @@
               </h2>
             {% endif %}
             {% if current_user.is_authenticated %}
-              <a class="edit-link" href="/admin/edit/0/{{ entry['name']|urlencode }}">Edit group</a>
+              <a class="edit-link" href="/admin/edit/0/{{ entry['name']|urlencode }}">{{ _('Edit group') }}</a>
             {% endif %}
           {% else %}
             {% if 'private' in entry and entry['private'] is true %}
@@ -107,44 +107,44 @@
               </h2>
             {% endif %}
             {% if current_user.is_authenticated %}
-              <a class="edit-link" href="/admin/edit/3/{{ entry['name']|urlencode }}">Edit group</a>
+              <a class="edit-link" href="/admin/edit/3/{{ entry['name']|urlencode }}">{{ _('Edit group') }}</a>
             {% endif %}
           {% endif %}
 
           <div class="profile-badges">
             {% if up_count > 0 %}
-              <span class="badge-status badge-up">Available {{ up_count }}/{{ total }}</span>
+              <span class="badge-status badge-up">{{ _('Available') }} {{ up_count }}/{{ total }}</span>
             {% else %}
-              <span class="badge-status badge-down">Offline</span>
+              <span class="badge-status badge-down">{{ _('Offline') }}</span>
             {% endif %}
 
             {% if entry['name'] and entry['name']|lower in parser %}
-              <span class="badge-neutral">Parsing: enabled</span>
+              <span class="badge-neutral">{{ _('Parsing: enabled') }}</span>
             {% endif %}
 
             {% if 'private' in entry and entry['private'] is true %}
-              <span class="badge-private">Private</span>
+              <span class="badge-private">{{ _('Private') }}</span>
             {% endif %}
           </div>
         </header>
 
         {% if entry['meta'] is not none %}
           <div class="profile-desc prose">
-            <h3>Description</h3>
+            <h3>{{ _('Description') }}</h3>
             <p>{{ entry['meta'] }}</p>
           </div>
         {% endif %}
 
         <div class="table-card">
           <div class="table-scroll">
-            <table class="rl-table" aria-label="Links for {{ entry['name'] }}">
+            <table class="rl-table" aria-label="{{ _('Links for %(name)s', name=entry['name']) }}">
               <thead>
                 <tr>
-                  <th style="width:28%">Page title</th>
-                  <th style="width:12%">Status</th>
-                  <th style="width:14%">Last visit</th>
-                  <th>URL</th>
-                  <th style="width:10%">Screen</th>
+                  <th style="width:28%">{{ _('Page title') }}</th>
+                  <th style="width:12%">{{ _('Status') }}</th>
+                  <th style="width:14%">{{ _('Last visit') }}</th>
+                  <th>{{ _('URL') }}</th>
+                  <th style="width:10%">{{ _('Screen') }}</th>
                 </tr>
               </thead>
               <tbody>
@@ -155,9 +155,9 @@
 
                     <td>
                       {% if location['available'] is true %}
-                        <span class="badge-status badge-up">Up</span>
+                        <span class="badge-status badge-up">{{ _('Up') }}</span>
                       {% else %}
-                        <span class="badge-status badge-down">Down</span>
+                        <span class="badge-status badge-down">{{ _('Down') }}</span>
                       {% endif %}
                     </td>
 
@@ -176,7 +176,7 @@
                         <a href="{{ location['screen'] }}"
                            class="open-shot"
                            data-caption="{{ entry['name'].title() }} — {{ location.get('title') or location['slug'] }}">
-                          Screen
+                          {{ _('Screen') }}
                         </a>
                       {% endif %}
                     </td>
@@ -197,13 +197,13 @@
 <div id="imgModal" class="rl-modal rl-modal--lightbox" role="dialog" aria-modal="true" aria-labelledby="imgModalCaption" hidden>
   <div class="rl-modal__backdrop" data-close></div>
   <figure class="rl-modal__panel rl-modal__panel--image" role="document">
-    <button class="rl-modal__close" aria-label="Close" data-close>&times;</button>
+    <button class="rl-modal__close" aria-label="{{ _('Close') }}" data-close>&times;</button>
 
-    <button class="img-nav img-prev" aria-label="Previous">‹</button>
+    <button class="img-nav img-prev" aria-label="{{ _('Previous') }}">‹</button>
 
     <div class="img-stage"><img id="imgModalImg" alt=""></div>
 
-    <button class="img-nav img-next" aria-label="Next">›</button>
+    <button class="img-nav img-next" aria-label="{{ _('Next') }}">›</button>
 
     <figcaption id="imgModalCaption" class="img-caption"></figcaption>
   </figure>

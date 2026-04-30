@@ -1,13 +1,13 @@
 {% extends "base.html" %}
 {% from 'bootstrap5/utils.html' import render_messages %}
-{% block title %}Admin · {{ mode|title }} address — {{ group }}{% endblock %}
+{% block title %}{{ _('Admin · %(mode)s address — %(group)s', mode=mode|title, group=group) }}{% endblock %}
 {% block content %}
 {{ render_messages(container=True, dismissible=True) }}
 
 <section class="hero">
   <div class="container" style="display:flex;align-items:center;gap:12px;flex-wrap:wrap">
-    <h1 class="m-0">{{ mode|title }} address — {{ group }}</h1>
-    <a href="{{ url_for('admin_crypto_group', group=group) }}" class="btn btn-secondary" style="margin-left:auto">Back</a>
+    <h1 class="m-0">{{ _('%(mode)s address — %(group)s', mode=mode|title, group=group) }}</h1>
+    <a href="{{ url_for('admin_crypto_group', group=group) }}" class="btn btn-secondary" style="margin-left:auto">{{ _('Back') }}</a>
   </div>
 </section>
 
@@ -17,62 +17,62 @@
 
       <!-- ===== Card: Wallet info ===== -->
       <div class="table-card admin-card">
-        <div class="card-toolbar"><span>Wallet details</span></div>
+        <div class="card-toolbar"><span>{{ _('Wallet details') }}</span></div>
         <div class="form-grid">
-          <label>Blockchain</label>
+          <label>{{ _('Blockchain') }}</label>
           <div>
             {% set cur_chain = doc.blockchain or blockchain or '' %}
             <select name="blockchain" class="input" required>
-              <option value="" disabled {{ 'selected' if not cur_chain }}>Select a blockchain</option>
-              <option value="bitcoin" {{ 'selected' if cur_chain == 'bitcoin' }}>Bitcoin</option>
-              <option value="ethereum" {{ 'selected' if cur_chain == 'ethereum' }}>Ethereum</option>
-              <option value="litecoin" {{ 'selected' if cur_chain == 'litecoin' }}>Litecoin</option>
-              <option value="bitcoin-cash" {{ 'selected' if cur_chain == 'bitcoin-cash' }}>Bitcoin Cash</option>
-              <option value="dash" {{ 'selected' if cur_chain == 'dash' }}>Dash</option>
-              <option value="dogecoin" {{ 'selected' if cur_chain == 'dogecoin' }}>Dogecoin</option>
-              <option value="zcash" {{ 'selected' if cur_chain == 'zcash' }}>Zcash</option>
-              <option value="monero" {{ 'selected' if cur_chain == 'monero' }}>Monero</option>
-              <option value="tron" {{ 'selected' if cur_chain == 'tron' }}>Tron</option>
-              <option value="ripple" {{ 'selected' if cur_chain == 'ripple' }}>Ripple (XRP)</option>
+              <option value="" disabled {{ 'selected' if not cur_chain }}>{{ _('Select a blockchain') }}</option>
+              <option value="bitcoin" {{ 'selected' if cur_chain == 'bitcoin' }}>{{ _('Bitcoin') }}</option>
+              <option value="ethereum" {{ 'selected' if cur_chain == 'ethereum' }}>{{ _('Ethereum') }}</option>
+              <option value="litecoin" {{ 'selected' if cur_chain == 'litecoin' }}>{{ _('Litecoin') }}</option>
+              <option value="bitcoin-cash" {{ 'selected' if cur_chain == 'bitcoin-cash' }}>{{ _('Bitcoin Cash') }}</option>
+              <option value="dash" {{ 'selected' if cur_chain == 'dash' }}>{{ _('Dash') }}</option>
+              <option value="dogecoin" {{ 'selected' if cur_chain == 'dogecoin' }}>{{ _('Dogecoin') }}</option>
+              <option value="zcash" {{ 'selected' if cur_chain == 'zcash' }}>{{ _('Zcash') }}</option>
+              <option value="monero" {{ 'selected' if cur_chain == 'monero' }}>{{ _('Monero') }}</option>
+              <option value="tron" {{ 'selected' if cur_chain == 'tron' }}>{{ _('Tron') }}</option>
+              <option value="ripple" {{ 'selected' if cur_chain == 'ripple' }}>{{ _('Ripple (XRP)') }}</option>
               {% if cur_chain and cur_chain not in ['bitcoin','ethereum','litecoin','bitcoin-cash','dash','dogecoin','zcash','monero','tron','ripple'] %}
                 <option value="{{ cur_chain }}" selected>{{ cur_chain }}</option>
               {% endif %}
             </select>
           </div>
 
-          <label>Address</label>
+          <label>{{ _('Address') }}</label>
           <div><input type="text" name="address" class="input" value="{{ doc.address or address or '' }}" {{ 'readonly' if mode=='edit' else 'required' }}></div>
 
-          <label>Source</label>
+          <label>{{ _('Source') }}</label>
           <div>
             {% set cur_src = doc.source or 'ransomlook' %}
             <select name="source" class="input" required>
               <option value="ransomlook" {{ 'selected' if cur_src == 'ransomlook' }}>ransomlook</option>
               <option value="ransomwhe.re" {{ 'selected' if cur_src == 'ransomwhe.re' }}>ransomwhe.re</option>
-              <option value="manual" {{ 'selected' if cur_src == 'manual' }}>manual</option>
+              <option value="manual" {{ 'selected' if cur_src == 'manual' }}>{{ _('manual') }}</option>
             </select>
           </div>
 
-          <label>Label <span class="muted">(optional)</span></label>
-          <div><input type="text" name="label" class="input" value="{{ doc.label or '' }}" placeholder="e.g. main wallet, seized by FBI..."></div>
+          <label>{{ _('Label') }} <span class="muted">{{ _('(optional)') }}</span></label>
+          <div><input type="text" name="label" class="input" value="{{ doc.label or '' }}" placeholder="{{ _('e.g. main wallet, seized by FBI...') }}"></div>
         </div>
       </div>
 
       <!-- ===== Card: Transactions ===== -->
       <div class="table-card admin-card">
         <div class="card-toolbar" style="justify-content:space-between;">
-          <span>Transactions <span id="tx-count" class="muted"></span></span>
-          <button type="button" id="tx-add" class="btn btn-primary" style="padding:4px 14px;">+ Add</button>
+          <span>{{ _('Transactions') }} <span id="tx-count" class="muted"></span></span>
+          <button type="button" id="tx-add" class="btn btn-primary" style="padding:4px 14px;">+ {{ _('Add') }}</button>
         </div>
 
         <div style="overflow-x:auto;">
-          <table class="rl-table" id="tx-table" aria-label="Transactions">
+          <table class="rl-table" id="tx-table" aria-label="{{ _('Transactions') }}">
             <thead>
               <tr>
-                <th>Hash</th>
-                <th style="width:14%">Date</th>
-                <th style="width:12%">Amount</th>
-                <th style="width:10%">Source</th>
+                <th>{{ _('Hash') }}</th>
+                <th style="width:14%">{{ _('Date') }}</th>
+                <th style="width:12%">{{ _('Amount') }}</th>
+                <th style="width:10%">{{ _('Source') }}</th>
                 <th style="width:90px"></th>
               </tr>
             </thead>
@@ -89,63 +89,63 @@
 
 <!-- Floating save button -->
 <div class="edit-actions">
-  <span id="unsaved-badge" class="unsaved-badge" hidden>Unsaved changes</span>
-  <button class="btn btn-primary" id="save-btn" type="submit" form="main-form">Save</button>
+  <span id="unsaved-badge" class="unsaved-badge" hidden>{{ _('Unsaved changes') }}</span>
+  <button class="btn btn-primary" id="save-btn" type="submit" form="main-form">{{ _('Save') }}</button>
 </div>
 
 <!-- Transaction modal -->
 <div id="txModal" class="rl-modal" role="dialog" aria-modal="true" aria-labelledby="txModalLabel" hidden>
   <div class="rl-modal__backdrop" data-close-tx></div>
   <div class="rl-modal__panel" role="document" style="max-width:600px;">
-    <button class="rl-modal__close" aria-label="Close" data-close-tx>&times;</button>
-    <h2 id="txModalLabel" class="rl-modal__title">Transaction</h2>
+    <button class="rl-modal__close" aria-label="{{ _('Close') }}" data-close-tx>&times;</button>
+    <h2 id="txModalLabel" class="rl-modal__title">{{ _('Transaction') }}</h2>
     <div style="display:grid;gap:10px;">
       <label>
-        <div class="muted" style="font-size:.8rem;">Hash</div>
-        <input type="text" id="m-hash" class="input" placeholder="Transaction hash">
+        <div class="muted" style="font-size:.8rem;">{{ _('Hash') }}</div>
+        <input type="text" id="m-hash" class="input" placeholder="{{ _('Transaction hash') }}">
       </label>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
         <label>
-          <div class="muted" style="font-size:.8rem;">From</div>
-          <input type="text" id="m-from" class="input" placeholder="Sender address">
+          <div class="muted" style="font-size:.8rem;">{{ _('From') }}</div>
+          <input type="text" id="m-from" class="input" placeholder="{{ _('Sender address') }}">
         </label>
         <label>
-          <div class="muted" style="font-size:.8rem;">To</div>
-          <input type="text" id="m-to" class="input" placeholder="Receiver address">
-        </label>
-      </div>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
-        <label>
-          <div class="muted" style="font-size:.8rem;">Amount</div>
-          <input type="number" step="any" id="m-amount" class="input" placeholder="e.g. 0.5">
-        </label>
-        <label>
-          <div class="muted" style="font-size:.8rem;">Amount USD</div>
-          <input type="number" step="0.01" id="m-amountUSD" class="input" placeholder="e.g. 15000">
+          <div class="muted" style="font-size:.8rem;">{{ _('To') }}</div>
+          <input type="text" id="m-to" class="input" placeholder="{{ _('Receiver address') }}">
         </label>
       </div>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
         <label>
-          <div class="muted" style="font-size:.8rem;">Date</div>
+          <div class="muted" style="font-size:.8rem;">{{ _('Amount') }}</div>
+          <input type="number" step="any" id="m-amount" class="input" placeholder="{{ _('e.g. 0.5') }}">
+        </label>
+        <label>
+          <div class="muted" style="font-size:.8rem;">{{ _('Amount USD') }}</div>
+          <input type="number" step="0.01" id="m-amountUSD" class="input" placeholder="{{ _('e.g. 15000') }}">
+        </label>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+        <label>
+          <div class="muted" style="font-size:.8rem;">{{ _('Date') }}</div>
           <input type="datetime-local" id="m-time" class="input">
         </label>
         <label>
-          <div class="muted" style="font-size:.8rem;">Block</div>
-          <input type="number" id="m-block" class="input" placeholder="Block number">
+          <div class="muted" style="font-size:.8rem;">{{ _('Block') }}</div>
+          <input type="number" id="m-block" class="input" placeholder="{{ _('Block number') }}">
         </label>
       </div>
       <label>
-        <div class="muted" style="font-size:.8rem;">Source</div>
+        <div class="muted" style="font-size:.8rem;">{{ _('Source') }}</div>
         <select id="m-source" class="input">
-          <option value="">(inherit from wallet)</option>
+          <option value="">{{ _('(inherit from wallet)') }}</option>
           <option value="ransomlook">ransomlook</option>
           <option value="ransomwhe.re">ransomwhe.re</option>
-          <option value="manual">manual</option>
+          <option value="manual">{{ _('manual') }}</option>
         </select>
       </label>
       <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:8px;">
-        <button type="button" class="btn btn-secondary" data-close-tx>Cancel</button>
-        <button type="button" class="btn btn-primary" id="m-save">Save transaction</button>
+        <button type="button" class="btn btn-secondary" data-close-tx>{{ _('Cancel') }}</button>
+        <button type="button" class="btn btn-primary" id="m-save">{{ _('Save transaction') }}</button>
       </div>
     </div>
   </div>
@@ -194,7 +194,7 @@
         '<td style="font-size:.8rem;">'+esc(tx.amount != null ? tx.amount : '')+'</td>'+
         '<td style="font-size:.8rem;">'+esc(tx.source || '')+'</td>'+
         '<td style="white-space:nowrap;">'+
-          '<button type="button" class="btn btn-secondary" style="padding:2px 8px;font-size:.75rem;" data-edit="'+i+'">Edit</button> '+
+          '<button type="button" class="btn btn-secondary" style="padding:2px 8px;font-size:.75rem;" data-edit="'+i+'">{{ _('Edit') }}</button> '+
           '<button type="button" class="btn btn-danger" style="padding:2px 8px;font-size:.75rem;" data-del="'+i+'">&times;</button>'+
         '</td>';
       tbody.appendChild(tr);
@@ -221,7 +221,7 @@
     document.getElementById('m-time').value = tx.time ? String(tx.time).slice(0,16) : '';
     document.getElementById('m-block').value = tx.block != null ? tx.block : '';
     document.getElementById('m-source').value = tx.source || '';
-    document.getElementById('txModalLabel').textContent = idx >= 0 ? 'Edit transaction' : 'New transaction';
+    document.getElementById('txModalLabel').textContent = idx >= 0 ? '{{ _('Edit transaction') }}' : '{{ _('New transaction') }}';
     modal.hidden = false;
     document.getElementById('m-hash').focus();
   }

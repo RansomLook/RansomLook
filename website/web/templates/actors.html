@@ -1,13 +1,13 @@
 {% extends "base.html" %}
 
-{% block title %}Threat Actors / Affiliates{% endblock %}
+{% block title %}{{ _('Threat Actors / Affiliates') }}{% endblock %}
 
 {% block content %}
 
 <section class="hero">
   <div class="container">
-    <h1>Actors</h1>
-    <p class="lead">Browse threat actors / affiliates.</p>
+    <h1>{{ _('Actors') }}</h1>
+    <p class="lead">{{ _('Browse threat actors / affiliates.') }}</p>
   </div>
 </section>
 
@@ -19,11 +19,11 @@
       <div class="filters-wrap">
         <div class="filters">
           <div class="field field--search">
-            <label class="sr-only" for="actors-filter">Search</label>
+            <label class="sr-only" for="actors-filter">{{ _('Search') }}</label>
             <input id="actors-filter" class="input" type="search"
-                   aria-label="Filter actors"
-                   placeholder="Actor name or alias…">
-            <button class="input-clear" type="button" aria-label="Clear search">×</button>
+                   aria-label="{{ _('Filter actors') }}"
+                   placeholder="{{ _('Actor name or alias…') }}">
+            <button class="input-clear" type="button" aria-label="{{ _('Clear search') }}">×</button>
           </div>
         </div>
         <div class="filters-meta"><span id="flt-count"></span></div>

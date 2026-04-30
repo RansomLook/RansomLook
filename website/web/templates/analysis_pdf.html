@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="utf-8">
-  <title>{{ group_name|title }} — Technical Analysis</title>
+  <title>{{ group_name|title }} — {{ _('Technical Analysis') }}</title>
   <style>
     /* ---------------------------------------------------------------
        PDF stylesheet — self-contained, print-friendly.
@@ -12,10 +12,10 @@
     @page {
       size: A4;
       margin: 22mm 18mm 22mm 18mm;
-      @top-left   { content: "{{ group_name|title }} — Technical Analysis"; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; font-size: 8pt; color: #888; vertical-align: middle; }
+      @top-left   { content: "{{ group_name|title }} — {{ _('Technical Analysis') }}"; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; font-size: 8pt; color: #888; vertical-align: middle; }
       @top-right  { content: "RansomLook"; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; font-size: 8pt; color: #888; vertical-align: middle; }
       @bottom-center { content: counter(page) " / " counter(pages); font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; font-size: 8pt; color: #888; }
-      @bottom-left   { content: "Generated {{ analysis_mtime }}"; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; font-size: 8pt; color: #888; }
+      @bottom-left   { content: "{{ _('Generated %(mtime)s', mtime=analysis_mtime) }}"; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; font-size: 8pt; color: #888; }
     }
     @page :first {
       margin-top: 30mm;
@@ -161,16 +161,16 @@
   <img src="{{ logo_svg_url }}" alt="RansomLook" style="width:60mm;height:auto;margin-bottom:14mm;" />
   {% endif %}
   <h1>{{ group_name|title }}</h1>
-  <div class="subtitle">Technical Analysis{% if variant_label and variant_label != 'Default' %} — {{ variant_label }}{% endif %}</div>
-  <div class="badge">Reverse-Engineered Report</div>
+  <div class="subtitle">{{ _('Technical Analysis') }}{% if variant_label and variant_label != 'Default' %} — {{ variant_label }}{% endif %}</div>
+  <div class="badge">{{ _('Reverse-Engineered Report') }}</div>
   <div class="source">
     <strong>RansomLook</strong> &middot;
     <a href="https://www.ransomlook.io">ransomlook.io</a><br/>
-    File last modified: {{ analysis_mtime }}<br/>
+    {{ _('File last modified:') }} {{ analysis_mtime }}<br/>
     <br/>
-    {% if meta and meta.get('author') %}Analyst: {{ meta['author'] }}<br/>{% endif %}
-    {% if meta and meta.get('date') %}Analysis date: {{ meta['date'] }}<br/>{% endif %}
-    {% if meta and meta.get('sha256') %}Sample SHA-256: <code>{{ meta['sha256'] }}</code><br/>{% endif %}
+    {% if meta and meta.get('author') %}{{ _('Analyst:') }} {{ meta['author'] }}<br/>{% endif %}
+    {% if meta and meta.get('date') %}{{ _('Analysis date:') }} {{ meta['date'] }}<br/>{% endif %}
+    {% if meta and meta.get('sha256') %}{{ _('Sample SHA-256:') }} <code>{{ meta['sha256'] }}</code><br/>{% endif %}
   </div>
 </section>
 

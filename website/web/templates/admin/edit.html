@@ -1,14 +1,14 @@
 {% extends "base.html" %}
 {% from 'bootstrap5/utils.html' import render_messages %}
-{% block title %}Admin · Edit{% endblock %}
+{% block title %}{{ _('Admin · Edit') }}{% endblock %}
 
 {% block content %}
 {{ render_messages(container=True, dismissible=True) }}
 
 <section class="hero">
   <div class="container">
-    <h1>Edit Group or Market</h1>
-    <p class="lead">Pick the type, search, then confirm to edit.</p>
+    <h1>{{ _('Edit Group or Market') }}</h1>
+    <p class="lead">{{ _('Pick the type, search, then confirm to edit.') }}</p>
   </div>
 </section>
 
@@ -17,18 +17,18 @@
 
     <!-- Type switch (no URL hash) -->
     <div class="table-card p-12 mb-14">
-      <div class="type-toggle" role="tablist" aria-label="Choose type to edit">
+      <div class="type-toggle" role="tablist" aria-label="{{ _('Choose type to edit') }}">
         <input type="radio" name="type" id="t-groups" checked>
-        <label for="t-groups" class="btn btn-secondary">Groups</label>
+        <label for="t-groups" class="btn btn-secondary">{{ _('Groups') }}</label>
 
         <input type="radio" name="type" id="t-markets">
-        <label for="t-markets" class="btn btn-secondary">Markets / Forums</label>
+        <label for="t-markets" class="btn btn-secondary">{{ _('Markets / Forums') }}</label>
       </div>
 
       <!-- Shared search box -->
       <div class="mt-10">
-        <label class="label" for="picker-search">Search</label>
-        <input id="picker-search" class="input" type="search" placeholder="Filter options…">
+        <label class="label" for="picker-search">{{ _('Search') }}</label>
+        <input id="picker-search" class="input" type="search" placeholder="{{ _('Filter options…') }}">
       </div>
     </div>
 

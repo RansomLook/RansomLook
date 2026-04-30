@@ -27,7 +27,7 @@
   <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}" integrity="{{get_sri('static', 'main.css')}}">
   <script defer src="{{ url_for('static', filename='js/main.js') }}" integrity="{{get_sri('static', 'main.js')}}"></script>
   <script defer src="{{ url_for('static', filename='js/rl-common.js') }}" integrity="{{get_sri('static', 'rl-common.js')}}"></script>
-  <link rel="alternate" type="application/rss+xml" title="RansomLook — Recent posts" href="/rss.xml">
+  <link rel="alternate" type="application/rss+xml" title="{{ _('RansomLook — Recent posts') }}" href="/rss.xml">
 </head>
 <body>
 {%- macro nav_link(href, label, icon, match=None, title=None) -%}
@@ -57,16 +57,16 @@
 
   <aside class="sidebar" id="sidebar">
     <div class="sidebar-head">
-      <a class="brand sidebar-brand" href="/" aria-label="RansomLook home">
+      <a class="brand sidebar-brand" href="/" aria-label="{{ _('RansomLook home') }}">
         <img src="{{ url_for('static', filename='img/favicon-48.png') }}" alt="" width="26" height="26">
         <span class="brand-name nav-label">RansomLook</span>
       </a>
-      <button class="sidebar-collapse" type="button" aria-label="Collapse sidebar" title="Collapse / expand">
+      <button class="sidebar-collapse" type="button" aria-label="{{ _('Collapse sidebar') }}" title="{{ _('Collapse / expand') }}">
         <svg class="ic-collapse" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 6 9 12 15 18"/></svg>
       </button>
     </div>
 
-    <nav class="side-nav" aria-label="Primary">
+    <nav class="side-nav" aria-label="{{ _('Primary') }}">
       <div class="nav-group">
         <h3 class="nav-group-title">{{ _('Data') }}</h3>
         <ul>
@@ -112,13 +112,13 @@
 
   <div class="app-main">
     <header class="topbar">
-      <button class="nav-toggle" aria-label="Open navigation" aria-controls="sidebar" aria-expanded="false">☰</button>
+      <button class="nav-toggle" aria-label="{{ _('Open navigation') }}" aria-controls="sidebar" aria-expanded="false">☰</button>
 
       <div class="topbar-spacer"></div>
 
       <div class="topbar-actions">
         {% if available_locales %}
-          <div class="lang-switch" role="group" aria-label="Language">
+          <div class="lang-switch" role="group" aria-label="{{ _('Language') }}">
             {% for code in available_locales %}
               <a class="lang-opt{% if code == locale %} is-active{% endif %}"
                  href="{{ url_for('set_locale', code=code) }}"

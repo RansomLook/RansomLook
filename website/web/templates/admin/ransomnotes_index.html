@@ -1,22 +1,22 @@
 {% extends "base.html" %}
 
-{% block title %}Notes from Groups (Admin){% endblock %}
+{% block title %}{{ _('Notes from Groups (Admin)') }}{% endblock %}
 
 {% block content %}
 
 <section class="hero">
   <div class="container">
-    <h1>Create a new group.</h1>
-    <p class="lead">Create a new group and its first ransomnote.</p>
+    <h1>{{ _('Create a new group.') }}</h1>
+    <p class="lead">{{ _('Create a new group and its first ransomnote.') }}</p>
   </div>
   <div class="container">
 
     <form method="post" action="{{ url_for('admin_ransomnotes_open') }}" class="table-card admin-form p-12 mb-14" style="display:flex;gap:10px;align-items:end;flex-wrap:wrap">
       <div>
-        <label class="label" for="new-group">Group slug</label>
-        <input id="new-group" class="input" type="text" name="group" placeholder="new-group-slug (ex: antefrigus)" required>
+        <label class="label" for="new-group">{{ _('Group slug') }}</label>
+        <input id="new-group" class="input" type="text" name="group" placeholder="{{ _('new-group-slug (ex: antefrigus)') }}" required>
       </div>
-      <button class="btn" type="submit">Open / Create</button>
+      <button class="btn" type="submit">{{ _('Open / Create') }}</button>
     </form>
 
   </div>
@@ -24,19 +24,19 @@
 
 <section class="metrics-section">
   <div class="container">
-    <h1>Groups with notes</h1>
-    <p class="lead">Browse ransomware note samples grouped by actor.</p>
+    <h1>{{ _('Groups with notes') }}</h1>
+    <p class="lead">{{ _('Browse ransomware note samples grouped by actor.') }}</p>
 
     <!-- Filters -->
     <div class="table-card search-card pad-mb">
       <div class="filters-wrap">
         <div class="filters">
           <div class="field field--search">
-            <label class="sr-only" for="notes-filter">Search</label>
+            <label class="sr-only" for="notes-filter">{{ _('Search') }}</label>
             <input id="notes-filter" class="input" type="search"
-                   aria-label="Filter groups"
-                   placeholder="Group name or alias…">
-            <button class="input-clear" type="button" aria-label="Clear search">×</button>
+                   aria-label="{{ _('Filter groups') }}"
+                   placeholder="{{ _('Group name or alias…') }}">
+            <button class="input-clear" type="button" aria-label="{{ _('Clear search') }}">×</button>
           </div>
         </div>
         <div class="filters-meta"><span id="flt-count"></span></div>
@@ -76,7 +76,7 @@
       a.style.display = match ? '' : 'none';
       if (match) n++;
     });
-    if (countEl) countEl.textContent = n + ' groups';
+    if (countEl) countEl.textContent = n + ' {{ _('groups') }}';
   }
 
   let t;

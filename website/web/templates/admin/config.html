@@ -1,15 +1,15 @@
 {% extends "base.html" %}
 {% from 'bootstrap5/utils.html' import render_messages %}
-{% block title %}Admin · Configuration{% endblock %}
+{% block title %}{{ _('Admin · Configuration') }}{% endblock %}
 
 {% block content %}
 {{ render_messages(container=True, dismissible=True) }}
 
 <section class="hero">
   <div class="container">
-    <h1>Configuration</h1>
-    <p class="lead">Edit <code>generic.json</code> settings.
-      {% if is_sample %}<span class="badge badge-warn">Using sample — no generic.json found, changes will create one.</span>{% endif %}
+    <h1>{{ _('Configuration') }}</h1>
+    <p class="lead">{{ _('Edit') }} <code>generic.json</code> {{ _('settings.') }}
+      {% if is_sample %}<span class="badge badge-warn">{{ _('Using sample — no generic.json found, changes will create one.') }}</span>{% endif %}
     </p>
   </div>
 </section>
@@ -27,9 +27,9 @@
               <div style="display:flex;align-items:center;gap:10px;">
                 {% if sec.data.get('enable') is not none %}
                   {% if sec.data.get('enable') %}
-                    <span class="badge badge-ok">enabled</span>
+                    <span class="badge badge-ok">{{ _('enabled') }}</span>
                   {% else %}
-                    <span class="badge badge-neutral">disabled</span>
+                    <span class="badge badge-neutral">{{ _('disabled') }}</span>
                   {% endif %}
                 {% endif %}
                 <span class="collapse-arrow">▸</span>
@@ -50,7 +50,7 @@
                     <input class="input" id="f-{{ sec.key }}-{{ field }}"
                            name="{{ sec.key }}.{{ field }}"
                            value="{{ val | join(', ') }}"
-                           placeholder="comma-separated"
+                           placeholder="{{ _('comma-separated') }}"
                            style="flex:1;">
                   {% elif val is number %}
                     <input class="input" type="number" id="f-{{ sec.key }}-{{ field }}"
@@ -64,7 +64,7 @@
                              value="{{ val }}"
                              autocomplete="off"
                              style="flex:1;">
-                      <button class="btn btn-secondary btn-sm js-toggle-pw" type="button" data-target="f-{{ sec.key }}-{{ field }}">Show</button>
+                      <button class="btn btn-secondary btn-sm js-toggle-pw" type="button" data-target="f-{{ sec.key }}-{{ field }}">{{ _('Show') }}</button>
                     {% else %}
                       <input class="input" type="text" id="f-{{ sec.key }}-{{ field }}"
                              name="{{ sec.key }}.{{ field }}"
@@ -84,7 +84,7 @@
       <div class="table-card mb-14">
         <div class="card-toolbar bb js-collapse-toggle" style="cursor:pointer;">
           <div style="display:flex;align-items:center;gap:8px;justify-content:space-between;width:100%;">
-            <span class="fw-600">General</span>
+            <span class="fw-600">{{ _('General') }}</span>
             <span class="collapse-arrow">▸</span>
           </div>
         </div>
@@ -104,7 +104,7 @@
                   {% if 'api' in sc.key or 'key' in sc.key %}
                     <input class="input" type="password" id="f-{{ sc.key }}" name="{{ sc.key }}"
                            value="{{ sc.value }}" autocomplete="off" style="flex:1;">
-                    <button class="btn btn-secondary btn-sm js-toggle-pw" type="button" data-target="f-{{ sc.key }}">Show</button>
+                    <button class="btn btn-secondary btn-sm js-toggle-pw" type="button" data-target="f-{{ sc.key }}">{{ _('Show') }}</button>
                   {% else %}
                     <input class="input" type="text" id="f-{{ sc.key }}" name="{{ sc.key }}"
                            value="{{ sc.value }}" style="flex:1;">
@@ -119,7 +119,7 @@
 
       <!-- Floating action buttons -->
       <div class="edit-actions">
-        <button class="btn btn-primary" type="submit">Save configuration</button>
+        <button class="btn btn-primary" type="submit">{{ _('Save configuration') }}</button>
       </div>
 
     </form>

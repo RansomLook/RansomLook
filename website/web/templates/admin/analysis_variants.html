@@ -101,7 +101,7 @@
         <div>
           <label class="label" for="new_variant">{{ _('Variant id') }}</label>
           <input type="text" id="new_variant" name="new_variant" class="input w-full" pattern="[a-z0-9_-]{1,64}"
-                 placeholder="e.g. windows" required spellcheck="false" autocomplete="off">
+                 placeholder="{{ _('e.g. windows') }}" required spellcheck="false" autocomplete="off">
         </div>
         <div class="self-end">
           <button type="submit" class="btn btn-primary">+ {{ _('Create variant') }}</button>

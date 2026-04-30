@@ -65,7 +65,7 @@
             {% set h_seed = ((d.seed / max_seen) * 72) | round(2) if max_seen and d.seed else 0 %}
             {% set x = loop.index0 * (bw + 1.5) %}
             {% if h_seen > 0 %}<rect x="{{ x }}" y="{{ 76 - h_seen }}" width="{{ bw }}" height="{{ h_seen }}" fill="#3b82f6" rx="1"><title>{{ d.day }} · {{ d.seen }}</title></rect>{% endif %}
-            {% if h_seed > 0 %}<rect x="{{ x }}" y="{{ 76 - h_seed }}" width="{{ bw }}" height="{{ h_seed }}" fill="#10b981" rx="1"><title>{{ d.day }} · seeder: {{ d.seed }}</title></rect>{% endif %}
+            {% if h_seed > 0 %}<rect x="{{ x }}" y="{{ 76 - h_seed }}" width="{{ bw }}" height="{{ h_seed }}" fill="#10b981" rx="1"><title>{{ d.day }} · {{ _('seeder:') }} {{ d.seed }}</title></rect>{% endif %}
           {% endfor %}
         </svg>
       </div>

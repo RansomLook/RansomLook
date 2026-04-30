@@ -4,19 +4,19 @@
 
 {% macro delta_badge(pct, raw, is_new) -%}
   {%- if is_new -%}
-    <span class="delta-badge delta-new" title="First seen in current window">NEW</span>
+    <span class="delta-badge delta-new" title="{{ _('First seen in current window') }}">{{ _('NEW') }}</span>
   {%- elif pct is none -%}
-    <span class="delta-badge delta-flat" title="No activity in previous window">—</span>
+    <span class="delta-badge delta-flat" title="{{ _('No activity in previous window') }}">—</span>
   {%- elif pct >= 50 -%}
-    <span class="delta-badge delta-up-strong" title="{{ raw }} vs previous {{ days }}d">▲ +{{ pct }}%</span>
+    <span class="delta-badge delta-up-strong" title="{{ _('%(raw)s vs previous %(d)sd', raw=raw, d=days) }}">▲ +{{ pct }}%</span>
   {%- elif pct > 0 -%}
-    <span class="delta-badge delta-up" title="{{ raw }} vs previous {{ days }}d">▲ +{{ pct }}%</span>
+    <span class="delta-badge delta-up" title="{{ _('%(raw)s vs previous %(d)sd', raw=raw, d=days) }}">▲ +{{ pct }}%</span>
   {%- elif pct <= -50 -%}
-    <span class="delta-badge delta-down-strong" title="{{ raw }} vs previous {{ days }}d">▼ {{ pct }}%</span>
+    <span class="delta-badge delta-down-strong" title="{{ _('%(raw)s vs previous %(d)sd', raw=raw, d=days) }}">▼ {{ pct }}%</span>
   {%- elif pct < 0 -%}
-    <span class="delta-badge delta-down" title="{{ raw }} vs previous {{ days }}d">▼ {{ pct }}%</span>
+    <span class="delta-badge delta-down" title="{{ _('%(raw)s vs previous %(d)sd', raw=raw, d=days) }}">▼ {{ pct }}%</span>
   {%- else -%}
-    <span class="delta-badge delta-flat" title="Stable vs previous {{ days }}d">= 0%</span>
+    <span class="delta-badge delta-flat" title="{{ _('Stable vs previous %(d)sd', d=days) }}">= 0%</span>
   {%- endif -%}
 {%- endmacro %}
 
@@ -53,7 +53,7 @@
     {# Global activity sparkline — daily buckets over the window #}
     {% if global_daily and days > 1 %}
       {% set gmax = global_daily|max %}
-      <div class="spark-band" aria-label="Global posts per day">
+      <div class="spark-band" aria-label="{{ _('Global posts per day') }}">
         <div class="activity-head">
           <span class="live-dot" aria-hidden="true"></span>
           <span class="activity-label">{{ _('Activity · last %(n)s days', n=days) }}</span>
@@ -68,14 +68,14 @@
             {% set x = loop.index0 * (bw + 1.5) %}
             {% set y = 45 - h %}
             <rect x="{{ x }}" y="{{ y }}" width="{{ bw }}" height="{{ h if h > 0 else 1.2 }}" rx="1">
-              <title>{{ n - loop.index }}d ago · {{ v }} post{{ '' if v == 1 else 's' }}</title>
+              <title>{{ ngettext('%(d)sd ago · %(n)s post', '%(d)sd ago · %(n)s posts', v, d=(n - loop.index), n=v) }}</title>
             </rect>
           {% endfor %}
         </svg>
         <div class="spark-axis">
           <span>-{{ days }}d</span>
           <span>-{{ (days/2)|int }}d</span>
-          <span>today</span>
+          <span>{{ _('today') }}</span>
         </div>
       </div>
     {% endif %}

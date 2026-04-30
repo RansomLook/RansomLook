@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 {% from 'bootstrap5/utils.html' import render_messages %}
-{% block title %}Add post · Admin{% endblock %}
+{% block title %}{{ _('Add post · Admin') }}{% endblock %}
 
 {% block content %}
 {{ render_messages(container=True, dismissible=True) }}
@@ -8,8 +8,8 @@
 
 <section class="hero">
   <div class="container">
-    <h1>Add post</h1>
-    <p class="lead">Create a new post with optional screenshot, custom date, link and magnet.</p>
+    <h1>{{ _('Add post') }}</h1>
+    <p class="lead">{{ _('Create a new post with optional screenshot, custom date, link and magnet.') }}</p>
   </div>
 </section>
 
@@ -22,34 +22,34 @@
         <!-- Left column: main fields -->
         <div class="card">
           <div class="card-hd">
-            <strong>New post</strong>
-            <span class="muted">Fields marked * are required</span>
+            <strong>{{ _('New post') }}</strong>
+            <span class="muted">{{ _('Fields marked * are required') }}</span>
           </div>
           <div class="card-bd">
 
-            <label class="label" for="title">Post title *</label>
-            {{ form.title(class_="input", id="title", placeholder="e.g. New victim on blog…") }}
+            <label class="label" for="title">{{ _('Post title *') }}</label>
+            {{ form.title(class_="input", id="title", placeholder=_('e.g. New victim on blog…')) }}
 
-            <label class="label" for="desc">Description</label>
-            {{ form.description(class_="textarea", id="desc", placeholder="Summary, key points, etc.") }}
-            <div class="counter"><span id="desc-count">0</span> characters</div>
+            <label class="label" for="desc">{{ _('Description') }}</label>
+            {{ form.description(class_="textarea", id="desc", placeholder=_('Summary, key points, etc.')) }}
+            <div class="counter"><span id="desc-count">0</span> {{ _('characters') }}</div>
 
             <div class="row2 mt-14">
               <div>
-                <label class="label" for="date">Date</label>
+                <label class="label" for="date">{{ _('Date') }}</label>
                 {{ form.date(class_="input", id="date", placeholder="YYYY-MM-DD HH:MM:SS") }}
                 <div class="hint mt-6">
-                  <button class="btn btn-secondary btn-sm" type="button" id="btn-now">Now</button>
-                  <span class="muted">Fills the current UTC timestamp.</span>
+                  <button class="btn btn-secondary btn-sm" type="button" id="btn-now">{{ _('Now') }}</button>
+                  <span class="muted">{{ _('Fills the current UTC timestamp.') }}</span>
                 </div>
               </div>
               <div>
-                <label class="label" for="link">Link (relative or full)</label>
+                <label class="label" for="link">{{ _('Link (relative or full)') }}</label>
                 {{ form.link(class_="input", id="link", placeholder="/relative/or/full/url") }}
               </div>
             </div>
 
-            <label class="label mt-12" for="magnet">Magnet</label>
+            <label class="label mt-12" for="magnet">{{ _('Magnet') }}</label>
             {{ form.magnet(class_="input", id="magnet", placeholder="magnet:?xt=urn:btih:…") }}
 
           </div>
@@ -57,23 +57,23 @@
 
         <!-- Right column: preview & upload -->
         <aside class="card">
-          <div class="card-hd"><strong>Preview</strong></div>
+          <div class="card-hd"><strong>{{ _('Preview') }}</strong></div>
           <div class="card-bd">
             <div class="preview-box" id="shot-box">
-              <span class="muted" id="shot-empty">No image selected</span>
+              <span class="muted" id="shot-empty">{{ _('No image selected') }}</span>
             </div>
 
             <dl class="kv mt-12">
-              <dt>Title:</dt><dd id="pv-title">—</dd>
-              <dt>Date:</dt><dd id="pv-date">—</dd>
-              <dt>Link:</dt><dd id="pv-link">—</dd>
+              <dt>{{ _('Title:') }}</dt><dd id="pv-title">—</dd>
+              <dt>{{ _('Date:') }}</dt><dd id="pv-date">—</dd>
+              <dt>{{ _('Link:') }}</dt><dd id="pv-link">—</dd>
             </dl>
 
             <div class="mt-14">
-              <label class="label" for="file">Upload screenshot (optional)</label>
+              <label class="label" for="file">{{ _('Upload screenshot (optional)') }}</label>
               <!-- keep the original name="file" to avoid backend changes -->
               <input type="file" name="file" id="file" class="input" accept="image/*">
-              <div class="hint mt-6">PNG/JPG/WebP recommended (reasonable size).</div>
+              <div class="hint mt-6">{{ _('PNG/JPG/WebP recommended (reasonable size).') }}</div>
             </div>
 
       <!-- Floating action buttons -->

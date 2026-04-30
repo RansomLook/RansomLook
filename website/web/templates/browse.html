@@ -5,11 +5,11 @@
 {% macro health_badge(up, total) -%}
   {% set ratio = (up / total) if total else 0 %}
   {% if up == 0 %}
-    <span class="badge-status badge-down" title="All mirrors offline">{{ up }}/{{ total }}</span>
+    <span class="badge-status badge-down" title="{{ _('All mirrors offline') }}">{{ up }}/{{ total }}</span>
   {% elif ratio >= 0.5 %}
-    <span class="badge-status badge-up" title="{{ (ratio*100)|round|int }}% mirrors up">{{ up }}/{{ total }}</span>
+    <span class="badge-status badge-up" title="{{ _('%(pct)s%% mirrors up', pct=(ratio*100)|round|int) }}">{{ up }}/{{ total }}</span>
   {% else %}
-    <span class="badge-status badge-degraded" title="{{ (ratio*100)|round|int }}% mirrors up — degraded">{{ up }}/{{ total }}</span>
+    <span class="badge-status badge-degraded" title="{{ _('%(pct)s%% mirrors up — degraded', pct=(ratio*100)|round|int) }}">{{ up }}/{{ total }}</span>
   {% endif %}
 {%- endmacro %}
 
@@ -121,7 +121,7 @@
           <div class="card-body">
             <div class="card-head">
               <h3 class="card-title">{{ it['name']|title }}</h3>
-              <span class="card-type-chip card-type-chip--{{ it['type'] }}">{{ it['type'] }}</span>
+              <span class="card-type-chip card-type-chip--{{ it['type'] }}">{{ _(it['type']) }}</span>
             </div>
 
             <div class="card-badges">

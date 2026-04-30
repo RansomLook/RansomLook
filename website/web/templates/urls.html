@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %}RansomLook — URLs{% endblock %}
+{% block title %}RansomLook — {{ _('URLs') }}{% endblock %}
 
 {% macro spark_svg(series) -%}
   {%- set n = series|length -%}
@@ -31,10 +31,9 @@
 
 <section class="hero">
   <div class="container">
-    <h1>URLs</h1>
+    <h1>{{ _('URLs') }}</h1>
     <p class="lead">
-      {{ _('All tracked mirrors across groups and markets, with live status and 30-day health.') if _
-         else 'All tracked mirrors across groups and markets, with live status and 30-day health.' }}
+      {{ _('All tracked mirrors across groups and markets, with live status and 30-day health.') }}
     </p>
   </div>
 </section>
@@ -46,7 +45,7 @@
 
       <div class="bf-row bf-row--search">
         <div class="field field--search bf-search">
-          <label class="sr-only" for="urls-q">Search</label>
+          <label class="sr-only" for="urls-q">{{ _('Search') }}</label>
           <input id="urls-q" class="input" type="search"
                  autocomplete="off" spellcheck="false"
                  aria-label="{{ _('Search by group, market or URL') }}"
@@ -94,11 +93,11 @@
 
     <div class="table-card">
       <div class="table-scroll">
-        <table class="rl-table rl-table--urls" id="urls-table" aria-label="URLs">
+        <table class="rl-table rl-table--urls" id="urls-table" aria-label="{{ _('URLs') }}">
           <thead>
             <tr>
               <th style="width:18%">{{ _('Group / Market') }}</th>
-              <th>URL</th>
+              <th>{{ _('URL') }}</th>
               <th style="width:8%"><center>{{ _('Status') }}</center></th>
               <th style="width:11%"><center>{{ _('Last scrape') }}</center></th>
               <th style="width:9%"><center>{{ _('Uptime 30d') }}</center></th>
@@ -122,18 +121,18 @@
                        href="/market/{{ r['entry_name']|urlencode }}">{{ r['entry_name']|title }}</a>
                   {% endif %}
                   <span class="card-type-chip card-type-chip--{{ r['entry_type'] }}" style="margin-left:6px">{{ r['entry_type'] }}</span>
-                  {% if r['entry_private'] %}<span class="badge-private" style="margin-left:6px">private</span>{% endif %}
+                  {% if r['entry_private'] %}<span class="badge-private" style="margin-left:6px">{{ _('private') }}</span>{% endif %}
                 </td>
                 <td class="url-cell {% if r['private'] %}is-private{% endif %}">
                   {{ r['slug'] }}
-                  {% if r['private'] %}<span class="badge-private" style="margin-left:6px">private</span>{% endif %}
+                  {% if r['private'] %}<span class="badge-private" style="margin-left:6px">{{ _('private') }}</span>{% endif %}
                 </td>
                 <td>
                   <center>
                   {% if r['available'] is true %}
-                    <span class="badge-status badge-up">Up</span>
+                    <span class="badge-status badge-up">{{ _('Up') }}</span>
                   {% elif r['available'] is false %}
-                    <span class="badge-status badge-down">Down</span>
+                    <span class="badge-status badge-down">{{ _('Down') }}</span>
                   {% else %}
                     <span class="badge-status badge-unknown">?</span>
                   {% endif %}
@@ -168,7 +167,7 @@
     </div>
 
     <p id="urls-empty" class="prose" style="display:none;color:var(--muted);text-align:center;padding:32px 0">
-      {{ _('No matches.') if _ else 'No matches.' }}
+      {{ _('No matches.') }}
     </p>
 
   </div>

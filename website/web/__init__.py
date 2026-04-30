@@ -42,6 +42,7 @@ from flask import (
 )
 from flask_babel import Babel  # type: ignore[import-untyped]
 from flask_babel import get_locale as _babel_get_locale
+from flask_babel import gettext as _
 from flask_bootstrap import Bootstrap5  # type: ignore
 from flask_login import current_user
 from flask_restx import Api  # type: ignore
@@ -732,22 +733,22 @@ def login():  # type: ignore[no-untyped-def]
                 user.id = username
                 flask_login.login_user(user)
                 audit_log("login", username, "local auth")
-                flash(f"Logged in as: {flask_login.current_user.id}", "success")
+                flash(_("Logged in as: %(user)s", user=flask_login.current_user.id), "success")
                 return redirect(url_for("admin"))
             else:
                 audit_log("login_failed", username, "local auth")
-                flash(f"Unable to login as: {username}", "error")
+                flash(_("Unable to login as: %(username)s", username=username), "error")
         else:
             if global_ldap_authentication(username, form.password.data, ldap_config):
                 user = User()
                 user.id = username
                 flask_login.login_user(user)
                 audit_log("login", username, "LDAP auth")
-                flash(f"Logged in as: {flask_login.current_user.id}", "success")
+                flash(_("Logged in as: %(user)s", user=flask_login.current_user.id), "success")
                 return redirect(url_for("admin"))
             else:
                 audit_log("login_failed", username, "LDAP auth")
-                flash(f"Unable to login as: {username}", "error")
+                flash(_("Unable to login as: %(username)s", username=username), "error")
     return render_template("login.html", form=form)
 
 
@@ -757,7 +758,7 @@ def logout():  # type: ignore
     username = flask_login.current_user.id if flask_login.current_user.is_authenticated else "?"
     flask_login.logout_user()
     audit_log("logout", username)
-    flash("Successfully logged out.", "success")
+    flash(_("Successfully logged out."), "success")
     return redirect(url_for("home"))
 
 
@@ -1734,6 +1735,7 @@ def group(name: str):  # type: ignore[no-untyped-def]
                 {
                     "id": v["id"],
                     "label": _variant_label(v["id"]),
+                    "type": (v["meta"].get("type") or "full").lower(),
                     "view_url": url_for("group_analysis") if False else (
                         url_for("group_analysis", name=group["name"]) if not v["id"]
                         else url_for("group_analysis_variant", name=group["name"], variant=v["id"])
@@ -2082,7 +2084,9 @@ def analyses_index():  # type: ignore[no-untyped-def]
                             else url_for("group_analysis_variant_pdf", name=g["name"], variant=v["id"])),
                 "private": is_private,
                 "mtime": mtime,
+                "mtime_ts": v["mtime"],
                 "sha256": v["meta"].get("sha256"),
+                "type": (v["meta"].get("type") or "full").lower(),
             })
     items.sort(key=lambda x: (x["mtime"] or "", x["name"].lower(), x["variant"].lower()), reverse=True)
     return render_template("analyses_index.html", items=items, total=len(items))
@@ -2117,6 +2121,7 @@ def _do_render_analysis_html(name: str, variant: Optional[str]):  # type: ignore
             "id": vv["id"],
             "label": _variant_label(vv["id"]),
             "is_current": vv["id"] == v["id"],
+            "type": (vv["meta"].get("type") or "full").lower(),
         }
         for vv in visible
     ]
@@ -2233,17 +2238,17 @@ def admin_group_analyses(name: str):  # type: ignore[no-untyped-def]
     red = Valkey(unix_socket_path=get_socket_path("cache"), db=DB_GROUPS)
     keys_lc = {k.decode().lower() for k in red.keys()}  # type: ignore[union-attr]
     if name.lower() not in keys_lc:
-        flash(f"No such group: {name}", "error")
+        flash(_("No such group: %(name)s", name=name), "error")
         return redirect(url_for("admin_analyses"))
 
     if request.method == "POST":
         new_id = (request.form.get("new_variant") or "").strip().lower()
         if not _is_valid_variant(new_id):
-            flash("Invalid variant id (use [a-z0-9_-], 1–64 chars; not 'assets'/'pdf').", "error")
+            flash(_("Invalid variant id (use [a-z0-9_-], 1–64 chars; not 'assets'/'pdf')."), "error")
             return redirect(url_for("admin_group_analyses", name=name))
         # Ensure no collision.
         if any(v["id"] == new_id for v in _list_variants(name)):
-            flash(f"Variant '{new_id}' already exists.", "error")
+            flash(_("Variant '%(new_id)s' already exists.", new_id=new_id), "error")
             return redirect(url_for("admin_group_analyses", name=name))
         # Create empty variant directory and an empty MD so the editor opens cleanly.
         base = _analysis_dir(name)
@@ -2297,7 +2302,7 @@ def _admin_check_group(name: str):  # type: ignore[no-untyped-def]
     red = Valkey(unix_socket_path=get_socket_path("cache"), db=DB_GROUPS)
     keys_lc = {k.decode().lower() for k in red.keys()}  # type: ignore[union-attr]
     if name.lower() not in keys_lc:
-        flash(f"No such group: {name}", "error")
+        flash(_("No such group: %(name)s", name=name), "error")
         return redirect(url_for("admin_analyses"))
     return None
 
@@ -2315,7 +2320,7 @@ def admin_edit_analysis_variant(name: str, variant_url: str):  # type: ignore[no
         return chk
     variant = _decode_variant_url(variant_url)
     if variant is None:
-        flash("Invalid variant id", "error")
+        flash(_("Invalid variant id"), "error")
         return redirect(url_for("admin_group_analyses", name=name))
 
     form = AnalysisForm()
@@ -2336,6 +2341,7 @@ def admin_edit_analysis_variant(name: str, variant_url: str):  # type: ignore[no
         form.sha256.data = existing_meta.get("sha256", "") or ""
         form.author.data = existing_meta.get("author", "") or ""
         form.analysis_date.data = existing_meta.get("date", "") or ""
+        form.analysis_type.data = existing_meta.get("type", "full") or "full"
         return render_template(
             "admin/edit_analysis.html",
             form=form,
@@ -2349,7 +2355,7 @@ def admin_edit_analysis_variant(name: str, variant_url: str):  # type: ignore[no
 
     # POST — accept either a textarea body or an uploaded .md file (uploaded file wins).
     if not form.validate_on_submit():
-        flash("Invalid form submission", "error")
+        flash(_("Invalid form submission"), "error")
         return redirect(url_for("admin_edit_analysis_variant", name=name, variant_url=variant_url))
 
     # Compute the target directory for THIS variant.
@@ -2367,17 +2373,17 @@ def admin_edit_analysis_variant(name: str, variant_url: str):  # type: ignore[no
             raw = f_in.read()
             new_content = raw.decode("utf-8", errors="replace")
         except Exception:
-            flash("Could not read uploaded file as UTF-8 text", "error")
+            flash(_("Could not read uploaded file as UTF-8 text"), "error")
             return redirect(url_for("admin_edit_analysis_variant", name=name, variant_url=variant_url))
     elif form.content.data is not None:
         new_content = form.content.data
 
     if new_content is None or new_content.strip() == "":
-        flash("Empty content — nothing saved", "error")
+        flash(_("Empty content — nothing saved"), "error")
         return redirect(url_for("admin_edit_analysis_variant", name=name, variant_url=variant_url))
 
     if "\n#" not in ("\n" + new_content):
-        flash("Warning: no Markdown heading found — saving anyway", "warning")
+        flash(_("Warning: no Markdown heading found — saving anyway"), "warning")
 
     with open(target_md, "w", encoding="utf-8") as f:
         f.write(new_content)
@@ -2392,13 +2398,13 @@ def admin_edit_analysis_variant(name: str, variant_url: str):  # type: ignore[no
         if re.fullmatch(r"[0-9a-f]{64}", sha_in):
             meta["sha256"] = sha_in
         else:
-            flash("SHA-256 ignored: must be 64 hex chars", "warning")
+            flash(_("SHA-256 ignored: must be 64 hex chars"), "warning")
     else:
         # Field empty → try to autodetect inside the Markdown's ## 1. Sample Identification.
         auto = _extract_sha256_from_md(new_content)
         if auto:
             meta["sha256"] = auto
-            flash(f"SHA-256 auto-extracted from Markdown: {auto[:16]}…", "info")
+            flash(_("SHA-256 auto-extracted from Markdown: %(prefix)s…", prefix=auto[:16]), "info")
         else:
             meta.pop("sha256", None)
 
@@ -2413,9 +2419,12 @@ def admin_edit_analysis_variant(name: str, variant_url: str):  # type: ignore[no
         if re.fullmatch(r"\d{4}-\d{2}-\d{2}", date_in):
             meta["date"] = date_in
         else:
-            flash("Analysis date ignored: expected YYYY-MM-DD", "warning")
+            flash(_("Analysis date ignored: expected YYYY-MM-DD"), "warning")
     else:
         meta.pop("date", None)
+
+    type_in = (form.analysis_type.data or "full").strip().lower()
+    meta["type"] = type_in if type_in in ("full", "cti") else "full"
 
     try:
         with open(os.path.join(target_dir, "meta.json"), "w", encoding="utf-8") as f:
@@ -2424,7 +2433,8 @@ def admin_edit_analysis_variant(name: str, variant_url: str):  # type: ignore[no
         pass
 
     audit_log("analysis_save", name, f"variant={variant or '(root)'}; bytes={len(new_content)}; private={meta['private']}")
-    flash(f"Saved analysis for {name}{' / ' + variant if variant else ''} ({len(new_content)} bytes)", "success")
+    variant_suffix = ' / ' + variant if variant else ''
+    flash(_("Saved analysis for %(name)s%(variant_suffix)s (%(size)s bytes)", name=name, variant_suffix=variant_suffix, size=len(new_content)), "success")
     return redirect(url_for("admin_group_analyses", name=name))
 
 
@@ -2530,11 +2540,11 @@ def admin_delete_analysis_variant(name: str, variant_url: str):  # type: ignore[
         return chk
     variant = _decode_variant_url(variant_url)
     if variant is None:
-        flash("Invalid variant id", "error")
+        flash(_("Invalid variant id"), "error")
         return redirect(url_for("admin_group_analyses", name=name))
     v = _resolve_variant(name, variant)
     if not v:
-        flash("Nothing to delete for that variant", "error")
+        flash(_("Nothing to delete for that variant"), "error")
         return redirect(url_for("admin_group_analyses", name=name))
     target_dir = os.path.dirname(v["md_path"])
     root = _analyses_root()
@@ -2554,11 +2564,12 @@ def admin_delete_analysis_variant(name: str, variant_url: str):  # type: ignore[
             if os.path.isdir(target_dir) and not os.listdir(target_dir):
                 os.rmdir(target_dir)
     except Exception as e:
-        flash(f"Delete failed: {e}", "error")
+        flash(_("Delete failed: %(error)s", error=str(e)), "error")
         return redirect(url_for("admin_group_analyses", name=name))
 
     audit_log("analysis_delete", name, f"variant={v['id'] or '(root)'}")
-    flash(f"Deleted analysis for {name}{' / ' + v['id'] if v['id'] else ''}", "success")
+    variant_suffix = ' / ' + v['id'] if v['id'] else ''
+    flash(_("Deleted analysis for %(name)s%(variant_suffix)s", name=name, variant_suffix=variant_suffix), "success")
     return redirect(url_for("admin_group_analyses", name=name))
 
 
@@ -3503,7 +3514,7 @@ def torrent_health_detail(infohash: str):  # type: ignore[no-untyped-def]
 
     meta = th.get_meta(infohash)
     if not meta:
-        flash("Unknown infohash", "error")
+        flash(_("Unknown infohash"), "error")
         return redirect(url_for("torrent_health_list"))
     history = th.get_history(infohash, limit=180)
     return render_template(
@@ -3557,7 +3568,7 @@ def torrent_health_ip_detail(ip: str):  # type: ignore[no-untyped-def]
 
     detail = th.get_ip_detail(ip.strip())
     if not detail.get("torrents") and not detail.get("enrichment"):
-        flash(f"No data for IP {ip!r}", "error")
+        flash(_("No data for IP %(ip)r", ip=ip), "error")
         return redirect(url_for("torrent_health_pivot"))
     timeline = th.get_ip_timeline(ip.strip(), days=30) if detail.get("torrents") else []
     return render_template("torrent_ip.html", detail=detail, timeline=timeline)
@@ -3569,7 +3580,7 @@ def torrent_health_asn_detail(asn: str):  # type: ignore[no-untyped-def]
 
     detail = th.get_asn_detail(asn.strip())
     if not detail.get("ips") and not detail.get("torrents"):
-        flash(f"No data for ASN {asn!r}", "error")
+        flash(_("No data for ASN %(asn)r", asn=asn), "error")
         return redirect(url_for("torrent_health_pivot"))
     return render_template("torrent_asn.html", detail=detail)
 
@@ -3608,13 +3619,13 @@ def admin_torrent_manage():  # type: ignore[no-untyped-def]
                     audit_log("delete_torrent", removed_ihs[0])
                 else:
                     audit_log("delete_torrent", f"{removed} torrents", ", ".join(removed_ihs[:10]) + ("…" if removed > 10 else ""))
-            flash(f"Removed {removed} torrent(s).", "success" if removed else "warning")
+            flash(_("Removed %(count)s torrent(s).", count=removed), "success" if removed else "warning")
             return redirect(url_for("admin_torrent_manage"))
 
         # ── Add (unit magnet, unit .torrent upload, or bulk textarea) ────
         group = (request.form.get("group") or "").strip()
         if not group:
-            flash("Pick a group.", "error")
+            flash(_("Pick a group."), "error")
             return redirect(url_for("admin_torrent_manage"))
 
         added = merged = failed = 0
@@ -3679,7 +3690,8 @@ def admin_torrent_manage():  # type: ignore[no-untyped-def]
             if merged_ihs:
                 det_parts.append(f"merged={','.join(merged_ihs[:10])}" + ("…" if len(merged_ihs) > 10 else ""))
             audit_log("add_torrent", group, "; ".join(det_parts))
-        flash(f"{' · '.join(parts) or 'No input.'}", "success" if not failed else "warning")
+        summary = ' · '.join(parts) or _('No input.')
+        flash(summary, "success" if not failed else "warning")
         for err in errors[:5]:
             flash(err, "error")
         return redirect(url_for("admin_torrent_manage"))
@@ -3736,14 +3748,14 @@ def addgroup():  # type: ignore[no-untyped-def]
             form.init_script.data,
         )
         if res == 2:
-            flash(f"URL already exists for {form.groupname.data}: {form.url.data}", "error")
+            flash(_("URL already exists for %(group)s: %(url)s", group=form.groupname.data, url=form.url.data), "error")
             return render_template("admin/add.html", form=form)
         elif res == 1:
-            flash(f"URL added to existing group {form.groupname.data}: {form.url.data}", "success")
+            flash(_("URL added to existing group %(group)s: %(url)s", group=form.groupname.data, url=form.url.data), "success")
             audit_log("add_url", form.groupname.data, f"url={form.url.data}")
             return redirect(url_for("admin"))
         else:
-            flash(f"New group created: {form.groupname.data} with URL {form.url.data}", "success")
+            flash(_("New group created: %(group)s with URL %(url)s", group=form.groupname.data, url=form.url.data), "success")
             audit_log("add_group", form.groupname.data, f"url={form.url.data}")
             return redirect(url_for("admin"))
     return render_template("admin/add.html", form=form)
@@ -3863,7 +3875,7 @@ def editgroup(database: int, name: str):  # type: ignore
     if deleteButton.validate_on_submit():
         red.delete(name)
         audit_log("delete_group", name)
-        flash(f"Success to delete : {name}", "success")
+        flash(_("Success to delete : %(name)s", name=name), "success")
         return redirect(url_for("admin"))
     if form.validate_on_submit():
         data = json.loads(red.get(name))  # type: ignore[arg-type]
@@ -3933,7 +3945,7 @@ def editgroup(database: int, name: str):  # type: ignore
                 filename = entry.file.data.filename
                 file_ext = os.path.splitext(filename)[1]
                 if file_ext not in app.config["UPLOAD_EXTENSIONS"] or file_ext != validate_image(entry.file.data):  # type: ignore
-                    flash(f"Error to add post to : {name} - Screen should be a PNG", "error")
+                    flash(_("Error to add post to : %(name)s - Screen should be a PNG", name=name), "error")
                     return render_template("editentry.html", form=form, deleteform=deleteButton)
                 filename = name + "-" + createfile(entry.slug.data) + ".png"
                 namefile = os.path.join(get_homedir(), "source/screenshots", filename)
@@ -3998,7 +4010,7 @@ def editgroup(database: int, name: str):  # type: ignore
 
             _rl_rename_in_all_actors(rel_key, name, form.groupname.data.strip())
             audit_log("rename_group", name, f"new_name={form.groupname.data}")
-        flash(f"Success to edit : {form.groupname.data}", "success")
+        flash(_("Success to edit : %(name)s", name=form.groupname.data), "success")
         return redirect(url_for("admin"))
 
     return render_template("admin/editentry.html", form=form, deleteform=deleteButton)
@@ -4062,7 +4074,7 @@ def editlogo(database: int, name: str):  # type: ignore
             filename = form.file.data.filename
             file_ext = os.path.splitext(filename)[1]
             if file_ext not in app.config["UPLOAD_EXTENSIONS"] or file_ext != validate_image(form.file.data):  # type: ignore
-                flash(f"Error to add post to : {name} - Screen should be a PNG", "error")
+                flash(_("Error to add post to : %(name)s - Screen should be a PNG", name=name), "error")
                 return render_template("admin/editlogo.html", form=form)
             filename = createfile(os.path.splitext(filename)[0]) + file_ext
             if not os.path.exists(logofolder):
@@ -4120,7 +4132,7 @@ def addpostentry(database: int, name: str):  # type: ignore
         if form.magnet.data:
             entry["magnet"] = form.magnet.data
         if form.link.data and form.magnet.data:
-            flash(f"Error to add post to : {name} - You should select Magnet or Link not both", "error")
+            flash(_("Error to add post to : %(name)s - You should select Magnet or Link not both", name=name), "error")
             return render_template("admin/addpostentry.html", form=form)
         if form.date.data:
             entry["date"] = str(parser.parse(form.date.data))
@@ -4129,7 +4141,7 @@ def addpostentry(database: int, name: str):  # type: ignore
         if filename != "":
             file_ext = os.path.splitext(filename)[1]
             if file_ext not in app.config["UPLOAD_EXTENSIONS"] or file_ext != validate_image(uploaded_file.stream):  # type: ignore
-                flash(f"Error to add post to : {name} - Screen should be a PNG", "error")
+                flash(_("Error to add post to : %(name)s - Screen should be a PNG", name=name), "error")
                 return render_template("admin/addpostentry.html", form=form)
             filenamepng = createfile(form.title.data) + file_ext
             base_path = os.path.normpath(str(get_homedir()) + "/source/screenshots")
@@ -4142,7 +4154,7 @@ def addpostentry(database: int, name: str):  # type: ignore
             uploaded_file.save(namepng)
             entry["screen"] = str(os.path.join("screenshots", name, filenamepng))
         if appender(entry, name):
-            flash(f"Error to add post to : {name} - The entry already exists", "error")
+            flash(_("Error to add post to : %(name)s - The entry already exists", name=name), "error")
             return render_template("admin/addpostentry.html", form=form)
         else:
             # statsgroup(name.encode())
@@ -4151,7 +4163,7 @@ def addpostentry(database: int, name: str):  # type: ignore
             # run_data_viz(30)
             # run_data_viz(90)
             audit_log("add_post", name, f"title={form.title.data}")
-            flash(f"Success to add post to : {name}", "success")
+            flash(_("Success to add post to : %(name)s", name=name), "success")
         return redirect(url_for("admin"))
 
     form.groupname.label = name
@@ -4226,13 +4238,13 @@ def editpostentry(name: str):  # type: ignore
                 filename = field.file.data.filename
                 file_ext = os.path.splitext(filename)[1]
                 if file_ext not in app.config["UPLOAD_EXTENSIONS"] or file_ext != validate_image(field.file.data):  # type: ignore
-                    flash(f"Error to add post to : {name} - Screen should be a PNG", "error")
+                    flash(_("Error to add post to : %(name)s - Screen should be a PNG", name=name), "error")
                     return render_template("admin/editpost.html", form=form)
                 filenamepng = createfile(post["post_title"]) + file_ext
                 base_path = os.path.normpath(str(get_homedir()) + "/source/screenshots")
                 path = os.path.normpath(os.path.join(base_path, name))
                 if not path.startswith(base_path + os.sep) and path != base_path:
-                    flash(f"Invalid path: {name}", "error")
+                    flash(_("Invalid path: %(name)s", name=name), "error")
                     return render_template("admin/editpost.html", form=form)
                 if not os.path.exists(path):
                     os.mkdir(path)
@@ -4255,7 +4267,7 @@ def editpostentry(name: str):  # type: ignore
         if not parts:
             parts.append("modified")
         audit_log("edit_posts", name, "; ".join(parts))
-        flash(f"Success to add post to : {name}", "success")
+        flash(_("Success to add post to : %(name)s", name=name), "success")
         return redirect(url_for("admin"))
 
     return render_template("admin/editpost.html", form=form)
@@ -4264,7 +4276,7 @@ def editpostentry(name: str):  # type: ignore
 @app.route("/export/<database>")
 def exportdb(database: int):  # type: ignore[no-untyped-def]
     if str(database) not in ["0", "2", "3", "4", "5", "6", "7"]:
-        flash("You are not allowed to dump this DataBase", "error")
+        flash(_("You are not allowed to dump this DataBase"), "error")
         return redirect(url_for("home"))
     red = Valkey(unix_socket_path=get_socket_path("cache"), db=database)
     dump = {}
@@ -4300,14 +4312,14 @@ def addactor():  # type: ignore[no-untyped-def]
     if form.validate_on_submit():
         key = (form.name.data or "").strip().lower()
         if not key:
-            flash("Name required", "error")
+            flash(_("Name required"), "error")
             return render_template(
                 "admin/addactor.html", form=form, groups_all=groups_all, markets_all=markets_all, peers_all=peers_all
             )
 
         red = _actor_db()
         if red.get(key):
-            flash("This actor already exists.", "error")
+            flash(_("This actor already exists."), "error")
             return render_template(
                 "admin/addactor.html", form=form, groups_all=groups_all, markets_all=markets_all, peers_all=peers_all
             )
@@ -4385,7 +4397,7 @@ def addactor():  # type: ignore[no-untyped-def]
             filename = file.filename
             file_ext = os.path.splitext(filename)[1].lower()
             if file_ext not in app.config["UPLOAD_EXTENSIONS"] or file_ext != validate_image(file.stream):  # type: ignore
-                flash("Image invalide (png/jpg/svg/gif)", "error")
+                flash(_("Image invalide (png/jpg/svg/gif)"), "error")
                 return render_template("admin/addactor.html", form=form)
             safe = secure_filename(os.path.splitext(filename)[0]) + f"-{int(time.time())}{file_ext}"
             file.stream.seek(0)
@@ -4401,7 +4413,7 @@ def addactor():  # type: ignore[no-untyped-def]
         if new_peers:
             _actor_details.append(f"peers={', '.join(sorted(new_peers))}")
         audit_log("add_actor", entry["name"], "; ".join(_actor_details) if _actor_details else "minimal profile")
-        flash("Actor created.", "success")
+        flash(_("Actor created."), "success")
         return redirect(f"/admin/editactor/{quote(entry['name'])}")
 
     return render_template(
@@ -4432,7 +4444,7 @@ def editactor(name: str):  # type: ignore[no-untyped-def]
             key = k
             break
     if not key:
-        flash("Actor not found", "error")
+        flash(_("Actor not found"), "error")
         return redirect("/admin/editactor")
     red_g = Valkey(unix_socket_path=get_socket_path("cache"), db=DB_GROUPS)
     groups_all = sorted([k.decode() for k in red_g.keys()], key=str.lower)  # type: ignore[union-attr]
@@ -4614,7 +4626,7 @@ def editactor(name: str):  # type: ignore[no-untyped-def]
             audit_log("edit_actor", actor["name"], "; ".join(_actor_details))
         else:
             audit_log("edit_actor", actor["name"], "no changes")
-        flash("Actor updated.", "success")
+        flash(_("Actor updated."), "success")
         return redirect(f"/admin/editactor/{quote(actor['name'])}")
 
     images_link = f"/admin/logo/5/{quote(actor.get('name', ''))}"
@@ -4673,7 +4685,7 @@ def admin_ransomnotes_index():  # type: ignore[no-untyped-def]
 def admin_ransomnotes_open():  # type: ignore[no-untyped-def]
     name = (request.form.get("group") or "").strip()
     if not name:
-        flash("Please select a group name.", "warning")
+        flash(_("Please select a group name."), "warning")
         return redirect(url_for("admin_ransomnotes_index"))
 
     slug = _norm_group(name)
@@ -4730,12 +4742,12 @@ def admin_ransomnotes_alias_add(slug: str):  # type: ignore[no-untyped-def]
     canon = _norm_group(slug)
     alias = _norm_group(request.form.get("alias") or "")
     if not alias or alias == canon:
-        flash("Alias invalide.", "warning")
+        flash(_("Alias invalide."), "warning")
         return redirect(url_for("admin_ransomnotes_group", slug=canon))
     r11.hset("alias:group", alias, canon)
     r11.sadd(f"group:{canon}:aliases", alias)
     audit_log("add_note_alias", canon, f"alias={alias}")
-    flash(f"Alias '{alias}' added.", "success")
+    flash(_("Alias '%(alias)s' added.", alias=alias), "success")
     return redirect(url_for("admin_ransomnotes_group", slug=canon))
 
 
@@ -4748,7 +4760,7 @@ def admin_ransomnotes_alias_del(slug: str, alias: str):  # type: ignore[no-untyp
     r11.hdel("alias:group", a)
     r11.srem(f"group:{canon}:aliases", a)
     audit_log("delete_note_alias", canon, f"alias={a}")
-    flash(f"Alias '{a}' deleted.", "success")
+    flash(_("Alias '%(alias)s' deleted.", alias=a), "success")
     return redirect(url_for("admin_ransomnotes_group", slug=canon))
 
 
@@ -4786,7 +4798,7 @@ def admin_ransomnotes_note_create(slug: str):  # type: ignore[no-untyped-def]
     }
     _save_note(r11, note)
     audit_log("create_note", canon, f"title={note['title']}")
-    flash("Note created.", "success")
+    flash(_("Note created."), "success")
     return redirect(url_for("admin_ransomnotes_group", slug=canon))
 
 
@@ -4798,7 +4810,7 @@ def admin_ransomnotes_note_update(slug: str, nid: str):  # type: ignore[no-untyp
 
     n = _load_note(r11, nid)
     if not n:
-        flash("Note not found.", "danger")
+        flash(_("Note not found."), "danger")
         return redirect(url_for("admin_ransomnotes_group", slug=canon))
 
     _old_note = {
@@ -4842,7 +4854,7 @@ def admin_ransomnotes_note_update(slug: str, nid: str):  # type: ignore[no-untyp
         canon,
         f"id={nid}, changed={', '.join(_note_changes)}" if _note_changes else f"id={nid}, no changes",
     )
-    flash("Note updated.", "success")
+    flash(_("Note updated."), "success")
     return redirect(url_for("admin_ransomnotes_group", slug=canon))
 
 
@@ -4854,12 +4866,12 @@ def admin_ransomnotes_note_delete(slug: str, nid: str):  # type: ignore[no-untyp
 
     n = _load_note(r11, nid)
     if not n:
-        flash("Note not found.", "warning")
+        flash(_("Note not found."), "warning")
         return redirect(url_for("admin_ransomnotes_group", slug=canon))
 
     _remove_note(r11, n)
     audit_log("delete_note", canon, f"title={n.get('title', '')}, id={nid}")
-    flash("Note deleted.", "success")
+    flash(_("Note deleted."), "success")
     return redirect(url_for("admin_ransomnotes_group", slug=canon))
 
 
@@ -4957,7 +4969,7 @@ def admin_crypto_group_new():  # type: ignore[no-untyped-def]
         aliases_raw = (request.form.get("aliases") or "").strip()
 
         if not canon:
-            flash("Canonical name is required.", "danger")
+            flash(_("Canonical name is required."), "danger")
             return redirect(url_for("admin_crypto_group_new"))
 
         if display_name:
@@ -4971,7 +4983,7 @@ def admin_crypto_group_new():  # type: ignore[no-untyped-def]
                     red.set(f"crypto:alias:{alias_norm}", canon)
 
         audit_log("add_crypto_group", canon, f"aliases={aliases_raw}")
-        flash("Group created in DB=7.", "success")
+        flash(_("Group created in DB=7."), "success")
         return redirect(url_for("admin_crypto_group", group=canon))
 
     return render_template("admin/crypto_group_new.html")
@@ -4994,7 +5006,7 @@ def admin_crypto_new(group):  # type: ignore[no-untyped-def]
         txs_raw = request.form.get("transactions") or "[]"
 
         if not addr:
-            flash("Address is required.", "danger")
+            flash(_("Address is required."), "danger")
             return redirect(url_for("admin_crypto_new", group=group))
 
         try:
@@ -5005,7 +5017,7 @@ def admin_crypto_new(group):  # type: ignore[no-untyped-def]
                 if isinstance(t, dict) and (not t.get("source")):
                     t["source"] = src
         except Exception as e:
-            flash(f"Invalid transactions JSON: {e}", "danger")
+            flash(_("Invalid transactions JSON: %(error)s", error=str(e)), "danger")
             return redirect(url_for("admin_crypto_new", group=group))
 
         now = dt.now(timezone.utc).isoformat().replace("+00:00", "Z")
@@ -5033,7 +5045,7 @@ def admin_crypto_new(group):  # type: ignore[no-untyped-def]
         red.sadd(f"idx:source:{src}:crypto", f"{chain}:{addr}")
 
         audit_log("add_crypto_addr", canon, f"chain={chain}, addr={addr}")
-        flash("Address created.", "success")
+        flash(_("Address created."), "success")
         return redirect(url_for("admin_crypto_group", group=group))
 
     return render_template("admin/crypto_addr_form.html", mode="new", group=group, blockchain="", address="", doc={})
@@ -5071,7 +5083,7 @@ def admin_crypto_edit_addr(group, chain, addr):  # type: ignore[no-untyped-def]
             red.srem(f"idx:source:{src}:crypto", f"{chain}:{addr}")
             red.delete(key)
             audit_log("delete_crypto_addr", canon, f"chain={chain}, addr={addr}")
-            flash("Address deleted.", "success")
+            flash(_("Address deleted."), "success")
             return redirect(url_for("admin_crypto_group", group=group))
 
         src = (request.form.get("source") or doc.get("source") or "manual").strip()
@@ -5086,7 +5098,7 @@ def admin_crypto_edit_addr(group, chain, addr):  # type: ignore[no-untyped-def]
                 if isinstance(t, dict) and (not t.get("source")):
                     t["source"] = src
         except Exception as e:
-            flash(f"Invalid transactions JSON: {e}", "danger")
+            flash(_("Invalid transactions JSON: %(error)s", error=str(e)), "danger")
             return redirect(url_for("admin_crypto_edit_addr", group=group, chain=chain, addr=addr))
 
         now = dt.now(timezone.utc).isoformat().replace("+00:00", "Z")
@@ -5128,7 +5140,7 @@ def admin_crypto_edit_addr(group, chain, addr):  # type: ignore[no-untyped-def]
             if _crypto_changes
             else f"chain={chain}, addr={addr}, no changes",
         )
-        flash("Address updated.", "success")
+        flash(_("Address updated."), "success")
         return redirect(url_for("admin_crypto_group", group=group))
 
     return render_template(
@@ -5147,7 +5159,7 @@ def admin_crypto_aliases():  # type: ignore[no-untyped-def]
         canon = (request.form.get("canon") or "").strip().lower()
 
         if not alias:
-            flash("Alias is required.", "danger")
+            flash(_("Alias is required."), "danger")
             return redirect(url_for("admin_crypto_aliases"))
 
         alias_norm = re.sub(r"[^a-z0-9]+", "", alias)
@@ -5155,16 +5167,16 @@ def admin_crypto_aliases():  # type: ignore[no-untyped-def]
         if action == "delete":
             red.delete("crypto:alias:" + alias_norm)
             audit_log("delete_crypto_alias", alias_norm)
-            flash("Alias deleted.", "success")
+            flash(_("Alias deleted."), "success")
             return redirect(url_for("admin_crypto_aliases"))
 
         if not canon:
-            flash("Canonical slug is required.", "danger")
+            flash(_("Canonical slug is required."), "danger")
             return redirect(url_for("admin_crypto_aliases"))
 
         red.set("crypto:alias:" + alias_norm, canon)
         audit_log("set_crypto_alias", alias_norm, f"canon={canon}")
-        flash("Alias saved.", "success")
+        flash(_("Alias saved."), "success")
         return redirect(url_for("admin_crypto_aliases"))
 
     # GET
@@ -5210,17 +5222,17 @@ def admin_urls():  # type: ignore[no-untyped-def]
         private = bool(request.form.get("private"))
 
         if not name:
-            flash("Group/market name is required.", "error")
+            flash(_("Group/market name is required."), "error")
         else:
             # Check that the group/market already exists
             red_check = Valkey(unix_socket_path=get_socket_path("cache"), db=db_val)
             if not red_check.exists(name):
-                flash(f'"{name}" does not exist. Create it first.', "error")
+                flash(_('"%(name)s" does not exist. Create it first.', name=name), "error")
                 return redirect(url_for("admin_urls"))
 
             urls = [u.strip() for u in raw_urls.splitlines() if u.strip()]
             if not urls:
-                flash("At least one URL is required.", "error")
+                flash(_("At least one URL is required."), "error")
             else:
                 for url in urls:
                     res = adder(name, url, db_val, fs, private, chat, is_admin, browser or None, init_script or None)
@@ -5234,9 +5246,9 @@ def admin_urls():  # type: ignore[no-untyped-def]
                 added = sum(1 for r in results if r["ok"])
                 dupes = sum(1 for r in results if not r["ok"])
                 if added:
-                    flash(f"{added} URL(s) added to {name}.", "success")
+                    flash(_("%(count)s URL(s) added to %(name)s.", count=added, name=name), "success")
                 if dupes:
-                    flash(f"{dupes} URL(s) already existed (skipped).", "warning")
+                    flash(_("%(count)s URL(s) already existed (skipped).", count=dupes), "warning")
 
     return render_template("admin/urls.html", groups=groups, markets=markets, results=results)
 
@@ -5348,7 +5360,7 @@ def admin_config():  # type: ignore[no-untyped-def]
 
         _save_config_file(cfg)
         audit_log("edit_config", "generic.json", ", ".join(changes) if changes else "no changes")
-        flash("Configuration saved.", "success")
+        flash(_("Configuration saved."), "success")
         return redirect(url_for("admin_config"))
 
     return render_template("admin/config.html", cfg=cfg, sections=sections, scalars=scalars, is_sample=is_sample)
@@ -5391,7 +5403,7 @@ def admin_apikeys_add():  # type: ignore[no-untyped-def]
 
     name = (request.form.get("name") or "").strip()
     if not name:
-        flash("A name / comment is required.", "error")
+        flash(_("A name / comment is required."), "error")
         return redirect(url_for("admin_apikeys"))
     token = secrets.token_hex(32)  # 64 chars
     meta = {
@@ -5404,7 +5416,7 @@ def admin_apikeys_add():  # type: ignore[no-untyped-def]
     red = _get_apikeys_redis()
     red.hset("apikeys", token, json.dumps(meta, ensure_ascii=False))
     audit_log("add_apikey", name, f"token={token[:8]}…")
-    flash(f"API key created. Token (copy it now, it won't be shown again): {token}", "success")
+    flash(_("API key created. Token (copy it now, it won't be shown again): %(token)s", token=token), "success")
     return redirect(url_for("admin_apikeys"))
 
 
@@ -5413,19 +5425,19 @@ def admin_apikeys_add():  # type: ignore[no-untyped-def]
 def admin_apikeys_toggle():  # type: ignore[no-untyped-def]
     token = request.form.get("token", "").strip()
     if not token:
-        flash("Missing token.", "error")
+        flash(_("Missing token."), "error")
         return redirect(url_for("admin_apikeys"))
     red = _get_apikeys_redis()
     raw = red.hget("apikeys", token)
     if not raw:
-        flash("Key not found.", "error")
+        flash(_("Key not found."), "error")
         return redirect(url_for("admin_apikeys"))
     meta = json.loads(raw)  # type: ignore[arg-type]
     meta["active"] = not meta.get("active", True)
     red.hset("apikeys", token, json.dumps(meta, ensure_ascii=False))
     state = "enabled" if meta["active"] else "disabled"
     audit_log("toggle_apikey", meta.get("name", ""), state)
-    flash(f'Key "{meta.get("name", "")}" {state}.', "success")
+    flash(_('Key "%(name)s" %(state)s.', name=meta.get("name", ""), state=state), "success")
     return redirect(url_for("admin_apikeys"))
 
 
@@ -5434,7 +5446,7 @@ def admin_apikeys_toggle():  # type: ignore[no-untyped-def]
 def admin_apikeys_delete():  # type: ignore[no-untyped-def]
     token = request.form.get("token", "").strip()
     if not token:
-        flash("Missing token.", "error")
+        flash(_("Missing token."), "error")
         return redirect(url_for("admin_apikeys"))
     red = _get_apikeys_redis()
     raw = red.hget("apikeys", token)
@@ -5446,7 +5458,7 @@ def admin_apikeys_delete():  # type: ignore[no-untyped-def]
             pass
     red.hdel("apikeys", token)
     audit_log("delete_apikey", name)
-    flash(f'Key "{name}" deleted.', "success")
+    flash(_('Key "%(name)s" deleted.', name=name), "success")
     return redirect(url_for("admin_apikeys"))
 
 
@@ -5517,7 +5529,7 @@ def alerting():  # type: ignore[no-untyped-def]
         if not parts:
             parts.append("no changes")
         audit_log("update_keywords", "alerting", "; ".join(parts))
-        flash("Success to update keywords", "success")
+        flash(_("Success to update keywords"), "success")
     form.keywords.data = keywords
     return render_template("admin/alerts.html", form=form)
 

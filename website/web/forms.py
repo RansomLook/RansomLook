@@ -55,6 +55,12 @@ class AnalysisForm(FlaskForm):  # type: ignore[misc]
         validators=[Optional()],
         render_kw={"placeholder": "2026-04-25"},
     )
+    analysis_type = SelectField(
+        "Document type",
+        choices=[("full", "Full technical analysis"), ("cti", "CTI report")],
+        default="full",
+        validators=[Optional()],
+    )
     private = BooleanField("Private (visible to authenticated users only)", default=False)
     submit = SubmitField("Save")
 

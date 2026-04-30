@@ -180,7 +180,7 @@
       row.hidden = !v;
       if (v) shown++;
     });
-    $count.textContent = shown + ' swarm' + (shown === 1 ? '' : 's');
+    $count.textContent = shown + ' ' + (shown === 1 ? '{{ _('swarm') }}' : '{{ _('swarms') }}');
   }
 
   $q.addEventListener('input', apply);
@@ -250,22 +250,22 @@
     const ih = btn.dataset.ih;
     btn.disabled = true;
     const prev = btn.textContent;
-    btn.textContent = 'Queuing…';
+    btn.textContent = '{{ _('Queuing…') }}';
     try {
       const resp = await fetch(`/api/torrent/refresh/${ih}`, { method: 'POST' });
       if (resp.status === 202) {
-        btn.textContent = `Scanning (${SCAN_DURATION}s)…`;
+        btn.textContent = `{{ _('Scanning (%(s)ss)…', s='${SCAN_DURATION}') }}`;
         setTimeout(() => location.reload(), SCAN_DURATION * 1000);
       } else if (resp.ok) {
-        btn.textContent = 'Done — reload';
+        btn.textContent = '{{ _('Done — reload') }}';
         setTimeout(() => location.reload(), 800);
       } else {
         const msg = (await resp.json().catch(() => ({}))).error || resp.status;
-        btn.textContent = 'Err: ' + msg;
+        btn.textContent = '{{ _('Err:') }} ' + msg;
         setTimeout(() => { btn.textContent = prev; btn.disabled = false; }, 3000);
       }
     } catch (e) {
-      btn.textContent = 'Err';
+      btn.textContent = '{{ _('Err') }}';
       setTimeout(() => { btn.textContent = prev; btn.disabled = false; }, 2000);
     }
   }));
