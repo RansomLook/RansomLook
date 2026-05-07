@@ -6,7 +6,7 @@ from urllib.parse import quote
 from bs4 import BeautifulSoup
 
 
-def main():
+def main() -> list[dict[str, str]]:
     """
     Parser for the Icarus ransomware DLS.
 
@@ -52,7 +52,7 @@ def main():
             except Exception:
                 pass
 
-        for item in victims_container.find_all('div', class_='victim-item'):
+        for item in victims_container.find_all('div', class_='victim-item'): # type: ignore[union-attr]
             h4 = item.find('h4')
             if not h4:
                 continue

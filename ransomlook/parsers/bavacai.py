@@ -17,10 +17,13 @@ def main() -> list[dict[str, str]]:
                 for card in cards:
                     name_el = card.find(class_="card-name")
                     desc_el = card.find(class_="card-desc")
+                    href = card.get("href", "")
+                    if isinstance(href, list):
+                        href = href[0] if href else ""
                     list_div.append({
                         "title": name_el.get_text(strip=True) if name_el else "",
                         "description": desc_el.get_text(strip=True) if desc_el else "",
-                        "link": card["href"],
+                        "link": href,
                         "slug": filename,
                     })
                 file.close()
