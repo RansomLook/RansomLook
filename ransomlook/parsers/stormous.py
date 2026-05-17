@@ -1,6 +1,5 @@
 import os
-
-from bs4 import BeautifulSoup
+import re
 
 from ransomlook.default.logging import get_logger
 
@@ -14,53 +13,23 @@ def main() -> list[dict[str, str]]:
         try:
             if filename.startswith(__name__.split(".")[-1] + "-"):
                 html_doc = "source/" + filename
-                file = open(html_doc, encoding="utf-8")
-                soup = BeautifulSoup(file, "html.parser")
-                divs_name = soup.find_all("center")
-                for div in divs_name:
-                    try:
-                        title = div.find("p", {"class": "h1"}).text
-                        description = div.find("p", {"class": "description"}).text.strip()
+                with open(html_doc, encoding="utf-8") as file:
+                    content = file.read()
+
+                # Extract data from JavaScript array using simple regex
+                # Look for name: "..." and desc: "..." patterns
+                name_matches = re.findall(r'name:\s*["\']([^"\']+)["\']', content)
+                desc_matches = re.findall(r'desc:\s*["\']([^"\']*)["\']', content)
+
+                # Pair names and descriptions
+                for i in range(min(len(name_matches), len(desc_matches))):
+                    title = name_matches[i].strip()
+                    description = desc_matches[i].strip()
+                    if title:
                         list_div.append({"title": title, "description": description})
-                    except Exception:
-                        pass
-                divs_name = soup.find_all("div", {"class": "item-details"})
-                for div in divs_name:
-                    try:
-                        title = div.find("h3").text
-                        description = div.find("p").text.strip()
-                        list_div.append({"title": title, "description": description})
-                    except Exception:
-                        pass
-                divs_name = soup.find("table", {"class": "data-table table nowrap"})  # type: ignore
-                try:
-                    divs = divs_name.find_all("tbody")  # type: ignore
-                    for div in divs:
-                        title = div.find("div", {"class": "txt"}).text.strip()
-                        description = ""
-                        list_div.append({"title": title, "description": description})
-                except Exception:
-                    pass
-                divs_name = soup.find_all("div", {"class": "post-card"})
-                for div in divs_name:
-                    try:
-                        title = div.find("h4").text.strip()
-                        description = div.find("p", {"class": "subtitle"}).text.strip()
-                        list_div.append({"title": title, "description": description})
-                    except Exception:
-                        pass
-                divs_name = soup.find_all("table", {"class": "w-full border-collapse"})
-                for div in divs_name:
-                    try:
-                        title = div.find("th").text.strip()
-                        fields = div.find_all("td")
-                        description = fields[3].text.strip()
-                        list_div.append({"title": title, "description": description})
-                    except Exception:
-                        pass
-                file.close()
 
         except Exception:
             logger.debug("Failed during : " + filename)
+
     logger.debug(list_div)
     return list_div
