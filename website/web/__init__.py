@@ -199,21 +199,9 @@ def set_locale(code: str):  # type: ignore[no-untyped-def]
     if not code or not isinstance(code, str) or code not in AVAILABLE_LOCALES:
         return redirect(url_for("home"))
 
-    target = request.referrer
-    if target:
-        try:
-            parsed_referrer = urlparse(target)
-            parsed_host = urlparse(request.host_url)
-
-            if (parsed_referrer.scheme != parsed_host.scheme or
-                parsed_referrer.netloc != parsed_host.netloc):
-                target = None
-        except (ValueError, AttributeError):
-            target = None
-
-    if not target:
-        target = url_for("home")
-
+    # Do not redirect to request-derived URLs (e.g., Referer header).
+    # Always use a server-generated safe endpoint.
+    target = url_for("home")
     resp = redirect(target)
     resp.set_cookie(
         LOCALE_COOKIE_NAME,
