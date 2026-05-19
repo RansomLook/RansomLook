@@ -26,7 +26,14 @@
       getCSV().forEach(function(val){
         var b = document.createElement('span');
         b.className = 'token';
-        b.innerHTML = '<span>'+val+'</span><span class="x" title="Remove">\u00d7</span>';
+        var label = document.createElement('span');
+        label.textContent = val;
+        var remove = document.createElement('span');
+        remove.className = 'x';
+        remove.title = 'Remove';
+        remove.textContent = '\u00d7';
+        b.appendChild(label);
+        b.appendChild(remove);
         b.querySelector('.x').addEventListener('click', function(){
           var arr = getCSV().filter(function(x){ return x.toLowerCase() !== val.toLowerCase(); });
           setCSV(arr); render();
