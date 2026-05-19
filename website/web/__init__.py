@@ -21,6 +21,7 @@ from os import listdir
 from os.path import basename, dirname, isfile, join
 from typing import Any, Dict, Optional
 from urllib.parse import quote
+from urllib.parse import urlparse
 from uuid import uuid4
 
 import flask_login  # type: ignore[import-untyped]
@@ -194,19 +195,33 @@ def _inject_locale() -> dict[str, Any]:
 @app.route("/set-locale/<code>")
 def set_locale(code: str):  # type: ignore[no-untyped-def]
     """Persist the UI language in a cookie, then bounce back."""
-    if code not in AVAILABLE_LOCALES:
+
+    if not code or not isinstance(code, str) or code not in AVAILABLE_LOCALES:
         return redirect(url_for("home"))
-    target = request.referrer or ""
-    if not target or not target.startswith(request.host_url):
+
+    target = request.referrer
+    if target:
+        try:
+            parsed_referrer = urlparse(target)
+            parsed_host = urlparse(request.host_url)
+
+            if (parsed_referrer.scheme != parsed_host.scheme or
+                parsed_referrer.netloc != parsed_host.netloc):
+                target = None
+        except (ValueError, AttributeError):
+            target = None
+
+    if not target:
         target = url_for("home")
+
     resp = redirect(target)
     resp.set_cookie(
         LOCALE_COOKIE_NAME,
         code,
         max_age=60 * 60 * 24 * 365,  # 1 year
-        samesite="Lax",
+        samesite="Strict",
         secure=request.is_secure,
-        httponly=False,  # allow JS read if we later add a SPA-style widget
+        httponly=True,
     )
     return resp
 
