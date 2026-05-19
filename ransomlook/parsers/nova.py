@@ -16,12 +16,11 @@ def main() -> list[dict[str, str]]:
                 html_doc = "source/" + filename
                 file = open(html_doc, encoding="utf-8")
                 soup = BeautifulSoup(file, "html.parser")
-                divs_name = soup.find_all("article")
+                divs_name = soup.find_all("article", {"class": "post-card"})
                 for div in divs_name:
-                    title = div.find("a").text.strip()
+                    title = div.find("a", {"class": "logo"}).text.strip()
                     description = div.find("p", {"class": "post-excerpt"}).text.strip()
-                    link = div.find("a")["href"]
-                    list_div.append({"title": title, "description": description, "link": link, "slug": filename})
+                    list_div.append({"title": title, "description": description})
                 file.close()
         except Exception as e:
             logger.debug("Error in parsing file: " + filename + " | " + str(e))
