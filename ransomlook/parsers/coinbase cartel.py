@@ -16,17 +16,26 @@ def main() -> list[dict[str, str]]:
                 html_doc = "source/" + filename
                 file = open(html_doc, encoding="utf-8")
                 soup = BeautifulSoup(file, "html.parser")
-                divs_name = soup.find_all("article", {"class": "card"})
+                for feat in soup.find_all("div", {"class": "featured"}):
+                    name = feat.find("span", {"class": "featured-name"})
+                    title = name.text.strip() if name else ""
+                    tags = [t.text.strip() for t in feat.find_all("span", {"class": "featured-tag"})
+                            if "status" not in t.get("class", []) and t.text.strip()]
+                    description = " - ".join(tags)
+                    link_tag = feat.find("a", {"class": "primary"}, href=True) or feat.find("a", href=True)
+                    link = link_tag["href"] if link_tag else ""
+                    if title:
+                        list_div.append({"title": title, "description": description, "link": link, "slug": filename})
+                divs_name = soup.find_all("div", {"class": "target-row"})
                 for div in divs_name:
-                    title = div.find("h3").text.strip()
-                    description = div.find("div", {"class": "card-meta"}).text.strip()
-                    link = div.find("a", {"class": "view-detail"})["href"]
-                    list_div.append({"title": title, "description": description, "link": link, "slug": filename})
-                divs_name = soup.find_all("article", {"class": "company-row"})
-                for div in divs_name:
-                    title = div.find("h3").text.strip()
-                    description = ""
-                    link = div.find("a", {"class": "btn btn-primary"})["href"]
+                    name = div.find("span", {"class": "target-name"})
+                    title = (name.text if name else div.get("data-name", "")).strip()
+                    industry = div.find("span", {"class": "target-industry"})
+                    rev = div.find("span", {"class": "target-rev"})
+                    parts = [span.text.strip() for span in (industry, rev) if span and span.text.strip()]
+                    description = " - ".join(parts)
+                    link_tag = div.find("a", href=True)
+                    link = link_tag["href"] if link_tag else ""
                     list_div.append({"title": title, "description": description, "link": link, "slug": filename})
                 file.close()
         except Exception:
