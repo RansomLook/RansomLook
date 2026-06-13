@@ -16,10 +16,14 @@ def main() -> list[dict[str, str]]:
                 html_doc = "source/" + filename
                 file = open(html_doc, encoding="utf-8")
                 soup = BeautifulSoup(file, "html.parser")
-                divs_name = soup.find_all("div", {"class":"card"})
+                divs_name = soup.find_all("div", {"class":"leak-card"})
                 for div in divs_name:
-                    title = div.find('h3').text.strip()
-                    description = ""
+                    title_el = div.find('h3')
+                    title = title_el.text.strip() if title_el else ""
+                    if not title:
+                        continue
+                    desc_el = div.find('div', {"class": "phrase"})
+                    description = desc_el.get_text("\n", strip=True) if desc_el else ""
                     list_div.append({"title": title, "description": description})
                 file.close()
         except Exception:
