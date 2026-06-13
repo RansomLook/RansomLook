@@ -14,20 +14,17 @@ def main() -> list[dict[str, str]]:
                 with open(html_doc, encoding="utf-8") as file:
                     soup = BeautifulSoup(file, "html.parser")
 
-                sections = soup.find_all("section", class_="landing-shell--portal")
-                for section in sections:
-                    # Title (victim name)
-                    h2 = section.find("h2", class_="landing-portal-frame__name")
+                shells = soup.find_all("a", class_="landing-shell--portal")
+                for shell in shells:
+                    h2 = shell.find("h2", class_="landing-portal-frame__name")
                     title = h2.get_text(strip=True) if h2 else ""
                     if not title:
                         continue
 
-                    # Description
-                    desc_el = section.find("p", class_="landing-desc")
+                    desc_el = shell.find("p", class_="landing-portal-frame__desc")
                     description = desc_el.get_text(strip=True) if desc_el else ""
 
-                    link_el = section.find("a", class_="btn-landing")
-                    link = link_el.get("href", "") if link_el else ""
+                    link = shell.get("href", "")
 
                     entry = {"title": title, "description": description}
                     if link:
