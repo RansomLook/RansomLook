@@ -16,17 +16,22 @@ def main() -> list[dict[str, str]]:
             if filename.startswith(__name__.split(".")[-1] + "-"):
                 html_doc = "source/" + filename
                 file = open(html_doc, encoding="utf-8")
-                soup = BeautifulSoup(file, "html.parser")
+                raw = file.read()
+                file.close()
                 try:
-                    jsonpart = soup.pre.contents  # type: ignore
-                    data = json.loads(jsonpart[0])  # type: ignore
-                    for entry in data:
+                    soup = BeautifulSoup(raw, "html.parser")
+                    raw = soup.pre.contents[0] if soup.pre else raw  # type: ignore
+                except Exception:
+                    pass
+                try:
+                    data = json.loads(raw)
+                    items = data.get("items", data) if isinstance(data, dict) else data
+                    for entry in items:
                         title = entry["name"]
-                        description = entry["info"].strip()
+                        description = (entry.get("info") or "").strip()
                         list_div.append({"title": title, "description": description})
                 except Exception:
                     pass
-                file.close()
         except Exception:
             logger.debug("Failed during : " + filename)
     logger.debug(list_div)
