@@ -199,9 +199,8 @@
 <pre><code class="language-python">import requests
 
 API = "https://www.ransomlook.io/api"
-HEADERS = {"Authorization": "YOUR_API_KEY"}
 
-resp = requests.get(f"{API}/posts", params={"days": 7}, headers=HEADERS)
+resp = requests.get(f"{API}/posts", params={"days": 7})
 for post in resp.json():
     print(post["group_name"], "—", post["post_title"])
 </code></pre>
@@ -212,9 +211,8 @@ for post in resp.json():
 <pre><code class="language-python">import requests
 
 API = "https://www.ransomlook.io/api"
-HEADERS = {"Authorization": "YOUR_API_KEY"}
 
-resp = requests.get(f"{API}/group/lockbit", headers=HEADERS)
+resp = requests.get(f"{API}/group/lockbit")
 group = resp.json()
 print(f"Group: {group[0]['name']}")
 for loc in group[0].get("locations", []):
@@ -228,13 +226,13 @@ for loc in group[0].get("locations", []):
 <pre><code class="language-python">import requests
 
 API = "https://www.ransomlook.io/api"
-HEADERS = {"Authorization": "YOUR_API_KEY"}
 
-resp = requests.get(f"{API}/search", params={"query": "acme"}, headers=HEADERS)
+resp = requests.get(f"{API}/search", params={"query": "acme"})
 for hit in resp.json():
     print(hit["group_name"], "—", hit["post_title"], "—", hit["discovered"])
 </code></pre>
       </div>
+
 
       <div class="rl-example">
         <h4>{{ _('Export full database (requires API key)') }}</h4>
@@ -259,9 +257,8 @@ for db_num in [0, 2, 3, 5]:
 <pre><code class="language-python">import requests
 
 API = "https://www.ransomlook.io/api"
-HEADERS = {"Authorization": "YOUR_API_KEY"}
 
-resp = requests.get(f"{API}/actor/bassterlord", headers=HEADERS)
+resp = requests.get(f"{API}/actor/bassterlord")
 actor = resp.json()
 print(f"Actor: {actor.get('name')}")
 print(f"Aliases: {', '.join(actor.get('aliases', []))}")
@@ -275,9 +272,8 @@ for g in actor.get("relations", {}).get("groups", []):
 <pre><code class="language-python">import requests
 
 API = "https://www.ransomlook.io/api"
-HEADERS = {"Authorization": "YOUR_API_KEY"}
 
-resp = requests.get(f"{API}/crypto/lockbit", headers=HEADERS)
+resp = requests.get(f"{API}/crypto/lockbit")
 data = resp.json()
 for chain, addrs in data.get("by_chain", {}).items():
     for a in addrs:
