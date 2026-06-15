@@ -100,6 +100,7 @@ posts_stat_model = api.model(
     "PostStat",
     {
         "group_name": fields.String(description="Group name"),
+        "post_title": fields.String(description="Title of the post"),
         "discovered": fields.String(description="ISO 8601 UTC timestamp (Z suffix)"),
     },
 )
@@ -513,6 +514,7 @@ class Posts(Resource):  # type: ignore[misc]
                     out.append(
                         {
                             "group_name": group_name,
+                            "post_title": p.get("post_title", ""),
                             "discovered": dt.isoformat().replace("+00:00", "Z"),  # propre ISO en Z
                         }
                     )
