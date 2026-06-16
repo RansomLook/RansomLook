@@ -256,7 +256,7 @@ def build_session(listen_port: int = 6881) -> lt.session:
         "announce_to_all_tiers": False,
         "announce_to_all_trackers": False,
     }
-    sess = lt.session(settings)
+    sess = lt.session(settings) # type: ignore[call-overload]
     sess.start_dht()
     return sess
 
@@ -310,7 +310,7 @@ def _self_ips(sess: lt.session) -> set[str]:
     except Exception:
         pass
     try:
-        for ext in (sess.external_address(),):
+        for ext in (sess.external_address(),): # type: ignore[attr-defined]
             if ext and isinstance(ext, (tuple, list)) and ext[0]:
                 ips.add(str(ext[0]))
             elif ext:

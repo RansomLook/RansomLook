@@ -16,7 +16,7 @@ from datetime import datetime
 from threading import Lock, Thread
 from typing import Any
 
-import libtorrent as lt  # type: ignore
+import libtorrent as lt
 import valkey
 from dateutil.relativedelta import relativedelta
 from lacuscore import LacusCore
