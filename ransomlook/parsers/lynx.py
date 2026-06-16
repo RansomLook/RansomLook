@@ -2,6 +2,7 @@ import json
 import os
 import urllib.parse
 from datetime import datetime, timezone
+from typing import Any
 
 from bs4 import BeautifulSoup
 
@@ -10,7 +11,7 @@ from ransomlook.default.logging import get_logger
 logger = get_logger(__name__)
 
 
-def _first(entry: dict, keys: list[str]) -> str:
+def _first(entry: dict[str, Any], keys: list[str]) -> str:
     for key in keys:
         value = entry.get(key)
         if value:
@@ -18,7 +19,7 @@ def _first(entry: dict, keys: list[str]) -> str:
     return ""
 
 
-def _decode_description(value) -> str:
+def _decode_description(value: Any) -> str:
     """The API stores the description as a list of percent-encoded strings."""
     parts = value if isinstance(value, list) else [value]
     decoded = [urllib.parse.unquote(str(p)).strip() for p in parts if p]
@@ -36,7 +37,7 @@ def parse_json(content: str, filename: str) -> list[dict[str, str]]:
             {"_id": "...", "company": {"company_name": "..."},
              "description": ["url%20encoded%20text"], "leakAt": 1781193000000}, ...]}}
     """
-    list_div = []
+    list_div: list[dict[str, str]] = []
     data = json.loads(content)
     if isinstance(data, dict):
         # Drill into payload then into the first list-valued candidate key.
