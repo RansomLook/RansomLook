@@ -2269,8 +2269,13 @@ def admin_group_analyses(name: str):  # type: ignore[no-untyped-def]
         if os.path.commonpath([variant_dir, md]) != variant_dir:
             abort(400)
         if not os.path.isfile(md):
-            with open(md, "w", encoding="utf-8") as f:
-                f.write(f"# {name.title()} — {_variant_label(new_id)}\n\n")
+            dir_fd = os.open(variant_dir, os.O_RDONLY)
+            try:
+                fd = os.open("FULL_ANALYSIS.md", os.O_WRONLY | os.O_CREAT | os.O_TRUNC, 0o644, dir_fd=dir_fd)
+                with os.fdopen(fd, "w", encoding="utf-8") as f:
+                    f.write(f"# {name.title()} — {_variant_label(new_id)}\n\n")
+            finally:
+                os.close(dir_fd)
         audit_log("analysis_variant_create", name, f"variant={new_id}")
         return redirect(url_for("admin_edit_analysis_variant", name=name, variant_url=new_id))
 
