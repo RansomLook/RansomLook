@@ -2257,7 +2257,10 @@ def admin_group_analyses(name: str):  # type: ignore[no-untyped-def]
         base = _analysis_dir(name)
         if not base:
             abort(400)
-        variant_dir = os.path.join(base, new_id)
+        base_abs = os.path.abspath(base)
+        variant_dir = os.path.abspath(os.path.join(base_abs, new_id))
+        if os.path.commonpath([base_abs, variant_dir]) != base_abs:
+            abort(400)
         os.makedirs(variant_dir, exist_ok=True)
         md = os.path.join(variant_dir, "FULL_ANALYSIS.md")
         if not os.path.isfile(md):
