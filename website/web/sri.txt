@@ -24,7 +24,7 @@
     "rf.js": "eVZ2VUm+fro8TNO01rhv2KiJ6LA0O3Nn4xtBxjSrtPvZy10QbZZlQp2nkrtd3TVjIKS9YYNxE9XdyQTduigWGQ==",
     "rl-common.js": "BLvDYYcCdVOyZi9rl920HWRE4s6OgF6cG+4JyeS1jSzqoSmWGGOVh6L8b8rzD1MX1fC5TTw2GHSCx8RzNbXrDQ==",
     "stats.js": "XFTTdcEI/hFOLzeeNYnw2rLhD9B4gf/vwKybJIjAmdDsAiYFBk9APsu/H6Nsd05L5ZN4CkTm5Y8QC5NhT5Ajnw==",
-    "tokens.js": "2giqxYmzYn/O4pX1/TubY3/6Pa464njRxhgsHd+f1haqsysKzv6LD58UfAaLMxFjZuysrX4BRy7jg3dPbA5I7A==",
+    "tokens.js": "dZ26OTouGMCBHHN+snGYlLVt3lI36vfxSrA/4YBwoMFUjsYjrEoucKFF5IrVjnJZ86kJGsVciETy+QeNg6qyeg==",
     "torrent_health.css": "2Amy7u0/5Nm9q3sl+3pBkYmElKLqe3BYXemd6lPuZuEjVhdiPZHj4pqxafjGNH1UNxoLL3Qm+fsT3WNiUXuy7g==",
     "torrent_health_detail.css": "5qYERvQ9mAd0JhQwMYC2xg981GTApDb82sNSnN1WPoNE8lq/CUq/0hTeM0PKER+ivLr4QHgo9RdNNLTPLPK1zQ==",
     "torrent_manage.js": "A9uj5pqhRCLfe7471ctTPXAz/SV87qmqg/jb+PdudfWx+ck/jZ5tjHwTpA72vkRiyrnPPupWaIP8SzyA9qIkSg==",
