@@ -4363,14 +4363,14 @@ cryptography = ">=43"
 
 [[package]]
 name = "rocketchat-api"
-version = "3.6.1"
+version = "3.7.0"
 description = "Python API wrapper for Rocket.Chat"
 optional = false
 python-versions = "*"
 groups = ["main"]
 files = [
-    {file = "rocketchat_api-3.6.1-py3-none-any.whl", hash = "sha256:220972633601c163d5d6177f210ccbcd3b8ebe92b707cc0ad60def6b0f8301d4"},
-    {file = "rocketchat_api-3.6.1.tar.gz", hash = "sha256:5bffaf1693b17eebfcc9f45d913eac7027c2208494599b89ca7de0ca79c7558c"},
+    {file = "rocketchat_api-3.7.0-py3-none-any.whl", hash = "sha256:77c5b98d812e665ae82088eb4c22ef78f27b6df1f7fc4274acbfc39aba98d2f7"},
+    {file = "rocketchat_api-3.7.0.tar.gz", hash = "sha256:fad6ac14bc7708bb875432a3e14c7578c999471094e22db1371ee982202719fa"},
 ]
 
 [package.dependencies]
