@@ -2272,14 +2272,14 @@ files = [
 
 [[package]]
 name = "lookyloo-models"
-version = "0.2.7"
+version = "0.2.9"
 description = "All the Pydantic models used across Lookyloo"
 optional = false
 python-versions = "<4,>=3.10"
 groups = ["main"]
 files = [
-    {file = "lookyloo_models-0.2.7-py3-none-any.whl", hash = "sha256:3a0bf96a70d3effabb215c1fba5a03896f5274ec748194f2d2179cf41691e181"},
-    {file = "lookyloo_models-0.2.7.tar.gz", hash = "sha256:e3e9649e37d8ded39599b8a393d20b768ee41828375cf1478f6f8eebdb26ac84"},
+    {file = "lookyloo_models-0.2.9-py3-none-any.whl", hash = "sha256:d335356f083c15114e299b4badc4ba75836bdaa2891a0f4846ccef548e3611dd"},
+    {file = "lookyloo_models-0.2.9.tar.gz", hash = "sha256:a1e83c966f046129195c646eabbae0586bfa9d1a69fa30e4fc570ea68cb4c150"},
 ]
 
 [package.dependencies]
@@ -3107,38 +3107,38 @@ black = ["black (>=25.9.0)"]
 
 [[package]]
 name = "playwrightcapture"
-version = "1.39.12"
+version = "1.40.0"
 description = "A simple library to capture websites using playwright"
 optional = false
 python-versions = "<3.15,>=3.10"
 groups = ["main"]
 files = [
-    {file = "playwrightcapture-1.39.12-py3-none-any.whl", hash = "sha256:7a66362539dd04892940f7d9c1c44199dfa56e23109b0e7f26901bfea07ce321"},
-    {file = "playwrightcapture-1.39.12.tar.gz", hash = "sha256:ba663716dc73d88898f0a381e764d78494f900ad351a637ef8537b86fff0413a"},
+    {file = "playwrightcapture-1.40.0-py3-none-any.whl", hash = "sha256:5e105656ea1ffeba49b3cfd24e067cb2c759db79b92568d6ba71918b698f6f49"},
+    {file = "playwrightcapture-1.40.0.tar.gz", hash = "sha256:2bef4e5af4d4538e59102ff83ea5eba9a6a49fd22d4d7196107a2bb0c98098a6"},
 ]
 
 [package.dependencies]
-aiohttp = {version = ">=3.13.5", extras = ["speedups"]}
+aiohttp = {version = ">=3.14.1", extras = ["speedups"]}
 aiohttp-socks = ">=0.11.0"
 async-timeout = {version = ">=5.0.1", markers = "python_version < \"3.11\""}
-beautifulsoup4 = {version = ">=4.14.3", extras = ["charset-normalizer", "lxml"]}
+beautifulsoup4 = {version = ">=4.15.0", extras = ["charset-normalizer", "lxml"]}
 charset-normalizer = ">=3.4.6,<4.0.0"
 dnspython = ">=2.7.0,<3.0.0"
-lookyloo-models = ">=0.2.7"
+lookyloo-models = ">=0.2.9"
 orjson = ">=3.11.4,<4.0.0"
 playwright = ">=1.60.0"
 playwright-stealth = ">=2.0.3"
-pure-magic-rs = ">=0.4.0"
+pure-magic-rs = ">=0.4.3"
 pydub-ng = {version = ">=0.2.0", optional = true, markers = "extra == \"recaptcha\""}
 pyfaup-rs = ">=0.4.6,<0.5.0"
 python-socks = ">=2.7.1,<3.0.0"
 rfc3161-client = ">=1.0.4,<2.0.0"
-SpeechRecognition = {version = ">=3.16.1", optional = true, markers = "extra == \"recaptcha\""}
+SpeechRecognition = {version = ">=3.17.0", optional = true, markers = "extra == \"recaptcha\""}
 typing-extensions = {version = ">=4.12.2,<5.0.0", markers = "python_version < \"3.12\""}
 w3lib = ">=2.4.1"
 
 [package.extras]
-recaptcha = ["SpeechRecognition (>=3.16.1)", "pydub-ng (>=0.2.0)"]
+recaptcha = ["SpeechRecognition (>=3.17.0)", "pydub-ng (>=0.2.0)"]
 
 [[package]]
 name = "pluggy"
@@ -4713,14 +4713,14 @@ files = [
 
 [[package]]
 name = "speechrecognition"
-version = "3.16.1"
+version = "3.17.0"
 description = "Library for performing speech recognition, with support for several engines and APIs, online and offline."
 optional = false
 python-versions = ">=3.9"
 groups = ["main"]
 files = [
-    {file = "speechrecognition-3.16.1-py3-none-any.whl", hash = "sha256:b27ee50422ecee9f6837faeaa2d0937c6ea6d7e1b9dbc00a90ebc0f745cceda9"},
-    {file = "speechrecognition-3.16.1.tar.gz", hash = "sha256:6e0e5a326825de99c20da129fd5536bdae899faafa137bea905403c7c8dd47ec"},
+    {file = "speechrecognition-3.17.0-py3-none-any.whl", hash = "sha256:754f2cd9d7fbeff5e05ad91b906350cb7983fd2ef82002d91e117ac44aa94efa"},
+    {file = "speechrecognition-3.17.0.tar.gz", hash = "sha256:bd7e609c2ebea1680e75fc5dfbd8b44388c316f134c8d44fa2a30c0f50b346be"},
 ]
 
 [package.dependencies]
@@ -4731,6 +4731,7 @@ typing-extensions = "*"
 [package.extras]
 assemblyai = ["requests"]
 audio = ["PyAudio (>=0.2.11)"]
+audio-split = ["librosa (>=0.10.2,<1.0)", "numpy (>=1.26.0)"]
 cohere-api = ["cohere (>=5.21.0)"]
 dev = ["mypy", "numpy", "pytest", "pytest-httpserver", "pytest-randomly", "respx", "types-requests"]
 faster-whisper = ["faster-whisper", "soundfile"]
