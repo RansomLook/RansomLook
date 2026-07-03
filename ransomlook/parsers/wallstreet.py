@@ -17,7 +17,7 @@ def main() -> list[dict[str, str]]:
                 html_doc = "source/" + filename
                 file = open(html_doc, encoding="utf-8")
                 soup = BeautifulSoup(file, "html.parser")
-                raw = soup.pre.text if soup.pre else soup.get_text()  # type: ignore
+                raw = soup.pre.text if soup.pre else soup.get_text()
                 data = json.loads(raw)
                 for entry in data:
                     title = entry.get("title", "").replace("\n", "").strip()
