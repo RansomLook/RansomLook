@@ -5,7 +5,8 @@ document.addEventListener('DOMContentLoaded', () => {
   const qInput   = document.getElementById('flt-q');
   const clearBtn = document.querySelector('.input-clear');
   const countEl  = document.getElementById('flt-count');
-  const table    = document.querySelector('table[aria-label="RF dumps"]');
+  const table    = document.getElementById('rf-table');
+  if (!table) return;
   const tbody    = table.querySelector('tbody');
   const rows     = [...tbody.querySelectorAll('tr')];
 

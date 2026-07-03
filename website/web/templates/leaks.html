@@ -34,12 +34,18 @@
 
     <div class="table-card">
       <div class="table-scroll">
-        <table class="rl-table" aria-label="{{ _('Leaks') }}">
+        <table id="leaks-table" class="rl-table" aria-label="{{ _('Leaks') }}">
           <thead>
             <tr>
-              <th style="width:70%">{{ _('Page title') }}</th>
-              <th style="width:20%">{{ _('Entries') }}</th>
-              <th style="width:10%">{{ _('Detection') }}</th>
+              <th class="sortable" data-type="text" aria-sort="none" style="width:70%">
+                <button type="button" class="sort-btn">{{ _('Page title') }}<span class="sort-caret" aria-hidden="true"></span></button>
+              </th>
+              <th class="sortable" data-type="num" aria-sort="none" style="width:20%">
+                <button type="button" class="sort-btn">{{ _('Entries') }}<span class="sort-caret" aria-hidden="true"></span></button>
+              </th>
+              <th class="sortable" data-type="date" aria-sort="none" style="width:10%">
+                <button type="button" class="sort-btn">{{ _('Detection') }}<span class="sort-caret" aria-hidden="true"></span></button>
+              </th>
             </tr>
           </thead>
           <tbody>

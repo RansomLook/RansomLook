@@ -18,7 +18,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const id   = art.getAttribute('id') || '';
     const name = (art.querySelector('.profile-title')?.textContent || '').trim();
     const desc = (art.querySelector('.profile-desc')?.textContent || '').trim();
-    const rows = [...art.querySelectorAll('table[aria-label^="Links"] tbody tr')];
+    const rows = [...art.querySelectorAll('table[data-links-table] tbody tr')];
     const titles = rows.map(r => (r.querySelector('td:nth-child(1)')?.textContent || '').trim()).join(' ');
     const urls   = rows.map(r => (r.querySelector('td:nth-child(4) a')?.getAttribute('href') || r.querySelector('td:nth-child(4)')?.textContent || '').trim()).join(' ');
     const searchable = norm([name, desc, titles, urls].join(' '));

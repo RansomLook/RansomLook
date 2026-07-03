@@ -76,7 +76,7 @@
   /* ---- Table filter ---- */
   var qInput   = document.getElementById('flt-q');
   var clearBtn = document.querySelector('.input-clear');
-  var table    = document.querySelector('table[aria-label="Leaks"]');
+  var table    = document.getElementById('leaks-table');
   if (!table) return;
   var trows    = Array.from(table.querySelector('tbody').querySelectorAll('tr'));
   var countEl  = document.getElementById('flt-count');
@@ -95,5 +95,47 @@
   var t;
   if (qInput) qInput.addEventListener('input', function(){ clearTimeout(t); t = setTimeout(apply, 120); });
   if (clearBtn) clearBtn.addEventListener('click', function(){ qInput.value = ''; apply(); qInput.focus(); });
+
+  /* ---- Table sort ---- */
+  var tbodyEl = table.querySelector('tbody');
+  var headers = Array.from(table.querySelectorAll('thead th.sortable'));
+
+  function cellText(tr, idx){
+    var td = tr.children[idx];
+    return td ? td.textContent.trim() : '';
+  }
+
+  function sortBy(th){
+    var idx  = th.cellIndex;
+    var type = th.getAttribute('data-type') || 'text';
+    // Toggle: same column flips direction, else start descending.
+    var cur  = th.getAttribute('aria-sort');
+    var asc  = cur === 'ascending' ? false : (cur === 'descending' ? true : false);
+    var dir  = asc ? 1 : -1;
+
+    trows.sort(function(a, b){
+      var va = cellText(a, idx), vb = cellText(b, idx);
+      if (type === 'num'){
+        return ((parseFloat(va.replace(/[^0-9.\-]/g, '')) || 0) -
+                (parseFloat(vb.replace(/[^0-9.\-]/g, '')) || 0)) * dir;
+      }
+      // 'text' and 'date' (ISO date strings sort lexicographically = chronologically)
+      return va.localeCompare(vb, undefined, { numeric: true }) * dir;
+    });
+
+    trows.forEach(function(tr){ tbodyEl.appendChild(tr); });
+
+    headers.forEach(function(h){ h.setAttribute('aria-sort', 'none'); });
+    th.setAttribute('aria-sort', asc ? 'ascending' : 'descending');
+  }
+
+  headers.forEach(function(th){
+    th.addEventListener('click', function(){ sortBy(th); });
+  });
+
+  // Default: newest detections first (Detection column, descending).
+  var dateHeader = headers.find(function(h){ return h.getAttribute('data-type') === 'date'; });
+  if (dateHeader) sortBy(dateHeader);
+
   apply();
 })();

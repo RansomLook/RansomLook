@@ -493,6 +493,21 @@ html.light .hero::before{
 .rl-table tbody tr:hover{ background:var(--panel); }
 .rl-table time{ color: var(--muted); }
 
+/* Sortable headers */
+.rl-table thead th.sortable{ padding:0; cursor:pointer; user-select:none; }
+.rl-table thead th.sortable .sort-btn{
+  display:flex; align-items:center; gap:6px; width:100%;
+  padding:12px 14px; background:none; border:0; cursor:pointer;
+  color:inherit; font:inherit; font-weight:700; text-align:left;
+}
+.rl-table thead th.sortable:hover .sort-btn{ color:var(--accent, #4da3ff); }
+.rl-table thead th .sort-caret{ font-size:.75em; opacity:.35; }
+.rl-table thead th .sort-caret::after{ content:"↕"; }
+.rl-table thead th[aria-sort="ascending"] .sort-caret{ opacity:1; }
+.rl-table thead th[aria-sort="ascending"] .sort-caret::after{ content:"▲"; }
+.rl-table thead th[aria-sort="descending"] .sort-caret{ opacity:1; }
+.rl-table thead th[aria-sort="descending"] .sort-caret::after{ content:"▼"; }
+
 /* Mobile: card layout */
 @media (max-width: 640px){
   .rl-table{ min-width:0; border-collapse:separate; }
