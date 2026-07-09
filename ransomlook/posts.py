@@ -6,12 +6,12 @@ from datetime import datetime
 import valkey
 
 from ransomlook.bluesky import blueskynotify
-from ransomlook.default import DB_ALERTS, DB_GROUPS, DB_POSTS, DB_TASKS
+from ransomlook.default import DB_ALERTS, DB_POSTS, DB_TASKS
 from ransomlook.default.config import get_config, get_socket_path
 from ransomlook.default.logging import get_logger
 from ransomlook.email import alertingnotify
 from ransomlook.mastodon import tootnotify
-from ransomlook.misp import mispevent
+from ransomlook.misp_feed import refresh_victim
 from ransomlook.rocket import rocketnotify
 from ransomlook.sharedutils import dbglog, errlog, stdlog
 
@@ -31,6 +31,7 @@ def posttemplate(
         "link": link,
         "magnet": magnet,
         "screen": screen,
+        "misp_uuid": None,
     }
     stdlog("new post: " + victim)
     dbglog(schema)
@@ -49,7 +50,6 @@ def appender(entry: dict[str, str | None] | str, group_name: str) -> int:
     rocketconfig = get_config("generic", "rocketchat")
     mastodonconfig = get_config("generic", "mastodon")
     blueskyconfig = get_config("generic", "bluesky")
-    mispconfig = get_config("generic", "misp")
     emailconfig = get_config("generic", "email")
     siteurl = get_config("generic", "siteurl")
     if type(entry) is str:
@@ -143,16 +143,6 @@ def appender(entry: dict[str, str | None] | str, group_name: str) -> int:
         tootnotify(mastodonconfig, group_name, post_title, siteurl)
     if blueskyconfig["enable"] == True:
         blueskynotify(blueskyconfig, group_name, post_title, siteurl)
-    if mispconfig["enable"] == True:
-        try:
-            groupred = _get_red(DB_GROUPS)
-            raw = groupred.get(group_name)
-            if raw:
-                groupinfo = json.loads(raw)  # type: ignore[arg-type]
-                galaxyname = groupinfo.get("ransomware_galaxy_value")
-            else:
-                galaxyname = None
-        except Exception:
-            galaxyname = None
-        mispevent(mispconfig, group_name, post_title, description, galaxyname)
+    # MISP local feed + push (upsert on the shared deterministic uuid)
+    refresh_victim(group_name, post_title)
     return 0

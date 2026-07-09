@@ -59,6 +59,16 @@
         "enable": false,
         "api_key": ""
     },
+    "misp_feed": {
+        "enable": false,
+        "orgc_name": "RansomLook",
+        "orgc_uuid": "",
+        "tlp": "tlp:clear",
+        "distribution": 3,
+        "analysis": 2,
+        "threat_level_id": 4,
+        "remove_on_delete": false
+    },
     "torrent_health": {
         "scan_retention_days": 30,
         "dead_threshold_days": 90,
@@ -100,6 +110,7 @@
         "users":  "It is some kind of an admin accounts. Format: {username: password}",
         "misp": "The MISP configuration",
         "breadcrumbs": "Breadcrumbs One API for blockchain transaction lookup (https://breadcrumbs-one.readme.io)",
+        "misp_feed": "Local MISP feed served at <siteurl>/feed/misp/ (subscribers pull, nothing is pushed). orgc_uuid: your MISP organisation UUID, keep it fixed for life. Only public (non-private) groups/victims are exposed. remove_on_delete: when true, deleting a group also purges its feed events (and the pushed events if the misp module is enabled) - off by default.",
         "alertondashboard": "Enable to view alerts on dashboard",
         "rf": "API Key for Identity Module",
         "ldap": "Ldap configuration for login",

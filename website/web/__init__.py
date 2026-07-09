@@ -72,6 +72,7 @@ from ransomlook.default import (
     get_socket_path,
 )
 from ransomlook.default.config import get_config, get_homedir
+from ransomlook import misp_feed
 from ransomlook.posts import appender
 from ransomlook.ransomlook import adder
 from ransomlook.sharedutils import (
@@ -1243,6 +1244,26 @@ def feeds():  # type: ignore[no-untyped-def]
         posts=recentposts,
         build_date=dt.now(timezone.utc).strftime("%a, %d %b %Y %T GMT"),
     ), {"Content-Type": "application/xml"}
+
+
+_MISP_UUID_RE = re.compile(r"^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$")
+
+
+@app.route("/feed/misp/manifest.json")
+def misp_feed_manifest():  # type: ignore[no-untyped-def]
+    if not misp_feed.enabled():
+        abort(404)
+    return misp_feed.manifest_json(), {"Content-Type": "application/json"}
+
+
+@app.route("/feed/misp/<uuid>.json")
+def misp_feed_event(uuid: str):  # type: ignore[no-untyped-def]
+    if not misp_feed.enabled() or not _MISP_UUID_RE.match(uuid):
+        abort(404)
+    body = misp_feed.event_json(uuid)
+    if body is None:
+        abort(404)
+    return body, {"Content-Type": "application/json"}
 
 
 @app.route("/stats")
@@ -3763,6 +3784,8 @@ def addgroup():  # type: ignore[no-untyped-def]
             form.browser.data,
             form.init_script.data,
         )
+        if res in (0, 1):
+            misp_feed.refresh_group(form.groupname.data.lower())
         if res == 2:
             flash(_("URL already exists for %(group)s: %(url)s", group=form.groupname.data, url=form.url.data), "error")
             return render_template("admin/add.html", form=form)
@@ -3889,6 +3912,8 @@ def editgroup(database: int, name: str):  # type: ignore
     form.groupname.label = name
 
     if deleteButton.validate_on_submit():
+        if int(database) == DB_GROUPS:
+            misp_feed.remove_group(name)
         red.delete(name)
         audit_log("delete_group", name)
         flash(_("Success to delete : %(name)s", name=name), "success")
@@ -3973,6 +3998,9 @@ def editgroup(database: int, name: str):  # type: ignore
 
         data["locations"] = newlocations
         red.set(name, json.dumps(data))
+
+        if int(database) == DB_GROUPS:
+            misp_feed.refresh_group(name)
 
         # --- Backlinks to ACTORS (db=5) from group/market edit ---
         rel_key = "groups" if int(database) == 0 else "forums"
@@ -4275,6 +4303,10 @@ def editpostentry(name: str):  # type: ignore
         _new_titles = {p["post_title"] for p in posts}
         _added = sorted(_new_titles - _old_titles)
         _removed = sorted(_old_titles - _new_titles)
+        for _title in _new_titles:
+            misp_feed.refresh_victim(name, _title)
+        for _title in _removed:
+            misp_feed.remove(misp_feed.deterministic_uuid("victim|" + name + "|" + _title))
         parts = []
         if _added:
             parts.append(f"added={', '.join(_added)}")

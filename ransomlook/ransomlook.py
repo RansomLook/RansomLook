@@ -25,6 +25,7 @@ from PIL.PngImagePlugin import PngInfo
 from pylacus import PyLacus
 from valkey import Valkey
 
+from . import misp_feed
 from .default import DB_GROUPS, DB_HEALTH, DB_LACUS, DB_POSTS, DB_TASKS
 from .default.config import get_config, get_homedir, get_socket_path
 from .default.logging import get_logger
@@ -496,6 +497,7 @@ def screen() -> None:
                                 post["screen"] = str(os.path.join("screenshots", capture["group"], filenamepng))
                                 post.update(post)
                         redpost.set(capture["group"], json.dumps(updated))
+                        misp_feed.refresh_victim(capture["group"], capture["title"])
                         toscreen = json.loads(red.get("toscan"))  # type: ignore[arg-type]
                         for idx, item in enumerate(toscreen):
                             if item["group"] == capture["group"] and item["title"] == capture["title"]:
