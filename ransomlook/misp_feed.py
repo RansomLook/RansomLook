@@ -147,6 +147,14 @@ def victimevent(
         attribute = misp_object.add_attribute("description", description)
         attribute.uuid = deterministic_uuid(event_uuid + "|description")  # type: ignore[union-attr]
         attribute.to_ids = False  # type: ignore[union-attr]
+    if screen:
+        # "proof" exists since template v5; explicit type so an older bundled
+        # pymisp template does not reject the unknown object relation
+        attribute = misp_object.add_attribute(
+            "proof", siteurl() + "/" + str(screen).lstrip("/"), type="link", comment="Screenshot"
+        )
+        attribute.uuid = deterministic_uuid(event_uuid + "|screen")  # type: ignore[union-attr]
+        attribute.to_ids = False  # type: ignore[union-attr]
     event.add_object(misp_object)
 
     if link:
@@ -156,10 +164,6 @@ def victimevent(
     if magnet:
         attribute = event.add_attribute("link", magnet, comment="Magnet")
         attribute.uuid = deterministic_uuid(event_uuid + "|magnet")
-        attribute.to_ids = False
-    if screen:
-        attribute = event.add_attribute("link", siteurl() + "/" + str(screen).lstrip("/"), comment="Screenshot")
-        attribute.uuid = deterministic_uuid(event_uuid + "|screen")
         attribute.to_ids = False
     return event
 
