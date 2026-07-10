@@ -32,7 +32,7 @@ def mispevent(config: dict[str, Any], group: str, title: str, description: str, 
     if config["publish"]:
         event.publish()
     if galaxyname is not None and galaxyname != "":
-        event.add_tag('misp-galaxy:Ransomware="' + galaxyname + '"')
+        event.add_tag('misp-galaxy:ransomware="' + galaxyname + '"')
     misp.add_event(event, pythonify=True)
 
 

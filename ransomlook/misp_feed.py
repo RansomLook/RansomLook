@@ -10,6 +10,7 @@ import json
 import time
 import uuid as uuidlib
 from typing import Any
+from urllib.parse import urljoin
 
 import valkey
 from pymisp import MISPEvent, MISPObject, MISPOrganisation
@@ -104,7 +105,7 @@ def baseevent(event_uuid: str, info: str, entrytype: str, galaxy: str | None) ->
     event.add_tag(cfg.get("tlp", "tlp:clear"))
     event.add_tag('ransomlook:type="' + entrytype + '"')
     if galaxy:
-        event.add_tag('misp-galaxy:Ransomware="' + galaxy + '"')
+        event.add_tag('misp-galaxy:ransomware="' + galaxy + '"')
     return event
 
 
@@ -123,6 +124,25 @@ def locationrole(location: dict[str, Any]) -> str:
     return "DLS"
 
 
+def group_base_url(group: dict[str, Any] | None) -> str:
+    """
+    return the base URL of the group's public DLS location, used to turn a post
+    URI into the full claim URL. Prefer a plain DLS mirror over admin/fs/chat.
+    """
+    locations = (group or {}).get("locations") or []
+    for location in locations:
+        if location.get("private"):
+            continue
+        if location.get("admin") or location.get("fs") or location.get("chat") or location.get("header"):
+            continue
+        if location.get("slug"):
+            return str(location["slug"])
+    for location in locations:  # fall back to any public mirror
+        if not location.get("private") and location.get("slug"):
+            return str(location["slug"])
+    return ""
+
+
 def victimevent(
     event_uuid: str,
     group: str,
@@ -132,6 +152,7 @@ def victimevent(
     magnet: str | None,
     screen: str | None,
     galaxy: str | None,
+    base_url: str = "",
 ) -> MISPEvent:
     """
     build the event describing a single victim
@@ -147,6 +168,13 @@ def victimevent(
         attribute = misp_object.add_attribute("description", description)
         attribute.uuid = deterministic_uuid(event_uuid + "|description")  # type: ignore[union-attr]
         attribute.to_ids = False  # type: ignore[union-attr]
+    if link:
+        # "link" object relation = "Original URL location of the post" : store the
+        # full claim URL (DLS base + URI), keeping an already-absolute link as-is
+        full_link = urljoin(base_url, link) if base_url else link
+        attribute = misp_object.add_attribute("link", full_link, comment="Original URL location of the post")
+        attribute.uuid = deterministic_uuid(event_uuid + "|link")  # type: ignore[union-attr]
+        attribute.to_ids = False  # type: ignore[union-attr]
     if screen:
         # "proof" exists since template v5; explicit type so an older bundled
         # pymisp template does not reject the unknown object relation
@@ -157,10 +185,6 @@ def victimevent(
         attribute.to_ids = False  # type: ignore[union-attr]
     event.add_object(misp_object)
 
-    if link:
-        attribute = event.add_attribute("link", link, comment="Leak page")  # type: ignore[assignment]
-        attribute.uuid = deterministic_uuid(event_uuid + "|link")  # type: ignore[union-attr]
-        attribute.to_ids = False  # type: ignore[union-attr]
     if magnet:
         attribute = event.add_attribute("link", magnet, comment="Magnet")  # type: ignore[assignment]
         attribute.uuid = deterministic_uuid(event_uuid + "|magnet")  # type: ignore[union-attr]
@@ -410,6 +434,7 @@ def refresh_victim(group_name: str, post_title: str) -> str | None:
             target.get("magnet"),
             target.get("screen"),
             galaxy or None,
+            group_base_url(group),
         )
         if target.get("discovered"):
             # the setter accepts a "YYYY-MM-DD" string even though the stub says date
