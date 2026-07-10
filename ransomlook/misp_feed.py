@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
 """
-Local MISP feed : one event per victim and one per group, stored in Valkey
-(DB_MISP) and served on the fly under /feed/misp/. Subscribers pull, nothing is
-pushed. Only public entities are exposed. UUIDs are deterministic (uuid5) so
-they stay stable across updates ; the event timestamp is bumped on each refresh
-so subscribers re-pull.
+Local MISP feed : one event per victim, one per group / market infrastructure
+and one per threat actor, stored in Valkey (DB_MISP) and served on the fly
+under /feed/misp/. Subscribers pull, nothing is pushed. Only public entities
+are exposed. UUIDs are deterministic (uuid5) so they stay stable across
+updates ; the event timestamp is bumped on each refresh so subscribers re-pull.
 """
 import json
 import time
@@ -14,7 +14,7 @@ from typing import Any
 import valkey
 from pymisp import MISPEvent, MISPObject, MISPOrganisation
 
-from .default import DB_GROUPS, DB_MISP, DB_POSTS
+from .default import DB_ACTORS, DB_GROUPS, DB_MARKETS, DB_MISP, DB_POSTS
 from .default.config import get_config, get_socket_path
 from .misp import delete_event, push_event
 from .sharedutils import errlog
@@ -168,11 +168,26 @@ def victimevent(
     return event
 
 
-def groupevent(event_uuid: str, group: str, locations: list[dict[str, Any]], galaxy: str | None) -> MISPEvent:
+def addattr(event: MISPEvent, event_uuid: str, seed: str, misp_type: str, value: str, comment: str) -> None:
     """
-    build the event describing the public infrastructure of a group
+    add a plain event attribute with a deterministic uuid
     """
-    event = baseevent(event_uuid, group.title() + " — infrastructure", "infrastructure", galaxy)
+    attribute = event.add_attribute(misp_type, value, comment=comment)
+    attribute.uuid = deterministic_uuid(event_uuid + "|" + seed)  # type: ignore[union-attr]
+    attribute.to_ids = False  # type: ignore[union-attr]
+
+
+def groupevent(
+    event_uuid: str,
+    group: str,
+    locations: list[dict[str, Any]],
+    galaxy: str | None,
+    entrytype: str = "infrastructure",
+) -> MISPEvent:
+    """
+    build the event describing the public infrastructure of a group or market
+    """
+    event = baseevent(event_uuid, group.title() + " — " + entrytype, entrytype, galaxy)
     for location in locations:
         fqdn = location.get("fqdn")
         if not fqdn:
@@ -182,6 +197,69 @@ def groupevent(event_uuid: str, group: str, locations: list[dict[str, Any]], gal
         attribute = event.add_attribute("domain", fqdn, comment=comment)
         attribute.uuid = deterministic_uuid(event_uuid + "|" + fqdn)  # type: ignore[union-attr]
         attribute.to_ids = False  # type: ignore[union-attr]
+    return event
+
+
+# actor contact channel -> (misp attribute type, comment)
+CONTACT_TYPES = {
+    "email": ("email", "Email"),
+    "jabber": ("jabber-id", "Jabber"),
+    "pgp": ("text", "PGP"),
+    "matrix": ("text", "Matrix"),
+    "session": ("text", "Session"),
+    "telegram": ("text", "Telegram"),
+    "tox": ("text", "Tox"),
+    "simplex": ("text", "SimpleX"),
+    "max": ("text", "MAX"),
+    "sonar": ("text", "Sonar"),
+    "x": ("text", "X / Twitter"),
+    "bluesky": ("text", "Bluesky"),
+}
+
+
+def actorevent(event_uuid: str, actor: dict[str, Any]) -> MISPEvent:
+    """
+    build the event describing a threat actor profile
+    """
+    name = str(actor.get("name") or "")
+    event = baseevent(event_uuid, name + " — threat actor", "actor", None)
+
+    addattr(event, event_uuid, "name", "threat-actor", name, "Actor name")
+    for alias in actor.get("aliases") or []:
+        if alias:
+            addattr(event, event_uuid, "alias|" + alias, "threat-actor", alias, "Alias")
+
+    if actor.get("bio"):
+        addattr(event, event_uuid, "bio", "text", str(actor["bio"]), "Bio")
+
+    contacts = actor.get("contacts") or {}
+    for channel, (misp_type, comment) in CONTACT_TYPES.items():
+        for value in contacts.get(channel) or []:
+            if value:
+                addattr(event, event_uuid, "contact|" + channel + "|" + value, misp_type, value, comment)
+
+    for source in actor.get("sources") or []:
+        url = source.get("url") if isinstance(source, dict) else source
+        if url:
+            addattr(event, event_uuid, "source|" + url, "link", url, "Source")
+
+    wanted = actor.get("wanted") or {}
+    for org in ("fbi", "europol", "interpol"):
+        url = (wanted.get(org) or {}).get("url")
+        if url:
+            addattr(event, event_uuid, "wanted|" + org, "link", url, org.upper() + " wanted notice")
+
+    relations = actor.get("relations") or {}
+    for group in relations.get("groups") or []:
+        if group:
+            addattr(event, event_uuid, "relation|group|" + group, "text", group, "Related group")
+    for forum in relations.get("forums") or []:
+        if forum:
+            addattr(event, event_uuid, "relation|forum|" + forum, "text", forum, "Related market / forum")
+    for peer in relations.get("peers") or []:
+        peername = peer.get("name") if isinstance(peer, dict) else peer
+        if peername:
+            addattr(event, event_uuid, "relation|peer|" + peername, "text", peername, "Related actor")
     return event
 
 
@@ -266,6 +344,28 @@ def remove_group(group_name: str) -> None:
         errlog("misp_feed: can not remove group " + group_name)
 
 
+def remove_market(market_name: str) -> None:
+    """
+    purge a market's infrastructure event and all its post events.
+    Opt-in: only runs when misp_feed.remove_on_delete is true.
+    """
+    if not config().get("remove_on_delete", False):
+        return
+    try:
+        purge(deterministic_uuid("market|" + market_name))
+        raw = getdb(DB_POSTS).get(market_name)
+        if not raw:
+            return
+        for post in json.loads(raw):  # type: ignore[arg-type]
+            title = post.get("post_title")
+            if not title:
+                continue
+            event_uuid = post.get("misp_uuid") or deterministic_uuid("victim|" + market_name + "|" + title)
+            purge(event_uuid)
+    except Exception:
+        errlog("misp_feed: can not remove market " + market_name)
+
+
 def groupinfo(group_name: str) -> dict[str, Any] | None:
     """
     load a group record from DB_GROUPS
@@ -346,6 +446,56 @@ def refresh_group(group_name: str) -> str | None:
         return event_uuid
     except Exception:
         errlog("misp_feed: can not refresh group " + group_name)
+        return None
+
+
+def refresh_market(market_name: str) -> str | None:
+    """
+    (re)build the infrastructure event for a market / forum from its public locations
+    """
+    if not (enabled() or push_enabled()):
+        return None
+    try:
+        event_uuid = deterministic_uuid("market|" + market_name)
+        raw = getdb(DB_MARKETS).get(market_name)
+        market = json.loads(raw) if raw else None  # type: ignore[arg-type]
+        if market is None or market.get("private"):
+            remove(event_uuid)
+            return None
+        locations = [loc for loc in (market.get("locations") or []) if not loc.get("private")]
+        if not locations:
+            remove(event_uuid)
+            return None
+        event = groupevent(event_uuid, market_name, locations, None, entrytype="market")
+        publish(event, "market")
+        return event_uuid
+    except Exception:
+        errlog("misp_feed: can not refresh market " + market_name)
+        return None
+
+
+def refresh_actor(actor_name: str) -> str | None:
+    """
+    (re)build the misp event for a threat actor profile
+    """
+    if not (enabled() or push_enabled()):
+        return None
+    try:
+        key = actor_name.strip().lower()
+        event_uuid = deterministic_uuid("actor|" + key)
+        raw = getdb(DB_ACTORS).get(key)
+        actor = json.loads(raw) if raw else None  # type: ignore[arg-type]
+        if actor is None or actor.get("private"):
+            remove(event_uuid)
+            return None
+        event = actorevent(event_uuid, actor)
+        if actor.get("created_at"):
+            # the setter accepts a "YYYY-MM-DD" string even though the stub says date
+            event.date = str(actor["created_at"]).split("T")[0]  # type: ignore[assignment]
+        publish(event, "actor")
+        return event_uuid
+    except Exception:
+        errlog("misp_feed: can not refresh actor " + actor_name)
         return None
 
 

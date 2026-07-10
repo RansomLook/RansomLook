@@ -3288,7 +3288,6 @@ def logofile(database: str, group: str, file: str):  # type: ignore[no-untyped-d
 def glossary():  # type: ignore[no-untyped-def]
     return render_template("glossary.html")
 
-
 # ─── Audit log helper ───────────────────────────────────────────────
 _AUDIT_RETENTION = 365  # days
 
@@ -3785,7 +3784,10 @@ def addgroup():  # type: ignore[no-untyped-def]
             form.init_script.data,
         )
         if res in (0, 1):
-            misp_feed.refresh_group(form.groupname.data.lower())
+            if int(form.category.data) == DB_MARKETS:
+                misp_feed.refresh_market(form.groupname.data.lower())
+            else:
+                misp_feed.refresh_group(form.groupname.data.lower())
         if res == 2:
             flash(_("URL already exists for %(group)s: %(url)s", group=form.groupname.data, url=form.url.data), "error")
             return render_template("admin/add.html", form=form)
@@ -3914,6 +3916,8 @@ def editgroup(database: int, name: str):  # type: ignore
     if deleteButton.validate_on_submit():
         if int(database) == DB_GROUPS:
             misp_feed.remove_group(name)
+        elif int(database) == DB_MARKETS:
+            misp_feed.remove_market(name)
         red.delete(name)
         audit_log("delete_group", name)
         flash(_("Success to delete : %(name)s", name=name), "success")
@@ -4001,6 +4005,8 @@ def editgroup(database: int, name: str):  # type: ignore
 
         if int(database) == DB_GROUPS:
             misp_feed.refresh_group(name)
+        elif int(database) == DB_MARKETS:
+            misp_feed.refresh_market(name)
 
         # --- Backlinks to ACTORS (db=5) from group/market edit ---
         rel_key = "groups" if int(database) == 0 else "forums"
@@ -4051,6 +4057,14 @@ def editgroup(database: int, name: str):  # type: ignore
             audit_log("modify_group", name, "no changes")
         if name != form.groupname.data:
             red.rename(name, form.groupname.data.lower())
+
+            # the feed event uuid is derived from the name : purge the old one
+            if int(database) == DB_GROUPS:
+                misp_feed.purge(misp_feed.deterministic_uuid("infra|" + name))
+                misp_feed.refresh_group(form.groupname.data.lower())
+            elif int(database) == DB_MARKETS:
+                misp_feed.purge(misp_feed.deterministic_uuid("market|" + name))
+                misp_feed.refresh_market(form.groupname.data.lower())
 
             _rl_rename_in_all_actors(rel_key, name, form.groupname.data.strip())
             audit_log("rename_group", name, f"new_name={form.groupname.data}")
@@ -4419,6 +4433,7 @@ def addactor():  # type: ignore[no-untyped-def]
         }
         entry["contacts"] = _normalize_contacts(entry["contacts"])
         red.set(key, json.dumps(entry, ensure_ascii=False))
+        misp_feed.refresh_actor(key)
         # --- Backlinks (add) ---
 
         actor_name = entry["name"]
@@ -4621,6 +4636,7 @@ def editactor(name: str):  # type: ignore[no-untyped-def]
         actor["updated_at"] = dt.utcnow().isoformat() + "Z"
 
         red.set(key, json.dumps(actor, ensure_ascii=False))
+        misp_feed.refresh_actor(key.decode())
         # --- Backlinks (edit diffs) ---
         actor_name = actor["name"]
         self_key = _norm_key(actor_name)
