@@ -158,13 +158,13 @@ def victimevent(
     event.add_object(misp_object)
 
     if link:
-        attribute = event.add_attribute("link", link, comment="Leak page")
-        attribute.uuid = deterministic_uuid(event_uuid + "|link")
-        attribute.to_ids = False
+        attribute = event.add_attribute("link", link, comment="Leak page")  # type: ignore[assignment]
+        attribute.uuid = deterministic_uuid(event_uuid + "|link")  # type: ignore[union-attr]
+        attribute.to_ids = False  # type: ignore[union-attr]
     if magnet:
-        attribute = event.add_attribute("link", magnet, comment="Magnet")
-        attribute.uuid = deterministic_uuid(event_uuid + "|magnet")
-        attribute.to_ids = False
+        attribute = event.add_attribute("link", magnet, comment="Magnet")  # type: ignore[assignment]
+        attribute.uuid = deterministic_uuid(event_uuid + "|magnet")  # type: ignore[union-attr]
+        attribute.to_ids = False  # type: ignore[union-attr]
     return event
 
 
@@ -180,8 +180,8 @@ def groupevent(event_uuid: str, group: str, locations: list[dict[str, Any]], gal
         comment = locationrole(location) + " — onion " + str(location.get("version") or "")
         comment += " — available=" + str(location.get("available"))
         attribute = event.add_attribute("domain", fqdn, comment=comment)
-        attribute.uuid = deterministic_uuid(event_uuid + "|" + fqdn)
-        attribute.to_ids = False
+        attribute.uuid = deterministic_uuid(event_uuid + "|" + fqdn)  # type: ignore[union-attr]
+        attribute.to_ids = False  # type: ignore[union-attr]
     return event
 
 
@@ -311,7 +311,9 @@ def refresh_victim(group_name: str, post_title: str) -> str | None:
             target.get("screen"),
             galaxy or None,
         )
-        event.date = str(target["discovered"]).split(" ")[0] if target.get("discovered") else event.date
+        if target.get("discovered"):
+            # the setter accepts a "YYYY-MM-DD" string even though the stub says date
+            event.date = str(target["discovered"]).split(" ")[0]  # type: ignore[assignment]
         publish(event, "victim")
 
         if target.get("misp_uuid") != event_uuid:

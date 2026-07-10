@@ -18,6 +18,7 @@ Dry-run by default ; pass --commit to actually write the UUIDs into Valkey.
 """
 import argparse
 import json
+from typing import Any
 
 import valkey
 from pymisp import MISPEvent, PyMISP
@@ -55,7 +56,7 @@ def event_identity(event: MISPEvent) -> tuple[str, str] | None:
     return group, title
 
 
-def find_post(posts: list[dict], title: str) -> dict | None:
+def find_post(posts: list[dict[str, Any]], title: str) -> dict[str, Any] | None:
     """
     match a victim by exact title, or by the 90-char truncation used in Valkey
     """
@@ -87,9 +88,12 @@ def main() -> None:
     red = getdb(DB_POSTS)
     matched = 0
     skipped = 0
-    changed_groups: dict[str, list] = {}
+    changed_groups: dict[str, list[dict[str, Any]]] = {}
 
     for event in events:
+        if not isinstance(event, MISPEvent):
+            skipped += 1
+            continue
         identity = event_identity(event)
         if identity is None:
             skipped += 1
