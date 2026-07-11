@@ -170,7 +170,9 @@ def victimevent(
         attribute.to_ids = False  # type: ignore[union-attr]
     if link:
         # "link" object relation = "Original URL location of the post" : store the
-        # full claim URL (DLS base + URI), keeping an already-absolute link as-is
+        # full claim URL (DLS base + URI), keeping an already-absolute link as-is.
+        # link may be a bare int (legacy numeric post id) so coerce to str first.
+        link = str(link)
         full_link = urljoin(base_url, link) if base_url else link
         attribute = misp_object.add_attribute("link", full_link, comment="Original URL location of the post")
         attribute.uuid = deterministic_uuid(event_uuid + "|link")  # type: ignore[union-attr]
@@ -424,7 +426,9 @@ def refresh_victim(group_name: str, post_title: str) -> str | None:
 
         if target.get("misp_uuid"):
             event_uuid = target["misp_uuid"]
-        galaxy = group.get("ransomware_galaxy_value") if group else None
+        # fall back to the group name as galaxy value when the group has no
+        # ransomware-galaxy mapping, so the victim still gets a galaxy tag.
+        galaxy = (group.get("ransomware_galaxy_value") if group else None) or group_name
         event = victimevent(
             event_uuid,
             group_name,
@@ -433,7 +437,7 @@ def refresh_victim(group_name: str, post_title: str) -> str | None:
             target.get("link"),
             target.get("magnet"),
             target.get("screen"),
-            galaxy or None,
+            galaxy,
             group_base_url(group),
         )
         if target.get("discovered"):
@@ -445,8 +449,8 @@ def refresh_victim(group_name: str, post_title: str) -> str | None:
             target["misp_uuid"] = event_uuid
             red.set(group_name, json.dumps(posts))
         return event_uuid
-    except Exception:
-        errlog("misp_feed: can not refresh victim " + group_name + " / " + post_title)
+    except Exception as e:
+        errlog("misp_feed: can not refresh victim " + group_name + " / " + post_title + " : " + repr(e))
         return None
 
 
@@ -466,7 +470,7 @@ def refresh_group(group_name: str) -> str | None:
         if not locations:
             remove(event_uuid)
             return None
-        event = groupevent(event_uuid, group_name, locations, group.get("ransomware_galaxy_value") or None)
+        event = groupevent(event_uuid, group_name, locations, group.get("ransomware_galaxy_value") or group_name)
         publish(event, "infrastructure")
         return event_uuid
     except Exception:
