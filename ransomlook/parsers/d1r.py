@@ -2,7 +2,7 @@ import html
 import json
 import os
 
-from bs4 import BeautifulSoup
+from bs4 import BeautifulSoup, Tag
 
 from ransomlook.default.logging import get_logger
 
@@ -37,7 +37,7 @@ def main() -> list[dict[str, str]]:
                 soup = BeautifulSoup(file, "html.parser")
 
             blob = soup.find("script", id="rl-d1r-data")
-            if blob and blob.string:
+            if isinstance(blob, Tag) and blob.string:
                 for prod in json.loads(blob.string):
                     title = _plain(str(prod.get("title") or ""))
                     if not title:
@@ -52,7 +52,7 @@ def main() -> list[dict[str, str]]:
 
             # fallback : rendered cards, title only (no link available in the DOM)
             for card in soup.find_all("div", class_="product-card"):
-                title = _plain(card.get("data-title") or "")
+                title = _plain(str(card.get("data-title") or ""))
                 if not title or title in entries:
                     continue
                 entries[title] = {"title": title, "description": "", "link": "", "slug": filename}
