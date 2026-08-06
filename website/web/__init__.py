@@ -5529,31 +5529,84 @@ def admin_apikeys_delete():  # type: ignore[no-untyped-def]
 ############ logs
 
 
+def _audit_filters_from_args() -> dict:  # type: ignore[type-arg]
+    q = (request.args.get("q") or "").strip()
+    action_f = (request.args.get("action") or "").strip()
+    user_f = (request.args.get("user") or "").strip()
+    from_s = (request.args.get("from") or "").strip()
+    to_s = (request.args.get("to") or "").strip()
+
+    dt_from = None
+    dt_to = None
+    if from_s:
+        try:
+            dt_from = dt.strptime(from_s, "%Y-%m-%d").replace(tzinfo=timezone.utc)
+        except ValueError:
+            from_s = ""
+    if to_s:
+        try:
+            dt_to = dt.strptime(to_s, "%Y-%m-%d").replace(hour=23, minute=59, second=59, tzinfo=timezone.utc)
+        except ValueError:
+            to_s = ""
+
+    return {
+        "q": q, "action": action_f, "user": user_f, "from": from_s, "to": to_s,
+        "dt_from": dt_from, "dt_to": dt_to,
+    }
+
+
+def _audit_entry_matches(e: dict, f: dict) -> bool:  # type: ignore[type-arg]
+    if f["action"] and e.get("action", "") != f["action"]:
+        return False
+    if f["user"] and e.get("user", "") != f["user"]:
+        return False
+    if f["q"] and f["q"].lower() not in f"{e.get('target', '')} {e.get('details', '')} {e.get('action', '')}".lower():
+        return False
+    if f["dt_from"] or f["dt_to"]:
+        try:
+            ts_dt = dt.strptime(e.get("ts", ""), "%Y-%m-%dT%H:%M:%SZ").replace(tzinfo=timezone.utc)
+        except (ValueError, TypeError):
+            ts_dt = None
+        if ts_dt:
+            if f["dt_from"] and ts_dt < f["dt_from"]:
+                return False
+            if f["dt_to"] and ts_dt > f["dt_to"]:
+                return False
+    return True
+
+
 @app.route("/admin/logs")
 @flask_login.login_required
 def logs():  # type: ignore[no-untyped-def]
     red = Valkey(unix_socket_path=get_socket_path("cache"), db=DB_TASKS)
     per_page = 50
     page = max(1, int(request.args.get("page", 1)))
-    total = red.zcard("audit")
-    start = (page - 1) * per_page
-    end = start + per_page - 1
-    raw = red.zrevrange("audit", start, end)
-    entries = []
+    filters = _audit_filters_from_args()
+
+    raw_all = red.zrevrange("audit", 0, -1)
     users_set = set()
     actions_set = set()
-    for r in raw:  # type: ignore[union-attr]
+    filtered = []
+    for r in raw_all:  # type: ignore[union-attr]
         try:
             e = json.loads(r.decode())
         except Exception:
             continue
         users_set.add(e.get("user", ""))
         actions_set.add(e.get("action", ""))
-        entries.append(e)
-    total_pages = max(1, (total + per_page - 1) // per_page)  # type: ignore[operator]
+        if _audit_entry_matches(e, filters):
+            filtered.append(e)
+
+    total = len(filtered)
+    total_pages = max(1, (total + per_page - 1) // per_page)
+    page = min(page, total_pages)
+    start = (page - 1) * per_page
+    entries = filtered[start:start + per_page]
 
     # also read legacy "logs" key if it exists (migration)
     legacy_count = red.zcard("logs")
+
+    pager_args = {k: filters[k] for k in ("q", "action", "user", "from", "to") if filters[k]}
 
     return render_template(
         "admin/logs.html",
@@ -5564,7 +5617,52 @@ def logs():  # type: ignore[no-untyped-def]
         legacy_count=legacy_count,
         users=sorted(users_set),
         actions=sorted(actions_set),
+        filters=filters,
+        pager_args=pager_args,
     )
+
+
+@app.route("/admin/logs/export.csv")
+@flask_login.login_required
+def logs_export_csv():  # type: ignore[no-untyped-def]
+    """Export the full audit log (all matching entries, not just the current page) as CSV.
+
+    Accepts the same filters as the /admin/logs UI: from, to (YYYY-MM-DD, inclusive),
+    action, user, q (free-text search over target/details/action).
+    """
+    red = Valkey(unix_socket_path=get_socket_path("cache"), db=DB_TASKS)
+    filters = _audit_filters_from_args()
+
+    raw = red.zrevrange("audit", 0, -1)
+    sio = StringIO()
+    writer = csv.writer(sio)
+    writer.writerow(["Date (UTC)", "User", "Action", "Target", "Details"])
+
+    for r in raw:  # type: ignore[union-attr]
+        try:
+            e = json.loads(r.decode())
+        except Exception:
+            continue
+
+        if not _audit_entry_matches(e, filters):
+            continue
+
+        action = e.get("action", "")
+        user = e.get("user", "")
+        target = e.get("target", "")
+        details = e.get("details", "")
+        ts = e.get("ts", "")
+
+        date_fmt = ts
+        m = re.match(r"^(\d{4})-(\d{2})-(\d{2})T(\d{2}:\d{2}:\d{2})", str(ts))
+        if m:
+            date_fmt = f"{m.group(2)}/{m.group(3)}/{m.group(1)} {m.group(4)}"
+
+        writer.writerow([date_fmt, user, action, target, details])
+
+    resp = Response(sio.getvalue(), mimetype="text/csv; charset=utf-8")
+    resp.headers["Content-Disposition"] = "attachment; filename=audit_log.csv"
+    return resp
 
 
 @app.route("/admin/alerting", methods=["GET", "POST"])

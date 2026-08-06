@@ -20,46 +20,48 @@
 
     <!-- Filters -->
     <div class="table-card" style="padding:12px; margin-bottom:16px;">
-      <form id="log-filters" onsubmit="return false" aria-label="{{ _('Filters') }}">
+      <form id="log-filters" method="get" action="{{ url_for('logs') }}" aria-label="{{ _('Filters') }}">
+        <input type="hidden" name="page" value="1">
         <div style="display:flex; flex-wrap:wrap; gap:12px; align-items:end;">
 
           <div>
             <label class="label" for="from-date">{{ _('From') }}</label>
-            <input id="from-date" type="date" class="input">
+            <input id="from-date" name="from" type="date" class="input" value="{{ filters.from }}">
           </div>
           <div>
             <label class="label" for="to-date">{{ _('To') }}</label>
-            <input id="to-date" type="date" class="input">
+            <input id="to-date" name="to" type="date" class="input" value="{{ filters.to }}">
           </div>
 
           <div>
             <label class="label" for="action-filter">{{ _('Action') }}</label>
-            <select id="action-filter" class="input">
-              <option value="">{{ _('All') }}</option>
+            <select id="action-filter" name="action" class="input">
+              <option value="" {{ 'selected' if not filters.action }}>{{ _('All') }}</option>
               {% for a in actions %}
-                <option value="{{ a }}">{{ a }}</option>
+                <option value="{{ a }}" {{ 'selected' if filters.action == a }}>{{ a }}</option>
               {% endfor %}
             </select>
           </div>
 
           <div>
             <label class="label" for="user-filter">{{ _('User') }}</label>
-            <select id="user-filter" class="input">
-              <option value="">{{ _('All') }}</option>
+            <select id="user-filter" name="user" class="input">
+              <option value="" {{ 'selected' if not filters.user }}>{{ _('All') }}</option>
               {% for u in users %}
-                <option value="{{ u }}">{{ u }}</option>
+                <option value="{{ u }}" {{ 'selected' if filters.user == u }}>{{ u }}</option>
               {% endfor %}
             </select>
           </div>
 
           <div style="flex:1 1 280px; min-width:200px;">
             <label class="label" for="log-search">{{ _('Search') }}</label>
-            <input id="log-search" class="input" type="search" placeholder="{{ _('target, details…') }}">
+            <input id="log-search" name="q" class="input" type="search" placeholder="{{ _('target, details…') }}" value="{{ filters.q }}">
           </div>
 
           <div style="margin-left:auto; display:flex; gap:8px;">
+            <button class="btn btn-primary" type="submit">{{ _('Apply') }}</button>
             <button id="export-csv" class="btn btn-secondary" type="button">{{ _('Export CSV') }}</button>
-            <button id="reset-filters" class="btn btn-secondary" type="button">{{ _('Reset') }}</button>
+            <a id="reset-filters" class="btn btn-secondary" href="{{ url_for('logs') }}">{{ _('Reset') }}</a>
           </div>
         </div>
       </form>
@@ -80,7 +82,7 @@
           </thead>
           <tbody id="log-body">
             {% for e in entries %}
-              <tr data-action="{{ e.action }}" data-user="{{ e.user }}" data-ts="{{ e.ts }}">
+              <tr data-ts="{{ e.ts }}">
                 <td><time class="utc-time" datetime="{{ e.ts }}">{{ e.ts }}</time></td>
                 <td>{{ e.user }}</td>
                 <td><span class="chip">{{ e.action }}</span></td>
@@ -97,11 +99,11 @@
     {% if total_pages > 1 %}
     <div style="display:flex; justify-content:center; gap:8px; margin-top:16px;">
       {% if page > 1 %}
-        <a class="btn btn-secondary btn-sm" href="{{ url_for('logs', page=page-1) }}">← {{ _('Previous') }}</a>
+        <a class="btn btn-secondary btn-sm" href="{{ url_for('logs', page=page-1, **pager_args) }}">← {{ _('Previous') }}</a>
       {% endif %}
       <span class="muted" style="padding:6px 12px;">{{ _('Page %(page)s / %(total)s', page=page, total=total_pages) }}</span>
       {% if page < total_pages %}
-        <a class="btn btn-secondary btn-sm" href="{{ url_for('logs', page=page+1) }}">{{ _('Next') }} →</a>
+        <a class="btn btn-secondary btn-sm" href="{{ url_for('logs', page=page+1, **pager_args) }}">{{ _('Next') }} →</a>
       {% endif %}
     </div>
     {% endif %}
@@ -109,6 +111,9 @@
   </div>
 </section>
 
+<script>
+  const exportUrl = "{{ url_for('logs_export_csv') }}";
+</script>
 <script src="{{ url_for('static', filename='js/logs.js') }}"></script>
 
 {% endblock %}
