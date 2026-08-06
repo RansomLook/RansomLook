@@ -1,0 +1,33 @@
+import os
+
+from bs4 import BeautifulSoup
+
+from ransomlook.default.logging import get_logger
+
+logger = get_logger(__name__)
+
+
+def main() -> list[dict[str, str]]:
+    list_div = []
+
+    for filename in os.listdir("source"):
+        try:
+            if filename.startswith(__name__.split(".")[-1] + "-"):
+                html_doc = "source/" + filename
+                file = open(html_doc, encoding="utf-8")
+                soup = BeautifulSoup(file, "html.parser")
+                rows = soup.find_all("a", {"class": "leak-row"})
+                for row in rows:
+                    h3 = row.find("h3")
+                    if not h3:
+                        continue
+                    title = h3.text.strip()
+                    p = row.find("p")
+                    description = p.text.strip() if p else ""
+                    link = row["href"]
+                    list_div.append({"title": title, "description": description, "link": link, "slug": filename})
+                file.close()
+        except Exception as e:
+            logger.debug("Error in parsing file: " + filename + " | " + str(e))
+    logger.debug(list_div)
+    return list_div
