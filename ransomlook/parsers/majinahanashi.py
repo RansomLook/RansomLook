@@ -28,17 +28,6 @@ def description(post: dict[str, Any]) -> str:
 
 
 def main() -> list[dict[str, str]]:
-    """
-    Parser for the MAJINAHANASHI DLS.
-
-    The site is a vanilla-JS SPA whose HTML holds no victim and whose JSON API
-    answers 403 until an arithmetic gate is solved, so the locations run an
-    init_script (majinahanashi_init_script.js) that solves it and injects the
-    whole listing as <script id="rl-majinahanashi-data">. We only read that blob.
-
-    'link' is the DLS post page: package.downloadUrl downloads the archive for
-    real and must never end up there.
-    """
     entries: dict[str, dict[str, str]] = {}
 
     for filename in os.listdir("source"):
@@ -62,7 +51,6 @@ def main() -> list[dict[str, str]]:
                     "description": description(post),
                     "link": str(post.get("link") or ""),
                     "slug": filename,
-                    "date": str(post.get("date") or ""),
                 }
         except Exception as e:
             logger.error("Error parsing %s: %s", filename, e)
