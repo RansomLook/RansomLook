@@ -41,8 +41,6 @@ def parse_json(content: str, filename: str) -> list[dict[str, str]]:
         title = str(entry.get("title") or "").strip()
         if not title:
             continue
-        if entry.get("status") and entry["status"] != "published":
-            continue
         if entry.get("description") is not None or entry.get("link") is not None:
             description = str(entry.get("description") or "")
             link = str(entry.get("link") or "").strip()
