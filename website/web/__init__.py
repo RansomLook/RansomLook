@@ -20,8 +20,8 @@ from io import StringIO
 from os import listdir
 from os.path import basename, dirname, isfile, join
 from typing import Any, Dict, Optional
-from urllib.parse import quote
-from urllib.parse import urlparse
+from urllib.parse import quote, unquote, urlparse
+from urllib.request import url2pathname
 from uuid import uuid4
 
 import flask_login  # type: ignore[import-untyped]
@@ -2156,6 +2156,53 @@ def _do_render_analysis_html(name: str, variant: Optional[str]):  # type: ignore
     )
 
 
+def _weasyprint() -> Any:
+    """Lazy handle on weasyprint.
+
+    Imported inside the call because the dependency is optional: the PDF route
+    degrades to HTML when it is absent. Kept as the single import site so the
+    ignore cannot go stale — mypy only reports import-untyped on the first
+    import of a module per file.
+    """
+    import weasyprint  # type: ignore[import-untyped]
+
+    return weasyprint
+
+
+def _pdf_url_fetcher(allowed_files: set[str], allowed_dirs: list[str]) -> Any:
+    """Build a WeasyPrint url_fetcher that only reads an explicit allowlist.
+
+    Without a fetcher WeasyPrint resolves whatever the document references, so
+    a `file://` URL in an analysis reaches any file the process can read, and
+    an `http://` one turns the renderer into an SSRF probe. Only the report
+    logo and the analysis' own assets are legitimate here.
+    """
+    default_url_fetcher = _weasyprint().default_url_fetcher
+
+    real_dirs = [os.path.realpath(d) for d in allowed_dirs if d]
+
+    def fetcher(url: str, *args: Any, **kwargs: Any) -> Any:
+        if url.startswith("data:"):
+            # self-contained, touches neither the filesystem nor the network
+            return default_url_fetcher(url, *args, **kwargs)
+        parsed = urlparse(url)
+        if parsed.scheme != "file":
+            raise ValueError(f"blocked non-file resource in PDF rendering: {parsed.scheme}:")
+        path = os.path.realpath(url2pathname(unquote(parsed.path)))
+        if path not in allowed_files and not any(
+            path.startswith(d + os.sep) for d in real_dirs
+        ):
+            raise ValueError("blocked file outside the analysis assets")
+        if not os.path.isfile(path):
+            raise ValueError("no such file")
+        return {
+            "file_obj": open(path, "rb"),
+            "mime_type": mimetypes.guess_type(path)[0] or "application/octet-stream",
+        }
+
+    return fetcher
+
+
 def _do_render_analysis_pdf(name: str, variant: Optional[str]):  # type: ignore[no-untyped-def]
     v = _resolve_variant(name, variant)
     if not v:
@@ -2182,14 +2229,20 @@ def _do_render_analysis_pdf(name: str, variant: Optional[str]):  # type: ignore[
         logo_svg_url=logo_svg_url,
     )
     try:
-        from weasyprint import HTML  # type: ignore[import-untyped]
+        HTML = _weasyprint().HTML
     except ImportError:
         return Response(
             page,
             mimetype="text/html",
             headers={"Content-Disposition": f"inline; filename={secure_filename(name)}_analysis.html"},
         )
-    pdf_bytes = HTML(string=page, base_url=request.host_url).write_pdf()
+    allowed_files = {os.path.realpath(logo_svg_url[len("file://"):])} if logo_svg_url else set()
+    assets_dir = _assets_dir(name, v["id"] or None)
+    pdf_bytes = HTML(
+        string=page,
+        base_url=request.host_url,
+        url_fetcher=_pdf_url_fetcher(allowed_files, [assets_dir] if assets_dir else []),
+    ).write_pdf()
     safe_name = secure_filename(name) or "analysis"
     fname = f"{safe_name}_analysis.pdf" if not v["id"] else f"{safe_name}_{secure_filename(v['id'])}_analysis.pdf"
     return Response(
@@ -4134,10 +4187,21 @@ def editlogo(database: int, name: str):  # type: ignore
     data = {"logos": logos}
     form = EditLogo(data=data, files=request.files)
     if form.validate_on_submit():
+        # `link` is an editable text field in the rendered form, so the value
+        # coming back is attacker-controlled. Never build a path from it: keep
+        # only the basename and require it to be one of the files actually in
+        # this folder. That also repairs deletion, which never worked — the
+        # field holds "/logo/<db>/<name>/<file>", so concatenating it produced
+        # a path that does not exist and raised FileNotFoundError.
+        existing = {f for f in listdir(logofolder)} if os.path.isdir(logofolder) else set()
         for currentlogo in form.logos:
             if currentlogo.delete.data is True:
-                os.remove(logofolder + "/" + currentlogo.link.data)
-                audit_log("delete_logo", name, f"file={currentlogo.link.data}")
+                candidate = os.path.basename((currentlogo.link.data or "").strip())
+                if not candidate or candidate not in existing:
+                    flash(_("Unknown logo: %(file)s", file=currentlogo.link.data), "error")
+                    continue
+                os.remove(os.path.join(logofolder, candidate))
+                audit_log("delete_logo", name, f"file={candidate}")
         if form.file.data is not None:
             filename = form.file.data.filename
             file_ext = os.path.splitext(filename)[1]
