@@ -14,7 +14,7 @@ from ransomlook.email import alertingnotify
 from ransomlook.mastodon import tootnotify
 from ransomlook.misp_feed import refresh_victim
 from ransomlook.rocket import rocketnotify
-from ransomlook.sharedutils import dbglog, errlog, stdlog
+from ransomlook.sharedutils import dbglog, errlog, is_private_entity, stdlog
 
 logger = get_logger("posts")
 
@@ -129,7 +129,12 @@ def appender(entry: dict[str, Any] | str, group_name: str) -> int:
             totorrent = json.loads(torrentred.get("totorrent"))  # type: ignore[arg-type]
         totorrent.append({"group": group_name, "title": entry["title"], "magnet": entry["magnet"]})  # type: ignore[index]
         torrentred.set("totorrent", json.dumps(totorrent))
-    # Notification zone
+    # Notification zone.
+    # A post is withheld from every public channel when the post itself OR its
+    # group / market carries the private flag. Checking only the post's own
+    # flag was not enough: a freshly parsed victim of a private group arrives
+    # with private=False and was still broadcast.
+    broadcast = not (private or is_private_entity(group_name))
     red_task = _get_red(DB_TASKS)
     keywords = red_task.get("keywords")
     matching = []
@@ -140,9 +145,9 @@ def appender(entry: dict[str, Any] | str, group_name: str) -> int:
             if keyword.lower() in post_title.lower() or keyword.lower() in description.lower():
                 matching.append(keyword)
         if matching:
-            # A post created private is never broadcast: the keyword hit still
-            # lands on the internal dashboard, but no mail goes out.
-            if not private:
+            # The keyword hit still lands on the internal dashboard below, but
+            # no mail goes out for a private post or a private entity.
+            if broadcast:
                 alertingnotify(emailconfig, group_name, post_title, description, matching)
             alertdb = _get_red(DB_ALERTS)
             uuidkey = str(uuid.uuid4())
@@ -156,8 +161,8 @@ def appender(entry: dict[str, Any] | str, group_name: str) -> int:
             alertdb.set(uuidkey, json.dumps(value))
             alertdb.expire(uuidkey, 60 * 60 * 24)
 
-    # Public broadcast channels are skipped for a post created private.
-    if not private:
+    # Public broadcast channels: Rocket.Chat, Mastodon, Bluesky.
+    if broadcast:
         if rocketconfig["enable"] == True:
             rocketnotify(rocketconfig, group_name, post_title, description)
         if mastodonconfig["enable"] == True:

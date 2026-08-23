@@ -64,6 +64,33 @@ def get_private_entity_names() -> set[str]:
     return names
 
 
+def is_private_entity(name: str) -> bool:
+    """True when the group or market `name` is flagged private.
+
+    Both DBs are checked: posts are appended for markets as well as groups, so
+    a check limited to DB_GROUPS would let a private market through. The exact
+    key is tried first and a case-insensitive scan is only the fallback.
+    """
+    if not name:
+        return False
+    for db_num in (DB_GROUPS, DB_MARKETS):
+        red = valkey.Valkey(unix_socket_path=get_socket_path("cache"), db=db_num)
+        raw = red.get(name)
+        if raw is None:
+            for key in red.keys():  # type: ignore[union-attr]
+                if key.decode().lower() == name.lower():
+                    raw = red.get(key)
+                    break
+        if not raw:
+            continue
+        try:
+            if json.loads(raw).get("private") is True:  # type: ignore[arg-type]
+                return True
+        except Exception:
+            continue
+    return False
+
+
 _GLOB_META_RE = re.compile(r"([\\*?\[\]])")
 
 

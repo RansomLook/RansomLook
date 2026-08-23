@@ -18,7 +18,7 @@ from pymisp import MISPEvent, MISPObject, MISPOrganisation
 from .default import DB_ACTORS, DB_GROUPS, DB_MARKETS, DB_MISP, DB_POSTS
 from .default.config import get_config, get_socket_path
 from .misp import delete_event, push_event
-from .sharedutils import errlog
+from .sharedutils import errlog, is_private_entity
 
 # Fixed namespace for deterministic UUIDs. NEVER change this value.
 NS = uuidlib.UUID("6f2b1e2a-9c3d-5a41-b7e8-0d1c2f3a4b5c")
@@ -411,7 +411,9 @@ def refresh_victim(group_name: str, post_title: str) -> str | None:
     try:
         event_uuid = deterministic_uuid("victim|" + group_name + "|" + post_title)
         group = groupinfo(group_name)
-        if group is not None and group.get("private"):
+        if is_private_entity(group_name):
+            # groupinfo() only reads DB_GROUPS, so gating on it alone let the
+            # victims of a private *market* through to the public feed.
             remove(event_uuid)
             return None
 
