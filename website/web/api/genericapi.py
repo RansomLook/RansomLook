@@ -52,6 +52,32 @@ def _check_export_auth() -> bool:
     return bool(_auth_helpers().viewer_is_authenticated(request))
 
 
+# Fields of a location record that may be published. Anything outside this set
+# is operator-side: `header` holds the cookies and authorization headers used to
+# scrape the site, `init_script` the logic that defeats its captcha or paywall,
+# `browser` the engine used. Publishing them lets the site operator replay the
+# credentials and patch the bypass.
+_PUBLIC_LOCATION_FIELDS = (
+    "slug",
+    "fqdn",
+    "title",
+    "version",
+    "available",
+    "updated",
+    "lastscrape",
+    "fs",
+    "chat",
+    "admin",
+    "screen",
+    "source",
+)
+
+
+def _public_location(location: dict[str, Any]) -> dict[str, Any]:
+    """Keep only the fields a location may expose to an untrusted caller."""
+    return {k: location[k] for k in _PUBLIC_LOCATION_FIELDS if k in location}
+
+
 def _source_path(relative: Any) -> str | None:
     """Resolve a DB-stored path under ``source/``, or None when it escapes.
 
@@ -224,7 +250,9 @@ class Groupinfo(Resource):  # type: ignore[misc]
                     group["meta"] = group["meta"].replace("\n", "<br/>")
                 if not _can_see_private():
                     group["locations"] = [
-                        location for location in group["locations"] if location.get("private") is not True
+                        _public_location(location)
+                        for location in group["locations"]
+                        if location.get("private") is not True
                     ]
                 for location in group["locations"]:
                     screenfile = "/screenshots/" + name.lower() + "-" + createfile(location["slug"]) + ".png"
@@ -254,7 +282,10 @@ class Groupinfo(Resource):  # type: ignore[misc]
         return [group, sorted_posts]
 
 
-@api.route("/post/<string:name>/<string:postname>")
+# `path` rather than `string`: a victim name legitimately contains a slash
+# ("JAI A/S", "T/CCI Manufacturing"), and `string` refuses it — even percent
+# encoded, since the path is decoded before routing. See issue #676.
+@api.route("/post/<string:name>/<path:postname>")
 @api.doc(
     description="Return details about a specific post (with screenshot and source if available).",
     params={"name": "Name of the group or market", "postname": "Exact post title"},
@@ -318,7 +349,9 @@ class Marketinfo(Resource):  # type: ignore[misc]
                     group["meta"] = group["meta"].replace("\n", "<br/>")
                 if not _can_see_private():
                     group["locations"] = [
-                        location for location in group["locations"] if location.get("private") is not True
+                        _public_location(location)
+                        for location in group["locations"]
+                        if location.get("private") is not True
                     ]
                 for location in group["locations"]:
                     screenfile = "/screenshots/" + name.lower() + "-" + createfile(location["slug"]) + ".png"
@@ -404,7 +437,9 @@ class Exportdb(Resource):  # type: ignore[misc]
                     continue
                 if "locations" in temp:
                     temp["locations"] = [
-                        location for location in temp["locations"] if location.get("private") is not True
+                        _public_location(location)
+                        for location in temp["locations"]
+                        if location.get("private") is not True
                     ]
                 dump[key_str] = temp
             elif str(database) == str(DB_POSTS):
