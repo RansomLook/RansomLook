@@ -58,13 +58,19 @@
                            value="{{ val }}"
                            style="flex:1;max-width:120px;">
                   {% else %}
-                    {% if 'pass' in field or 'secret' in field or 'token' in field or 'apikey' in field or 'api_key' in field or 'APP_PASSWORD' in field %}
+                    {% set fkey = sec.key ~ '.' ~ field %}
+                    {% if fkey in secret_fields %}
+                      {# never rendered: the value stays server-side. Blank on save keeps it. #}
                       <input class="input" type="password" id="f-{{ sec.key }}-{{ field }}"
                              name="{{ sec.key }}.{{ field }}"
-                             value="{{ val }}"
-                             autocomplete="off"
+                             value=""
+                             autocomplete="new-password"
+                             placeholder="{{ _('unchanged') if secret_fields[fkey] else _('not set') }}"
                              style="flex:1;">
-                      <button class="btn btn-secondary btn-sm js-toggle-pw" type="button" data-target="f-{{ sec.key }}-{{ field }}">{{ _('Show') }}</button>
+                      <span class="badge {{ 'badge-ok' if secret_fields[fkey] else 'badge-neutral' }}"
+                            title="{{ _('The stored value is never shown. Leave blank to keep it.') }}">
+                        {{ _('set') if secret_fields[fkey] else _('empty') }}
+                      </span>
                     {% else %}
                       <input class="input" type="text" id="f-{{ sec.key }}-{{ field }}"
                              name="{{ sec.key }}.{{ field }}"
@@ -101,10 +107,16 @@
                   <input class="input" type="number" id="f-{{ sc.key }}" name="{{ sc.key }}"
                          value="{{ sc.value }}" style="max-width:120px;">
                 {% else %}
-                  {% if 'api' in sc.key or 'key' in sc.key %}
+                  {% if sc.key in secret_fields %}
+                    {# never rendered: the value stays server-side. Blank on save keeps it. #}
                     <input class="input" type="password" id="f-{{ sc.key }}" name="{{ sc.key }}"
-                           value="{{ sc.value }}" autocomplete="off" style="flex:1;">
-                    <button class="btn btn-secondary btn-sm js-toggle-pw" type="button" data-target="f-{{ sc.key }}">{{ _('Show') }}</button>
+                           value="" autocomplete="new-password"
+                           placeholder="{{ _('unchanged') if secret_fields[sc.key] else _('not set') }}"
+                           style="flex:1;">
+                    <span class="badge {{ 'badge-ok' if secret_fields[sc.key] else 'badge-neutral' }}"
+                          title="{{ _('The stored value is never shown. Leave blank to keep it.') }}">
+                      {{ _('set') if secret_fields[sc.key] else _('empty') }}
+                    </span>
                   {% else %}
                     <input class="input" type="text" id="f-{{ sc.key }}" name="{{ sc.key }}"
                            value="{{ sc.value }}" style="flex:1;">

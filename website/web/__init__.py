@@ -5435,6 +5435,32 @@ def admin_urls():  # type: ignore[no-untyped-def]
 # Keys excluded from the config editor
 _CONFIG_HIDDEN = {"users", "_notes", "logos"}
 
+# Config values never sent back to the browser. /admin/config used to render
+# them into the page source — password-typed, but still readable in View Source
+# — so an admin session, a shoulder-surfer or a cached page handed over every
+# credential of the connected systems.
+_CONFIG_SECRET_RE = re.compile(r"(pass|passwd|password|token|secret|api_?key)", re.I)
+# Scalars whose name gives no hint but which hold a credential.
+_CONFIG_SECRET_SCALARS = {"malpedia", "rf"}
+# Section fields the name-based rule does not catch. orgc_uuid identifies the
+# publishing organisation in the MISP feed and is not for public consumption.
+_CONFIG_SECRET_FIELDS = {"orgc_uuid"}
+
+
+def _is_secret_config(field: str, value: Any, scalar: bool = False) -> bool:
+    """True when this config field holds a credential and must stay server-side.
+
+    Only strings qualify: booleans and numbers carry no secret and are rendered
+    as usual.
+    """
+    if not isinstance(value, str):
+        return False
+    if scalar and field in _CONFIG_SECRET_SCALARS:
+        return True
+    if field in _CONFIG_SECRET_FIELDS:
+        return True
+    return bool(_CONFIG_SECRET_RE.search(field))
+
 
 def _load_config_file() -> tuple[dict[str, Any], Any, bool]:
     """Load generic.json (or .sample fallback) and return (dict, path, is_sample)."""
@@ -5496,6 +5522,9 @@ def admin_config():  # type: ignore[no-untyped-def]
                 if form_key not in request.form:
                     continue
                 raw = request.form[form_key]
+                if _is_secret_config(field, old_val) and raw == "":
+                    # blank means "keep what is already there"
+                    continue
                 if isinstance(old_val, int):
                     try:
                         new_val = int(raw)  # type: ignore[assignment]
@@ -5527,6 +5556,8 @@ def admin_config():  # type: ignore[no-untyped-def]
                     new_val = old_val  # type: ignore[assignment]
             else:
                 new_val = request.form.get(k, old_val)
+                if _is_secret_config(k, old_val, scalar=True) and new_val == "":
+                    continue  # blank means "keep what is already there"
             if new_val != old_val:
                 changes.append(k)
             cfg[k] = new_val
@@ -5540,7 +5571,29 @@ def admin_config():  # type: ignore[no-untyped-def]
         flash(_("Configuration saved."), "success")
         return redirect(url_for("admin_config"))
 
-    return render_template("admin/config.html", cfg=cfg, sections=sections, scalars=scalars, is_sample=is_sample)
+    # {form_key: bool} — the field is a secret, and whether one is currently set.
+    secret_fields: dict[str, bool] = {}
+    for sec in sections:
+        section_key = str(sec["key"])
+        section_data = cfg.get(section_key) or {}
+        if not isinstance(section_data, dict):
+            continue
+        for field, val in section_data.items():
+            if _is_secret_config(field, val):
+                secret_fields[f"{section_key}.{field}"] = bool(val)
+    for sc in scalars:
+        scalar_key = str(sc["key"])
+        if _is_secret_config(scalar_key, sc["value"], scalar=True):
+            secret_fields[scalar_key] = bool(sc["value"])
+
+    return render_template(
+        "admin/config.html",
+        cfg=cfg,
+        sections=sections,
+        scalars=scalars,
+        is_sample=is_sample,
+        secret_fields=secret_fields,
+    )
 
 
 ############ API Keys
