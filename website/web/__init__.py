@@ -3291,6 +3291,21 @@ def glossary():  # type: ignore[no-untyped-def]
 _AUDIT_RETENTION = 365  # days
 
 
+def _source_path(relative: Any) -> Optional[str]:
+    """Resolve a stored path under ``source/``, or None when it escapes.
+
+    Post ``screen`` values are free-form text, so they are validated on write
+    as well as on read: the database should never come to hold a traversal.
+    """
+    if not relative:
+        return None
+    base = os.path.realpath(os.path.join(str(get_homedir()), "source"))
+    target = os.path.realpath(os.path.join(base, str(relative)))
+    if target != base and not target.startswith(base + os.sep):
+        return None
+    return target
+
+
 def audit_log(action: str, target: str, details: str = "") -> None:
     """Write a structured JSON audit entry to Redis DB=1 sorted set 'audit'.
 
@@ -4318,7 +4333,14 @@ def editpostentry(name: str):  # type: ignore
                 post["screen"] = str(os.path.join("screenshots", name, filenamepng))
             else:
                 if field.screen.data:
-                    post["screen"] = field.screen.data.strip() if field.screen.data else ""
+                    screen_value = field.screen.data.strip()
+                    if screen_value and _source_path(screen_value) is None:
+                        flash(
+                            _("Invalid screen path for %(title)s", title=post["post_title"]),
+                            "error",
+                        )
+                        return render_template("admin/editpost.html", form=form)
+                    post["screen"] = screen_value
             posts.append(post)
         red.set(name, json.dumps(posts))
         _new_titles = {p["post_title"] for p in posts}

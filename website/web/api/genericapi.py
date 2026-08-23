@@ -52,6 +52,23 @@ def _check_export_auth() -> bool:
     return bool(_auth_helpers().viewer_is_authenticated(request))
 
 
+def _source_path(relative: Any) -> str | None:
+    """Resolve a DB-stored path under ``source/``, or None when it escapes.
+
+    ``screen`` is free-form text: an admin types it in the edit-post form and
+    ``tools/import_from_instance.py`` writes a remote instance's JSON verbatim,
+    so it must never be trusted as a path component. realpath is compared on
+    both sides so a symlink cannot step outside either.
+    """
+    if not relative:
+        return None
+    base = os.path.realpath(os.path.join(str(get_homedir()), "source"))
+    target = os.path.realpath(os.path.join(base, str(relative)))
+    if target != base and not target.startswith(base + os.sep):
+        return None
+    return target
+
+
 def _can_see_private() -> bool:
     """Whether this caller may see entries flagged private.
 
@@ -258,8 +275,10 @@ class GroupPost(Resource):  # type: ignore[misc]
                 for post in posts:
                     if post["post_title"] == postname:
                         if "screen" in post and post["screen"] is not None:
-                            screenpath = str(get_homedir()) + "/source/" + post["screen"]
-                            if os.path.exists(screenpath):
+                            # A rejected path is skipped rather than raised on:
+                            # a 500 would confirm the probe to the caller.
+                            screenpath = _source_path(post["screen"])
+                            if screenpath and os.path.isfile(screenpath):
                                 with open(screenpath, "rb") as image_file:
                                     screenencoded = base64.b64encode(image_file.read()).decode("ascii")
                                 post.update({"screen": screenencoded})
