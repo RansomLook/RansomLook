@@ -8,6 +8,7 @@ from flask_restx import Namespace, Resource, fields  # type: ignore
 from valkey import Valkey
 
 from ransomlook.default import DB_CRYPTO, get_socket_path
+from ransomlook.sharedutils import escape_glob
 
 api = Namespace("CryptoAPI", description="Cryptocurrency wallet tracking API", path="/api/crypto")
 
@@ -154,7 +155,7 @@ class CryptoByChain(Resource):  # type: ignore[misc]
         chain = chain.strip().lower()
         wallets: list[dict[str, Any]] = []
 
-        for key in red.scan_iter(match=f"crypto:addr:{chain}:*"):
+        for key in red.scan_iter(match=f"crypto:addr:{escape_glob(chain)}:*"):
             raw = red.get(key)
             if not raw:
                 continue

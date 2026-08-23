@@ -20,6 +20,7 @@ from ransomlook.default import (
 )
 from ransomlook.sharedutils import (
     currentmonthstr,
+    escape_glob,
     groupcount,
     hostcount,
     hostcountadmin,
@@ -331,12 +332,17 @@ class HealthEndpoint(Resource):  # type: ignore[misc]
             if real_name:
                 break
         if not real_name:
-            real_name = name  # fallback to provided name
+            # No fallback to the caller-supplied string: it lands in a SCAN
+            # MATCH pattern, so an unresolved name like "*" or "Secret*" would
+            # enumerate the health keys of every group, private ones included.
+            api.abort(404, "No health data found for this group")
+            return []  # unreachable: api.abort raises, but it is not typed NoReturn
 
         results = []
         cursor = 0
+        pattern = f"health:{escape_glob(real_name)}:*"
         while True:
-            cursor, keys = red6.scan(cursor=cursor, match=f"health:{real_name}:*", count=500)  # type: ignore[misc]
+            cursor, keys = red6.scan(cursor=cursor, match=pattern, count=500)  # type: ignore[misc]
             for k in keys:
                 k_dec = k.decode()
                 # Skip counter/lastday keys

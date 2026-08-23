@@ -44,6 +44,7 @@ import valkey
 
 from .default import DB_POSTS, DB_TORRENT_HEALTH, get_socket_path
 from .default.config import get_config
+from .sharedutils import escape_glob
 
 logger = logging.getLogger(__name__)
 
@@ -1357,7 +1358,7 @@ def delete_manual_torrent(infohash: str) -> bool:
     deleted = 0
     deleted += int(r.delete(f"torrent_health:meta:{infohash}") or 0)  # type: ignore[arg-type]
     deleted += int(r.delete(f"torrent_health:scans:{infohash}") or 0)  # type: ignore[arg-type]
-    for k in r.scan_iter(match=f"torrent_health:scan:{infohash}:*"):
+    for k in r.scan_iter(match=f"torrent_health:scan:{escape_glob(infohash)}:*"):
         r.delete(k)
         deleted += 1
     return deleted > 0

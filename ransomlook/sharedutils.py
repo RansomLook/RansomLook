@@ -64,6 +64,19 @@ def get_private_entity_names() -> set[str]:
     return names
 
 
+_GLOB_META_RE = re.compile(r"([\\*?\[\]])")
+
+
+def escape_glob(value: str) -> str:
+    """Escape Redis glob metacharacters so a value is safe in a SCAN MATCH pattern.
+
+    Redis treats ``*``, ``?``, ``[``, ``]`` and ``\\`` as pattern syntax. A
+    caller-supplied name carrying any of them would widen the scan to keys the
+    caller must never reach — including those of entities flagged private.
+    """
+    return _GLOB_META_RE.sub(r"\\\1", value or "")
+
+
 def norm_group_slug(value: str) -> str:
     """Slugify a group/market name the way DB_NOTES keys its indexes.
 
