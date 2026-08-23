@@ -80,22 +80,23 @@ from ransomlook.sharedutils import (
     createfile,
     cryptostats,
     currentmonthstr,
-    get_private_entity_names,
     groupcount,
     hostcount,
     hostcountadmin,
     hostcountchat,
     hostcountdls,
     hostcountfs,
+    iter_posts,
     leakcount,
     mounthlypostcount,
     notecount,
     onlinecount,
+    parse_discovered,
     parsercount,
-    postcount,
     postslast24h,
     postssince,
     poststhisyear,
+    public_posts,
     rfcount,
 )
 
@@ -125,7 +126,15 @@ from .forms import (
     LoginForm,
     SelectForm,
 )
-from .helpers import User, build_users_table, get_secret_key, load_user_from_request, sri_load
+from .helpers import (
+    User,
+    api_key_meta,
+    build_users_table,
+    get_secret_key,
+    load_user_from_request,
+    sri_load,
+    viewer_can_see_private,
+)
 from .ldap import global_ldap_authentication
 
 
@@ -810,6 +819,8 @@ def custom_strftime(fmt, t) -> str:  # type: ignore
 def home():  # type: ignore[no-untyped-def]
     date = custom_strftime("%B {S}, %Y", dt.now()).lower()
 
+    include_private = can_see_private()
+
     # ── Coverage / totals (as before, for the "Coverage" strip) ──────────
     data: dict[str, Any] = {}
     data["nbgroups"]     = groupcount(0)
@@ -819,7 +830,8 @@ def home():  # type: ignore[no-untyped-def]
     data["nbcryptoaddr"] = crypto["addresses"]
     data["nbnotes"]      = notecount()
     data["nbleaks"]      = leakcount()
-    data["nbposts"]      = postcount()
+    # data["nbposts"] is filled from the insights pass below, which already
+    # walks every post — no need to scan the database a second time.
     data["nbanalyses"]   = _public_analyses_count()
     data["year"]         = dt.now().year
 
@@ -829,15 +841,8 @@ def home():  # type: ignore[no-untyped-def]
     prev_7d_start = now - timedelta(days=14)
     win_30d_start = now - timedelta(days=30)
 
-    red_posts = Valkey(unix_socket_path=get_socket_path("cache"), db=DB_POSTS)
-
     def _parse_ts(s: str) -> Optional[dt]:
-        for fmt in ("%Y-%m-%d %H:%M:%S.%f", "%Y-%m-%d %H:%M:%S"):
-            try:
-                return dt.strptime(s, fmt)
-            except Exception:
-                pass
-        return None
+        return parse_discovered(s)
 
     sparkline_30d: list[int] = [0] * 30
     posts_7d_cur = 0
@@ -850,35 +855,40 @@ def home():  # type: ignore[no-untyped-def]
     group_first_seen: dict[str, dt] = {}
     all_recent: list[dict[str, Any]] = []
 
-    for key in red_posts.keys():  # type: ignore[union-attr]
-        try:
-            entries = json.loads(red_posts.get(key))  # type: ignore[arg-type]
-        except Exception:
+    total_posts = 0
+    for gname, entry in iter_posts(include_private):
+        total_posts += 1
+        ts_str = entry.get("discovered") or ""
+        ts = _parse_ts(ts_str)
+        if not ts:
             continue
-        gname = key.decode() if isinstance(key, (bytes, bytearray)) else str(key)
-        for entry in entries:
-            ts_str = entry.get("discovered") or ""
-            ts = _parse_ts(ts_str)
-            if not ts:
-                continue
-            # first-seen per group
-            first = group_first_seen.get(gname)
-            if first is None or ts < first:
-                group_first_seen[gname] = ts
-            # 30-day sparkline
-            if ts >= win_30d_start:
-                days_ago = (now - ts).days
-                idx = 29 - days_ago
-                if 0 <= idx < 30:
-                    sparkline_30d[idx] += 1
-            # 7-day window
-            if ts >= win_7d_start:
-                posts_7d_cur += 1
-                group_counts_7d[gname] = group_counts_7d.get(gname, 0) + 1
-                all_recent.append({"group": gname, "title": entry.get("post_title", ""), "ts": ts_str})
-            elif ts >= prev_7d_start:
-                posts_7d_prev += 1
-                group_counts_prev[gname] = group_counts_prev.get(gname, 0) + 1
+        # first-seen per group
+        first = group_first_seen.get(gname)
+        if first is None or ts < first:
+            group_first_seen[gname] = ts
+        # 30-day sparkline
+        if ts >= win_30d_start:
+            days_ago = (now - ts).days
+            idx = 29 - days_ago
+            if 0 <= idx < 30:
+                sparkline_30d[idx] += 1
+        # 7-day window
+        if ts >= win_7d_start:
+            posts_7d_cur += 1
+            group_counts_7d[gname] = group_counts_7d.get(gname, 0) + 1
+            all_recent.append(
+                {
+                    "group": gname,
+                    "title": entry.get("post_title", ""),
+                    "ts": ts_str,
+                    "private": entry.get("private") is True,
+                }
+            )
+        elif ts >= prev_7d_start:
+            posts_7d_prev += 1
+            group_counts_prev[gname] = group_counts_prev.get(gname, 0) + 1
+
+    data["nbposts"] = total_posts
 
     # Deltas
     def _pct(cur: int, prev: int) -> Optional[float]:
@@ -990,12 +1000,9 @@ def recent():  # type: ignore[no-untyped-def]
     row_cap = 2000
 
     posts = []
-    red = Valkey(unix_socket_path=get_socket_path("cache"), db=DB_POSTS)
-    for key in red.keys():  # type: ignore[union-attr]
-        entries = json.loads(red.get(key))  # type: ignore[arg-type]
-        for entry in entries:
-            entry["group_name"] = key.decode()
-            posts.append(entry)
+    for group_name, entry in iter_posts(can_see_private()):
+        entry["group_name"] = group_name
+        posts.append(entry)
     sorted_posts = sorted(posts, key=lambda x: x["discovered"], reverse=True)
 
     now = dt.now(timezone.utc)
@@ -1074,7 +1081,7 @@ def hot():  # type: ignore[no-untyped-def]
     window_start = now - timedelta(days=number)
     prev_start = now - timedelta(days=2 * number)
 
-    red = Valkey(unix_socket_path=get_socket_path("cache"), db=DB_POSTS)
+    include_private = can_see_private()
 
     # Per-group aggregates
     groups: dict[str, dict[str, Any]] = {}
@@ -1086,51 +1093,39 @@ def hot():  # type: ignore[no-untyped-def]
     group_first_seen: dict[str, dt] = {}
 
     def _parse(s: str) -> Optional[dt]:
-        for fmt in ("%Y-%m-%d %H:%M:%S.%f", "%Y-%m-%d %H:%M:%S"):
-            try:
-                return dt.strptime(s, fmt)
-            except Exception:
-                pass
-        return None
+        return parse_discovered(s)
 
-    for key in red.keys():  # type: ignore[union-attr]
-        try:
-            entries = json.loads(red.get(key))  # type: ignore[arg-type]
-        except Exception:
-            continue
-        gname = key.decode() if isinstance(key, (bytes, bytearray)) else str(key)
+    for gname, entry in iter_posts(include_private):
         g = gname.lower()
-
-        for entry in entries:
-            ts = _parse(entry.get("discovered", ""))
-            if not ts:
-                continue
-            first = group_first_seen.get(g)
-            if first is None or ts < first:
-                group_first_seen[g] = ts
-            if ts >= window_start:
-                rec = groups.setdefault(g, {
-                    "group": gname, "count": 0, "prev_count": 0,
-                    "sparkline": [0] * number,
-                    "last_post": None,
-                })
-                rec["count"] += 1
-                dp = entry.get("discovered")
-                if dp and (rec["last_post"] is None or dp > rec["last_post"]):
-                    rec["last_post"] = dp
-                # Day index: 0 = oldest, number-1 = today
-                days_ago = (now - ts).days
-                idx = number - 1 - days_ago
-                if 0 <= idx < number:
-                    rec["sparkline"][idx] += 1
-                    global_daily[idx] += 1
-            elif ts >= prev_start:
-                rec = groups.setdefault(g, {
-                    "group": gname, "count": 0, "prev_count": 0,
-                    "sparkline": [0] * number,
-                    "last_post": None,
-                })
-                rec["prev_count"] += 1
+        ts = _parse(entry.get("discovered", ""))
+        if not ts:
+            continue
+        first = group_first_seen.get(g)
+        if first is None or ts < first:
+            group_first_seen[g] = ts
+        if ts >= window_start:
+            rec = groups.setdefault(g, {
+                "group": gname, "count": 0, "prev_count": 0,
+                "sparkline": [0] * number,
+                "last_post": None,
+            })
+            rec["count"] += 1
+            dp = entry.get("discovered")
+            if dp and (rec["last_post"] is None or dp > rec["last_post"]):
+                rec["last_post"] = dp
+            # Day index: 0 = oldest, number-1 = today
+            days_ago = (now - ts).days
+            idx = number - 1 - days_ago
+            if 0 <= idx < number:
+                rec["sparkline"][idx] += 1
+                global_daily[idx] += 1
+        elif ts >= prev_start:
+            rec = groups.setdefault(g, {
+                "group": gname, "count": 0, "prev_count": 0,
+                "sparkline": [0] * number,
+                "last_post": None,
+            })
+            rec["prev_count"] += 1
 
     rows = []
     for g, rec in groups.items():
@@ -1202,18 +1197,12 @@ def hot():  # type: ignore[no-untyped-def]
 @app.route("/rss.xml")
 def feeds():  # type: ignore[no-untyped-def]
     posts = []
-    private_names = get_private_entity_names()
-    red = Valkey(unix_socket_path=get_socket_path("cache"), db=DB_POSTS)
 
-    # Iterate over Redis keys and parse entries
-    for key in red.keys():  # type: ignore[union-attr]
-        group_name = key.decode()
-        if group_name.lower() in private_names:
-            continue
-        entries = json.loads(red.get(key))  # type: ignore[arg-type]
-        for entry in entries:
-            entry["group_name"] = group_name
-            posts.append(entry)
+    # The feed is served to anonymous readers only: never include private
+    # groups or private posts, whoever is asking.
+    for group_name, entry in iter_posts():
+        entry["group_name"] = group_name
+        posts.append(entry)
 
     # Sort posts by 'discovered' field
     sorted_posts = sorted(posts, key=lambda x: x["discovered"], reverse=True)
@@ -1621,6 +1610,8 @@ def group(name: str):  # type: ignore[no-untyped-def]
             redpost = Valkey(unix_socket_path=get_socket_path("cache"), db=DB_POSTS)
             if key in redpost.keys():  # type: ignore[operator]
                 posts = json.loads(redpost.get(key))  # type: ignore[arg-type]
+                if not can_see_private():
+                    posts = public_posts(posts)
                 sorted_posts = sorted(posts, key=lambda x: x["discovered"], reverse=True)
             else:
                 sorted_posts = []
@@ -2631,6 +2622,8 @@ def market(name: str):  # type: ignore[no-untyped-def]
             redpost = Valkey(unix_socket_path=get_socket_path("cache"), db=DB_POSTS)
             if key in redpost.keys():  # type: ignore[operator]
                 posts = json.loads(redpost.get(key))  # type: ignore[arg-type]
+                if not can_see_private():
+                    posts = public_posts(posts)
                 sorted_posts = sorted(posts, key=lambda x: x["discovered"], reverse=True)
             else:
                 sorted_posts = []
@@ -3126,19 +3119,16 @@ def search():  # type: ignore[no-untyped-def]
                 leaks.append(group)
         leaks.sort(key=lambda x: x["name"].lower())
 
-        red = Valkey(unix_socket_path=get_socket_path("cache"), db=DB_POSTS)
         posts = []
-        for key in red.keys():  # type: ignore[union-attr]
-            entries = json.loads(red.get(key))  # type: ignore[arg-type]
-            for entry in entries:
-                if (
-                    query.lower() in entry["post_title"].lower()  # type: ignore[union-attr]
-                    or "description" in entry
-                    and entry["description"] is not None
-                    and query.lower() in entry["description"].lower()  # type: ignore[union-attr]
-                ):
-                    entry["group_name"] = key.decode()
-                    posts.append(entry)
+        for group_name, entry in iter_posts(can_see_private()):
+            if (
+                query.lower() in entry["post_title"].lower()  # type: ignore[union-attr]
+                or "description" in entry
+                and entry["description"] is not None
+                and query.lower() in entry["description"].lower()  # type: ignore[union-attr]
+            ):
+                entry["group_name"] = group_name
+                posts.append(entry)
         posts.sort(key=lambda x: x["group_name"].lower())
 
         red = Valkey(unix_socket_path=get_socket_path("cache"), db=DB_NOTES)
@@ -3331,23 +3321,15 @@ def _get_apikeys_redis() -> Valkey:
 def check_api_key() -> str | None:
     """Check Authorization header against API keys in Redis DB=1.
     Returns the key name/comment if valid, None otherwise."""
-    token = request.headers.get("Authorization", "").strip()
-    if not token:
+    meta = api_key_meta(request)
+    if meta is None:
         return None
-    red = _get_apikeys_redis()
-    raw = red.hget("apikeys", token)
-    if not raw:
-        return None
-    try:
-        meta = json.loads(raw)  # type: ignore[arg-type]
-    except Exception:
-        return None
-    if not meta.get("active", True):
-        return None
-    # Update last_used
-    meta["last_used"] = dt.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
-    red.hset("apikeys", token, json.dumps(meta, ensure_ascii=False))
-    return meta.get("name", "")
+    return str(meta.get("name", ""))
+
+
+def can_see_private() -> bool:
+    """Whether the current caller is entitled to see entries flagged private."""
+    return viewer_can_see_private(request)
 
 
 def require_api_key(f: Any) -> Any:
@@ -4178,7 +4160,7 @@ def addpostentry(database: int, name: str):  # type: ignore
     form = AddPostForm()
 
     if form.validate_on_submit():
-        entry: dict[str, str | None] = {}
+        entry: dict[str, Any] = {}
         entry["slug"] = None
         entry["title"] = form.title.data
         if form.description.data:
@@ -4189,6 +4171,7 @@ def addpostentry(database: int, name: str):  # type: ignore
             entry["link"] = form.link.data
         if form.magnet.data:
             entry["magnet"] = form.magnet.data
+        entry["private"] = bool(form.private.data)
         if form.link.data and form.magnet.data:
             flash(_("Error to add post to : %(name)s - You should select Magnet or Link not both", name=name), "error")
             return render_template("admin/addpostentry.html", form=form)
@@ -4220,7 +4203,11 @@ def addpostentry(database: int, name: str):  # type: ignore
             # run_data_viz(14)
             # run_data_viz(30)
             # run_data_viz(90)
-            audit_log("add_post", name, f"title={form.title.data}")
+            audit_log(
+                "add_post",
+                name,
+                f"title={form.title.data}" + (" (private)" if form.private.data else ""),
+            )
             flash(_("Success to add post to : %(name)s", name=name), "success")
         return redirect(url_for("admin"))
 
@@ -4264,7 +4251,9 @@ def editpostentry(name: str):  # type: ignore
         posts = json.loads(red.get(name))  # type: ignore[arg-type]
     except Exception:
         return redirect("/admin/editpost")
-    postdata = namedtuple("posts", ["post_title", "discovered", "description", "link", "magnet", "screen"])  # type: ignore
+    postdata = namedtuple(  # type: ignore
+        "posts", ["post_title", "discovered", "description", "link", "magnet", "screen", "private"]
+    )
     postlist = []
     for entry in posts:
         postlist.append(
@@ -4275,9 +4264,14 @@ def editpostentry(name: str):  # type: ignore
                 entry["link"] if "link" in entry else "",
                 entry["magnet"] if "magnet" in entry else "",
                 entry["screen"] if "screen" in entry else "",
+                entry.get("private") is True,
             )
         )
     _old_titles = {e["post_title"] for e in posts}
+    # The form rebuilds each post from scratch, so fields it doesn't carry
+    # (misp_uuid) would be dropped on every save. Keep them keyed by title.
+    _carried = {e["post_title"]: e for e in posts}
+    _old_private = {e["post_title"] for e in posts if e.get("private") is True}
     data = {"postslist": postlist}
     form = EditPostsForm(data=data, files=request.files)
     if form.validate_on_submit():
@@ -4291,7 +4285,11 @@ def editpostentry(name: str):  # type: ignore
                 "description": field.description.data.strip() if field.description else "",
                 "link": field.link.data.strip() if field.link.data else "",
                 "magnet": field.magnet.data.strip() if field.magnet.data else "",
+                "private": bool(field.private.data),
             }
+            _previous = _carried.get(post["post_title"])
+            if _previous and _previous.get("misp_uuid"):
+                post["misp_uuid"] = _previous["misp_uuid"]
             if field.file.data is not None:
                 filename = field.file.data.filename
                 file_ext = os.path.splitext(filename)[1]
@@ -4316,16 +4314,24 @@ def editpostentry(name: str):  # type: ignore
         red.set(name, json.dumps(posts))
         _new_titles = {p["post_title"] for p in posts}
         _added = sorted(_new_titles - _old_titles)
-        _removed = sorted(_old_titles - _new_titles)
+        _removed_set = _old_titles - _new_titles
+        _removed = sorted(_removed_set)
         for _title in _new_titles:
             misp_feed.refresh_victim(name, _title)
         for _title in _removed:
             misp_feed.remove(misp_feed.deterministic_uuid("victim|" + name + "|" + _title))
+        _new_private = {p["post_title"] for p in posts if p.get("private") is True}
+        _gone_private = sorted(_new_private - _old_private)
+        _gone_public = sorted(_old_private - _new_private - _removed_set)
         parts = []
         if _added:
             parts.append(f"added={', '.join(_added)}")
         if _removed:
             parts.append(f"deleted={', '.join(_removed)}")
+        if _gone_private:
+            parts.append(f"private={', '.join(_gone_private)}")
+        if _gone_public:
+            parts.append(f"public={', '.join(_gone_public)}")
         if not parts:
             parts.append("modified")
         audit_log("edit_posts", name, "; ".join(parts))
@@ -4333,29 +4339,6 @@ def editpostentry(name: str):  # type: ignore
         return redirect(url_for("admin"))
 
     return render_template("admin/editpost.html", form=form)
-
-
-@app.route("/export/<database>")
-def exportdb(database: int):  # type: ignore[no-untyped-def]
-    if str(database) not in ["0", "2", "3", "4", "5", "6", "7"]:
-        flash(_("You are not allowed to dump this DataBase"), "error")
-        return redirect(url_for("home"))
-    red = Valkey(unix_socket_path=get_socket_path("cache"), db=database)
-    dump = {}
-    for key in red.keys():  # type: ignore[union-attr]
-        if str(database) != "0" and str(database) != "3":
-            dump[key.decode()] = json.loads(red.get(key))  # type: ignore[arg-type]
-        else:
-            temp = json.loads(red.get(key))  # type: ignore[arg-type]
-            if not current_user.is_authenticated and "private" in temp and temp["private"] is True:
-                continue
-
-            if "locations" in temp:
-                for location in temp["locations"]:
-                    if "private" in location and location["private"] is True:
-                        temp["locations"].remove(location)
-            dump[key.decode()] = temp
-    return dump
 
 
 @app.route("/admin/addactor", methods=["GET", "POST"])
@@ -5454,6 +5437,7 @@ def admin_apikeys():  # type: ignore[no-untyped-def]
                 "created_by": meta.get("created_by", ""),
                 "last_used": meta.get("last_used", ""),
                 "active": meta.get("active", True),
+                "private": meta.get("private", False),
             }
         )
     keys.sort(key=lambda x: x["name"].lower())
@@ -5476,6 +5460,7 @@ def admin_apikeys_add():  # type: ignore[no-untyped-def]
         "created_by": flask_login.current_user.id,
         "last_used": "",
         "active": True,
+        "private": (request.form.get("private") or "") not in ("", "0", "off"),
     }
     red = _get_apikeys_redis()
     red.hset("apikeys", token, json.dumps(meta, ensure_ascii=False))
@@ -5502,6 +5487,30 @@ def admin_apikeys_toggle():  # type: ignore[no-untyped-def]
     state = "enabled" if meta["active"] else "disabled"
     audit_log("toggle_apikey", meta.get("name", ""), state)
     flash(_('Key "%(name)s" %(state)s.', name=meta.get("name", ""), state=state), "success")
+    return redirect(url_for("admin_apikeys"))
+
+
+@app.route("/admin/apikeys/toggle-private", methods=["POST"])
+@flask_login.login_required
+def admin_apikeys_toggle_private():  # type: ignore[no-untyped-def]
+    token = request.form.get("token", "").strip()
+    if not token:
+        flash(_("Missing token."), "error")
+        return redirect(url_for("admin_apikeys"))
+    red = _get_apikeys_redis()
+    raw = red.hget("apikeys", token)
+    if not raw:
+        flash(_("Key not found."), "error")
+        return redirect(url_for("admin_apikeys"))
+    meta = json.loads(raw)  # type: ignore[arg-type]
+    meta["private"] = not meta.get("private", False)
+    red.hset("apikeys", token, json.dumps(meta, ensure_ascii=False))
+    state = "granted" if meta["private"] else "revoked"
+    audit_log("toggle_apikey_private", meta.get("name", ""), state)
+    flash(
+        _('Private access %(state)s for key "%(name)s".', state=state, name=meta.get("name", "")),
+        "success",
+    )
     return redirect(url_for("admin_apikeys"))
 
 
@@ -5994,6 +6003,8 @@ def group_posts_csv(name: str):  # type: ignore[no-untyped-def]
     rows = []
     if key_bytes in redpost.keys():  # type: ignore[operator]
         posts = json.loads(redpost.get(key_bytes))  # type: ignore[arg-type]
+        if not can_see_private():
+            posts = public_posts(posts)
         posts.sort(key=lambda x: x.get("discovered", ""), reverse=True)
         for post in posts:
             date_str = ""
@@ -6068,6 +6079,8 @@ def market_posts_csv(name: str):  # type: ignore[no-untyped-def]
     rows = []
     if key_bytes in redpost.keys():  # type: ignore[operator]
         posts = json.loads(redpost.get(key_bytes))  # type: ignore[arg-type]
+        if not can_see_private():
+            posts = public_posts(posts)
         posts.sort(key=lambda x: x.get("discovered", ""), reverse=True)
         for post in posts:
             date_str = ""
@@ -6174,6 +6187,8 @@ def compare():  # type: ignore[no-untyped-def]
                 posts = json.loads(red_posts.get(key))  # type: ignore[arg-type]
             except Exception:
                 posts = []
+        if not can_see_private():
+            posts = public_posts(posts)
         now = dt.now()
         cutoff = now - timedelta(days=days)
         c = 0

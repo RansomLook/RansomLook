@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
 import argparse
-import json
 import logging
 import smtplib
 import ssl
@@ -8,11 +7,9 @@ from collections import defaultdict
 from datetime import date, timedelta
 from email.message import EmailMessage
 
-import valkey
-
-from ransomlook.default import DB_POSTS
-from ransomlook.default.config import get_config, get_socket_path
+from ransomlook.default.config import get_config
 from ransomlook.default.logging import get_logger
+from ransomlook.sharedutils import iter_posts
 
 logger = get_logger("notify")
 
@@ -20,14 +17,14 @@ logger = get_logger("notify")
 def getnewpost(date: str) -> dict[str, list[str]]:
     """
     check if a post already exists in posts.json
+
+    The digest goes out to an external subscriber list, so private groups and
+    private posts are left out.
     """
-    red = valkey.Valkey(unix_socket_path=get_socket_path("cache"), db=DB_POSTS)
     notify = defaultdict(list)
-    for group in red.keys():  # type: ignore[union-attr]
-        posts = json.loads(red.get(group))  # type: ignore[arg-type]
-        for post in posts:
-            if post["discovered"].split()[0] == date:
-                notify[group.decode()].append(post["post_title"])
+    for group_name, post in iter_posts():
+        if str(post.get("discovered", "")).split()[0:1] == [date]:
+            notify[group_name].append(post["post_title"])
     ret = dict(sorted(notify.items()))
     return ret
 

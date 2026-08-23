@@ -116,7 +116,7 @@
                       {{ entry['discovered'] }}
                     </time>
                   </td>
-                  <td class="recent-title">{{ entry['post_title'] }}</td>
+                  <td class="recent-title">{{ entry['post_title'] }}{% if entry.get('private') %} <span class="badge badge-warn" title="{{ _('Hidden from anonymous visitors') }}">{{ _('private') }}</span>{% endif %}</td>
                   <td>
                     <a class="recent-group-link" href="/group/{{ entry['group_name']|urlencode }}">
                       <span class="group-dot" data-group-dot="{{ gname }}" aria-hidden="true"></span>

@@ -18,48 +18,33 @@ from ransomlook.default import (
     DB_MARKETS,
     DB_POSTS,
     DB_RF,
-    DB_TASKS,
     get_homedir,
     get_socket_path,
 )
-from ransomlook.sharedutils import createfile, get_private_entity_names, striptld
+from ransomlook.sharedutils import (
+    createfile,
+    get_private_entity_names,
+    iter_posts,
+    parse_discovered,
+    public_posts,
+    striptld,
+)
 
 api = Namespace("GenericAPI", description="Generic Ransomlook API", path="/api")
 
 
 def _check_export_auth() -> bool:
     """Check if the request has valid auth for export: admin session, legacy key, or Redis API key."""
-    import flask_login  # type: ignore[import-untyped]
+    from web.helpers import viewer_is_authenticated  # type: ignore[import-not-found]
 
-    # Admin session
-    try:
-        if flask_login.current_user.is_authenticated:
-            return True
-    except Exception:
-        pass
-    # Legacy API key (generic.json)
-    from web.helpers import load_user_from_request  # type: ignore[import-not-found]
-
-    if load_user_from_request(request):
-        return True
-    # Redis API keys (DB=1)
-    token = request.headers.get("Authorization", "").strip()
-    if token:
-        red = Valkey(unix_socket_path=get_socket_path("cache"), db=DB_TASKS)
-        raw = red.hget("apikeys", token)
-        if raw:
-            try:
-                meta = json.loads(raw)  # type: ignore[arg-type]
-                if meta.get("active", True):
-                    meta["last_used"] = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
-                    red.hset("apikeys", token, json.dumps(meta, ensure_ascii=False))
-                    return True
-            except Exception:
-                pass
-    return False
+    return bool(viewer_is_authenticated(request))
 
 
-# ── Swagger models ──────────────────────────────────────────────────────
+def _can_see_private() -> bool:
+    from web.helpers import viewer_can_see_private
+
+    return bool(viewer_can_see_private(request))
+
 
 post_model = api.model(
     "Post",
@@ -120,18 +105,11 @@ posts_stat_response = api.model(
 )
 class RecentPost(Resource):  # type: ignore[misc]
     @api.response(200, "List of posts", [post_model])  # type: ignore[untyped-decorator]
-    def get(self, number: int = 100) -> list[str]:
+    def get(self, number: int = 100) -> list[dict[str, Any]]:
         posts = []
-        private_names = get_private_entity_names()
-        red = Valkey(unix_socket_path=get_socket_path("cache"), db=DB_POSTS)
-        for key in red.keys():  # type: ignore[union-attr]
-            group_name = key.decode()
-            if group_name.lower() in private_names:
-                continue
-            entries = json.loads(red.get(key))  # type: ignore[arg-type]
-            for entry in entries:
-                entry["group_name"] = group_name
-                posts.append(entry)
+        for group_name, entry in iter_posts(_can_see_private()):
+            entry["group_name"] = group_name
+            posts.append(entry)
         sorted_posts = sorted(posts, key=lambda x: x["discovered"], reverse=True)
         recentposts = []
         for post in sorted_posts:
@@ -151,21 +129,11 @@ class LastPost(Resource):  # type: ignore[misc]
     def get(self, number: int = 1) -> list[dict[str, Any]]:
         posts = []
         actualdate = datetime.now() + timedelta(days=-number)
-        private_names = get_private_entity_names()
-        red = Valkey(unix_socket_path=get_socket_path("cache"), db=DB_POSTS)
-        for key in red.keys():  # type: ignore[union-attr]
-            group_name = key.decode()
-            if group_name.lower() in private_names:
-                continue
-            entries = json.loads(red.get(key))  # type: ignore[arg-type]
-            for entry in entries:
-                try:
-                    datetime_object = datetime.strptime(entry["discovered"], "%Y-%m-%d %H:%M:%S.%f")
-                except Exception:
-                    datetime_object = datetime.strptime(entry["discovered"], "%Y-%m-%d %H:%M:%S")
-                if datetime_object > actualdate:
-                    entry["group_name"] = group_name
-                    posts.append(entry)
+        for group_name, entry in iter_posts(_can_see_private()):
+            datetime_object = parse_discovered(entry.get("discovered"))
+            if datetime_object is not None and datetime_object > actualdate:
+                entry["group_name"] = group_name
+                posts.append(entry)
         sorted_posts = sorted(posts, key=lambda x: x["discovered"], reverse=True)
         return sorted_posts
 
@@ -176,10 +144,11 @@ class Groups(Resource):  # type: ignore[misc]
     @api.response(200, "List of group names (strings)")  # type: ignore[untyped-decorator]
     def get(self) -> list[str]:
         groups = []
+        show_private = _can_see_private()
         red = Valkey(unix_socket_path=get_socket_path("cache"), db=DB_GROUPS)
         for key in red.keys():  # type: ignore[union-attr]
             group = json.loads(red.get(key))  # type: ignore[arg-type]
-            if "private" in group and group["private"] is True:
+            if not show_private and group.get("private") is True:
                 continue
             groups.append(key.decode())
         return groups
@@ -191,10 +160,11 @@ class Markets(Resource):  # type: ignore[misc]
     @api.response(200, "List of market names (strings)")  # type: ignore[untyped-decorator]
     def get(self) -> list[str]:
         groups = []
+        show_private = _can_see_private()
         red = Valkey(unix_socket_path=get_socket_path("cache"), db=DB_MARKETS)
         for key in red.keys():  # type: ignore[union-attr]
             group = json.loads(red.get(key))  # type: ignore[arg-type]
-            if "private" in group and group["private"] is True:
+            if not show_private and group.get("private") is True:
                 continue
             groups.append(key.decode())
         return groups
@@ -215,16 +185,15 @@ class Groupinfo(Resource):  # type: ignore[misc]
         for key in red.keys():  # type: ignore[union-attr]
             if key.decode().lower() == name.lower():
                 group = json.loads(red.get(key))  # type: ignore[arg-type]
-                if "private" in group and group["private"] is True:
+                if group.get("private") is True and not _can_see_private():
                     return [[], {}]
 
                 if group["meta"] is not None:
                     group["meta"] = group["meta"].replace("\n", "<br/>")
-                group["locations"] = [
-                    location
-                    for location in group["locations"]
-                    if not ("private" in location and location["private"] is True)
-                ]
+                if not _can_see_private():
+                    group["locations"] = [
+                        location for location in group["locations"] if location.get("private") is not True
+                    ]
                 for location in group["locations"]:
                     screenfile = "/screenshots/" + name.lower() + "-" + createfile(location["slug"]) + ".png"
                     screenpath = os.path.normpath(str(get_homedir()) + "/source" + screenfile)
@@ -245,6 +214,8 @@ class Groupinfo(Resource):  # type: ignore[misc]
                 redpost = Valkey(unix_socket_path=get_socket_path("cache"), db=DB_POSTS)
                 if key in redpost.keys():  # type: ignore[operator]
                     posts = json.loads(redpost.get(key))  # type: ignore[arg-type]
+                    if not _can_see_private():
+                        posts = public_posts(posts)
                     sorted_posts = sorted(posts, key=lambda x: x["discovered"], reverse=True)
                 else:
                     sorted_posts = []
@@ -260,12 +231,15 @@ class GroupPost(Resource):  # type: ignore[misc]
     @api.response(200, "Post object", post_model)  # type: ignore[untyped-decorator]
     @api.response(404, "Post not found (returns {})")  # type: ignore[untyped-decorator]
     def get(self, name: str, postname: str) -> dict[str, Any]:
-        if name.lower() in get_private_entity_names():
+        show_private = _can_see_private()
+        if not show_private and name.lower() in get_private_entity_names():
             return {}
         red = Valkey(unix_socket_path=get_socket_path("cache"), db=DB_POSTS)
         for key in red.keys():  # type: ignore[union-attr]
             if key.decode().lower() == name.lower():
                 posts = json.loads(red.get(key))  # type: ignore[arg-type]
+                if not show_private:
+                    posts = public_posts(posts)
                 for post in posts:
                     if post["post_title"] == postname:
                         if "screen" in post and post["screen"] is not None:
@@ -304,15 +278,14 @@ class Marketinfo(Resource):  # type: ignore[misc]
         for key in red.keys():  # type: ignore[union-attr]
             if key.decode().lower() == name.lower():
                 group = json.loads(red.get(key))  # type: ignore[arg-type]
-                if "private" in group and group["private"] is True:
+                if group.get("private") is True and not _can_see_private():
                     return [[], {}]
                 if group["meta"] is not None:
                     group["meta"] = group["meta"].replace("\n", "<br/>")
-                group["locations"] = [
-                    location
-                    for location in group["locations"]
-                    if not ("private" in location and location["private"] is True)
-                ]
+                if not _can_see_private():
+                    group["locations"] = [
+                        location for location in group["locations"] if location.get("private") is not True
+                    ]
                 for location in group["locations"]:
                     screenfile = "/screenshots/" + name.lower() + "-" + createfile(location["slug"]) + ".png"
                     screenpath = os.path.normpath(str(get_homedir()) + "/source" + screenfile)
@@ -333,6 +306,8 @@ class Marketinfo(Resource):  # type: ignore[misc]
                 redpost = Valkey(unix_socket_path=get_socket_path("cache"), db=DB_POSTS)
                 if key in redpost.keys():  # type: ignore[operator]
                     posts = json.loads(redpost.get(key))  # type: ignore[arg-type]
+                    if not _can_see_private():
+                        posts = public_posts(posts)
                     sorted_posts = sorted(posts, key=lambda x: x["discovered"], reverse=True)
                 else:
                     sorted_posts = []
@@ -377,32 +352,32 @@ class Exportdb(Resource):  # type: ignore[misc]
             api.abort(
                 403, f"Database {database} is not exportable. Allowed: {', '.join(sorted(_EXPORT_DBS.keys(), key=int))}"
             )
+        show_private = _can_see_private()
         red = Valkey(unix_socket_path=get_socket_path("cache"), db=database)
         dump = {}
         # For DBs keyed by entity name (POSTS) or entity-derived keys (HEALTH),
         # cross-lookup DB_GROUPS/DB_MARKETS so private entities are excluded.
         private_names = (
             get_private_entity_names()
-            if str(database) in (str(DB_POSTS), str(DB_HEALTH))
+            if not show_private and str(database) in (str(DB_POSTS), str(DB_HEALTH))
             else set()
         )
         for key in red.keys():  # type: ignore[union-attr]
             key_str = key.decode()
-            if str(database) in _EXPORT_FILTER_PRIVATE:
+            if not show_private and str(database) in _EXPORT_FILTER_PRIVATE:
                 temp = json.loads(red.get(key))  # type: ignore[arg-type]
-                if "private" in temp and temp["private"] is True:
+                if temp.get("private") is True:
                     continue
                 if "locations" in temp:
                     temp["locations"] = [
-                        location
-                        for location in temp["locations"]
-                        if not ("private" in location and location["private"] is True)
+                        location for location in temp["locations"] if location.get("private") is not True
                     ]
                 dump[key_str] = temp
             elif str(database) == str(DB_POSTS):
                 if key_str.lower() in private_names:
                     continue
-                dump[key_str] = json.loads(red.get(key))  # type: ignore[arg-type]
+                posts = json.loads(red.get(key))  # type: ignore[arg-type]
+                dump[key_str] = posts if show_private else public_posts(posts)
             elif str(database) == str(DB_HEALTH):
                 # DB_HEALTH keys are "health:<group>:<slug>" (+ ":cnt:", ":lastday:" variants).
                 parts = key_str.split(":", 2)
@@ -417,7 +392,7 @@ class Exportdb(Resource):  # type: ignore[misc]
 # ── Date utilities ───────────────────────────────────────────────────────
 
 
-def _parse_iso_maybe_z(s: str) -> datetime | None:
+def _parse_iso_maybe_z(s: str | None) -> datetime | None:
     """Parse ISO 8601, accepte ...Z et avec offset. Renvoie un datetime timezone-aware en UTC."""
     if not s:
         return None
@@ -485,39 +460,22 @@ class Posts(Resource):  # type: ignore[misc]
         groups_wanted = set([g.strip() for g in groups_param.split(",") if g.strip()]) if groups_param else None
 
         # --- Read Redis db=2 as in your script ---
-        red = Valkey(unix_socket_path=get_socket_path("cache"), db=DB_POSTS)
-        private_names = get_private_entity_names()
-
         out: list[dict[str, Any]] = []
-        for key in red.keys():  # type: ignore[union-attr]
-            group_name = key.decode()
-            if group_name.lower() in private_names:
-                continue
+        for group_name, p in iter_posts(_can_see_private()):
             if groups_wanted and group_name not in groups_wanted:
                 continue
-
-            raw = red.get(key)
-            if not raw:
+            ts_s = p.get("discovered")
+            dt = _parse_iso_maybe_z(ts_s)
+            if not dt:
                 continue
-
-            try:
-                posts = json.loads(raw)  # type: ignore[arg-type]
-            except Exception:
-                continue
-
-            for p in posts:
-                ts_s = p.get("discovered")
-                dt = _parse_iso_maybe_z(ts_s)
-                if not dt:
-                    continue
-                if start <= dt <= end:
-                    out.append(
-                        {
-                            "group_name": group_name,
-                            "post_title": p.get("post_title", ""),
-                            "discovered": dt.isoformat().replace("+00:00", "Z"),  # propre ISO en Z
-                        }
-                    )
+            if start <= dt <= end:
+                out.append(
+                    {
+                        "group_name": group_name,
+                        "post_title": p.get("post_title", ""),
+                        "discovered": dt.isoformat().replace("+00:00", "Z"),  # propre ISO en Z
+                    }
+                )
 
         # On peut trier par date pour plus de cohérence (optionnel)
         out.sort(key=lambda r: r["discovered"])
@@ -533,35 +491,17 @@ class Posts(Resource):  # type: ignore[misc]
 ))
 class GroupFirstSeen(Resource):  # type: ignore[misc]
     def get(self) -> dict[str, str]:
-        red_posts = Valkey(unix_socket_path=get_socket_path("cache"), db=DB_POSTS)
-        private_names = get_private_entity_names()
         out: dict[str, str] = {}
-
-        def _parse_ts(s: str) -> Any:
-            for fmt in ("%Y-%m-%d %H:%M:%S.%f", "%Y-%m-%d %H:%M:%S"):
-                try:
-                    return datetime.strptime(s, fmt)
-                except Exception:
-                    pass
-            return None
-
-        for key in red_posts.keys():  # type: ignore[union-attr]
-            gname = key.decode() if isinstance(key, (bytes, bytearray)) else str(key)
-            if gname.lower() in private_names:
+        earliest: dict[str, Any] = {}
+        for gname, entry in iter_posts(_can_see_private()):
+            ts = parse_discovered(entry.get("discovered"))
+            if ts is None:
                 continue
-            try:
-                entries = json.loads(red_posts.get(key))  # type: ignore[arg-type]
-            except Exception:
-                continue
-            earliest: Any = None
-            for entry in entries:
-                ts = _parse_ts(entry.get("discovered") or "")
-                if ts is None:
-                    continue
-                if earliest is None or ts < earliest:
-                    earliest = ts
-            if earliest is not None:
-                out[gname] = earliest.strftime("%Y-%m-%dT%H:%M:%SZ")
+            current = earliest.get(gname)
+            if current is None or ts < current:
+                earliest[gname] = ts
+        for gname, ts in earliest.items():
+            out[gname] = ts.strftime("%Y-%m-%dT%H:%M:%SZ")
         return out
 
 
@@ -579,17 +519,10 @@ class PostPerMonth(Resource):  # type: ignore[misc]
             date = str(year) + "-" + str(month)
         else:
             date = str(year) + "-"
-        private_names = get_private_entity_names()
-        red = Valkey(unix_socket_path=get_socket_path("cache"), db=DB_POSTS)
-        for key in red.keys():  # type: ignore[union-attr]
-            group_name = key.decode()
-            if group_name.lower() in private_names:
-                continue
-            entries = json.loads(red.get(key))  # type: ignore[arg-type]
-            for entry in entries:
-                if entry["discovered"].startswith(date):
-                    entry["group_name"] = group_name
-                    posts.append(entry)
+        for group_name, entry in iter_posts(_can_see_private()):
+            if entry["discovered"].startswith(date):
+                entry["group_name"] = group_name
+                posts.append(entry)
         sorted_posts = sorted(posts, key=lambda x: x["discovered"], reverse=True)
         return sorted_posts
 
@@ -603,16 +536,9 @@ class PostPerPeriod(Resource):  # type: ignore[misc]
     @api.response(200, "List of posts", [post_model])  # type: ignore[untyped-decorator]
     def get(self, start_date: str, end_date: str) -> list[dict[str, Any]]:
         posts = []
-        private_names = get_private_entity_names()
-        red = Valkey(unix_socket_path=get_socket_path("cache"), db=DB_POSTS)
-        for key in red.keys():  # type: ignore[union-attr]
-            group_name = key.decode()
-            if group_name.lower() in private_names:
-                continue
-            entries = json.loads(red.get(key))  # type: ignore[arg-type]
-            for entry in entries:
-                if start_date <= entry["discovered"].split(" ")[0] <= end_date:
-                    entry["group_name"] = group_name
-                    posts.append(entry)
+        for group_name, entry in iter_posts(_can_see_private()):
+            if start_date <= entry["discovered"].split(" ")[0] <= end_date:
+                entry["group_name"] = group_name
+                posts.append(entry)
         sorted_posts = sorted(posts, key=lambda x: x["discovered"], reverse=True)
         return sorted_posts

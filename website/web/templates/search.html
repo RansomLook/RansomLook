@@ -98,7 +98,7 @@
           {% for entry in posts %}
             <tr>
               <td><a href="/group/{{entry['group_name']}}">{{entry['group_name'].title()}}</a></td>
-              <td>{{entry['post_title']}}</td>
+              <td>{{entry['post_title']}}{% if entry.get('private') %} <span class="badge badge-warn" title="{{ _('Hidden from anonymous visitors') }}">{{ _('private') }}</span>{% endif %}</td>
               <td>{{entry['discovered'].split(' ')[0]}}</td>
             </tr>
             {% if 'description' in entry and entry['description'] is not none %}

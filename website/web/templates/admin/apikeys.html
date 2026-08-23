@@ -24,6 +24,10 @@
         <form action="{{ url_for('admin_apikeys_add') }}" method="post">
           <label class="label" for="name">{{ _('Name / comment') }}</label>
           <input id="name" name="name" class="input" placeholder="{{ _('e.g. MISP sync, partner feed, CI/CD…') }}" required style="width:100%;box-sizing:border-box;margin-bottom:12px;">
+          <label class="chk" style="display:flex;align-items:center;gap:8px;margin-bottom:12px;">
+            <input type="checkbox" name="private" value="1">
+            <span>{{ _('Grant access to private entries (posts, groups, markets, actors)') }}</span>
+          </label>
           <div style="display:flex;justify-content:flex-end;">
             <button class="btn btn-primary" type="submit">{{ _('Generate key') }}</button>
           </div>
@@ -46,7 +50,7 @@
               <th>{{ _('Created') }}</th>
               <th>{{ _('Last used') }}</th>
               <th>{{ _('Status') }}</th>
-              <th style="width:140px;">{{ _('Actions') }}</th>
+              <th style="width:260px;">{{ _('Actions') }}</th>
             </tr>
           </thead>
           <tbody>
@@ -62,13 +66,23 @@
                 {% else %}
                   <span class="badge badge-neutral">{{ _('disabled') }}</span>
                 {% endif %}
+                {% if k.private %}
+                  <span class="badge badge-warn" title="{{ _('This key sees entries flagged private') }}">{{ _('private') }}</span>
+                {% endif %}
               </td>
               <td>
-                <div style="display:flex;gap:6px;">
+                <div style="display:flex;gap:6px;flex-wrap:wrap;">
                   <form action="{{ url_for('admin_apikeys_toggle') }}" method="post" style="margin:0;">
                     <input type="hidden" name="token" value="{{ k.token }}">
                     <button class="btn btn-secondary btn-sm" type="submit">
                       {{ _('Disable') if k.active else _('Enable') }}
+                    </button>
+                  </form>
+                  <form action="{{ url_for('admin_apikeys_toggle_private') }}" method="post" style="margin:0;">
+                    <input type="hidden" name="token" value="{{ k.token }}">
+                    <button class="btn btn-secondary btn-sm" type="submit"
+                            title="{{ _('Whether this key may read entries flagged private') }}">
+                      {{ _('Revoke private') if k.private else _('Grant private') }}
                     </button>
                   </form>
                   <form action="{{ url_for('admin_apikeys_delete') }}" method="post" style="margin:0;"

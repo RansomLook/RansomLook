@@ -178,6 +178,7 @@ class AddPostForm(FlaskForm):  # type: ignore[misc]
     link = StringField()
     magnet = StringField()
     file = FileField("File")
+    private = BooleanField("Private (visible to authenticated users only)")
     submit = SubmitField("Add post")
 
 
@@ -189,6 +190,7 @@ class EditPostForm(Form):  # type: ignore[misc]
     magnet = StringField()
     screen = StringField()
     file = FileField("File")
+    private = BooleanField("Private")
     delete = BooleanField("Delete")
 
 

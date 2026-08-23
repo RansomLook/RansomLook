@@ -424,6 +424,14 @@ def refresh_victim(group_name: str, post_title: str) -> str | None:
         if target is None:
             return None
 
+        if target.get("private") is True:
+            # Same rule as a private group: the victim event drops out of the
+            # local pull feed as soon as the post is flagged private. Like the
+            # private-group path above this calls remove(), not purge(), so an
+            # already-pushed event stays on the MISP instance.
+            remove(target.get("misp_uuid") or event_uuid)
+            return None
+
         if target.get("misp_uuid"):
             event_uuid = target["misp_uuid"]
         # fall back to the group name as galaxy value when the group has no

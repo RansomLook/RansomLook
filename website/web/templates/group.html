@@ -730,7 +730,7 @@
               {% for entry in posts %}
                 <tr>
                   <td><center><time datetime="{{ entry['discovered'] }}">{{ entry['discovered'].split(' ')[0] }}</time></center></td>
-                  <td>{{ entry['post_title'] }}</td>
+                  <td>{{ entry['post_title'] }}{% if entry.get('private') %} <span class="badge badge-warn" title="{{ _('Hidden from anonymous visitors') }}">{{ _('private') }}</span>{% endif %}</td>
                   <td class="break-all">{% if entry['description'] is not none %}{{ entry['description'] }}{% endif %}</td>
                   <td class="thumb-cell">
                     {% if entry.get('screen') %}

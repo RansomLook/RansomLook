@@ -52,6 +52,14 @@
             <label class="label mt-12" for="magnet">{{ _('Magnet') }}</label>
             {{ form.magnet(class_="input", id="magnet", placeholder="magnet:?xt=urn:btih:…") }}
 
+            <label class="chk mt-14" style="display:flex;align-items:center;gap:8px;">
+              {{ form.private(id="private") }}
+              <span>{{ _('Private') }}</span>
+            </label>
+            <div class="hint mt-6">
+              {{ _('A private post is hidden from anonymous visitors, the API, the RSS feed and the MISP feed, and is not broadcast on Rocket.Chat, Mastodon or Bluesky.') }}
+            </div>
+
           </div>
         </div>
 

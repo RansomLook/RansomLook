@@ -94,12 +94,15 @@
       {% set title_txt = (_pt.data if (_pt is not none and _pt.__call__ is defined and _pt.data is not none) else (_pt if _pt is string else '')) %}
       {% set disc_txt  = (_dc.data if (_dc is not none and _dc.__call__ is defined and _dc.data is not none) else (_dc if _dc is string else '')) %}
       {% set screen_url= (_sc.data if (_sc is not none and _sc.__call__ is defined and _sc.data is not none) else (_sc if _sc is string else '')) %}
+      {% set _pv = (f.private if f.private is defined else none) %}
+      {% set is_private = (_pv.data if (_pv is not none and _pv.__call__ is defined) else false) %}
 
       <details class="post" data-card>
         <summary class="post-head">
           <span class="dot" aria-hidden="true"></span>
           <span class="pill" data-date>{{ disc_txt or '—' }}</span>
           <strong class="title">{{ title_txt or _('(untitled)') }}</strong>
+          {% if is_private %}<span class="badge badge-warn">{{ _('private') }}</span>{% endif %}
           <span class="badge-id">{{ (f.post_title.name if f.post_title is defined and f.post_title.__call__ is defined else 'postslist-' ~ idx ~ '-post_title') }}</span>
           <svg class="chev" width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M8 10l4 4 4-4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
         </summary>
@@ -148,10 +151,18 @@
                 </div>
                 <div class="spacer"></div>
                 <div>
+                  <label class="label">{{ _('Private') }}</label><br>
+                  {{ f.private }}
+                </div>
+                <div class="spacer"></div>
+                <div>
                   <label class="label">{{ _('Delete') }}</label><br>
                   {{ f.delete }}
                 </div>
               </div>
+              <p class="muted" style="font-size:.8rem;margin-top:6px;">
+                {{ _('A private post is hidden from anonymous visitors, the API, the RSS feed and the MISP feed.') }}
+              </p>
             </aside>
           </div>
         </div>

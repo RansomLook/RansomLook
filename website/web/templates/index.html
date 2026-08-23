@@ -151,6 +151,7 @@
             <li>
               <time class="insight-time" datetime="{{ p.ts }}" data-ts="{{ p.ts }}">{{ p.ts }}</time>
               <span class="insight-title" title="{{ p.title }}">{{ p.title }}</span>
+              {% if p.private %}<span class="badge badge-warn" title="{{ _('Hidden from anonymous visitors') }}">{{ _('private') }}</span>{% endif %}
               <a class="insight-name insight-name--right" href="/group/{{ p.group|urlencode }}">
                 <span class="group-dot" data-group-dot="{{ p.group|lower }}" aria-hidden="true"></span>
                 {{ p.group|title }}

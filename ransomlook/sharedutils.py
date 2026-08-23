@@ -3,6 +3,7 @@
 import glob
 import json
 import sys
+from collections.abc import Iterator
 from datetime import datetime, timedelta
 from os.path import basename, dirname, isfile, join
 from typing import Any
@@ -62,6 +63,68 @@ def get_private_entity_names() -> set[str]:
     return names
 
 
+def is_private_post(post: Any) -> bool:
+    """Return True when a post carries the `private: true` flag.
+
+    Posts predate the flag, so an absent key means public.
+    """
+    return isinstance(post, dict) and post.get("private") is True
+
+
+def public_posts(posts: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    """Drop the posts flagged private from a group's post list."""
+    return [post for post in posts if not is_private_post(post)]
+
+
+def parse_discovered(value: Any) -> datetime | None:
+    """Parse a post `discovered` stamp, with or without microseconds.
+
+    Returns None instead of raising: a single malformed stamp must not take
+    down a whole aggregate.
+    """
+    if not isinstance(value, str):
+        return None
+    for fmt in ("%Y-%m-%d %H:%M:%S.%f", "%Y-%m-%d %H:%M:%S"):
+        try:
+            return datetime.strptime(value, fmt)
+        except ValueError:
+            continue
+    return None
+
+
+def iter_posts(
+    include_private: bool = False, red: valkey.Valkey | None = None
+) -> Iterator[tuple[str, dict[str, Any]]]:
+    """Yield `(group_name, post)` over the whole post database.
+
+    Unless `include_private`, posts belonging to a group/market flagged
+    private and posts flagged private themselves are skipped. This is the
+    single filtering point every public aggregate should go through.
+    """
+    if red is None:
+        red = valkey.Valkey(unix_socket_path=get_socket_path("cache"), db=DB_POSTS)
+    private_names: set[str] = set() if include_private else get_private_entity_names()
+    for key in red.keys():  # type: ignore[union-attr]
+        group_name = key.decode() if isinstance(key, (bytes, bytearray)) else str(key)
+        if not include_private and group_name.lower() in private_names:
+            continue
+        raw = red.get(key)
+        if not raw:
+            continue
+        try:
+            entries = json.loads(raw)  # type: ignore[arg-type]
+        except Exception:
+            continue
+        if not isinstance(entries, list):
+            continue
+        for entry in entries:
+            if not isinstance(entry, dict):
+                continue
+            if not include_private and is_private_post(entry):
+                continue
+            yield group_name, entry
+
+
 def gcount(posts: list[dict[str, Any]]) -> dict[str, int]:
     group_counts: dict[str, int] = {}
     for post in posts:
@@ -72,13 +135,10 @@ def gcount(posts: list[dict[str, Any]]) -> dict[str, int]:
     return group_counts
 
 
-def postcount() -> int:
-    post_count = 0
-    red = valkey.Valkey(unix_socket_path=get_socket_path("cache"), db=DB_POSTS)
-    for group in red.keys():  # type: ignore[union-attr]
-        grouppost = json.loads(red.get(group))  # type: ignore[arg-type]
-        post_count += len(grouppost)
-    return post_count
+def postcount(include_private: bool = False) -> int:
+    """Total number of posts. Private groups and private posts are excluded
+    unless the caller is entitled to see them."""
+    return sum(1 for _ in iter_posts(include_private))
 
 
 def groupcount(db: int) -> int:
@@ -150,55 +210,36 @@ def hostcountadmin(db: int) -> int:
     return len(set(hosts))
 
 
-def postssince(days: int) -> int:
+def postssince(days: int, include_private: bool = False) -> int:
     """returns the number of posts within the last x days"""
+    cutoff = datetime.now() - timedelta(days=days)
     post_count = 0
-    red = valkey.Valkey(unix_socket_path=get_socket_path("cache"), db=DB_POSTS)
-    groups = red.keys()
-    for entry in groups:  # type: ignore[union-attr]
-        posts = json.loads(red.get(entry))  # type: ignore[arg-type]
-        for post in posts:
-            try:
-                datetime_object = datetime.strptime(post["discovered"], "%Y-%m-%d %H:%M:%S.%f")
-            except Exception:
-                datetime_object = datetime.strptime(post["discovered"], "%Y-%m-%d %H:%M:%S")
-            if datetime_object > datetime.now() - timedelta(days=days):
-                post_count += 1
+    for _, post in iter_posts(include_private):
+        discovered = parse_discovered(post.get("discovered"))
+        if discovered is not None and discovered > cutoff:
+            post_count += 1
     return post_count
 
 
-def poststhisyear() -> int:
+def poststhisyear(include_private: bool = False) -> int:
     """returns the number of posts within the current year"""
     current_year = datetime.now().year
     post_count = 0
-    red = valkey.Valkey(unix_socket_path=get_socket_path("cache"), db=DB_POSTS)
-    groups = red.keys()
-    for entry in groups:  # type: ignore[union-attr]
-        posts = json.loads(red.get(entry))  # type: ignore[arg-type]
-        for post in posts:
-            try:
-                datetime_object = datetime.strptime(post["discovered"], "%Y-%m-%d %H:%M:%S.%f")
-            except Exception:
-                datetime_object = datetime.strptime(post["discovered"], "%Y-%m-%d %H:%M:%S")
-            if datetime_object.year == current_year:
-                post_count += 1
+    for _, post in iter_posts(include_private):
+        discovered = parse_discovered(post.get("discovered"))
+        if discovered is not None and discovered.year == current_year:
+            post_count += 1
     return post_count
 
 
-def postslast24h() -> int:
+def postslast24h(include_private: bool = False) -> int:
     """returns the number of posts within the last 24 hours"""
+    cutoff = datetime.now() - timedelta(hours=24)
     post_count = 0
-    red = valkey.Valkey(unix_socket_path=get_socket_path("cache"), db=DB_POSTS)
-    groups = red.keys()
-    for entry in groups:  # type: ignore[union-attr]
-        posts = json.loads(red.get(entry))  # type: ignore[arg-type]
-        for post in posts:
-            try:
-                datetime_object = datetime.strptime(post["discovered"], "%Y-%m-%d %H:%M:%S.%f")
-            except Exception:
-                datetime_object = datetime.strptime(post["discovered"], "%Y-%m-%d %H:%M:%S")
-            if datetime_object > datetime.now() - timedelta(hours=24):
-                post_count += 1
+    for _, post in iter_posts(include_private):
+        discovered = parse_discovered(post.get("discovered"))
+        if discovered is not None and discovered > cutoff:
+            post_count += 1
     return post_count
 
 
@@ -258,24 +299,16 @@ def currentmonthstr() -> str:
     return datetime.now().strftime("%B").lower()
 
 
-def mounthlypostcount() -> int:
+def mounthlypostcount(include_private: bool = False) -> int:
     """
     returns the number of posts within the current month
     """
+    month_first_day = datetime.now().replace(day=1, hour=0, minute=0, second=0, microsecond=0)
     post_count = 0
-    red = valkey.Valkey(unix_socket_path=get_socket_path("cache"), db=DB_POSTS)
-    groups = red.keys()
-    date_today = datetime.now()
-    month_first_day = date_today.replace(day=1, hour=0, minute=0, second=0, microsecond=0)
-    for entry in groups:  # type: ignore[union-attr]
-        posts = json.loads(red.get(entry))  # type: ignore[arg-type]
-        for post in posts:
-            try:
-                datetime_object = datetime.strptime(post["discovered"], "%Y-%m-%d %H:%M:%S.%f")
-            except Exception:
-                datetime_object = datetime.strptime(post["discovered"], "%Y-%m-%d %H:%M:%S")
-            if datetime_object > month_first_day:
-                post_count += 1
+    for _, post in iter_posts(include_private):
+        discovered = parse_discovered(post.get("discovered"))
+        if discovered is not None and discovered > month_first_day:
+            post_count += 1
     return post_count
 
 

@@ -20,21 +20,31 @@ from ransomlook.default import (
 )
 from ransomlook.sharedutils import (
     currentmonthstr,
-    get_private_entity_names,
     groupcount,
     hostcount,
     hostcountadmin,
     hostcountchat,
     hostcountdls,
     hostcountfs,
+    iter_posts,
     mounthlypostcount,
     onlinecount,
+    parse_discovered,
     parsercount,
     postcount,
     postslast24h,
     postssince,
     poststhisyear,
+    public_posts,
 )
+
+
+def _can_see_private() -> bool:
+    """Whether this caller may see entries flagged private."""
+    from web.helpers import viewer_can_see_private  # type: ignore[import-not-found]
+
+    return bool(viewer_can_see_private(request))
+
 
 api = Namespace("StatsAPI", description="Statistics, trending and search API", path="/api")
 
@@ -112,6 +122,7 @@ health_entry_model = api.model(
 class StatsEndpoint(Resource):  # type: ignore[misc]
     @api.response(200, "Platform statistics", stats_model)  # type: ignore[untyped-decorator]
     def get(self) -> dict[str, Any]:
+        show_private = _can_see_private()
         return {
             "groups": groupcount(DB_GROUPS),
             "groups_locations": hostcount(DB_GROUPS),
@@ -123,12 +134,12 @@ class StatsEndpoint(Resource):  # type: ignore[misc]
             "markets": groupcount(DB_MARKETS),
             "markets_locations": hostcount(DB_MARKETS),
             "markets_online": onlinecount(DB_MARKETS),
-            "posts_total": postcount(),
-            "posts_24h": postslast24h(),
-            "posts_month": mounthlypostcount(),
+            "posts_total": postcount(show_private),
+            "posts_24h": postslast24h(show_private),
+            "posts_month": mounthlypostcount(show_private),
             "posts_month_label": currentmonthstr(),
-            "posts_90d": postssince(90),
-            "posts_year": poststhisyear(),
+            "posts_90d": postssince(90, show_private),
+            "posts_year": poststhisyear(show_private),
             "year": datetime.now().year,
             "parsers": parsercount(),
         }
@@ -150,33 +161,16 @@ class HotEndpoint(Resource):  # type: ignore[misc]
         if days > 365:
             days = 365
 
-        red = Valkey(unix_socket_path=get_socket_path("cache"), db=DB_POSTS)
         actualdate = datetime.now() + timedelta(days=-days)
-        private_names = get_private_entity_names()
 
         posts = []
-        for key in red.keys():  # type: ignore[union-attr]
-            group_name = key.decode() if isinstance(key, (bytes, bytearray)) else str(key)
-            if group_name.lower() in private_names:
+        for group_name, entry in iter_posts(_can_see_private()):
+            dt_obj = parse_discovered(entry.get("discovered"))
+            if dt_obj is None or dt_obj <= actualdate:
                 continue
-            try:
-                entries = json.loads(red.get(key))  # type: ignore[arg-type]
-            except Exception:
-                continue
-            for entry in entries:
-                dt_obj = None
-                for fmt in ("%Y-%m-%d %H:%M:%S.%f", "%Y-%m-%d %H:%M:%S"):
-                    try:
-                        dt_obj = datetime.strptime(entry.get("discovered", ""), fmt)
-                        break
-                    except Exception:
-                        pass
-                if not dt_obj:
-                    continue
-                if dt_obj > actualdate:
-                    e = dict(entry)
-                    e["group_name"] = group_name
-                    posts.append(e)
+            e = dict(entry)
+            e["group_name"] = group_name
+            posts.append(e)
 
         by_group: dict[str, dict[str, Any]] = {}
         for p in posts:
@@ -216,12 +210,14 @@ class SearchEndpoint(Resource):  # type: ignore[misc]
 
         ql = query.lower()
 
+        show_private = _can_see_private()
+
         # Groups (DB=0)
         red = Valkey(unix_socket_path=get_socket_path("cache"), db=DB_GROUPS)
         groups = []
         for key in red.keys():  # type: ignore[union-attr]
             group = json.loads(red.get(key))  # type: ignore[arg-type]
-            if group.get("private"):
+            if group.get("private") and not show_private:
                 continue
             name = key.decode()
             meta = group.get("meta") or ""
@@ -234,7 +230,7 @@ class SearchEndpoint(Resource):  # type: ignore[misc]
         markets = []
         for key in red.keys():  # type: ignore[union-attr]
             group = json.loads(red.get(key))  # type: ignore[arg-type]
-            if group.get("private"):
+            if group.get("private") and not show_private:
                 continue
             name = key.decode()
             meta = group.get("meta") or ""
@@ -243,20 +239,13 @@ class SearchEndpoint(Resource):  # type: ignore[misc]
         markets.sort(key=lambda x: x["name"].lower())
 
         # Posts (DB=2)
-        private_names = get_private_entity_names()
-        red = Valkey(unix_socket_path=get_socket_path("cache"), db=DB_POSTS)
         found_posts = []
-        for key in red.keys():  # type: ignore[union-attr]
-            group_name = key.decode()
-            if group_name.lower() in private_names:
-                continue
-            entries = json.loads(red.get(key))  # type: ignore[arg-type]
-            for entry in entries:
-                title = (entry.get("post_title") or "").lower()
-                desc = (entry.get("description") or "").lower()
-                if ql in title or ql in desc:
-                    entry["group_name"] = group_name
-                    found_posts.append(entry)
+        for group_name, entry in iter_posts(show_private):
+            title = (entry.get("post_title") or "").lower()
+            desc = (entry.get("description") or "").lower()
+            if ql in title or ql in desc:
+                entry["group_name"] = group_name
+                found_posts.append(entry)
         found_posts.sort(key=lambda x: x.get("discovered", ""), reverse=True)
 
         # Leaks (DB=4)
@@ -333,7 +322,7 @@ class HealthEndpoint(Resource):  # type: ignore[misc]
                     if entry_raw:
                         try:
                             entry_data = json.loads(entry_raw)  # type: ignore[arg-type]
-                            if entry_data.get("private") is True:
+                            if entry_data.get("private") is True and not _can_see_private():
                                 api.abort(404, "No health data found for this group")
                         except ValueError:
                             pass
@@ -418,13 +407,15 @@ def _resolve_key(red: Valkey, name: str) -> Any:
     return None, None
 
 
-def _posts_in_window(red_posts: Valkey, key: Any, days: int) -> int:
+def _posts_in_window(red_posts: Valkey, key: Any, days: int, include_private: bool = False) -> int:
     if not key or key not in red_posts.keys():  # type: ignore[operator]
         return 0
     try:
         posts = json.loads(red_posts.get(key))  # type: ignore[arg-type]
     except Exception:
         return 0
+    if not include_private:
+        posts = public_posts(posts)
     now = datetime.now()
     cutoff = now - timedelta(days=days)
     count = 0
@@ -484,12 +475,14 @@ def _compute_entry(kind: str, name: str) -> dict[str, Any] | None:
     except Exception:
         return None
 
-    if entry.get("private") is True:
+    show_private = _can_see_private()
+    if entry.get("private") is True and not show_private:
         return None
 
     entry["name"] = entry.get("name") or real_name
     locs = entry.get("locations") or []
-    locs = [l for l in locs if not l.get("private")]
+    if not show_private:
+        locs = [l for l in locs if not l.get("private")]
     visible = [l for l in locs if not l.get("fs") and not l.get("chat") and not l.get("admin")] or locs
 
     try:
@@ -499,9 +492,9 @@ def _compute_entry(kind: str, name: str) -> dict[str, Any] | None:
 
     return {
         "name": entry["name"],
-        "posts7": _posts_in_window(red_posts, key, 7),
-        "posts30": _posts_in_window(red_posts, key, 30),
-        "posts365": _posts_in_window(red_posts, key, 365),
+        "posts7": _posts_in_window(red_posts, key, 7, show_private),
+        "posts30": _posts_in_window(red_posts, key, 30, show_private),
+        "posts365": _posts_in_window(red_posts, key, 365, show_private),
         "mirrors_total": len(visible),
         "mirrors_up": sum(1 for l in visible if l.get("available") in (True, 1, "1")),
         "captcha": entry.get("captcha", False),
