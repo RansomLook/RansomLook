@@ -80,6 +80,7 @@ from ransomlook.sharedutils import (
     createfile,
     cryptostats,
     currentmonthstr,
+    get_private_note_slugs,
     groupcount,
     hostcount,
     hostcountadmin,
@@ -89,6 +90,8 @@ from ransomlook.sharedutils import (
     iter_posts,
     leakcount,
     mounthlypostcount,
+    norm_group_slug,
+    note_is_private,
     notecount,
     onlinecount,
     parse_discovered,
@@ -146,10 +149,7 @@ def _norm_for_sort(s: str) -> str:
 
 
 def _norm_group(s: str) -> str:
-    s = (s or "").strip().lower().replace(" ", "-").replace("_", "-")
-    s = re.sub(r"[^a-z0-9\-]+", "", s)
-    s = re.sub(r"-+", "-", s).strip("-")
-    return s
+    return norm_group_slug(s)
 
 
 class App(Flask):
@@ -2859,6 +2859,9 @@ def notes():  # type: ignore[no-untyped-def]
             canon_to_aliases.setdefault(c, set()).update(x.decode() for x in als)
 
     canons = sorted({alias_to_canon.get(s, s) for s in found})
+    if not can_see_private():
+        private_slugs = get_private_note_slugs()
+        canons = [c for c in canons if c not in private_slugs]
 
     data = [canons[i : i + 3] for i in range(0, len(canons), 3)]
 
@@ -2876,6 +2879,9 @@ def notesdetails(name: str):  # type: ignore[no-untyped-def]
     mapped = red11.hget("alias:group", slug)
     if mapped:
         slug = mapped.decode()  # type: ignore[union-attr]
+
+    if not can_see_private() and slug in get_private_note_slugs():
+        return redirect(url_for("home"))
 
     idset_keys = [f"idx:group:{slug}:notes"]
     try:
@@ -3143,12 +3149,15 @@ def search():  # type: ignore[no-untyped-def]
             raw = pipe.execute()  # type: ignore[no-untyped-call]
 
             ql = query.lower()  # type: ignore[union-attr]
+            private_slugs = set() if can_see_private() else get_private_note_slugs()
             for b in raw:
                 if not b:
                     continue
                 try:
                     n = json.loads(b)
                 except Exception:
+                    continue
+                if note_is_private(n, private_slugs):
                     continue
                 title = (n.get("title") or "").lower()
                 content = (n.get("content") or "").lower()
@@ -6151,15 +6160,27 @@ def compare():  # type: ignore[no-untyped-def]
     except Exception:
         red_health = None
 
-    # listes pour les selects (Choices.js)
-    try:
-        choices_groups = sorted([k.decode() for k in red_groups.keys()])  # type: ignore[union-attr]
-    except Exception:
-        choices_groups = []
-    try:
-        choices_markets = sorted([k.decode() for k in red_markets.keys()])  # type: ignore[union-attr]
-    except Exception:
-        choices_markets = []
+    show_private = can_see_private()
+
+    def _choices(red: Valkey) -> list[str]:
+        """Names offered in the pickers, minus the private ones for anonymous
+        visitors — listing a private group's name is already a disclosure."""
+        out = []
+        try:
+            for key in red.keys():  # type: ignore[union-attr]
+                if not show_private:
+                    try:
+                        if json.loads(red.get(key)).get("private") is True:  # type: ignore[arg-type]
+                            continue
+                    except Exception:
+                        continue
+                out.append(key.decode())
+        except Exception:
+            return []
+        return sorted(out)
+
+    choices_groups = _choices(red_groups)
+    choices_markets = _choices(red_markets)
 
     def load_entry(_kind: str, name: str) -> tuple[Any, Any]:
         if not name:
@@ -6188,7 +6209,7 @@ def compare():  # type: ignore[no-untyped-def]
                 posts = json.loads(red_posts.get(key))  # type: ignore[arg-type]
             except Exception:
                 posts = []
-        if not can_see_private():
+        if not show_private:
             posts = public_posts(posts)
         now = dt.now()
         cutoff = now - timedelta(days=days)
@@ -6239,8 +6260,13 @@ def compare():  # type: ignore[no-untyped-def]
         key, entry = load_entry(_kind, name)
         if not entry:
             return None
+        if entry.get("private") is True and not show_private:
+            # Private locations were already filtered here, but the entity's
+            # own flag was never checked: ?a=<private-group> still returned
+            # its post counts, mirror totals and uptime.
+            return None
         locs = entry.get("locations", []) or []
-        if not current_user.is_authenticated:
+        if not show_private:
             locs = [l for l in locs if not l.get("private")]
         # pour coller aux DLS, on affiche les “URLs principales”
         visible = [l for l in locs if not l.get("fs") and not l.get("chat") and not l.get("admin")] or locs

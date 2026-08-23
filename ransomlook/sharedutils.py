@@ -2,6 +2,7 @@
 
 import glob
 import json
+import re
 import sys
 from collections.abc import Iterator
 from datetime import datetime, timedelta
@@ -61,6 +62,58 @@ def get_private_entity_names() -> set[str]:
             if data.get("private") is True:
                 names.add(key.decode().lower())
     return names
+
+
+def norm_group_slug(value: str) -> str:
+    """Slugify a group/market name the way DB_NOTES keys its indexes.
+
+    Ransom notes are stored under `idx:group:<slug>:notes`, so any privacy
+    check on notes has to compare slugs, not raw group names.
+    """
+    slug = (value or "").strip().lower().replace(" ", "-").replace("_", "-")
+    slug = re.sub(r"[^a-z0-9\-]+", "", slug)
+    slug = re.sub(r"-+", "-", slug).strip("-")
+    return slug
+
+
+def get_private_group_slugs() -> set[str]:
+    """Slugified names of the groups/markets flagged private."""
+    return {norm_group_slug(name) for name in get_private_entity_names()}
+
+
+def get_private_note_slugs() -> set[str]:
+    """Every note slug that belongs to a private group or market.
+
+    A note may be tagged with an alias rather than the canonical slug, so the
+    private set is expanded with the aliases resolving to a private group —
+    otherwise filtering on the canonical slug alone leaves the alias exposed.
+    """
+    private = get_private_group_slugs()
+    if not private:
+        return private
+    try:
+        red = valkey.Valkey(unix_socket_path=get_socket_path("cache"), db=DB_NOTES)
+        aliases = red.hgetall("alias:group") or {}
+        for alias, canon in aliases.items():  # type: ignore[union-attr]
+            if canon.decode() in private:
+                private.add(alias.decode())
+        for canon in list(private):
+            for alias in red.smembers("group:" + canon + ":aliases") or []:  # type: ignore[union-attr]
+                private.add(alias.decode())
+    except Exception:
+        pass
+    return private
+
+
+def note_is_private(note: Any, private_slugs: set[str]) -> bool:
+    """True when a note is attached to at least one private group.
+
+    Conservative on purpose: a note tagged with both a public and a private
+    group still discloses the private association, so it stays hidden.
+    """
+    if not isinstance(note, dict):
+        return False
+    return any(str(group) in private_slugs for group in (note.get("groups") or []))
 
 
 def is_private_post(post: Any) -> bool:

@@ -4,12 +4,23 @@ import json
 import re
 from typing import Any
 
+from flask import request
 from flask_restx import Namespace, Resource, fields  # type: ignore
 from valkey import Valkey
 
 from ransomlook.default import DB_NOTES, get_socket_path
+from ransomlook.sharedutils import get_private_note_slugs, note_is_private
 
 api = Namespace("NotesAPI", description="Ransom notes API", path="/api/notes")
+
+
+def _private_slugs() -> set[str]:
+    """Note slugs this caller must not see — empty when private access is granted."""
+    from web.helpers import viewer_can_see_private  # type: ignore[import-not-found]
+
+    if viewer_can_see_private(request):
+        return set()
+    return get_private_note_slugs()
 
 # ── Swagger models ──────────────────────────────────────────────────────
 
@@ -84,6 +95,8 @@ class NoteGroups(Resource):  # type: ignore[misc]
                 canon_to_aliases.setdefault(c, set()).update(x.decode() for x in als)
 
         canons = sorted({alias_to_canon.get(s, s) for s in found})
+        private_slugs = _private_slugs()
+        canons = [c for c in canons if c not in private_slugs]
 
         data = []
         for canon in canons:
@@ -115,12 +128,15 @@ class NotesRecent(Resource):  # type: ignore[misc]
         raw = pipe.execute()  # type: ignore[no-untyped-call]
 
         data = []
+        private_slugs = _private_slugs()
         for nid, b in zip(ids, raw):  # type: ignore[arg-type]
             if not b:
                 continue
             try:
                 n = json.loads(b)
             except Exception:
+                continue
+            if note_is_private(n, private_slugs):
                 continue
             data.append(
                 {
@@ -150,6 +166,9 @@ class NotesByGroup(Resource):  # type: ignore[misc]
         mapped = red.hget("alias:group", slug)
         if mapped:
             slug = mapped.decode()  # type: ignore[union-attr]
+
+        if slug in _private_slugs():
+            api.abort(404, "No notes found for this group")
 
         idset_keys = [f"idx:group:{slug}:notes"]
         try:
@@ -210,6 +229,8 @@ class NoteDetail(Resource):  # type: ignore[misc]
             n = json.loads(b)  # type: ignore[arg-type]
         except Exception:
             api.abort(500, "Malformed note data")
+        if note_is_private(n, _private_slugs()):
+            api.abort(404, "Note not found")
         return {
             "id": n.get("id"),
             "title": n.get("title") or "",
