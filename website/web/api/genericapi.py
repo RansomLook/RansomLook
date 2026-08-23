@@ -235,7 +235,7 @@ class Markets(Resource):  # type: ignore[misc]
 )
 class Groupinfo(Resource):  # type: ignore[misc]
     @api.response(200, "Array [group_object, posts_array]")  # type: ignore[untyped-decorator]
-    @api.response(404, "Group not found or private (returns [[], {}])")  # type: ignore[untyped-decorator]
+    @api.response(404, "Group not found, or private and the caller may not see it")  # type: ignore[untyped-decorator]
     def get(self, name: str) -> list[Any]:
         red = Valkey(unix_socket_path=get_socket_path("cache"), db=DB_GROUPS)
         group = {}
@@ -244,7 +244,10 @@ class Groupinfo(Resource):  # type: ignore[misc]
             if key.decode().lower() == name.lower():
                 group = json.loads(red.get(key))  # type: ignore[arg-type]
                 if group.get("private") is True and not _can_see_private():
-                    return [[], {}]
+                    # Deliberately the same answer as a name that does not
+                    # exist: a distinguishable response lets a caller
+                    # enumerate the private group names.
+                    api.abort(404, "Group not found")
 
                 if group["meta"] is not None:
                     group["meta"] = group["meta"].replace("\n", "<br/>")
@@ -279,7 +282,9 @@ class Groupinfo(Resource):  # type: ignore[misc]
                     sorted_posts = sorted(posts, key=lambda x: x["discovered"], reverse=True)
                 else:
                     sorted_posts = []
-        return [group, sorted_posts]
+                return [group, sorted_posts]
+        api.abort(404, "Group not found")
+        return []  # unreachable: api.abort raises, but it is not typed NoReturn
 
 
 # `path` rather than `string`: a victim name legitimately contains a slash
@@ -292,11 +297,11 @@ class Groupinfo(Resource):  # type: ignore[misc]
 )
 class GroupPost(Resource):  # type: ignore[misc]
     @api.response(200, "Post object", post_model)  # type: ignore[untyped-decorator]
-    @api.response(404, "Post not found (returns {})")  # type: ignore[untyped-decorator]
+    @api.response(404, "Post not found")  # type: ignore[untyped-decorator]
     def get(self, name: str, postname: str) -> dict[str, Any]:
         show_private = _can_see_private()
         if not show_private and name.lower() in get_private_entity_names():
-            return {}
+            api.abort(404, "Post not found")
         red = Valkey(unix_socket_path=get_socket_path("cache"), db=DB_POSTS)
         for key in red.keys():  # type: ignore[union-attr]
             if key.decode().lower() == name.lower():
@@ -325,7 +330,8 @@ class GroupPost(Resource):  # type: ignore[misc]
                                 post.update({"source": srcencoded})
 
                         return post
-        return {}
+        api.abort(404, "Post not found")
+        return {}  # unreachable: api.abort raises, but it is not typed NoReturn
 
 
 @api.route("/market/<string:name>")
@@ -335,7 +341,7 @@ class GroupPost(Resource):  # type: ignore[misc]
 )
 class Marketinfo(Resource):  # type: ignore[misc]
     @api.response(200, "Array [market_object, posts_array]")  # type: ignore[untyped-decorator]
-    @api.response(404, "Market not found or private (returns [[], {}])")  # type: ignore[untyped-decorator]
+    @api.response(404, "Market not found, or private and the caller may not see it")  # type: ignore[untyped-decorator]
     def get(self, name: str) -> list[Any]:
         red = Valkey(unix_socket_path=get_socket_path("cache"), db=DB_MARKETS)
         group = {}
@@ -344,7 +350,7 @@ class Marketinfo(Resource):  # type: ignore[misc]
             if key.decode().lower() == name.lower():
                 group = json.loads(red.get(key))  # type: ignore[arg-type]
                 if group.get("private") is True and not _can_see_private():
-                    return [[], {}]
+                    api.abort(404, "Market not found")
                 if group["meta"] is not None:
                     group["meta"] = group["meta"].replace("\n", "<br/>")
                 if not _can_see_private():
@@ -378,7 +384,9 @@ class Marketinfo(Resource):  # type: ignore[misc]
                     sorted_posts = sorted(posts, key=lambda x: x["discovered"], reverse=True)
                 else:
                     sorted_posts = []
-        return [group, sorted_posts]
+                return [group, sorted_posts]
+        api.abort(404, "Market not found")
+        return []  # unreachable: api.abort raises, but it is not typed NoReturn
 
 
 _EXPORT_DBS = {
