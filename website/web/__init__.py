@@ -1209,11 +1209,15 @@ def feeds():  # type: ignore[no-untyped-def]
 
     recentposts = []
     for post in sorted_posts:
-        # Convert 'discovered' to UTC datetime and format as RFC 2822
-        if "discovered" in post:
-            discovered_time = dt.strptime(post["discovered"].split(".")[0], "%Y-%m-%d %H:%M:%S")
+        # Convert 'discovered' to UTC datetime and format as RFC 2822.
+        # A stamp that cannot be parsed skips the entry instead of raising:
+        # one malformed record used to take the whole feed down with a 500.
+        discovered_time = parse_discovered(post.get("discovered"))
+        if discovered_time is not None:
             discovered_utc = discovered_time.replace(tzinfo=timezone.utc)
             post["discovered"] = discovered_utc.strftime("%a, %d %b %Y %T GMT")
+        elif "discovered" in post:
+            continue
         else:
             # Fallback to current UTC time if 'discovered' is missing
             post["discovered"] = dt.now(timezone.utc).strftime("%a, %d %b %Y %T GMT")

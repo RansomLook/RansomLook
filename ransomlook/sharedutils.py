@@ -5,7 +5,7 @@ import json
 import re
 import sys
 from collections.abc import Iterator
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from os.path import basename, dirname, isfile, join
 from typing import Any
 from urllib.parse import urlparse, urlsplit
@@ -169,20 +169,44 @@ def public_posts(posts: list[dict[str, Any]]) -> list[dict[str, Any]]:
     return [post for post in posts if not is_private_post(post)]
 
 
-def parse_discovered(value: Any) -> datetime | None:
-    """Parse a post `discovered` stamp, with or without microseconds.
+def _naive_utc(parsed: datetime) -> datetime:
+    """Drop the timezone, converting to UTC first, so results stay comparable
+    with the naive `datetime.now()` the callers use."""
+    if parsed.tzinfo is not None:
+        return parsed.astimezone(timezone.utc).replace(tzinfo=None)
+    return parsed
 
-    Returns None instead of raising: a single malformed stamp must not take
-    down a whole aggregate.
+
+def parse_discovered(value: Any) -> datetime | None:
+    """Parse a post `discovered` stamp.
+
+    Several shapes occur in the wild: with microseconds (what `appender`
+    writes), without, date-only, and ISO 8601 — the admin edit form takes
+    `discovered` as free text, so "2026-08-11" can be stored. All are accepted
+    so those posts still count in aggregates, matching `/api/posts` (which
+    parses with `datetime.fromisoformat`) and `tools/checkdb.py`.
+
+    Always returns a naive UTC datetime, since callers compare against a naive
+    `datetime.now()`. Returns None instead of raising: a single malformed stamp
+    must not take down a whole aggregate.
     """
+    if isinstance(value, datetime):
+        return _naive_utc(value)
     if not isinstance(value, str):
         return None
-    for fmt in ("%Y-%m-%d %H:%M:%S.%f", "%Y-%m-%d %H:%M:%S"):
+    text = value.strip()
+    if not text:
+        return None
+    for fmt in ("%Y-%m-%d %H:%M:%S.%f", "%Y-%m-%d %H:%M:%S", "%Y-%m-%d"):
         try:
-            return datetime.strptime(value, fmt)
+            return datetime.strptime(text, fmt)
         except ValueError:
             continue
-    return None
+    try:
+        # ISO 8601, including the trailing Z that fromisoformat rejects before 3.11
+        return _naive_utc(datetime.fromisoformat(text.replace("Z", "+00:00")))
+    except ValueError:
+        return None
 
 
 def iter_posts(
