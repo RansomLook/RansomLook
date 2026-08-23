@@ -64,6 +64,25 @@ def get_private_entity_names() -> set[str]:
     return names
 
 
+_CHAIN_RE = re.compile(r"^[a-z0-9][a-z0-9-]{0,31}$")
+# Every one of the 11k+ addresses in production is strictly [A-Za-z0-9]; ':' and
+# '-' are tolerated for the prefixed forms some chains use (CashAddr and the
+# like) so a future importer is not rejected. Nothing here can close a quote,
+# open a tag or a call: an address is rendered into HTML and into Redis keys,
+# and ransomwhe.re is an untrusted upstream.
+_CRYPTO_ADDR_RE = re.compile(r"^[A-Za-z0-9][A-Za-z0-9:_-]{0,127}$")
+
+
+def is_valid_chain(value: Any) -> bool:
+    """True when `value` is usable as a blockchain name."""
+    return isinstance(value, str) and bool(_CHAIN_RE.match(value))
+
+
+def is_valid_crypto_address(value: Any) -> bool:
+    """True when `value` is safe to store and render as a wallet address."""
+    return isinstance(value, str) and bool(_CRYPTO_ADDR_RE.match(value))
+
+
 def is_private_entity(name: str) -> bool:
     """True when the group or market `name` is flagged private.
 

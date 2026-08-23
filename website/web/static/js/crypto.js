@@ -111,6 +111,15 @@ document.addEventListener('click', function(e) {
   rows.forEach(r => tbody.appendChild(r));
 });
 
+/* Wallet CSV buttons: the address is read from data-* instead of being
+   interpolated into an inline handler, so it is never parsed as code. */
+document.addEventListener('click', function(e) {
+  const btn = e.target.closest('.export-wallet');
+  if (!btn) return;
+  e.stopPropagation();
+  exportWalletCSV(btn.dataset.chain || '', btn.dataset.address || '');
+});
+
 /* ── Filters ── */
 function applyFilters(btn) {
   const card = btn.closest('.table-card');

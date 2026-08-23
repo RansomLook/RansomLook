@@ -87,6 +87,8 @@ from ransomlook.sharedutils import (
     hostcountchat,
     hostcountdls,
     hostcountfs,
+    is_valid_chain,
+    is_valid_crypto_address,
     iter_posts,
     leakcount,
     mounthlypostcount,
@@ -5159,6 +5161,14 @@ def admin_crypto_new(group):  # type: ignore[no-untyped-def]
 
         if not addr:
             flash(_("Address is required."), "danger")
+            return redirect(url_for("admin_crypto_new", group=group))
+
+        if not is_valid_crypto_address(addr):
+            flash(_("Invalid address: letters, digits, ':', '_' and '-' only."), "danger")
+            return redirect(url_for("admin_crypto_new", group=group))
+
+        if not is_valid_chain(chain):
+            flash(_("Invalid blockchain name: lowercase letters, digits and '-' only."), "danger")
             return redirect(url_for("admin_crypto_new", group=group))
 
         try:

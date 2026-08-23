@@ -11,6 +11,7 @@ from valkey import Valkey
 
 from ransomlook.default import DB_CRYPTO
 from ransomlook.default.config import get_socket_path
+from ransomlook.sharedutils import is_valid_chain, is_valid_crypto_address
 from ransomlook.default.logging import get_logger
 
 logger = get_logger("cryptocur")
@@ -144,6 +145,16 @@ def main() -> int:
         item = dict(row)
         item["address"] = str(row.get("address")).strip()
         item["blockchain"] = str(row.get("blockchain") or "unknown").strip().lower()
+        # ransomwhe.re is a public, crowd-sourced feed: anyone able to get a
+        # record in there would otherwise have its address written verbatim to
+        # Redis and rendered on a public page.
+        if not is_valid_crypto_address(item["address"]) or not is_valid_chain(item["blockchain"]):
+            logger.warning(
+                "skipping record with unusable address/chain: %r / %r",
+                item["address"][:80],
+                item["blockchain"][:40],
+            )
+            continue
         txs = item.get("transactions") or []
         # ensure every tx has a source + normalize satoshis to BTC
         chain_name = item["blockchain"]

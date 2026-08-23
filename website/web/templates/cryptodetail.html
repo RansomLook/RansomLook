@@ -68,7 +68,10 @@
               {% endif %}
               <span class="count">{{ ngettext('%(n)s tx', '%(n)s txs', tx_count, n=tx_count) }}</span>
               {% if tx_count > 0 %}
-                <button class="btn btn-secondary" style="padding:1px 8px;font-size:.75rem;margin-left:4px;" onclick="event.stopPropagation();exportWalletCSV('{{ chain }}','{{ crypto['address'] }}')" title="{{ _('Export CSV') }}">{{ _('CSV') }}</button>
+                {# data-* rather than an onclick argument: the handler is a JS string context,
+                   where the HTML parser decodes Jinja's &#39; back to a quote before the JS
+                   parser sees it, so autoescaping does not protect the literal. #}
+                <button class="btn btn-secondary export-wallet" style="padding:1px 8px;font-size:.75rem;margin-left:4px;" data-chain="{{ chain }}" data-address="{{ crypto['address'] }}" title="{{ _('Export CSV') }}">{{ _('CSV') }}</button>
               {% endif %}
             </summary>
 
