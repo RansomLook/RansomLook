@@ -44,7 +44,7 @@ import valkey
 
 from .default import DB_POSTS, DB_TORRENT_HEALTH, get_socket_path
 from .default.config import get_config
-from .sharedutils import escape_glob
+from .sharedutils import escape_glob, get_private_entity_names, is_private_post
 
 logger = logging.getLogger(__name__)
 
@@ -1143,6 +1143,48 @@ def purge_dead(now: datetime | None = None) -> int:
     return removed
 
 
+def redact_private_groups(payload: Any, private_names: set[str]) -> Any:
+    """Strip private group names out of a torrent payload.
+
+    Removes them from every ``groups`` list, drops any entry left with none
+    (its only link was to a private entity), and keeps ``group_count`` in step.
+    `private_names` holds lowercase names; pass an empty set for a caller
+    entitled to see private entries and the payload comes back untouched.
+
+    The mechanism lives here, the policy in the web layer: the CLI tools must
+    keep seeing everything.
+    """
+    if not private_names:
+        return payload
+
+    def visible(groups: Any) -> list[Any]:
+        return [g for g in (groups or []) if str(g).lower() not in private_names]
+
+    def walk(node: Any) -> Any:
+        if isinstance(node, list):
+            out = []
+            for item in node:
+                red = walk(item)
+                if red is not None:
+                    out.append(red)
+            return out
+        if not isinstance(node, dict):
+            return node
+        entry = dict(node)
+        if "groups" in entry:
+            kept = visible(entry.get("groups"))
+            if entry.get("groups") and not kept:
+                return None  # only ever linked to private entities
+            entry["groups"] = kept
+            if "group_count" in entry:
+                entry["group_count"] = len(kept)
+        if isinstance(entry.get("torrents"), list):
+            entry["torrents"] = [t for t in (walk(t) for t in entry["torrents"]) if t is not None]
+        return entry
+
+    return walk(payload)
+
+
 # ─── Collecting magnets from posts ─────────────────────────────────────
 
 
@@ -1152,6 +1194,10 @@ def collect_magnets() -> dict[str, dict[str, Any]]:
     Skips entries whose magnet cannot be parsed.
     """
     posts_r = valkey.Valkey(unix_socket_path=get_socket_path("cache"), db=DB_POSTS)
+    # Private groups/markets and private posts never enter the swarm database:
+    # every torrent endpoint is public, so a magnet collected here would publish
+    # the entity's name and the torrent's name.
+    private_names = get_private_entity_names()
     out: dict[str, dict[str, Any]] = {}
     for key in posts_r.scan_iter():
         try:
@@ -1164,9 +1210,11 @@ def collect_magnets() -> dict[str, dict[str, Any]]:
             continue
         if not isinstance(posts, list):
             continue
+        if group.lower() in private_names:
+            continue
         for p in posts:
             mag = p.get("magnet") if isinstance(p, dict) else None
-            if not mag:
+            if not mag or is_private_post(p):
                 continue
             try:
                 atp = lt.parse_magnet_uri(mag)
@@ -1186,7 +1234,7 @@ def collect_magnets() -> dict[str, dict[str, Any]]:
     for meta_key in th_r.scan_iter(match="torrent_health:meta:*"):
         ih = meta_key.decode().split(":", 2)[2]
         meta = get_meta(ih) or {}
-        meta_groups = [g for g in (meta.get("groups") or []) if g]
+        meta_groups = [g for g in (meta.get("groups") or []) if g and str(g).lower() not in private_names]
         meta_magnets = [m for m in (meta.get("magnets") or []) if m]
         if not meta_groups or not meta_magnets:
             continue

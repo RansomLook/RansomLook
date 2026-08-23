@@ -15,6 +15,21 @@ from flask_restx import Namespace, Resource, fields  # type: ignore
 api = Namespace("TorrentHealth", description="Torrent swarm health, peer enrichment and IP/ASN pivot", path="/api/torrent")
 
 
+def _private_names() -> set[str]:
+    """Group/market names this caller must not see in a torrent payload.
+
+    Every route in this namespace is unauthenticated, and a swarm entry carries
+    the names of the groups it belongs to. Returns an empty set — a no-op for
+    the redactor — when the caller is entitled to private entries.
+    """
+    from ransomlook.sharedutils import get_private_entity_names
+    from web.helpers import viewer_can_see_private  # type: ignore[import-not-found]
+
+    if viewer_can_see_private(request):
+        return set()
+    return get_private_entity_names()
+
+
 # ── Swagger models ──────────────────────────────────────────────────────
 
 top_ip_model = api.model("TopIp", {
@@ -79,6 +94,7 @@ class HealthList(Resource):  # type: ignore[misc]
                 if query not in hay:
                     continue
             rows.append(meta)
+        rows = [r for r in th.redact_private_groups(rows, _private_names()) if r]
         rows.sort(key=lambda r: (-int(r.get("last_peers_count") or 0), r.get("name") or ""))
         total = len(rows)
         start = (page - 1) * per_page
@@ -97,8 +113,9 @@ class HealthList(Resource):  # type: ignore[misc]
 class HealthDetail(Resource):  # type: ignore[misc]
     def get(self, infohash: str) -> Any:
         from ransomlook import torrent_health as th
-        meta = th.get_meta(infohash)
+        meta = th.redact_private_groups(th.get_meta(infohash), _private_names())
         if not meta:
+            # also covers a swarm whose only links were to private entities
             return {"error": "unknown infohash"}, 404
         try:
             limit = min(200, max(1, int(request.args.get("history", "50"))))
@@ -180,7 +197,10 @@ class TopCrossGroup(Resource):  # type: ignore[misc]
             limit = min(500, max(1, int(request.args.get("limit", "50"))))
         except ValueError:
             limit = 50
-        results = th.get_top_cross_group_ips(limit=limit)
+        results = [
+            r for r in th.redact_private_groups(th.get_top_cross_group_ips(limit=limit), _private_names())
+            if r and int(r.get("group_count") or 0) >= 2
+        ]
         return _csv_or_json({"results": results}, request.args.get("format"), "cross_group.csv")
 
 
@@ -194,7 +214,7 @@ class TopCrossGroup(Resource):  # type: ignore[misc]
 class IpDetail(Resource):  # type: ignore[misc]
     def get(self, ip: str) -> Any:
         from ransomlook import torrent_health as th
-        detail = th.get_ip_detail(ip.strip())
+        detail = th.redact_private_groups(th.get_ip_detail(ip.strip()), _private_names())
         if not detail.get("torrents") and not detail.get("enrichment"):
             return detail, 404
         return _csv_or_json(detail, request.args.get("format"), f"ip_{ip}.csv", csv_field="torrents")
@@ -224,7 +244,7 @@ class IpTimeline(Resource):  # type: ignore[misc]
 class AsnDetail(Resource):  # type: ignore[misc]
     def get(self, asn: str) -> Any:
         from ransomlook import torrent_health as th
-        detail = th.get_asn_detail(asn.strip())
+        detail = th.redact_private_groups(th.get_asn_detail(asn.strip()), _private_names())
         if not detail.get("ips") and not detail.get("torrents"):
             return detail, 404
         return _csv_or_json(detail, request.args.get("format"), f"asn_{asn}.csv", csv_field="torrents")

@@ -80,6 +80,7 @@ from ransomlook.sharedutils import (
     createfile,
     cryptostats,
     currentmonthstr,
+    get_private_entity_names,
     get_private_note_slugs,
     groupcount,
     hostcount,
@@ -3526,7 +3527,7 @@ def api_torrent_refresh(infohash: str):  # type: ignore[no-untyped-def]
     # Synchronous mode for scripted callers (LEA export workflows).
     if request.args.get("wait") == "1":
         thread.join(timeout=90)
-        meta = th.get_meta(infohash)
+        meta = th.redact_private_groups(th.get_meta(infohash), _torrent_private_names())
         history = th.get_history(infohash, limit=1)
         return jsonify({
             "status": "done" if not thread.is_alive() else "running",
@@ -3565,14 +3566,24 @@ def api_enrich_ip_bulk():  # type: ignore[no-untyped-def]
 # website/web/api/torrentapi.py so they show up on /doc.
 
 
+def _torrent_private_names() -> set[str]:
+    """Group/market names to strip from torrent payloads for this caller.
+
+    The /torrent-health pages are unauthenticated and a swarm entry names the
+    groups it belongs to. Empty set = no redaction, for an entitled caller.
+    """
+    return set() if can_see_private() else get_private_entity_names()
+
+
 @app.route("/torrent-health")
 def torrent_health_list():  # type: ignore[no-untyped-def]
     from ransomlook import torrent_health as th
     from datetime import datetime, timedelta, timezone
 
     rows = []
+    _private = _torrent_private_names()
     for ih in th.list_infohashes():
-        meta = th.get_meta(ih)
+        meta = th.redact_private_groups(th.get_meta(ih), _private)
         if meta:
             rows.append(meta)
     rows.sort(key=lambda r: (-int(r.get("last_peers_count") or 0), r.get("name") or ""))
@@ -3618,8 +3629,9 @@ def torrent_health_list():  # type: ignore[no-untyped-def]
 def torrent_health_detail(infohash: str):  # type: ignore[no-untyped-def]
     from ransomlook import torrent_health as th
 
-    meta = th.get_meta(infohash)
+    meta = th.redact_private_groups(th.get_meta(infohash), _torrent_private_names())
     if not meta:
+        # also covers a swarm whose only links were to private entities
         flash(_("Unknown infohash"), "error")
         return redirect(url_for("torrent_health_list"))
     history = th.get_history(infohash, limit=180)
@@ -3663,7 +3675,10 @@ def torrent_health_pivot():  # type: ignore[no-untyped-def]
         top_ips_seed=top_ips_seed,
         top_asn=top_asn,
         top_asn_seed=top_asn_seed,
-        cross_group=th.get_top_cross_group_ips(limit=50),
+        cross_group=[
+            r for r in th.redact_private_groups(th.get_top_cross_group_ips(limit=50), _torrent_private_names())
+            if r and int(r.get("group_count") or 0) >= 2
+        ],
         days=days,
     )
 
@@ -3672,7 +3687,7 @@ def torrent_health_pivot():  # type: ignore[no-untyped-def]
 def torrent_health_ip_detail(ip: str):  # type: ignore[no-untyped-def]
     from ransomlook import torrent_health as th
 
-    detail = th.get_ip_detail(ip.strip())
+    detail = th.redact_private_groups(th.get_ip_detail(ip.strip()), _torrent_private_names())
     if not detail.get("torrents") and not detail.get("enrichment"):
         flash(_("No data for IP %(ip)r", ip=ip), "error")
         return redirect(url_for("torrent_health_pivot"))
@@ -3684,7 +3699,7 @@ def torrent_health_ip_detail(ip: str):  # type: ignore[no-untyped-def]
 def torrent_health_asn_detail(asn: str):  # type: ignore[no-untyped-def]
     from ransomlook import torrent_health as th
 
-    detail = th.get_asn_detail(asn.strip())
+    detail = th.redact_private_groups(th.get_asn_detail(asn.strip()), _torrent_private_names())
     if not detail.get("ips") and not detail.get("torrents"):
         flash(_("No data for ASN %(asn)r", asn=asn), "error")
         return redirect(url_for("torrent_health_pivot"))
