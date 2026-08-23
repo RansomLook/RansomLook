@@ -33,17 +33,32 @@ from ransomlook.sharedutils import (
 api = Namespace("GenericAPI", description="Generic Ransomlook API", path="/api")
 
 
+def _auth_helpers() -> Any:
+    """Lazy handle on web.helpers.
+
+    Imported inside the call rather than at module scope to avoid a cycle
+    with the app package. Kept as the single import site for the module:
+    mypy only reports import-not-found on the first import of a module per
+    file, so a second one would carry an ignore that is dead today and
+    required again the moment the functions are reordered.
+    """
+    from web import helpers  # type: ignore[import-not-found]
+
+    return helpers
+
+
 def _check_export_auth() -> bool:
     """Check if the request has valid auth for export: admin session, legacy key, or Redis API key."""
-    from web.helpers import viewer_is_authenticated  # type: ignore[import-not-found]
-
-    return bool(viewer_is_authenticated(request))
+    return bool(_auth_helpers().viewer_is_authenticated(request))
 
 
 def _can_see_private() -> bool:
-    from web.helpers import viewer_can_see_private
+    """Whether this caller may see entries flagged private.
 
-    return bool(viewer_can_see_private(request))
+    Sessions and legacy generic.json keys always may; a Redis API key only
+    when it was explicitly granted private access in /admin/apikeys.
+    """
+    return bool(_auth_helpers().viewer_can_see_private(request))
 
 
 post_model = api.model(
