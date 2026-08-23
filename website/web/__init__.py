@@ -171,6 +171,11 @@ app.config["SECRET_KEY"] = get_secret_key()
 app.config["PREFERRED_URL_SCHEME"] = "https"
 app.config["UPLOAD_EXTENSIONS"] = [".png", ".jpg", ".svg", ".gif"]
 app.config["MAX_CONTENT_LENGTH"] = 50 * 1024 * 1024
+# flask-restx otherwise appends "did you mean <route> or <route> ?" to every 404,
+# picking the suggestions with difflib against the requested path. The routes are
+# public in Swagger anyway, but it makes 404 bodies vary with the caller's input,
+# which is noise when comparing responses and invites reading meaning into it.
+app.config["ERROR_404_HELP"] = False
 Bootstrap5(app)
 app.config["BOOTSTRAP_SERVE_LOCAL"] = True
 
