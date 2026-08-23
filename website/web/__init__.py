@@ -5007,6 +5007,7 @@ def admin_crypto_group(group):  # type: ignore[no-untyped-def]
 
 
 @app.route("/admin/crypto/group/new", methods=["GET", "POST"])
+@flask_login.login_required
 def admin_crypto_group_new():  # type: ignore[no-untyped-def]
     red = Valkey(unix_socket_path=get_socket_path("cache"), db=DB_CRYPTO)
 
