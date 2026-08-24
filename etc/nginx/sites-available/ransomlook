@@ -7,7 +7,14 @@ server {
         proxy_set_header Host $http_host;
         proxy_redirect off;
         proxy_set_header X-Real-IP $remote_addr;
-        proxy_set_header X_FORWARDED_PROTO $scheme;
+        # Appends the real client address at the end of the chain. ProxyFix is
+        # configured with x_for=1, so it reads the rightmost entry — the one
+        # written here — and a client-supplied header cannot influence it.
+        # Login rate limiting keys on this address.
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        # Underscores in header names are dropped by nginx by default, so the
+        # previous X_FORWARDED_PROTO never reached the application.
+        proxy_set_header X-Forwarded-Proto $scheme;
         proxy_connect_timeout 300;
         proxy_read_timeout 300;
         proxy_pass http://localhost:8000/;

@@ -10,6 +10,7 @@ import mimetypes
 import os
 import random
 import re
+import secrets
 import time
 import unicodedata
 from collections import OrderedDict, defaultdict, namedtuple
@@ -53,7 +54,7 @@ from PIL.PngImagePlugin import PngInfo
 from valkey import Valkey
 from werkzeug.exceptions import HTTPException
 from werkzeug.middleware.proxy_fix import ProxyFix
-from werkzeug.security import check_password_hash
+from werkzeug.security import check_password_hash, generate_password_hash
 from werkzeug.utils import secure_filename
 
 from ransomlook.default import (
@@ -743,14 +744,96 @@ def _load_user_from_request(request):  # type: ignore
     return load_user_from_request(request)  # type: ignore[no-untyped-call]
 
 
+# Failed-login budget per client, held in Redis with a sliding TTL. The point is
+# as much availability as credential protection: each attempt costs ~60 ms of a
+# gunicorn sync worker, so an unthrottled /login saturates the site, not just the
+# login page. The check runs before any password work for that reason.
+#
+# Per client IP and nothing else: the username is not part of the key, so
+# cycling through names fills the same budget. Never per account either —
+# locking one would hand anyone who knows a username a denial of service on
+# that admin. It relies on
+# request.remote_addr being trustworthy, which needs nginx to set
+# X-Forwarded-For (see etc/nginx/sites-available/ransomlook).
+_LOGIN_MAX_FAILURES = 5
+# Two separate durations on purpose. The window is how long failures accumulate;
+# the block is how long the client is turned away once the budget is spent, and
+# it is applied from the failure that trips it — otherwise five mistakes spread
+# across the window would earn only the few seconds left on the original TTL.
+_LOGIN_WINDOW_SECONDS = 300
+_LOGIN_BLOCK_SECONDS = 3600
+
+
+def _login_rate_key() -> str:
+    return "login_fail:" + (request.remote_addr or "unknown")
+
+
+def _login_rate_limited() -> bool:
+    """True when this client has spent its budget of failed attempts."""
+    try:
+        red = Valkey(unix_socket_path=get_socket_path("cache"), db=DB_TASKS)
+        raw = red.get(_login_rate_key())
+    except Exception:
+        # A cache that is down must not lock everybody out of the admin.
+        return False
+    try:
+        return bool(raw) and int(raw) >= _LOGIN_MAX_FAILURES  # type: ignore[arg-type]
+    except (TypeError, ValueError):
+        return False
+
+
+def _login_record_failure() -> None:
+    """Count one failed attempt, and start the block once the budget is spent."""
+    try:
+        red = Valkey(unix_socket_path=get_socket_path("cache"), db=DB_TASKS)
+        key = _login_rate_key()
+        count = red.incr(key)
+        if count == 1:
+            red.expire(key, _LOGIN_WINDOW_SECONDS)
+        elif count == _LOGIN_MAX_FAILURES:
+            # Budget spent: hold the client off for the full block, counted from
+            # here rather than from whatever was left of the window.
+            red.expire(key, _LOGIN_BLOCK_SECONDS)
+    except Exception:
+        pass
+
+
+def _login_clear_failures() -> None:
+    """Wipe the counter after a successful login."""
+    try:
+        Valkey(unix_socket_path=get_socket_path("cache"), db=DB_TASKS).delete(_login_rate_key())
+    except Exception:
+        pass
+
+
+# Verified against when the username is unknown, so a failed login costs the same
+# either way. Built at import from a random secret whose plain text is never
+# kept, so it cannot match; the algorithm and cost are werkzeug's defaults, the
+# same ones build_users_table() uses for real accounts.
+_DUMMY_PASSWORD_HASH = generate_password_hash(secrets.token_urlsafe(32))
+
+
 @app.route("/login", methods=["GET", "POST"])
 def login():  # type: ignore[no-untyped-def]
     form = LoginForm()
     if form.validate_on_submit():
         username = form.username.data
+        if _login_rate_limited():
+            # Same answer whatever the username, so this adds no oracle.
+            audit_log("login_blocked", username or "", "rate limit")
+            flash(_("Too many failed attempts. Please try again later."), "error")
+            return render_template("login.html", form=form), 429
         if not ldap_config["enable"]:
             users_table = build_users_table()
-            if username in users_table and check_password_hash(users_table[username]["password"], form.password.data):  # type: ignore[no-untyped-call]
+            entry = users_table.get(username or "")
+            # Always run the KDF. Short-circuiting on an unknown name answered in
+            # milliseconds where a real one took the full verification, which
+            # enumerates accounts from response time alone.
+            password_ok = check_password_hash(  # type: ignore[no-untyped-call]
+                entry["password"] if entry else _DUMMY_PASSWORD_HASH, form.password.data
+            )
+            if entry and password_ok:
+                _login_clear_failures()
                 user = User()
                 user.id = username
                 flask_login.login_user(user)
@@ -758,10 +841,12 @@ def login():  # type: ignore[no-untyped-def]
                 flash(_("Logged in as: %(user)s", user=flask_login.current_user.id), "success")
                 return redirect(url_for("admin"))
             else:
+                _login_record_failure()
                 audit_log("login_failed", username, "local auth")
                 flash(_("Unable to login as: %(username)s", username=username), "error")
         else:
             if global_ldap_authentication(username, form.password.data, ldap_config):
+                _login_clear_failures()
                 user = User()
                 user.id = username
                 flask_login.login_user(user)
@@ -769,6 +854,7 @@ def login():  # type: ignore[no-untyped-def]
                 flash(_("Logged in as: %(user)s", user=flask_login.current_user.id), "success")
                 return redirect(url_for("admin"))
             else:
+                _login_record_failure()
                 audit_log("login_failed", username, "LDAP auth")
                 flash(_("Unable to login as: %(username)s", username=username), "error")
     return render_template("login.html", form=form)
