@@ -287,51 +287,106 @@ class Groupinfo(Resource):  # type: ignore[misc]
         return []  # unreachable: api.abort raises, but it is not typed NoReturn
 
 
+def _post_payload(name: str, postname: str) -> dict[str, Any]:
+    """Return one post, with its screenshot and source inlined when present."""
+    show_private = _can_see_private()
+    if not show_private and name.lower() in get_private_entity_names():
+        api.abort(404, "Post not found")
+    red = Valkey(unix_socket_path=get_socket_path("cache"), db=DB_POSTS)
+    for key in red.keys():  # type: ignore[union-attr]
+        if key.decode().lower() == name.lower():
+            posts = json.loads(red.get(key))  # type: ignore[arg-type]
+            if not show_private:
+                posts = public_posts(posts)
+            for post in posts:
+                if post["post_title"] == postname:
+                    if "screen" in post and post["screen"] is not None:
+                        # A rejected path is skipped rather than raised on:
+                        # a 500 would confirm the probe to the caller.
+                        screenpath = _source_path(post["screen"])
+                        if screenpath and os.path.isfile(screenpath):
+                            with open(screenpath, "rb") as image_file:
+                                screenencoded = base64.b64encode(image_file.read()).decode("ascii")
+                            post.update({"screen": screenencoded})
+                    if "link" in post and post["link"] is not None:
+                        filepath = os.path.normpath(
+                            str(get_homedir()) + "/source/" + name + "/" + createfile(postname) + ".html"
+                        )
+                        if not filepath.startswith(str(get_homedir()) + os.sep):
+                            raise Exception("not allowed")
+                        if os.path.exists(filepath):
+                            with open(filepath, "rb") as src_file:
+                                srcencoded = base64.b64encode(src_file.read()).decode("ascii")
+                            post.update({"source": srcencoded})
+
+                    return post
+    api.abort(404, "Post not found")
+    return {}  # unreachable: api.abort raises, but it is not typed NoReturn
+
+
+# Two ways in, because a post title is not a viable path segment. It is
+# free-form text: some hold newlines and raw HTML, and the reverse proxy
+# re-normalises the path (collapsing //, resolving . and ..) before Flask
+# ever sees it, so those titles are unreachable however they are encoded.
+# The query form has none of that and is the one to use. See issue #677.
+@api.route("/post/<string:name>")
+@api.doc(
+    description=(
+        "Return one post, selected by its exact title given in the `title` query parameter. "
+        "**Use this endpoint.** It reaches every post, whatever the title contains — slashes, "
+        "newlines, raw HTML, quotes, non-ASCII. "
+        "The other endpoint, GET /api/post/{name}/{postname}, puts the title in the URL path "
+        "instead; a reverse proxy rewrites the path before the application sees it, so titles "
+        "holding `//`, a leading or trailing `/`, or a newline cannot be requested that way at "
+        "all. Example: /api/post/8base?title=JAI%20A%2FS"
+    ),
+    params={
+        "name": "Name of the group or market (case-insensitive)",
+        "title": {
+            "description": "Exact post title, URL-encoded",
+            "in": "query",
+            "type": "string",
+            "required": True,
+        },
+    },
+)
+class GroupPostByTitle(Resource):  # type: ignore[misc]
+    @api.response(200, "Post object", post_model)  # type: ignore[untyped-decorator]
+    @api.response(400, "The title query parameter is missing or empty")  # type: ignore[untyped-decorator]
+    @api.response(404, "Post not found")  # type: ignore[untyped-decorator]
+    def get(self, name: str) -> dict[str, Any]:
+        title = request.args.get("title")
+        if title is None:
+            title = request.args.get("postname")
+        if not title:
+            api.abort(400, "A 'title' query parameter is required")
+        return _post_payload(name, str(title))
+
+
 # `path` rather than `string`: a victim name legitimately contains a slash
 # ("JAI A/S", "T/CCI Manufacturing"), and `string` refuses it — even percent
-# encoded, since the path is decoded before routing. See issue #676.
+# encoded, since the path is decoded before routing. See issue #676. This form
+# still cannot express every title; see the query form above.
 @api.route("/post/<string:name>/<path:postname>")
 @api.doc(
-    description="Return details about a specific post (with screenshot and source if available).",
-    params={"name": "Name of the group or market", "postname": "Exact post title"},
+    description=(
+        "Return one post, selected by its title placed in the URL path. "
+        "**Kept for backwards compatibility only — prefer GET /api/post/{name}?title=...** "
+        "A reverse proxy rewrites the path before the application sees it, so a title "
+        "containing `//`, a leading or trailing `/`, or a newline can never be requested "
+        "here, no matter how it is encoded. Those titles do exist: query the group with "
+        "GET /api/group/{name} to see them."
+    ),
+    params={
+        "name": "Name of the group or market (case-insensitive)",
+        "postname": "Exact post title. Slashes are allowed but see the note above.",
+    },
 )
 class GroupPost(Resource):  # type: ignore[misc]
     @api.response(200, "Post object", post_model)  # type: ignore[untyped-decorator]
     @api.response(404, "Post not found")  # type: ignore[untyped-decorator]
     def get(self, name: str, postname: str) -> dict[str, Any]:
-        show_private = _can_see_private()
-        if not show_private and name.lower() in get_private_entity_names():
-            api.abort(404, "Post not found")
-        red = Valkey(unix_socket_path=get_socket_path("cache"), db=DB_POSTS)
-        for key in red.keys():  # type: ignore[union-attr]
-            if key.decode().lower() == name.lower():
-                posts = json.loads(red.get(key))  # type: ignore[arg-type]
-                if not show_private:
-                    posts = public_posts(posts)
-                for post in posts:
-                    if post["post_title"] == postname:
-                        if "screen" in post and post["screen"] is not None:
-                            # A rejected path is skipped rather than raised on:
-                            # a 500 would confirm the probe to the caller.
-                            screenpath = _source_path(post["screen"])
-                            if screenpath and os.path.isfile(screenpath):
-                                with open(screenpath, "rb") as image_file:
-                                    screenencoded = base64.b64encode(image_file.read()).decode("ascii")
-                                post.update({"screen": screenencoded})
-                        if "link" in post and post["link"] is not None:
-                            filepath = os.path.normpath(
-                                str(get_homedir()) + "/source/" + name + "/" + createfile(postname) + ".html"
-                            )
-                            if not filepath.startswith(str(get_homedir()) + os.sep):
-                                raise Exception("not allowed")
-                            if os.path.exists(filepath):
-                                with open(filepath, "rb") as src_file:
-                                    srcencoded = base64.b64encode(src_file.read()).decode("ascii")
-                                post.update({"source": srcencoded})
-
-                        return post
-        api.abort(404, "Post not found")
-        return {}  # unreachable: api.abort raises, but it is not typed NoReturn
+        return _post_payload(name, postname)
 
 
 @api.route("/market/<string:name>")
