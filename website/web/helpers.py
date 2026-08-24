@@ -11,6 +11,7 @@ from valkey import Valkey
 from werkzeug.security import generate_password_hash
 
 from ransomlook.default import DB_TASKS, get_config, get_homedir, get_socket_path
+from ransomlook.default.logging import get_logger
 
 
 def load_user_from_request(request):  # type: ignore
@@ -72,13 +73,39 @@ def build_users_table() -> dict[str, dict[str, str]]:
     return users_table
 
 
+def _restrict_to_owner(path: Path) -> None:
+    """Drop group and other permissions on an existing file.
+
+    Best effort: an instance whose file belongs to another user keeps running,
+    with a warning, rather than refusing to start.
+    """
+    try:
+        if path.stat().st_mode & 0o077:
+            path.chmod(0o600)
+    except OSError as e:
+        get_logger("helpers").warning("cannot restrict permissions on %s: %s", path, e)
+
+
 @lru_cache(64)
 def get_secret_key() -> bytes:
+    """Return the Flask session-signing key, creating it on first use.
+
+    The file signs session cookies and feeds the legacy API-key KDF, so anything
+    able to read it forges an admin session — and in LDAP mode `user_loader`
+    does not even check that the name exists. It is therefore created 0600, and
+    an existing one is tightened on every start, since instances predating this
+    hold a file created with the process umask (0644 under the usual 022).
+    """
     secret_file_path: Path = get_homedir() / "secret_key"
     if not secret_file_path.exists() or secret_file_path.stat().st_size < 64:
-        if not secret_file_path.exists() or secret_file_path.stat().st_size < 64:
-            with secret_file_path.open("wb") as f:
-                f.write(os.urandom(64))
+        # os.open rather than Path.open: the mode has to be applied at creation,
+        # otherwise the key sits world-readable in the window before chmod.
+        fd = os.open(secret_file_path, os.O_WRONLY | os.O_CREAT | os.O_TRUNC, 0o600)
+        try:
+            os.write(fd, os.urandom(64))
+        finally:
+            os.close(fd)
+    _restrict_to_owner(secret_file_path)
     with secret_file_path.open("rb") as f:
         return f.read()
 
