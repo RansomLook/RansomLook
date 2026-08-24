@@ -3,6 +3,7 @@ import csv
 import datetime
 import glob
 import hashlib
+import hmac
 import imghdr
 import json
 import mimetypes
@@ -5436,6 +5437,28 @@ def admin_urls():  # type: ignore[no-untyped-def]
 ############ API Keys
 
 
+def _apikey_handle(token: str) -> str:
+    """Opaque, non-reversible handle for an API key, used in the admin forms.
+
+    The key itself is shown once, at creation, and never again: rendering it
+    into the page put every token in the HTML source, where View Source, a
+    proxy log or a cached page hands them over.
+    """
+    return hashlib.sha256(token.encode()).hexdigest()
+
+
+def _resolve_apikey(handle: str) -> str | None:
+    """Map a handle from a form back to its token, or None when unknown."""
+    if not handle:
+        return None
+    red = _get_apikeys_redis()
+    for raw in red.hgetall("apikeys") or {}:  # type: ignore[union-attr]
+        token = raw.decode()
+        if hmac.compare_digest(_apikey_handle(token), handle):
+            return token
+    return None
+
+
 @app.route("/admin/apikeys", methods=["GET"])
 @flask_login.login_required
 def admin_apikeys():  # type: ignore[no-untyped-def]
@@ -5450,7 +5473,8 @@ def admin_apikeys():  # type: ignore[no-untyped-def]
             meta = {}
         keys.append(
             {
-                "token": token_str,
+                # never the token itself — see _apikey_handle
+                "handle": _apikey_handle(token_str),
                 "token_short": token_str[:8] + "…" + token_str[-8:],
                 "name": meta.get("name", ""),
                 "created_at": meta.get("created_at", ""),
@@ -5492,9 +5516,9 @@ def admin_apikeys_add():  # type: ignore[no-untyped-def]
 @app.route("/admin/apikeys/toggle", methods=["POST"])
 @flask_login.login_required
 def admin_apikeys_toggle():  # type: ignore[no-untyped-def]
-    token = request.form.get("token", "").strip()
+    token = _resolve_apikey(request.form.get("handle", "").strip())
     if not token:
-        flash(_("Missing token."), "error")
+        flash(_("Key not found."), "error")
         return redirect(url_for("admin_apikeys"))
     red = _get_apikeys_redis()
     raw = red.hget("apikeys", token)
@@ -5513,9 +5537,9 @@ def admin_apikeys_toggle():  # type: ignore[no-untyped-def]
 @app.route("/admin/apikeys/toggle-private", methods=["POST"])
 @flask_login.login_required
 def admin_apikeys_toggle_private():  # type: ignore[no-untyped-def]
-    token = request.form.get("token", "").strip()
+    token = _resolve_apikey(request.form.get("handle", "").strip())
     if not token:
-        flash(_("Missing token."), "error")
+        flash(_("Key not found."), "error")
         return redirect(url_for("admin_apikeys"))
     red = _get_apikeys_redis()
     raw = red.hget("apikeys", token)
@@ -5537,9 +5561,9 @@ def admin_apikeys_toggle_private():  # type: ignore[no-untyped-def]
 @app.route("/admin/apikeys/delete", methods=["POST"])
 @flask_login.login_required
 def admin_apikeys_delete():  # type: ignore[no-untyped-def]
-    token = request.form.get("token", "").strip()
+    token = _resolve_apikey(request.form.get("handle", "").strip())
     if not token:
-        flash(_("Missing token."), "error")
+        flash(_("Key not found."), "error")
         return redirect(url_for("admin_apikeys"))
     red = _get_apikeys_redis()
     raw = red.hget("apikeys", token)
