@@ -876,7 +876,11 @@ def get_ip_detail(ip: str) -> dict[str, Any]:
     enrichment: dict[str, Any] = {}
     try:
         from . import ipenrich
-        enrichment = ipenrich.enrich(ip) or {}
+        # Only for an address a scan actually saw. Enriching on demand would let
+        # an unauthenticated caller drive outbound CIRCL and reverse-DNS lookups
+        # for any address they choose.
+        if ih_all or ih_seed:
+            enrichment = ipenrich.enrich(ip) or {}
     except Exception as e:
         logger.debug("enrichment lookup failed for %s: %s", ip, e)
 

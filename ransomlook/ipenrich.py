@@ -18,6 +18,7 @@ Record shape::
 
 from __future__ import annotations
 
+import ipaddress
 import json
 import logging
 import socket
@@ -138,8 +139,30 @@ def _circl_asn_meta(asn: str) -> dict[str, Any] | None:
     return {"asn_org": org, "country": country}
 
 
+def is_valid_ip(value: Any) -> bool:
+    """True when `value` is a usable IP address literal."""
+    try:
+        ipaddress.ip_address(str(value))
+    except ValueError:
+        return False
+    return True
+
+
+def _observed_in_a_scan(ip: str) -> bool:
+    """True when this IP was actually seen in a stored swarm scan.
+
+    Anything else is a string a caller handed us: /torrent-health/ip/<ip> and
+    /api/torrent/ip/<ip> are unauthenticated, so without this an outsider picks
+    the addresses that end up in the public ASN pivots and leaderboards.
+    """
+    r = _redis()
+    return bool(r.smembers(f"torrent_health:ip_to_ih:{ip}") or r.smembers(f"torrent_health:ip_seeds:{ip}"))
+
+
 def enrich(ip: str, force: bool = False) -> dict[str, Any]:
     """Return enrichment for ``ip`` (cached 7 days). ``force`` bypasses the cache."""
+    if not is_valid_ip(ip):
+        return {}
     r = _redis()
     key = _cache_key(ip)
     if not force:
@@ -200,6 +223,11 @@ def _index_ip_asn(ip: str, asn: Any) -> None:
     try:
         asn_num = int(asn)
     except (TypeError, ValueError):
+        return
+    if not _observed_in_a_scan(ip):
+        # The pivots and the leaderboards are public intelligence. Only what a
+        # scan actually saw belongs in them, or an unauthenticated caller can
+        # name the ASNs RansomLook reports as top ransomware infrastructure.
         return
     r = _redis()
     asn_key = str(asn_num)
