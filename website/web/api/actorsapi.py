@@ -8,6 +8,7 @@ from flask_restx import Namespace, Resource, fields  # type: ignore
 from valkey import Valkey
 
 from ransomlook.default import DB_ACTORS, DB_GROUPS, DB_MARKETS, get_homedir, get_socket_path
+from ransomlook.sharedutils import actor_logo_dir
 
 api = Namespace("ActorsAPI", description="Threat actor intelligence API", path="/api/actors")
 
@@ -150,8 +151,8 @@ class ActorDetail(Resource):  # type: ignore[misc]
 
         images = []
         try:
-            base_path = os.path.join(str(get_homedir()), "source", "logo", "actor", actor["name"])
-            if os.path.isdir(base_path):
+            base_path = actor_logo_dir(actor["name"])
+            if base_path and os.path.isdir(base_path):
                 for fn in sorted(os.listdir(base_path)):
                     ext = os.path.splitext(fn)[1].lower()
                     if ext in (".png", ".jpg", ".jpeg", ".gif", ".svg", ".webp"):

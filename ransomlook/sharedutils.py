@@ -2,6 +2,7 @@
 
 import glob
 import json
+import os
 import re
 import sys
 from collections.abc import Iterator
@@ -81,6 +82,29 @@ def is_valid_chain(value: Any) -> bool:
 def is_valid_crypto_address(value: Any) -> bool:
     """True when `value` is safe to store and render as a wallet address."""
     return isinstance(value, str) and bool(_CRYPTO_ADDR_RE.match(value))
+
+
+def actor_logo_dir(name: Any) -> str | None:
+    """Resolve an actor's logo directory, or None when the name escapes it.
+
+    `name` reaches here straight from the add-actor form and, on the read paths,
+    from the stored record. Joined unchecked it created directories anywhere the
+    process can write — and the upload that follows dropped a file there, which
+    with .svg allowed means active content under the application's own origin.
+
+    The raw name stays the directory component so folders created before this
+    remain reachable; only traversal is refused. realpath is compared so a
+    symlink cannot step outside either.
+    """
+    candidate = str(name or "").strip()
+    if not candidate or candidate in (".", "..") or set(candidate) & {"/", "\\", "\0"}:
+        return None
+    base = os.path.realpath(os.path.join(str(get_homedir()), "source", "logo", "actor"))
+    target = os.path.realpath(os.path.join(base, candidate))
+    # exactly one level below the base, never the base itself
+    if os.path.dirname(target) != base:
+        return None
+    return target
 
 
 def is_private_entity(name: str) -> bool:

@@ -252,6 +252,10 @@ class AddActorForm(FlaskForm):  # type: ignore[misc]
     # Sources (un URL par ligne — titre/notes optionnels seront gérés plus tard)
     sources = TextAreaField("Liens de documentation/source (un par ligne)", render_kw={"rows": 4})
 
+    # Logo : le template poste déjà ce champ, il doit exister sur le formulaire
+    # sinon la vue ne lit jamais request.files.
+    file = FileField("File")
+
     submit = SubmitField("Save")
 
 

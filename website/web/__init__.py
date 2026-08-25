@@ -78,6 +78,7 @@ from ransomlook import misp_feed
 from ransomlook.posts import appender
 from ransomlook.ransomlook import adder
 from ransomlook.sharedutils import (
+    actor_logo_dir,
     actorcount,
     createfile,
     cryptostats,
@@ -2907,8 +2908,8 @@ def actor_details(name: str):  # type: ignore
     # Images (vignettes)
     images = []
     try:
-        base_path = os.path.join(str(get_homedir()), "source", "logo", "actor", actor["name"])
-        if os.path.isdir(base_path):
+        base_path = actor_logo_dir(actor["name"])
+        if base_path and os.path.isdir(base_path):
             for fn in sorted(os.listdir(base_path)):
                 ext = os.path.splitext(fn)[1].lower()
                 if ext in (".png", ".jpg", ".jpeg", ".gif", ".svg", ".webp"):
@@ -4570,6 +4571,14 @@ def addactor():  # type: ignore[no-untyped-def]
                 "admin/addactor.html", form=form, groups_all=groups_all, markets_all=markets_all, peers_all=peers_all
             )
 
+        # The name becomes a directory under source/logo/actor: refuse anything
+        # that would not stay there, before writing anything.
+        if actor_logo_dir(form.name.data.strip()) is None:
+            flash(_("Invalid actor name: %(name)s", name=form.name.data.strip()), "error")
+            return render_template(
+                "admin/addactor.html", form=form, groups_all=groups_all, markets_all=markets_all, peers_all=peers_all
+            )
+
         red = _actor_db()
         if red.get(key):
             flash(_("This actor already exists."), "error")
@@ -4643,19 +4652,26 @@ def addactor():  # type: ignore[no-untyped-def]
         for p in [x for x in new_peers if x and x != _norm_key(actor_name)]:
             _set_peer_has_actor(p, actor_name, True)
 
-        base_path = os.path.join(str(get_homedir()), "source", "logo", "actor", entry["name"])
-        os.makedirs(base_path, exist_ok=True)
+        base_path = actor_logo_dir(entry["name"])
+        if base_path is not None:
+            os.makedirs(base_path, exist_ok=True)
 
-        file = request.files.get("file") if hasattr(form, "file") else None
-        if file and file.filename:
-            filename = file.filename
-            file_ext = os.path.splitext(filename)[1].lower()
-            if file_ext not in app.config["UPLOAD_EXTENSIONS"] or file_ext != validate_image(file.stream):  # type: ignore
-                flash(_("Image invalide (png/jpg/svg/gif)"), "error")
-                return render_template("admin/addactor.html", form=form)
-            safe = secure_filename(os.path.splitext(filename)[0]) + f"-{int(time.time())}{file_ext}"
-            file.stream.seek(0)
-            file.save(os.path.join(base_path, safe))
+            file = request.files.get("file") if hasattr(form, "file") else None
+            if file and file.filename:
+                filename = file.filename
+                file_ext = os.path.splitext(filename)[1].lower()
+                if file_ext not in app.config["UPLOAD_EXTENSIONS"] or file_ext != validate_image(file.stream):  # type: ignore
+                    flash(_("Image invalide (png/jpg/svg/gif)"), "error")
+                    return render_template(
+                        "admin/addactor.html",
+                        form=form,
+                        groups_all=groups_all,
+                        markets_all=markets_all,
+                        peers_all=peers_all,
+                    )
+                safe = secure_filename(os.path.splitext(filename)[0]) + f"-{int(time.time())}{file_ext}"
+                file.stream.seek(0)
+                file.save(os.path.join(base_path, safe))
 
         _actor_details = []
         if entry.get("aliases"):
