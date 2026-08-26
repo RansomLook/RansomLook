@@ -51,7 +51,13 @@ def main() -> None:
         logger.info("Parser : %s", p)
         try:
             for entry in module.main():
-                appender(entry, p)
+                # Per entry, not per parser: one malformed victim used to drop
+                # every victim listed after it, and the crash repeats on each
+                # run because it happens before the write.
+                try:
+                    appender(entry, p)
+                except Exception:
+                    logger.exception("Error with : %s, entry: %r", p, entry)
         except Exception:
             logger.exception("Error with : %s", p)
 

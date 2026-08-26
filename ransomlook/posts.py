@@ -67,6 +67,11 @@ def appender(entry: dict[str, Any] | str, group_name: str) -> int:
         magnet = None
         screen = None
         private = False
+        # A bare title carries no date. This has to be decided here rather than
+        # at the posttemplate() call: `"date" in entry` on a str is a substring
+        # test, so a title containing "date" — "Mandate Group", "Update
+        # Holdings" — took the dict branch and raised TypeError on entry["date"].
+        date = str(datetime.today())
     else:
         post_title = entry["title"]  # type: ignore[index]
         description = entry["description"]  # type: ignore[index]
@@ -83,6 +88,7 @@ def appender(entry: dict[str, Any] | str, group_name: str) -> int:
         else:
             screen = None
         private = entry.get("private") is True  # type: ignore[union-attr]
+        date = str(entry["date"]) if "date" in entry else str(datetime.today())  # type: ignore[index]
     if len(post_title) == 0:
         errlog("post_title is empty")
         return 2
@@ -103,7 +109,7 @@ def appender(entry: dict[str, Any] | str, group_name: str) -> int:
         post_title,
         description,
         link,
-        str(entry["date"]) if "date" in entry else str(datetime.today()),  # type: ignore[index]
+        date,
         magnet,
         screen,
         private,
