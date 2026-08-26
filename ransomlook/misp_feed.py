@@ -515,7 +515,7 @@ def refresh_group_victims(group_name: str) -> int:
             )
             if post.get("discovered"):
                 # the setter accepts a "YYYY-MM-DD" string even though the stub says date
-                event.date = str(post["discovered"]).split(" ")[0]
+                event.date = str(post["discovered"]).split(" ")[0]  # type: ignore[assignment]
             publish(event, "victim")
             if post.get("misp_uuid") != event_uuid:
                 post["misp_uuid"] = event_uuid
