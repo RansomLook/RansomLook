@@ -11,12 +11,11 @@ empty ; run this once after enabling misp_feed to publish the whole history.
     poetry run python tools/misp_feed_backfill.py --victims-only
 """
 import argparse
-import json
 
 import valkey
 
 from ransomlook.default import DB_ACTORS, DB_GROUPS, DB_MARKETS, DB_POSTS, get_socket_path
-from ransomlook.misp_feed import enabled, push_enabled, refresh_actor, refresh_group, refresh_market, refresh_victim
+from ransomlook.misp_feed import enabled, push_enabled, refresh_actor, refresh_group, refresh_group_victims, refresh_market
 
 
 def getdb(db: int) -> valkey.Valkey:
@@ -57,17 +56,19 @@ def backfill_actors() -> int:
 
 
 def backfill_victims() -> int:
+    """
+    Rebuild every victim event. This also drops the events of entities that are
+    private today, so it doubles as the cleanup pass for feeds built before
+    refresh_group_victims() existed and kept serving a private group's victims.
+    """
     red = getdb(DB_POSTS)
     count = 0
     for key in red.keys():  # type: ignore[union-attr]
         name = key.decode()
-        posts = json.loads(red.get(name))  # type: ignore[arg-type]
-        for post in posts:
-            title = post.get("post_title")
-            if title and refresh_victim(name, title):
-                count += 1
-        print("  %s: done (%d total)" % (name, count))
-    print("victims: %d events" % count)
+        handled = refresh_group_victims(name)
+        count += handled
+        print("  %s: %d posts (%d total)" % (name, handled, count))
+    print("victims: %d posts processed" % count)
     return count
 
 

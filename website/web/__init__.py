@@ -4181,6 +4181,13 @@ def editgroup(database: int, name: str):  # type: ignore
         elif int(database) == DB_MARKETS:
             misp_feed.refresh_market(name)
 
+        # The infrastructure event is not the only thing the feed holds for this
+        # entity: every one of its posts has a victim event too. Only rebuild
+        # them when the private flag actually moved, since a large group means
+        # one event per post.
+        if bool(_old["private"]) != bool(data["private"]):
+            misp_feed.refresh_group_victims(name)
+
         # --- Backlinks to ACTORS (db=5) from group/market edit ---
         rel_key = "groups" if int(database) == 0 else "forums"
         display_name = (form.groupname.data or name).strip() or name

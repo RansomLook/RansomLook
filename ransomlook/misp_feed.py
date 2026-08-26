@@ -464,6 +464,70 @@ def refresh_victim(group_name: str, post_title: str) -> str | None:
         return None
 
 
+def refresh_group_victims(group_name: str) -> int:
+    """
+    (re)build every victim event of a group / market, and return how many posts
+    were handled.
+
+    refresh_group() and refresh_market() only ever touched the infrastructure
+    event, so flipping the private flag left every victim event of that entity
+    sitting in the feed, which /feed/misp/ serves unauthenticated. Posts are
+    read once here rather than calling refresh_victim() per title, which would
+    re-read and re-parse the whole post list for every post.
+
+    Like the private paths in refresh_victim() this calls remove(), not purge():
+    an event already pushed to a remote MISP instance is left there.
+    """
+    if not (enabled() or push_enabled()):
+        return 0
+    try:
+        red = getdb(DB_POSTS)
+        raw = red.get(group_name)
+        if not raw:
+            return 0
+        posts = json.loads(raw)  # type: ignore[arg-type]
+        # covers a private market as well as a private group
+        private = is_private_entity(group_name)
+        group = groupinfo(group_name)
+        galaxy = (group.get("ransomware_galaxy_value") if group else None) or group_name
+        base_url = group_base_url(group)
+        changed = False
+        handled = 0
+        for post in posts:
+            title = post.get("post_title")
+            if not title:
+                continue
+            handled += 1
+            event_uuid = post.get("misp_uuid") or deterministic_uuid("victim|" + group_name + "|" + title)
+            if private or post.get("private") is True:
+                remove(event_uuid)
+                continue
+            event = victimevent(
+                event_uuid,
+                group_name,
+                title,
+                post.get("description"),
+                post.get("link"),
+                post.get("magnet"),
+                post.get("screen"),
+                galaxy,
+                base_url,
+            )
+            if post.get("discovered"):
+                # the setter accepts a "YYYY-MM-DD" string even though the stub says date
+                event.date = str(post["discovered"]).split(" ")[0]
+            publish(event, "victim")
+            if post.get("misp_uuid") != event_uuid:
+                post["misp_uuid"] = event_uuid
+                changed = True
+        if changed:
+            red.set(group_name, json.dumps(posts))
+        return handled
+    except Exception as e:
+        errlog("misp_feed: can not refresh victims of " + group_name + " : " + repr(e))
+        return 0
+
+
 def refresh_group(group_name: str) -> str | None:
     """
     (re)build the infrastructure event for a group from its public locations
