@@ -46,6 +46,7 @@ from flask import (
 from flask_babel import Babel  # type: ignore[import-untyped]
 from flask_babel import get_locale as _babel_get_locale
 from flask_babel import gettext as _
+from flask_babel import ngettext
 from flask_bootstrap import Bootstrap5  # type: ignore
 from flask_login import current_user
 from flask_restx import Api  # type: ignore
@@ -66,6 +67,7 @@ from ransomlook.default import (
     DB_LACUS,
     DB_LEAKS,
     DB_MARKETS,
+    DB_MISP,
     DB_NOTES,
     DB_POSTS,
     DB_RF,
@@ -96,6 +98,7 @@ from ransomlook.sharedutils import (
     iter_posts,
     leakcount,
     mounthlypostcount,
+    escape_glob,
     norm_group_slug,
     note_is_private,
     notecount,
@@ -4003,6 +4006,239 @@ def edit():  # type: ignore[no-untyped-def]
     return render_template("admin/edit.html", form=formSelect, formMarkets=formMarkets)
 
 
+def _misp_victim_events(name: str, first_only: bool = False) -> list[str]:
+    """Victim event uuids still carrying `name` in the local MISP feed.
+
+    The uuids are hashes of "victim|<group>|<title>", so they cannot be derived
+    from the group name alone. The manifest does hold the event info, written
+    as `group.title() + " — " + title`, and the ransomlook:type tag, so a scan
+    on that prefix finds them. Infrastructure events share the prefix and are
+    excluded by the tag: they are handled by purge()/refresh_group() already.
+
+    `first_only` stops at the first hit, which is all a blocker needs.
+    """
+    prefix = (name or "").strip().title() + " — "
+    if prefix == " — ":
+        return []
+    found = []
+    try:
+        red = Valkey(unix_socket_path=get_socket_path("cache"), db=DB_MISP)
+        for uuid_b, meta_b in red.hscan_iter(misp_feed.MANIFEST_KEY):
+            try:
+                meta = json.loads(meta_b)
+            except Exception:
+                continue
+            if not str(meta.get("info", "")).startswith(prefix):
+                continue
+            tags = {t.get("name") for t in (meta.get("Tag") or []) if isinstance(t, dict)}
+            if 'ransomlook:type="victim"' not in tags:
+                continue
+            found.append(uuid_b.decode())
+            if first_only:
+                break
+    except Exception:
+        app.logger.exception("misp feed: can not scan the manifest for %s", name)
+    return found
+
+
+def _detach_group_data(database: int, name: str) -> dict[str, int]:
+    """Take a deleted group's data out of the shared stores.
+
+    Deleting the record alone left DB_POSTS keyed on the name, so the victims
+    survived — and stopped being filtered with it: iter_posts() hides a post by
+    looking its group up in DB_GROUPS / DB_MARKETS, so deleting a *private*
+    group republished every one of its victims on /api/recent and /rss.xml.
+    The posts now go with the group, and their events leave the local MISP feed.
+
+    Ransom notes and crypto addresses are kept — they are research material in
+    their own right. Only their attachment to the group is removed, so nothing
+    is left pointing at a group that no longer exists.
+    """
+    counts = {"posts": 0, "notes": 0, "wallets": 0}
+    key = (name or "").strip().lower()
+    if not key:
+        return counts
+
+    # --- posts: removed, with their victim events ---------------------------
+    red_posts = Valkey(unix_socket_path=get_socket_path("cache"), db=DB_POSTS)
+    raw = red_posts.get(key)
+    if raw:
+        try:
+            posts = json.loads(raw)  # type: ignore[arg-type]
+        except Exception:
+            posts = []
+        for post in posts if isinstance(posts, list) else []:
+            if not isinstance(post, dict):
+                continue
+            title = post.get("post_title")
+            if not title:
+                continue
+            counts["posts"] += 1
+            event_uuid = post.get("misp_uuid") or misp_feed.deterministic_uuid("victim|" + key + "|" + title)
+            misp_feed.remove(event_uuid)
+        red_posts.delete(key)
+
+    # events whose post is already gone (a post list emptied by hand) are not
+    # covered by the loop above: sweep the manifest for anything left
+    for stale in _misp_victim_events(key):
+        misp_feed.remove(stale)
+        counts["posts"] += 1
+
+    # --- ransom notes: kept, detached ---------------------------------------
+    slug = norm_group_slug(key)
+    if slug:
+        red_notes = Valkey(unix_socket_path=get_socket_path("cache"), db=DB_NOTES)
+        try:
+            slugs = {slug}
+            for alias in red_notes.smembers("group:" + slug + ":aliases") or []:  # type: ignore[union-attr]
+                slugs.add(alias.decode())
+            for alias, canon in (red_notes.hgetall("alias:group") or {}).items():  # type: ignore[union-attr]
+                if canon.decode() == slug:
+                    slugs.add(alias.decode())
+            for one in slugs:
+                idx = "idx:group:" + one + ":notes"
+                for nid in red_notes.smembers(idx) or []:  # type: ignore[union-attr]
+                    note_key = "note:" + nid.decode()
+                    body = red_notes.get(note_key)
+                    if not body:
+                        continue
+                    try:
+                        note = json.loads(body)  # type: ignore[arg-type]
+                    except Exception:
+                        continue
+                    groups = [g for g in (note.get("groups") or []) if g not in slugs]
+                    if groups != (note.get("groups") or []):
+                        note["groups"] = groups
+                        red_notes.set(note_key, json.dumps(note, ensure_ascii=False))
+                        counts["notes"] += 1
+                red_notes.delete(idx)
+                red_notes.delete("group:" + one + ":aliases")
+                red_notes.hdel("alias:group", one)
+        except Exception:
+            app.logger.exception("delete group: can not detach notes of %s", key)
+
+    # --- crypto: kept, detached ---------------------------------------------
+    red_crypto = Valkey(unix_socket_path=get_socket_path("cache"), db=DB_CRYPTO)
+    try:
+        norm = re.sub(r"[^a-z0-9]+", "", key)
+        canon_raw = red_crypto.get(ALIAS_PREFIX + norm) if norm else None
+        canon = canon_raw.decode() if canon_raw else key  # type: ignore[union-attr]
+        members: set[bytes] = red_crypto.smembers("idx:group:" + canon + ":crypto") or set()  # type: ignore[assignment]
+        counts["wallets"] = len(members)
+        # The address doc carries its own group field, and /api/crypto/stats and
+        # /api/crypto/links read that rather than the index — leaving it would
+        # keep the deleted group showing up there. "Unknwn" is what the rest of
+        # the code already uses for a wallet with no group.
+        for member in members:
+            part = member.decode()
+            if ":" not in part:
+                continue
+            chain, addr = part.split(":", 1)
+            addr_key = "crypto:addr:" + chain + ":" + addr
+            body = red_crypto.get(addr_key)
+            if not body:
+                continue
+            try:
+                doc = json.loads(body)  # type: ignore[arg-type]
+            except Exception:
+                continue
+            if doc.get("group") == canon:
+                doc["group"] = "Unknwn"
+                red_crypto.set(addr_key, json.dumps(doc, ensure_ascii=False))
+        red_crypto.delete("idx:group:" + canon + ":crypto")
+        for chain_key in red_crypto.scan_iter(match="idx:group:" + escape_glob(canon) + ":crypto:*"):
+            red_crypto.delete(chain_key)
+        red_crypto.delete("crypto:group:" + canon + ":meta")
+        for alias_key in red_crypto.scan_iter(match=ALIAS_PREFIX + "*"):
+            target = red_crypto.get(alias_key)
+            if target and target.decode() == canon:  # type: ignore[union-attr]
+                red_crypto.delete(alias_key)
+    except Exception:
+        app.logger.exception("delete group: can not detach crypto of %s", key)
+
+    return counts
+
+
+def _rename_blockers(database: int, old: str, new: str) -> list[str]:
+    """What a group / market rename would leave behind, in plain words.
+
+    Only the record itself is renamed: DB_POSTS is keyed by the group name,
+    ransom notes are indexed under idx:group:<slug>:notes, mirror health under
+    health:<group>:<slug>, crypto is reached through crypto:alias:<norm>, the
+    MISP victim event uuids derive from the name, and four filesystem paths
+    carry it — including source/<group>-*.html, which is the prefix the parsers
+    match on, so a renamed group stops seeing its own captures.
+
+    Migrating all of that from a web request is not something to attempt
+    halfway, so a rename is refused as soon as anything depends on the old
+    name. Renaming a freshly created, still empty group stays possible.
+    """
+    blockers = []
+    old_key = (old or "").strip().lower()
+    new_key = (new or "").strip().lower()
+
+    red = Valkey(unix_socket_path=get_socket_path("cache"), db=int(database))
+    if red.exists(new_key):
+        # redis rename() overwrites the destination without a word
+        blockers.append(_("a group or market named %(name)s already exists", name=new_key))
+
+    posts_raw = Valkey(unix_socket_path=get_socket_path("cache"), db=DB_POSTS).get(old_key)
+    if posts_raw:
+        try:
+            count = len(json.loads(posts_raw))  # type: ignore[arg-type]
+        except Exception:
+            count = 0
+        if count:
+            blockers.append(ngettext("%(n)d post in db=2", "%(n)d posts in db=2", count, n=count))
+
+    slug = norm_group_slug(old_key)
+    if slug:
+        notes = Valkey(unix_socket_path=get_socket_path("cache"), db=DB_NOTES)
+        try:
+            n = notes.scard("idx:group:" + slug + ":notes") or 0
+            if n:
+                blockers.append(
+                    ngettext(
+                        "%(n)d ransom note indexed under idx:group:%(slug)s",
+                        "%(n)d ransom notes indexed under idx:group:%(slug)s",
+                        n,
+                        n=n,
+                        slug=slug,
+                    )
+                )
+        except Exception:
+            pass
+
+    home = str(get_homedir())
+    paths = [
+        (os.path.join(home, "source", "screenshots", old_key), _("screenshots")),
+        (os.path.join(home, "source", old_key), _("torrent files and notes")),
+        (os.path.join(home, "source", "logo", "group", old_key), _("logo")),
+    ]
+    for path, label in paths:
+        if os.path.isdir(path):
+            blockers.append(_("a %(label)s directory: %(path)s", label=label, path=path))
+    if _misp_victim_events(old_key, first_only=True):
+        blockers.append(_("victim events still in the MISP feed under that name"))
+
+    try:
+        captures = [f for f in os.listdir(os.path.join(home, "source")) if f.startswith(old_key + "-")]
+        if captures:
+            blockers.append(
+                ngettext(
+                    "%(n)d captured page source/%(name)s-*.html",
+                    "%(n)d captured pages source/%(name)s-*.html",
+                    len(captures),
+                    n=len(captures),
+                    name=old_key,
+                )
+            )
+    except OSError:
+        pass
+
+    return blockers
+
+
 @app.route("/admin/edit/<database>/<name>", methods=["GET", "POST"])
 @flask_login.login_required  # type: ignore
 def editgroup(database: int, name: str):  # type: ignore
@@ -4087,15 +4323,50 @@ def editgroup(database: int, name: str):  # type: ignore
     form.groupname.label = name
 
     if deleteButton.validate_on_submit():
+        # misp_feed.remove_*() is opt-in (misp_feed.remove_on_delete) because it
+        # also deletes from a remote MISP instance. _detach_group_data() below
+        # always clears the local feed of the posts it removes.
         if int(database) == DB_GROUPS:
             misp_feed.remove_group(name)
         elif int(database) == DB_MARKETS:
             misp_feed.remove_market(name)
+        detached = _detach_group_data(int(database), name)
         red.delete(name)
-        audit_log("delete_group", name)
-        flash(_("Success to delete : %(name)s", name=name), "success")
+        audit_log(
+            "delete_group",
+            name,
+            "posts=%d; notes detached=%d; wallets detached=%d"
+            % (detached["posts"], detached["notes"], detached["wallets"]),
+        )
+        flash(
+            _(
+                "Success to delete : %(name)s — %(posts)d posts removed, "
+                "%(notes)d ransom notes and %(wallets)d wallets kept but detached.",
+                name=name,
+                posts=detached["posts"],
+                notes=detached["notes"],
+                wallets=detached["wallets"],
+            ),
+            "success",
+        )
         return redirect(url_for("admin"))
     if form.validate_on_submit():
+        # Refuse a rename that would strand data, before anything is written:
+        # only this record moves, everything else stays keyed on the old name.
+        if name != form.groupname.data:
+            blockers = _rename_blockers(int(database), name, form.groupname.data)
+            if blockers:
+                flash(
+                    _(
+                        "Cannot rename %(old)s to %(new)s: only the record itself would move. "
+                        "Left behind: %(what)s. Rename it from the shell instead.",
+                        old=name,
+                        new=form.groupname.data,
+                        what="; ".join(blockers),
+                    ),
+                    "error",
+                )
+                return render_template("admin/editentry.html", form=form, deleteform=deleteButton)
         data = json.loads(red.get(name))  # type: ignore[arg-type]
         # snapshot tracked fields before modification
         _old = {
