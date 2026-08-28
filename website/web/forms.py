@@ -262,3 +262,38 @@ class AddActorForm(FlaskForm):  # type: ignore[misc]
 class EditActorForm(AddActorForm):
     # même champs ; on désactivera "name" côté template pour éviter de renommer la clé
     pass
+
+
+class RaasSelectForm(FlaskForm):  # type: ignore[misc]
+    """Selector for the group whose RaaS affiliate rules we want to edit."""
+    group = SelectField("Group", coerce=str, validate_choice=True, validators=[DataRequired()])
+    submit = SubmitField("Edit rules")
+
+
+class RaasBlockForm(FlaskForm):  # type: ignore[misc]
+    """One published set of affiliate rules.
+
+    A program rewrites its terms over time, so a group carries several of these.
+    `started` is optional — the date a version came into force is often unknown —
+    and `current` marks the set in force today; it is exclusive per group.
+    """
+    content = TextAreaField(
+        "Rules (Markdown)",
+        render_kw={"id": "raas-content", "rows": 20, "spellcheck": "false"},
+        validators=[DataRequired()],
+    )
+    comment = StringField(
+        "Public comment",
+        validators=[Optional()],
+        render_kw={"placeholder": "e.g. taken from the affiliate panel, translated from Russian"},
+    )
+    started = StringField(
+        "In force since (YYYY-MM-DD, optional)",
+        validators=[Optional()],
+        render_kw={"placeholder": "2026-03-01", "autocomplete": "off"},
+    )
+    current = BooleanField("These are the current rules")
+    # Screenshots are read straight from request.files.getlist("images"): several
+    # per block, and each is checked with validate_image() in the view rather
+    # than by a field type. See AddActorForm for what a missing field costs.
+    submit = SubmitField("Save")

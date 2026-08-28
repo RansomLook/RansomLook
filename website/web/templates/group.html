@@ -112,6 +112,7 @@
     <div class="profile-badges mb-14">
       {% if group['name'].lower() in parser %}<span class="badge-neutral">{{ _('Parsing: enabled') }}</span>{% endif %}
       {% if group.get('raas') %}<span class="badge-neutral">{{ _('Known RaaS') }}</span>{% endif %}
+      {% if group.get('raas_blocks') %}<a class="badge-neutral" href="{{ url_for('raas_group', name=group['name']) }}">{{ _('Affiliate rules') }} ({{ group['raas_blocks'] }})</a>{% endif %}
       {% if group.get('captcha') %}<span class="badge-neutral">{{ _('Captcha in place') }}</span>{% endif %}
       {% if group.get('private') %}<span class="badge-private">{{ _('Private') }}</span>{% endif %}
     </div>

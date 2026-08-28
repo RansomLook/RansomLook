@@ -77,6 +77,7 @@ from ransomlook.default import (
 )
 from ransomlook.default.config import get_config, get_homedir
 from ransomlook import misp_feed
+from ransomlook import raas as raas_rules
 from ransomlook.posts import appender
 from ransomlook.ransomlook import adder
 from ransomlook.sharedutils import (
@@ -93,6 +94,7 @@ from ransomlook.sharedutils import (
     hostcountchat,
     hostcountdls,
     hostcountfs,
+    is_private_entity,
     is_valid_chain,
     is_valid_crypto_address,
     iter_posts,
@@ -119,6 +121,7 @@ from .api.cryptoapi import api as crypto_api
 from .api.genericapi import api as generic_api
 from .api.leaksapi import api as leaks_api
 from .api.notesapi import api as notes_api
+from .api.raasapi import api as raas_api
 from .api.rfapi import api as rf_api
 from .api.statsapi import api as stats_api
 from .api.torrentapi import api as torrent_api
@@ -136,6 +139,8 @@ from .forms import (
     EditLogo,
     EditPostsForm,
     LoginForm,
+    RaasBlockForm,
+    RaasSelectForm,
     SelectForm,
 )
 from .helpers import (
@@ -1866,6 +1871,9 @@ def group(name: str):  # type: ignore[no-untyped-def]
                 for v in visible
             ]
             group["has_analysis"] = bool(group["analysis_variants"])
+            # The rules follow the group's own visibility, so no extra check is
+            # needed here: an anonymous viewer never reaches a private group page.
+            group["raas_blocks"] = raas_rules.count(name)
 
             return render_template(
                 "group.html",
@@ -4054,7 +4062,7 @@ def _detach_group_data(database: int, name: str) -> dict[str, int]:
     their own right. Only their attachment to the group is removed, so nothing
     is left pointing at a group that no longer exists.
     """
-    counts = {"posts": 0, "notes": 0, "wallets": 0}
+    counts = {"posts": 0, "notes": 0, "wallets": 0, "raas": 0}
     key = (name or "").strip().lower()
     if not key:
         return counts
@@ -4083,6 +4091,11 @@ def _detach_group_data(database: int, name: str) -> dict[str, int]:
     for stale in _misp_victim_events(key):
         misp_feed.remove(stale)
         counts["posts"] += 1
+
+    # --- RaaS rules: removed, they describe this group and nothing else ------
+    counts["raas"] = raas_rules.count(key)
+    if counts["raas"]:
+        raas_rules.save(key, [])
 
     # --- ransom notes: kept, detached ---------------------------------------
     slug = norm_group_slug(key)
@@ -4221,6 +4234,12 @@ def _rename_blockers(database: int, old: str, new: str) -> list[str]:
     if _misp_victim_events(old_key, first_only=True):
         blockers.append(_("victim events still in the MISP feed under that name"))
 
+    raas_blocks = raas_rules.count(old_key)
+    if raas_blocks:
+        blockers.append(
+            ngettext("%(n)d recorded RaaS rules version", "%(n)d recorded RaaS rules versions", raas_blocks, n=raas_blocks)
+        )
+
     try:
         captures = [f for f in os.listdir(os.path.join(home, "source")) if f.startswith(old_key + "-")]
         if captures:
@@ -4335,15 +4354,16 @@ def editgroup(database: int, name: str):  # type: ignore
         audit_log(
             "delete_group",
             name,
-            "posts=%d; notes detached=%d; wallets detached=%d"
-            % (detached["posts"], detached["notes"], detached["wallets"]),
+            "posts=%d; raas versions=%d; notes detached=%d; wallets detached=%d"
+            % (detached["posts"], detached["raas"], detached["notes"], detached["wallets"]),
         )
         flash(
             _(
-                "Success to delete : %(name)s — %(posts)d posts removed, "
+                "Success to delete : %(name)s — %(posts)d posts and %(raas)d RaaS rules versions removed, "
                 "%(notes)d ransom notes and %(wallets)d wallets kept but detached.",
                 name=name,
                 posts=detached["posts"],
+                raas=detached["raas"],
                 notes=detached["notes"],
                 wallets=detached["wallets"],
             ),
@@ -4523,6 +4543,282 @@ def editgroup(database: int, name: str):  # type: ignore
         return redirect(url_for("admin"))
 
     return render_template("admin/editentry.html", form=form, deleteform=deleteButton)
+
+
+# ── RaaS affiliate rules ────────────────────────────────────────────────
+# The terms a ransomware-as-a-service program imposes on its affiliates. A
+# group carries several blocks because programs rewrite their rules; nothing
+# here has a private flag of its own, visibility follows the group.
+
+
+def _raas_csrf() -> str:
+    """A CSRF token for the hand-written forms on the rules admin page.
+
+    CSRFProtect is not installed app-wide and csrf_token() is therefore not a
+    Jinja global, so the token is produced here and passed in the context. The
+    state-changing routes below check it with _raas_check_csrf().
+    """
+    from flask_wtf.csrf import generate_csrf
+
+    return str(generate_csrf())
+
+
+def _raas_check_csrf() -> None:
+    from flask_wtf.csrf import validate_csrf
+
+    try:
+        validate_csrf(request.form.get("csrf_token"))
+    except Exception:
+        abort(400)
+
+
+def _raas_group_exists(name: str) -> str | None:
+    """Canonical DB_GROUPS / DB_MARKETS key for `name`, or None."""
+    key = raas_rules.norm_group(name)
+    if not key:
+        return None
+    for db_num in (DB_GROUPS, DB_MARKETS):
+        red = Valkey(unix_socket_path=get_socket_path("cache"), db=db_num)
+        for raw in red.keys():  # type: ignore[union-attr]
+            if raw.decode().lower() == key:
+                return raw.decode()
+    return None
+
+
+def _raas_visible_or_404(name: str) -> list[dict[str, Any]]:
+    """Blocks of `name` for this viewer; 404 when the group hides them.
+
+    A private group answers 404 rather than an empty page: an empty list would
+    say "this group exists and has no rules", which a 404 does not.
+    """
+    if _raas_group_exists(name) is None:
+        abort(404)
+    if not can_see_private() and is_private_entity(raas_rules.norm_group(name)):
+        abort(404)
+    blocks = raas_rules.visible(name, include_private=True)
+    if not blocks:
+        abort(404)
+    return blocks
+
+
+@app.route("/raas-rules")
+def raas_index():  # type: ignore[no-untyped-def]
+    """Every group whose affiliate rules we hold."""
+    include_private = can_see_private()
+    items = []
+    for name in raas_rules.groups(include_private=include_private):
+        blocks = raas_rules.load(name)
+        if not blocks:
+            continue
+        items.append({
+            "name": name,
+            "blocks": len(blocks),
+            "latest": raas_rules.latest_date(blocks),
+            "has_current": any(b.get("current") is True for b in blocks),
+            "private": is_private_entity(name),
+        })
+    items.sort(key=lambda x: (x["latest"] or "", x["name"].lower()), reverse=True)
+    return render_template("raas_index.html", items=items, total=len(items))
+
+
+@app.route("/group/<name>/raas-rules")
+def raas_group(name: str):  # type: ignore[no-untyped-def]
+    blocks = _raas_visible_or_404(name)
+    rendered = []
+    for block in blocks:
+        rendered.append({
+            **block,
+            "html": _render_markdown_text(raas_rules.render_source(block.get("content"))),
+        })
+    return render_template("raas_rules.html", name=name, blocks=rendered)
+
+
+@app.route("/raas-rules/<group>/asset/<path:filename>")
+def raas_asset(group: str, filename: str):  # type: ignore[no-untyped-def]
+    """Serve one screenshot, refusing it for a group the viewer may not see.
+
+    /screenshots/ performs no such check, which is why these files live in
+    their own tree.
+    """
+    if _raas_group_exists(group) is None:
+        abort(404)
+    if not can_see_private() and is_private_entity(raas_rules.norm_group(group)):
+        abort(404)
+    base = raas_rules.asset_dir(group)
+    safe = raas_rules.safe_asset(filename)
+    if base is None or safe is None or not os.path.isfile(os.path.join(base, safe)):
+        abort(404)
+    return send_from_directory(base, safe, mimetype=get_mime_type(os.path.join(base, safe)), max_age=0)  # type: ignore[no-untyped-call]
+
+
+@app.route("/admin/raas-rules", methods=["GET", "POST"])
+@flask_login.login_required
+def admin_raas_select():  # type: ignore[no-untyped-def]
+    form = RaasSelectForm()
+    names = []
+    for db_num in (DB_GROUPS, DB_MARKETS):
+        red = Valkey(unix_socket_path=get_socket_path("cache"), db=db_num)
+        names.extend(k.decode() for k in red.keys())  # type: ignore[union-attr]
+    form.group.choices = sorted(set(names), key=str.lower)
+    if form.validate_on_submit():
+        return redirect(url_for("admin_raas_group", group=form.group.data))
+    counts = {n: raas_rules.count(n) for n in form.group.choices}
+    return render_template("admin/raas_select.html", form=form, counts=counts)
+
+
+@app.route("/admin/raas-rules/<group>", methods=["GET", "POST"])
+@flask_login.login_required
+def admin_raas_group(group: str):  # type: ignore[no-untyped-def]
+    canonical = _raas_group_exists(group)
+    if canonical is None:
+        flash(_("Group not found: %(name)s", name=group), "error")
+        return redirect(url_for("admin_raas_select"))
+    key = raas_rules.norm_group(canonical)
+    form = RaasBlockForm()
+
+    if form.validate_on_submit():
+        blocks = raas_rules.load(key)
+        block = raas_rules.make_block(
+            content=form.content.data or "",
+            comment=(form.comment.data or "").strip(),
+            started=form.started.data or "",
+            current=bool(form.current.data),
+            author=str(getattr(current_user, "id", "admin")),
+        )
+        raw_started = (form.started.data or "").strip()
+        if raw_started and not block["started"]:
+            flash(_("Ignored start date %(value)s: expected YYYY-MM-DD.", value=raw_started), "warning")
+        saved, rejected = _raas_store_images(key, block)
+        blocks.append(block)
+        if block["current"]:
+            raas_rules.set_current(blocks, block["id"])
+        raas_rules.save(key, blocks)
+        audit_log("add_raas_rules", key, f"block={block['id']}; images={saved}; started={block['started'] or '-'}")
+        if rejected:
+            flash(_("%(n)d file(s) refused: images only (png/jpg/gif/webp).", n=rejected), "warning")
+        flash(_("Rules added."), "success")
+        return redirect(url_for("admin_raas_group", group=canonical))
+
+    blocks = raas_rules.sort_blocks(raas_rules.load(key))
+    return render_template(
+        "admin/raas_group.html", form=form, group=canonical, blocks=blocks, csrf=_raas_csrf()
+    )
+
+
+def _raas_store_images(key: str, block: dict[str, Any]) -> tuple[int, int]:
+    """Save the uploaded screenshots of one block. Returns (saved, rejected).
+
+    Read from request.files rather than through a form field: a field the view
+    forgets to declare is silently ignored, which is how the actor logo upload
+    stayed dead. Each file is checked by content, not just by extension.
+    """
+    base = raas_rules.asset_dir(key)
+    if base is None:
+        return 0, 0
+    saved = rejected = 0
+    files = request.files.getlist("images")
+    for uploaded in files:
+        if not uploaded or not uploaded.filename:
+            continue
+        ext = os.path.splitext(uploaded.filename)[1].lower()
+        if ext not in app.config["UPLOAD_EXTENSIONS"] or ext != validate_image(uploaded.stream):  # type: ignore
+            rejected += 1
+            continue
+        os.makedirs(base, exist_ok=True)
+        name = secure_filename(os.path.splitext(uploaded.filename)[0]) or "screenshot"
+        stored = f"{name}-{uuid4().hex[:8]}{ext}"
+        uploaded.stream.seek(0)
+        uploaded.save(os.path.join(base, stored))
+        block.setdefault("images", []).append(stored)
+        saved += 1
+    return saved, rejected
+
+
+@app.route("/admin/raas-rules/<group>/<block_id>/update", methods=["POST"])
+@flask_login.login_required
+def admin_raas_update(group: str, block_id: str):  # type: ignore[no-untyped-def]
+    _raas_check_csrf()
+    canonical = _raas_group_exists(group)
+    if canonical is None:
+        abort(404)
+    key = raas_rules.norm_group(canonical)
+    blocks = raas_rules.load(key)
+    block = raas_rules.find(blocks, block_id)
+    if block is None:
+        abort(404)
+    block["content"] = request.form.get("content") or block.get("content", "")
+    block["comment"] = (request.form.get("comment") or "").strip()
+    raw_started = (request.form.get("started") or "").strip()
+    block["started"] = raas_rules.valid_started(raw_started)
+    if raw_started and not block["started"]:
+        flash(_("Ignored start date %(value)s: expected YYYY-MM-DD.", value=raw_started), "warning")
+    block["updated_at"] = raas_rules.now_iso()
+    saved, rejected = _raas_store_images(key, block)
+    if request.form.get("current") == "y":
+        raas_rules.set_current(blocks, block_id)
+    else:
+        block["current"] = False
+    raas_rules.save(key, blocks)
+    audit_log("edit_raas_rules", key, f"block={block_id}; images added={saved}")
+    if rejected:
+        flash(_("%(n)d file(s) refused: images only (png/jpg/gif/webp).", n=rejected), "warning")
+    flash(_("Rules updated."), "success")
+    return redirect(url_for("admin_raas_group", group=canonical))
+
+
+@app.route("/admin/raas-rules/<group>/<block_id>/delete", methods=["POST"])
+@flask_login.login_required
+def admin_raas_delete(group: str, block_id: str):  # type: ignore[no-untyped-def]
+    _raas_check_csrf()
+    canonical = _raas_group_exists(group)
+    if canonical is None:
+        abort(404)
+    key = raas_rules.norm_group(canonical)
+    blocks = raas_rules.load(key)
+    block = raas_rules.find(blocks, block_id)
+    if block is None:
+        abort(404)
+    base = raas_rules.asset_dir(key)
+    removed = 0
+    for image in block.get("images") or []:
+        safe = raas_rules.safe_asset(image)
+        if base and safe:
+            try:
+                os.remove(os.path.join(base, safe))
+                removed += 1
+            except OSError:
+                pass
+    raas_rules.save(key, [b for b in blocks if b.get("id") != block_id])
+    audit_log("delete_raas_rules", key, f"block={block_id}; images removed={removed}")
+    flash(_("Rules deleted."), "success")
+    return redirect(url_for("admin_raas_group", group=canonical))
+
+
+@app.route("/admin/raas-rules/<group>/<block_id>/image/<path:filename>/delete", methods=["POST"])
+@flask_login.login_required
+def admin_raas_image_delete(group: str, block_id: str, filename: str):  # type: ignore[no-untyped-def]
+    _raas_check_csrf()
+    canonical = _raas_group_exists(group)
+    if canonical is None:
+        abort(404)
+    key = raas_rules.norm_group(canonical)
+    blocks = raas_rules.load(key)
+    block = raas_rules.find(blocks, block_id)
+    safe = raas_rules.safe_asset(filename)
+    if block is None or safe is None or safe not in (block.get("images") or []):
+        abort(404)
+    base = raas_rules.asset_dir(key)
+    if base:
+        try:
+            os.remove(os.path.join(base, safe))
+        except OSError:
+            pass
+    block["images"] = [i for i in (block.get("images") or []) if i != safe]
+    block["updated_at"] = raas_rules.now_iso()
+    raas_rules.save(key, blocks)
+    audit_log("delete_raas_image", key, f"block={block_id}; file={safe}")
+    flash(_("Screenshot removed."), "success")
+    return redirect(url_for("admin_raas_group", group=canonical))
 
 
 @app.route("/admin/logo", methods=["GET", "POST"])
@@ -6149,6 +6445,7 @@ api.add_namespace(generic_api)
 api.add_namespace(actors_api)
 api.add_namespace(crypto_api)
 api.add_namespace(notes_api)
+api.add_namespace(raas_api)
 api.add_namespace(leaks_api)
 api.add_namespace(rf_api)
 api.add_namespace(torrent_api)

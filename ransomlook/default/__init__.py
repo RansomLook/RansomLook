@@ -15,6 +15,7 @@ DB_ACTORS = 5  # Threat actor profiles and relations
 DB_HEALTH = 6  # Mirror uptime / health checks
 DB_CRYPTO = 7  # Cryptocurrency wallets and transactions
 DB_MISP = 8  # MISP feed events + manifest (local pull feed)
+DB_RAAS = 9  # RaaS affiliate rules, one list of blocks per group
 DB_RF = 10  # Recorded Future channel data
 DB_NOTES = 11  # Ransom notes
 DB_ALERTS = 12  # Alert keywords and matches
@@ -41,6 +42,7 @@ __all__ = [
     "DB_HEALTH",
     "DB_CRYPTO",
     "DB_MISP",
+    "DB_RAAS",
     "DB_RF",
     "DB_NOTES",
     "DB_ALERTS",

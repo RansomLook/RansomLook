@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+{% from 'bootstrap5/utils.html' import render_messages %}
+{% block title %}{{ _('RaaS Rules') }} · {{ _('Admin') }}{% endblock %}
+
+{% block content %}
+<section class="hero">
+  <div class="container">
+    <h1>{{ _('RaaS Rules') }}</h1>
+    <p class="lead">{{ _('Pick the group whose affiliate rules you want to edit.') }}</p>
+  </div>
+</section>
+
+<section class="metrics-section">
+  <div class="container">{{ render_messages(container=False, dismissible=True) }}</div>
+  <div class="container">
+    <form action="" method="post" class="table-card admin-form p-16">
+      {{ form.csrf_token }}
+      <div class="field">
+        {{ form.group.label }}
+        {{ form.group(class="input") }}
+      </div>
+      {{ form.submit(class="btn btn-primary") }}
+    </form>
+
+    {% if counts %}
+    <div class="table-scroll mt-14">
+      <table class="table">
+        <thead><tr><th>{{ _('Group') }}</th><th>{{ _('Versions') }}</th></tr></thead>
+        <tbody>
+          {% for name, n in counts.items() %}
+            {% if n %}
+            <tr>
+              <td><a href="{{ url_for('admin_raas_group', group=name) }}">{{ name }}</a></td>
+              <td>{{ n }}</td>
+            </tr>
+            {% endif %}
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    {% endif %}
+  </div>
+</section>
+{% endblock %}

@@ -1,0 +1,104 @@
+{% extends "base.html" %}
+{% from 'bootstrap5/utils.html' import render_messages %}
+{% block title %}{{ group }} — {{ _('RaaS Rules') }} · {{ _('Admin') }}{% endblock %}
+
+{% block content %}
+<section class="hero">
+  <div class="container">
+    <h1>{{ group }} — {{ _('RaaS Rules') }}</h1>
+    <p class="lead">
+      {{ _('One block per published version of the affiliate terms. Marking a block current clears the flag on the others.') }}
+      <a href="{{ url_for('admin_raas_select') }}">{{ _('Change group') }}</a> ·
+      <a href="{{ url_for('raas_group', name=group) }}">{{ _('Public page') }}</a>
+    </p>
+  </div>
+</section>
+
+<section class="metrics-section">
+  <div class="container">{{ render_messages(container=False, dismissible=True) }}</div>
+  <div class="container">
+
+    <form action="" method="post" enctype="multipart/form-data" class="table-card admin-form p-16 mb-14">
+      {{ form.csrf_token }}
+      <h2>{{ _('Add a version') }}</h2>
+      <div class="field">{{ form.content.label }} {{ form.content(class="input") }}</div>
+      <div class="field">{{ form.comment.label }} {{ form.comment(class="input") }}</div>
+      <div class="field">{{ form.started.label }} {{ form.started(class="input") }}</div>
+      <div class="field">
+        <label class="switch">{{ form.current() }} <span>{{ _('These are the current rules') }}</span></label>
+      </div>
+      <div class="field">
+        <label>{{ _('Screenshots') }}</label>
+        <input type="file" name="images" class="input" multiple accept="image/png,image/jpeg,image/gif,image/webp">
+      </div>
+      {{ form.submit(class="btn btn-primary") }}
+    </form>
+
+    {% for block in blocks %}
+    <form action="{{ url_for('admin_raas_update', group=group, block_id=block.id) }}"
+          method="post" enctype="multipart/form-data" class="table-card admin-form p-16 mb-14">
+      <input type="hidden" name="csrf_token" value="{{ csrf }}">
+      <h2>
+        {% if block.current %}<span class="badge-neutral">{{ _('Current') }}</span>{% endif %}
+        {{ block.started or _('Date unknown') }}
+      </h2>
+
+      <div class="field">
+        <label>{{ _('Rules (Markdown)') }}</label>
+        <textarea name="content" rows="16" class="input" spellcheck="false">{{ block.content }}</textarea>
+      </div>
+      <div class="field">
+        <label>{{ _('Public comment') }}</label>
+        <input type="text" name="comment" class="input" value="{{ block.comment }}">
+      </div>
+      <div class="field">
+        <label>{{ _('In force since (YYYY-MM-DD, optional)') }}</label>
+        <input type="text" name="started" class="input" value="{{ block.started }}" autocomplete="off">
+      </div>
+      <div class="field">
+        <label class="switch">
+          <input type="checkbox" name="current" value="y" {% if block.current %}checked{% endif %}>
+          <span>{{ _('These are the current rules') }}</span>
+        </label>
+      </div>
+
+      {% if block.images %}
+      <div class="field">
+        <label>{{ _('Screenshots') }}</label>
+        <div>
+          {% for image in block.images %}
+          <figure style="display:inline-block;margin:0 12px 12px 0;text-align:center">
+            <img src="{{ url_for('raas_asset', group=group, filename=image) }}"
+                 alt="" loading="lazy" style="max-width:220px;height:auto;border-radius:6px">
+            <figcaption>
+              <button type="submit" class="btn btn-danger"
+                      formaction="{{ url_for('admin_raas_image_delete', group=group, block_id=block.id, filename=image) }}">
+                {{ _('Remove') }}
+              </button>
+            </figcaption>
+          </figure>
+          {% endfor %}
+        </div>
+      </div>
+      {% endif %}
+
+      <div class="field">
+        <label>{{ _('Add screenshots') }}</label>
+        <input type="file" name="images" class="input" multiple accept="image/png,image/jpeg,image/gif,image/webp">
+      </div>
+
+      <button type="submit" class="btn btn-primary">{{ _('Save changes') }}</button>
+      <button type="submit" class="btn btn-danger"
+              formaction="{{ url_for('admin_raas_delete', group=group, block_id=block.id) }}">
+        {{ _('Delete this version') }}
+      </button>
+    </form>
+    {% else %}
+    <div class="table-card p-12">
+      <p>{{ _('No rules recorded for this group yet.') }}</p>
+    </div>
+    {% endfor %}
+
+  </div>
+</section>
+{% endblock %}

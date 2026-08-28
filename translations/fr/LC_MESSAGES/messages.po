@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version:  RansomLook\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-04-30 13:32+0200\n"
+"POT-Creation-Date: 2026-08-27 09:12+0200\n"
 "PO-Revision-Date: 2026-04-21 13:39+0200\n"
 "Last-Translator: RansomLook team\n"
 "Language: fr\n"
@@ -17,149 +17,253 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 2.18.0\n"
 
-#: website/web/__init__.py:736 website/web/__init__.py:747
+#: website/web/__init__.py:833
+msgid "Too many failed attempts. Please try again later."
+msgstr "Trop de tentatives échouées. Réessayez plus tard."
+
+#: website/web/__init__.py:850 website/web/__init__.py:863
 #, python-format
 msgid "Logged in as: %(user)s"
 msgstr "Connecté en tant que : %(user)s"
 
-#: website/web/__init__.py:740 website/web/__init__.py:751
+#: website/web/__init__.py:855 website/web/__init__.py:868
 #, python-format
 msgid "Unable to login as: %(username)s"
 msgstr "Impossible de se connecter en tant que : %(username)s"
 
-#: website/web/__init__.py:761
+#: website/web/__init__.py:878
 msgid "Successfully logged out."
 msgstr "Déconnexion réussie."
 
-#: website/web/__init__.py:2241 website/web/__init__.py:2305
+#: website/web/__init__.py:2420 website/web/__init__.py:2497
 #, python-format
 msgid "No such group: %(name)s"
 msgstr "Groupe inexistant : %(name)s"
 
-#: website/web/__init__.py:2247
+#: website/web/__init__.py:2426
 msgid "Invalid variant id (use [a-z0-9_-], 1–64 chars; not 'assets'/'pdf')."
-msgstr ""
+msgstr "Identifiant de variante invalide (utilisez [a-z0-9_-], 1 à 64 caractères ; ni « assets » ni « pdf »)."
 "ID de variante invalide (utilisez [a-z0-9_-], 1–64 caractères ; pas "
 "'assets'/'pdf')."
 
-#: website/web/__init__.py:2251
+#: website/web/__init__.py:2430
 #, python-format
 msgid "Variant '%(new_id)s' already exists."
 msgstr "La variante '%(new_id)s' existe déjà."
 
-#: website/web/__init__.py:2323 website/web/__init__.py:2543
+#: website/web/__init__.py:2515 website/web/__init__.py:2735
 msgid "Invalid variant id"
 msgstr "ID de variante invalide"
 
-#: website/web/__init__.py:2358
+#: website/web/__init__.py:2550
 msgid "Invalid form submission"
 msgstr "Soumission de formulaire invalide"
 
-#: website/web/__init__.py:2376
+#: website/web/__init__.py:2568
 msgid "Could not read uploaded file as UTF-8 text"
 msgstr "Impossible de lire le fichier téléversé en UTF-8"
 
-#: website/web/__init__.py:2382
+#: website/web/__init__.py:2574
 msgid "Empty content — nothing saved"
 msgstr "Contenu vide — rien d'enregistré"
 
-#: website/web/__init__.py:2386
+#: website/web/__init__.py:2578
 msgid "Warning: no Markdown heading found — saving anyway"
 msgstr "Attention : aucun titre Markdown trouvé — enregistrement quand même"
 
-#: website/web/__init__.py:2401
+#: website/web/__init__.py:2593
 msgid "SHA-256 ignored: must be 64 hex chars"
 msgstr "SHA-256 ignoré : doit faire 64 caractères hex"
 
-#: website/web/__init__.py:2407
+#: website/web/__init__.py:2599
 #, python-format
 msgid "SHA-256 auto-extracted from Markdown: %(prefix)s…"
 msgstr "SHA-256 extrait automatiquement du Markdown : %(prefix)s…"
 
-#: website/web/__init__.py:2422
+#: website/web/__init__.py:2614
 msgid "Analysis date ignored: expected YYYY-MM-DD"
 msgstr "Date d'analyse ignorée : format attendu AAAA-MM-JJ"
 
-#: website/web/__init__.py:2437
+#: website/web/__init__.py:2629
 #, python-format
 msgid "Saved analysis for %(name)s%(variant_suffix)s (%(size)s bytes)"
 msgstr "Analyse enregistrée pour %(name)s%(variant_suffix)s (%(size)s octets)"
 
-#: website/web/__init__.py:2547
+#: website/web/__init__.py:2739
 msgid "Nothing to delete for that variant"
 msgstr "Rien à supprimer pour cette variante"
 
-#: website/web/__init__.py:2567
+#: website/web/__init__.py:2759
 #, python-format
 msgid "Delete failed: %(error)s"
 msgstr "Échec de la suppression : %(error)s"
 
-#: website/web/__init__.py:2572
+#: website/web/__init__.py:2764
 #, python-format
 msgid "Deleted analysis for %(name)s%(variant_suffix)s"
 msgstr "Analyse supprimée pour %(name)s%(variant_suffix)s"
 
-#: website/web/__init__.py:3517
+#: website/web/__init__.py:3734
 msgid "Unknown infohash"
 msgstr "Infohash inconnu"
 
-#: website/web/__init__.py:3571
+#: website/web/__init__.py:3791
 #, python-format
 msgid "No data for IP %(ip)r"
 msgstr "Aucune donnée pour l'IP %(ip)r"
 
-#: website/web/__init__.py:3583
+#: website/web/__init__.py:3803
 #, python-format
 msgid "No data for ASN %(asn)r"
 msgstr "Aucune donnée pour l'ASN %(asn)r"
 
-#: website/web/__init__.py:3622
+#: website/web/__init__.py:3842
 #, python-format
 msgid "Removed %(count)s torrent(s)."
 msgstr "%(count)s torrent(s) supprimé(s)."
 
-#: website/web/__init__.py:3628
+#: website/web/__init__.py:3848
 msgid "Pick a group."
 msgstr "Choisissez un groupe."
 
-#: website/web/__init__.py:3693
+#: website/web/__init__.py:3913
 msgid "No input."
 msgstr "Aucune saisie."
 
-#: website/web/__init__.py:3751
+#: website/web/__init__.py:3976
 #, python-format
 msgid "URL already exists for %(group)s: %(url)s"
 msgstr "L'URL existe déjà pour %(group)s : %(url)s"
 
-#: website/web/__init__.py:3754
+#: website/web/__init__.py:3979
 #, python-format
 msgid "URL added to existing group %(group)s: %(url)s"
 msgstr "URL ajoutée au groupe existant %(group)s : %(url)s"
 
-#: website/web/__init__.py:3758
+#: website/web/__init__.py:3983
 #, python-format
 msgid "New group created: %(group)s with URL %(url)s"
 msgstr "Nouveau groupe créé : %(group)s avec l'URL %(url)s"
 
-#: website/web/__init__.py:3878
+#: website/web/__init__.py:4196
 #, python-format
-msgid "Success to delete : %(name)s"
-msgstr "Suppression réussie : %(name)s"
+msgid "a group or market named %(name)s already exists"
+msgstr "un groupe ou marché nommé %(name)s existe déjà"
 
-#: website/web/__init__.py:3948 website/web/__init__.py:4077
-#: website/web/__init__.py:4144 website/web/__init__.py:4241
+#: website/web/__init__.py:4205
+#, python-format
+msgid "%(n)d post in db=2"
+msgid_plural "%(n)d posts in db=2"
+msgstr[0] "%(n)d post en db=2"
+msgstr[1] "%(n)d posts en db=2"
+
+#: website/web/__init__.py:4215
+#, python-format
+msgid "%(n)d ransom note indexed under idx:group:%(slug)s"
+msgid_plural "%(n)d ransom notes indexed under idx:group:%(slug)s"
+msgstr[0] "%(n)d note de rançon indexée sous idx:group:%(slug)s"
+msgstr[1] "%(n)d notes de rançon indexées sous idx:group:%(slug)s"
+
+#: website/web/__init__.py:4227
+msgid "screenshots"
+msgstr "captures d'écran"
+
+#: website/web/__init__.py:4228
+msgid "torrent files and notes"
+msgstr "fichiers torrent et notes"
+
+#: website/web/__init__.py:4229
+msgid "logo"
+msgstr "logo"
+
+#: website/web/__init__.py:4233
+#, python-format
+msgid "a %(label)s directory: %(path)s"
+msgstr "un répertoire de %(label)s : %(path)s"
+
+#: website/web/__init__.py:4235
+msgid "victim events still in the MISP feed under that name"
+msgstr "des événements victime encore présents dans le feed MISP sous ce nom"
+
+#: website/web/__init__.py:4240
+#, python-format
+msgid "%(n)d recorded RaaS rules version"
+msgid_plural "%(n)d recorded RaaS rules versions"
+msgstr[0] "%(n)d version de règles RaaS enregistrée"
+msgstr[1] "%(n)d versions de règles RaaS enregistrées"
+
+#: website/web/__init__.py:4248
+#, python-format
+msgid "%(n)d captured page source/%(name)s-*.html"
+msgid_plural "%(n)d captured pages source/%(name)s-*.html"
+msgstr[0] "%(n)d page capturée source/%(name)s-*.html"
+msgstr[1] "%(n)d pages capturées source/%(name)s-*.html"
+
+#: website/web/__init__.py:4362
+#, python-format
+msgid ""
+"Success to delete : %(name)s — %(posts)d posts and %(raas)d RaaS rules "
+"versions removed, %(notes)d ransom notes and %(wallets)d wallets kept but"
+" detached."
+msgstr "Suppression réussie : %(name)s — %(posts)d posts et %(raas)d versions de règles RaaS supprimés, %(notes)d notes de rançon et %(wallets)d portefeuilles conservés mais détachés."
+
+#: website/web/__init__.py:4381
+#, python-format
+msgid ""
+"Cannot rename %(old)s to %(new)s: only the record itself would move. Left"
+" behind: %(what)s. Rename it from the shell instead."
+msgstr "Impossible de renommer %(old)s en %(new)s : seul l'enregistrement lui-même serait déplacé. Resteraient en arrière : %(what)s. Renommez-le depuis le shell."
+
+#: website/web/__init__.py:4457 website/web/__init__.py:4867
+#: website/web/__init__.py:4935 website/web/__init__.py:5047
 #, python-format
 msgid "Error to add post to : %(name)s - Screen should be a PNG"
-msgstr ""
+msgstr "Échec de l'ajout du post à %(name)s — la capture doit être un PNG"
 "Erreur lors de l'ajout d'une publication à %(name)s — la capture doit "
 "être un PNG"
 
-#: website/web/__init__.py:4013
+#: website/web/__init__.py:4542
 #, python-format
 msgid "Success to edit : %(name)s"
 msgstr "Édition réussie : %(name)s"
 
-#: website/web/__init__.py:4135
+#: website/web/__init__.py:4653
+#, python-format
+msgid "Group not found: %(name)s"
+msgstr "Groupe introuvable : %(name)s"
+
+#: website/web/__init__.py:4669 website/web/__init__.py:4730
+#, python-format
+msgid "Ignored start date %(value)s: expected YYYY-MM-DD."
+msgstr "Date de début %(value)s ignorée : format attendu AAAA-MM-JJ."
+
+#: website/web/__init__.py:4677 website/web/__init__.py:4740
+#, python-format
+msgid "%(n)d file(s) refused: images only (png/jpg/gif/webp)."
+msgstr "%(n)d fichier(s) refusé(s) : images uniquement (png/jpg/gif/webp)."
+
+#: website/web/__init__.py:4678
+msgid "Rules added."
+msgstr "Règles ajoutées."
+
+#: website/web/__init__.py:4741
+msgid "Rules updated."
+msgstr "Règles mises à jour."
+
+#: website/web/__init__.py:4768
+msgid "Rules deleted."
+msgstr "Règles supprimées."
+
+#: website/web/__init__.py:4794
+msgid "Screenshot removed."
+msgstr "Capture d'écran supprimée."
+
+#: website/web/__init__.py:4859
+#, python-format
+msgid "Unknown logo: %(file)s"
+msgstr "Logo inconnu : %(file)s"
+
+#: website/web/__init__.py:4926
 #, python-format
 msgid ""
 "Error to add post to : %(name)s - You should select Magnet or Link not "
@@ -168,185 +272,198 @@ msgstr ""
 "Erreur lors de l'ajout d'une publication à %(name)s — sélectionnez Magnet"
 " ou Lien, pas les deux"
 
-#: website/web/__init__.py:4157
+#: website/web/__init__.py:4948
 #, python-format
 msgid "Error to add post to : %(name)s - The entry already exists"
 msgstr "Erreur lors de l'ajout d'une publication à %(name)s — l'entrée existe déjà"
 
-#: website/web/__init__.py:4166 website/web/__init__.py:4270
+#: website/web/__init__.py:4961 website/web/__init__.py:5095
 #, python-format
 msgid "Success to add post to : %(name)s"
 msgstr "Publication ajoutée avec succès à %(name)s"
 
-#: website/web/__init__.py:4247
+#: website/web/__init__.py:5053
 #, python-format
 msgid "Invalid path: %(name)s"
 msgstr "Chemin invalide : %(name)s"
 
-#: website/web/__init__.py:4279
-msgid "You are not allowed to dump this DataBase"
-msgstr "Vous n'êtes pas autorisé à dumper cette base de données"
+#: website/web/__init__.py:5065
+#, python-format
+msgid "Invalid screen path for %(title)s"
+msgstr "Chemin de capture invalide pour %(title)s"
 
-#: website/web/__init__.py:4315
+#: website/web/__init__.py:5117
 msgid "Name required"
 msgstr "Nom requis"
 
-#: website/web/__init__.py:4322
+#: website/web/__init__.py:5125
+#, python-format
+msgid "Invalid actor name: %(name)s"
+msgstr "Nom d'acteur invalide : %(name)s"
+
+#: website/web/__init__.py:5132
 msgid "This actor already exists."
 msgstr "Cet acteur existe déjà."
 
-#: website/web/__init__.py:4400
+#: website/web/__init__.py:5212
 msgid "Image invalide (png/jpg/svg/gif)"
 msgstr "Image invalide (png/jpg/svg/gif)"
 
-#: website/web/__init__.py:4416
+#: website/web/__init__.py:5234
 msgid "Actor created."
 msgstr "Acteur créé."
 
-#: website/web/__init__.py:4447
+#: website/web/__init__.py:5265
 msgid "Actor not found"
 msgstr "Acteur introuvable"
 
-#: website/web/__init__.py:4629
+#: website/web/__init__.py:5448
 msgid "Actor updated."
 msgstr "Acteur mis à jour."
 
-#: website/web/__init__.py:4688
+#: website/web/__init__.py:5507
 msgid "Please select a group name."
 msgstr "Veuillez sélectionner un nom de groupe."
 
-#: website/web/__init__.py:4745
+#: website/web/__init__.py:5564
 msgid "Alias invalide."
 msgstr "Alias invalide."
 
-#: website/web/__init__.py:4750
+#: website/web/__init__.py:5569
 #, python-format
 msgid "Alias '%(alias)s' added."
 msgstr "Alias « %(alias)s » ajouté."
 
-#: website/web/__init__.py:4763
+#: website/web/__init__.py:5582
 #, python-format
 msgid "Alias '%(alias)s' deleted."
 msgstr "Alias « %(alias)s » supprimé."
 
-#: website/web/__init__.py:4801
+#: website/web/__init__.py:5620
 msgid "Note created."
 msgstr "Note créée."
 
-#: website/web/__init__.py:4813 website/web/__init__.py:4869
+#: website/web/__init__.py:5632 website/web/__init__.py:5688
 msgid "Note not found."
 msgstr "Note introuvable."
 
-#: website/web/__init__.py:4857
+#: website/web/__init__.py:5676
 msgid "Note updated."
 msgstr "Note mise à jour."
 
-#: website/web/__init__.py:4874
+#: website/web/__init__.py:5693
 msgid "Note deleted."
 msgstr "Note supprimée."
 
-#: website/web/__init__.py:4972
+#: website/web/__init__.py:5792
 msgid "Canonical name is required."
 msgstr "Le nom canonique est requis."
 
-#: website/web/__init__.py:4986
+#: website/web/__init__.py:5806
 msgid "Group created in DB=7."
 msgstr "Groupe créé en DB=7."
 
-#: website/web/__init__.py:5009
+#: website/web/__init__.py:5829
 msgid "Address is required."
 msgstr "L'adresse est requise."
 
-#: website/web/__init__.py:5020 website/web/__init__.py:5101
+#: website/web/__init__.py:5833
+msgid "Invalid address: letters, digits, ':', '_' and '-' only."
+msgstr "Adresse invalide : lettres, chiffres, « : », « _ » et « - » uniquement."
+
+#: website/web/__init__.py:5837
+msgid "Invalid blockchain name: lowercase letters, digits and '-' only."
+msgstr "Nom de blockchain invalide : minuscules, chiffres et « - » uniquement."
+
+#: website/web/__init__.py:5848 website/web/__init__.py:5929
 #, python-format
 msgid "Invalid transactions JSON: %(error)s"
 msgstr "JSON de transactions invalide : %(error)s"
 
-#: website/web/__init__.py:5048
+#: website/web/__init__.py:5876
 msgid "Address created."
 msgstr "Adresse créée."
 
-#: website/web/__init__.py:5086
+#: website/web/__init__.py:5914
 msgid "Address deleted."
 msgstr "Adresse supprimée."
 
-#: website/web/__init__.py:5143
+#: website/web/__init__.py:5971
 msgid "Address updated."
 msgstr "Adresse mise à jour."
 
-#: website/web/__init__.py:5162
+#: website/web/__init__.py:5990
 msgid "Alias is required."
 msgstr "L'alias est requis."
 
-#: website/web/__init__.py:5170
+#: website/web/__init__.py:5998
 msgid "Alias deleted."
 msgstr "Alias supprimé."
 
-#: website/web/__init__.py:5174
+#: website/web/__init__.py:6002
 msgid "Canonical slug is required."
 msgstr "Le slug canonique est requis."
 
-#: website/web/__init__.py:5179
+#: website/web/__init__.py:6007
 msgid "Alias saved."
 msgstr "Alias enregistré."
 
-#: website/web/__init__.py:5225
+#: website/web/__init__.py:6053
 msgid "Group/market name is required."
 msgstr "Le nom de groupe/marché est requis."
 
-#: website/web/__init__.py:5230
+#: website/web/__init__.py:6058
 #, python-format
 msgid "\"%(name)s\" does not exist. Create it first."
 msgstr "« %(name)s » n'existe pas. Créez-le d'abord."
 
-#: website/web/__init__.py:5235
+#: website/web/__init__.py:6063
 msgid "At least one URL is required."
 msgstr "Au moins une URL est requise."
 
-#: website/web/__init__.py:5249
+#: website/web/__init__.py:6077
 #, python-format
 msgid "%(count)s URL(s) added to %(name)s."
 msgstr "%(count)s URL(s) ajoutée(s) à %(name)s."
 
-#: website/web/__init__.py:5251
+#: website/web/__init__.py:6079
 #, python-format
 msgid "%(count)s URL(s) already existed (skipped)."
 msgstr "%(count)s URL(s) existaient déjà (ignorées)."
 
-#: website/web/__init__.py:5363
-msgid "Configuration saved."
-msgstr "Configuration enregistrée."
-
-#: website/web/__init__.py:5406
+#: website/web/__init__.py:6148
 msgid "A name / comment is required."
 msgstr "Un nom / commentaire est requis."
 
-#: website/web/__init__.py:5419
+#: website/web/__init__.py:6162
 #, python-format
 msgid "API key created. Token (copy it now, it won't be shown again): %(token)s"
-msgstr ""
+msgstr "Clé d'API créée. Jeton (copiez-le maintenant, il ne sera plus affiché) : %(token)s"
 "Clé API créée. Jeton (copiez-le maintenant, il ne sera plus affiché) : "
 "%(token)s"
 
-#: website/web/__init__.py:5428 website/web/__init__.py:5449
-msgid "Missing token."
-msgstr "Jeton manquant."
-
-#: website/web/__init__.py:5433
+#: website/web/__init__.py:6171 website/web/__init__.py:6176
+#: website/web/__init__.py:6192 website/web/__init__.py:6197
+#: website/web/__init__.py:6216
 msgid "Key not found."
 msgstr "Clé introuvable."
 
-#: website/web/__init__.py:5440
+#: website/web/__init__.py:6183
 #, python-format
 msgid "Key \"%(name)s\" %(state)s."
 msgstr "Clé « %(name)s » %(state)s."
 
-#: website/web/__init__.py:5461
+#: website/web/__init__.py:6205
+#, python-format
+msgid "Private access %(state)s for key \"%(name)s\"."
+msgstr "Accès privé %(state)s pour la clé « %(name)s »."
+
+#: website/web/__init__.py:6228
 #, python-format
 msgid "Key \"%(name)s\" deleted."
 msgstr "Clé « %(name)s » supprimée."
 
-#: website/web/__init__.py:5532
+#: website/web/__init__.py:6397
 msgid "Success to update keywords"
 msgstr "Mots-clés mis à jour avec succès"
 
@@ -392,7 +509,7 @@ msgstr ""
 msgid "Retry"
 msgstr "Réessayer"
 
-#: website/web/templates/RF.html:3 website/web/templates/base.html:89
+#: website/web/templates/RF.html:3 website/web/templates/base.html:90
 #: website/web/templates/glossary.html:114
 msgid "RF Dumps"
 msgstr "RF Dumps"
@@ -432,8 +549,8 @@ msgstr "Dump"
 #: website/web/templates/RF.html:45
 #: website/web/templates/admin/addpostentry.html:33
 #: website/web/templates/admin/editentry.html:39
-#: website/web/templates/admin/editpost.html:114
-#: website/web/templates/group.html:163 website/web/templates/group.html:725
+#: website/web/templates/admin/editpost.html:117
+#: website/web/templates/group.html:164 website/web/templates/group.html:726
 #: website/web/templates/groups.html:133 website/web/templates/search.html:18
 #: website/web/templates/search.html:43 website/web/templates/search.html:68
 msgid "Description"
@@ -454,10 +571,10 @@ msgstr "Dump RF"
 #: website/web/templates/RF.html:81 website/web/templates/actor.html:253
 #: website/web/templates/admin/crypto_addr_form.html:100
 #: website/web/templates/admin/ransomnotes_group.html:125
-#: website/web/templates/base.html:175 website/web/templates/group.html:758
-#: website/web/templates/group.html:767 website/web/templates/group.html:794
-#: website/web/templates/group.html:811 website/web/templates/groups.html:200
-#: website/web/templates/leaks.html:74 website/web/templates/stats.html:162
+#: website/web/templates/base.html:176 website/web/templates/group.html:759
+#: website/web/templates/group.html:768 website/web/templates/group.html:795
+#: website/web/templates/group.html:812 website/web/templates/groups.html:200
+#: website/web/templates/leaks.html:80 website/web/templates/stats.html:162
 msgid "Close"
 msgstr "Fermer"
 
@@ -470,7 +587,7 @@ msgstr "En-tête RF"
 #: website/web/templates/admin/crypto_addr_form.html:75
 #: website/web/templates/admin/crypto_addr_form.html:138
 #: website/web/templates/admin/crypto_group.html:36
-#: website/web/templates/cryptodetail.html:129
+#: website/web/templates/cryptodetail.html:132
 msgid "Source"
 msgstr "Source"
 
@@ -485,21 +602,21 @@ msgstr "Infos supplémentaires RF"
 #: website/web/templates/RF.html:108
 #: website/web/templates/admin/torrent_health.html:75
 #: website/web/templates/admin/torrent_manage.html:84
-#: website/web/templates/leaks.html:82
+#: website/web/templates/leaks.html:88
 #: website/web/templates/torrent_health.html:75
 #: website/web/templates/torrent_health_detail.html:171
 msgid "Size"
 msgstr "Taille"
 
-#: website/web/templates/RF.html:109 website/web/templates/leaks.html:83
+#: website/web/templates/RF.html:109 website/web/templates/leaks.html:89
 msgid "Records"
 msgstr "Enregistrements"
 
-#: website/web/templates/RF.html:110 website/web/templates/leaks.html:42
+#: website/web/templates/RF.html:110 website/web/templates/leaks.html:47
 msgid "Detection"
 msgstr "Détection"
 
-#: website/web/templates/RF.html:111 website/web/templates/leaks.html:85
+#: website/web/templates/RF.html:111 website/web/templates/leaks.html:91
 msgid "Columns"
 msgstr "Colonnes"
 
@@ -515,7 +632,7 @@ msgstr "Clé"
 msgid "Value"
 msgstr "Valeur"
 
-#: website/web/templates/about.html:3 website/web/templates/base.html:100
+#: website/web/templates/about.html:3 website/web/templates/base.html:101
 msgid "About"
 msgstr "À propos"
 
@@ -743,7 +860,7 @@ msgstr "Plusieurs moyens permettent de suivre les nouvelles publications :"
 
 #: website/web/templates/about.html:103
 msgid "Run your own instance and enable RocketChat and/or email notifications"
-msgstr ""
+msgstr "Hébergez votre propre instance et activez les notifications RocketChat et/ou courriel"
 "Héberger sa propre instance et activer les notifications RocketChat et/ou"
 " e‑mail"
 
@@ -781,7 +898,7 @@ msgstr "Ouvrir un ticket sur notre dépôt GitHub"
 
 #: website/web/templates/about.html:131
 msgid "Submit pull requests with new features or improvements"
-msgstr ""
+msgstr "Proposez des pull requests avec de nouvelles fonctionnalités ou des améliorations"
 "Proposer des pull requests avec de nouvelles fonctionnalités ou "
 "améliorations"
 
@@ -927,16 +1044,19 @@ msgstr "Acteur de menace"
 msgid "WANTED"
 msgstr "RECHERCHÉ"
 
-#: website/web/templates/actor.html:34 website/web/templates/group.html:131
+#: website/web/templates/actor.html:34 website/web/templates/group.html:132
 #: website/web/templates/groups.html:69
 msgid "Inactive"
 msgstr "Inactif"
 
 #: website/web/templates/actor.html:35
 #: website/web/templates/admin/addactor.html:45
+#: website/web/templates/admin/addpostentry.html:57
 #: website/web/templates/admin/editactor.html:49
+#: website/web/templates/admin/editpost.html:154
 #: website/web/templates/admin/urls.html:61
-#: website/web/templates/group.html:116 website/web/templates/groups.html:126
+#: website/web/templates/group.html:117 website/web/templates/groups.html:126
+#: website/web/templates/raas_index.html:33
 msgid "Private"
 msgstr "Privé"
 
@@ -957,7 +1077,6 @@ msgstr[1] "%(n)s pairs"
 #: website/web/templates/actor.html:43
 #: website/web/templates/admin/admin.html:45
 #: website/web/templates/admin/analysis_variants.html:73
-#: website/web/templates/admin/config.html:11
 #: website/web/templates/admin/crypto_addr_form.html:197
 #: website/web/templates/admin/crypto_group.html:49
 #: website/web/templates/admin/editentry.html:3
@@ -981,11 +1100,13 @@ msgstr "Cet acteur"
 
 #: website/web/templates/actor.html:79
 #: website/web/templates/admin/crypto.html:30
+#: website/web/templates/admin/raas_select.html:26
 #: website/web/templates/admin/torrent_manage.html:31
 #: website/web/templates/admin/torrent_manage.html:56
 #: website/web/templates/admin/urls.html:24
 #: website/web/templates/analyses_index.html:47
 #: website/web/templates/glossary.html:34 website/web/templates/hot.html:128
+#: website/web/templates/raas_index.html:22
 #: website/web/templates/recent.html:94 website/web/templates/recent.html:107
 #: website/web/templates/search.html:17 website/web/templates/search.html:42
 #: website/web/templates/search.html:92 website/web/templates/search.html:124
@@ -1170,11 +1291,11 @@ msgstr "Parcourir les acteurs de menace / affiliés."
 #: website/web/templates/admin/editactor_select.html:17
 #: website/web/templates/admin/editpost.html:65
 #: website/web/templates/admin/logo.html:33
-#: website/web/templates/admin/logs.html:56
+#: website/web/templates/admin/logs.html:57
 #: website/web/templates/admin/ransomnotes_index.html:35
 #: website/web/templates/analyses_index.html:21
-#: website/web/templates/base.html:144 website/web/templates/base.html:176
-#: website/web/templates/base.html:179 website/web/templates/browse.html:37
+#: website/web/templates/base.html:145 website/web/templates/base.html:177
+#: website/web/templates/base.html:180 website/web/templates/browse.html:37
 #: website/web/templates/crypto.html:22 website/web/templates/groups.html:42
 #: website/web/templates/groups.html:44 website/web/templates/leaks.html:23
 #: website/web/templates/leaks.html:25 website/web/templates/notes.html:22
@@ -1195,7 +1316,7 @@ msgstr "Nom ou alias de l'acteur…"
 #: website/web/templates/admin/analysis_variants.html:10
 #: website/web/templates/analyses_index.html:2
 #: website/web/templates/analyses_index.html:7
-#: website/web/templates/group.html:810
+#: website/web/templates/group.html:811
 msgid "Technical Analyses"
 msgstr "Analyses techniques"
 
@@ -1216,11 +1337,11 @@ msgstr "Filtrer par groupe, variante ou SHA-256…"
 msgid "Document type"
 msgstr "Type de document"
 
-#: website/web/templates/admin/logs.html:38
-#: website/web/templates/admin/logs.html:48
+#: website/web/templates/admin/logs.html:39
+#: website/web/templates/admin/logs.html:49
 #: website/web/templates/analyses_index.html:27
 #: website/web/templates/browse.html:50 website/web/templates/browse.html:83
-#: website/web/templates/cryptodetail.html:97
+#: website/web/templates/cryptodetail.html:100
 #: website/web/templates/stats.html:66 website/web/templates/stats.html:92
 #: website/web/templates/urls.html:61 website/web/templates/urls.html:73
 msgid "All"
@@ -1253,7 +1374,7 @@ msgid "Updated"
 msgstr "Mis à jour"
 
 #: website/web/templates/admin/analysis_variants.html:35
-#: website/web/templates/admin/apikeys.html:49
+#: website/web/templates/admin/apikeys.html:53
 #: website/web/templates/admin/crypto.html:32
 #: website/web/templates/admin/crypto_aliases.html:36
 #: website/web/templates/admin/crypto_group.html:38
@@ -1269,32 +1390,36 @@ msgstr "Actions"
 msgid "Visible to authenticated users only"
 msgstr "Visible uniquement aux utilisateurs authentifiés"
 
+#: website/web/templates/admin/apikeys.html:70
+#: website/web/templates/admin/editpost.html:105
 #: website/web/templates/analyses_index.html:67
 #: website/web/templates/analysis.html:31 website/web/templates/browse.html:135
-#: website/web/templates/group.html:41
+#: website/web/templates/group.html:41 website/web/templates/group.html:734
+#: website/web/templates/index.html:154 website/web/templates/recent.html:119
+#: website/web/templates/search.html:101
 #: website/web/templates/torrent_health_detail.html:122
 #: website/web/templates/urls.html:124 website/web/templates/urls.html:128
 msgid "private"
 msgstr "privé"
 
 #: website/web/templates/analyses_index.html:72
-#: website/web/templates/analysis.html:26 website/web/templates/group.html:821
-#: website/web/templates/group.html:827
+#: website/web/templates/analysis.html:26 website/web/templates/group.html:822
+#: website/web/templates/group.html:828
 msgid "Cyber Threat Intelligence report"
 msgstr "Rapport Cyber Threat Intelligence"
 
 #: website/web/templates/analyses_index.html:72
-#: website/web/templates/group.html:821
+#: website/web/templates/group.html:822
 msgid "CTI"
 msgstr "CTI"
 
 #: website/web/templates/analyses_index.html:74
-#: website/web/templates/analysis.html:28 website/web/templates/group.html:823
+#: website/web/templates/analysis.html:28 website/web/templates/group.html:824
 msgid "Full technical analysis"
 msgstr "Analyse technique complète"
 
 #: website/web/templates/analyses_index.html:74
-#: website/web/templates/group.html:823
+#: website/web/templates/group.html:824
 msgid "Full"
 msgstr "Complète"
 
@@ -1420,7 +1545,7 @@ msgstr "Renseignement"
 
 #: website/web/templates/admin/admin.html:35
 #: website/web/templates/admin/urls.html:74 website/web/templates/base.html:83
-#: website/web/templates/group.html:459 website/web/templates/urls.html:3
+#: website/web/templates/group.html:460 website/web/templates/urls.html:3
 #: website/web/templates/urls.html:34 website/web/templates/urls.html:96
 msgid "URLs"
 msgstr "URLs"
@@ -1433,7 +1558,7 @@ msgstr "Tous les miroirs suivis"
 msgid "Crypto"
 msgstr "Crypto"
 
-#: website/web/templates/admin/admin.html:137
+#: website/web/templates/admin/admin.html:147
 #: website/web/templates/base.html:84 website/web/templates/cryptodetail.html:3
 #: website/web/templates/search.html:146 website/web/templates/search.html:149
 msgid "Cryptocurrencies"
@@ -1468,11 +1593,27 @@ msgstr "Analyses"
 msgid "In-house technical analyses"
 msgstr "Analyses techniques internes"
 
-#: website/web/templates/admin/admin.html:171
+#: website/web/templates/admin/admin.html:75
+#: website/web/templates/admin/raas_group.html:2
+#: website/web/templates/admin/raas_group.html:7
+#: website/web/templates/admin/raas_select.html:2
+#: website/web/templates/admin/raas_select.html:7
+#: website/web/templates/base.html:88 website/web/templates/raas_index.html:2
+#: website/web/templates/raas_index.html:7
+#: website/web/templates/raas_rules.html:2
+#: website/web/templates/raas_rules.html:7
+msgid "RaaS Rules"
+msgstr "Règles RaaS"
+
+#: website/web/templates/base.html:88
+msgid "Affiliate rules published by RaaS programs"
+msgstr "Règles imposées aux affiliés par les programmes RaaS"
+
+#: website/web/templates/admin/admin.html:181
 #: website/web/templates/admin/torrent_pivot.html:66
 #: website/web/templates/admin/torrent_pivot.html:130
 #: website/web/templates/admin/torrent_pivot.html:195
-#: website/web/templates/base.html:91
+#: website/web/templates/base.html:92
 #: website/web/templates/torrent_pivot.html:66
 #: website/web/templates/torrent_pivot.html:130
 #: website/web/templates/torrent_pivot.html:203
@@ -1480,71 +1621,73 @@ msgid "Torrents"
 msgstr "Torrents"
 
 #: website/web/templates/admin/torrent_health.html:11
-#: website/web/templates/base.html:91
+#: website/web/templates/base.html:92
 #: website/web/templates/torrent_health.html:11
 msgid "Torrent swarm health"
 msgstr "État des swarms torrent"
 
-#: website/web/templates/base.html:96
+#: website/web/templates/base.html:97
 msgid "Info"
 msgstr "Infos"
 
-#: website/web/templates/base.html:98 website/web/templates/index.html:55
+#: website/web/templates/base.html:99 website/web/templates/index.html:55
 msgid "API"
 msgstr "API"
 
-#: website/web/templates/base.html:98
+#: website/web/templates/base.html:99
 msgid "API documentation (Swagger)"
 msgstr "Documentation de l'API (Swagger)"
 
-#: website/web/templates/base.html:99 website/web/templates/glossary.html:2
+#: website/web/templates/base.html:100 website/web/templates/glossary.html:2
 #: website/web/templates/glossary.html:7
 msgid "Glossary"
 msgstr "Glossaire"
 
-#: website/web/templates/base.html:106
+#: website/web/templates/base.html:107
 msgid "RSS feed — Recent posts"
 msgstr "Flux RSS — publications récentes"
 
-#: website/web/templates/base.html:115
+#: website/web/templates/base.html:116
 msgid "Open navigation"
 msgstr "Ouvrir la navigation"
 
-#: website/web/templates/base.html:121
+#: website/web/templates/base.html:122
 msgid "Language"
 msgstr "Langue"
 
 #: website/web/templates/admin/editentry.html:170
-#: website/web/templates/base.html:135
+#: website/web/templates/admin/raas_group.html:2
+#: website/web/templates/admin/raas_select.html:2
+#: website/web/templates/base.html:136
 msgid "Admin"
 msgstr "Admin"
 
-#: website/web/templates/base.html:137 website/web/templates/login.html:3
+#: website/web/templates/base.html:138 website/web/templates/login.html:3
 #: website/web/templates/login.html:10
 msgid "Login"
 msgstr "Connexion"
 
-#: website/web/templates/base.html:140
+#: website/web/templates/base.html:141
 msgid "Search (Ctrl/Cmd+K)"
 msgstr "Rechercher (Ctrl/Cmd+K)"
 
-#: website/web/templates/base.html:147
+#: website/web/templates/base.html:148
 msgid "Toggle dark/light mode"
 msgstr "Basculer mode sombre/clair"
 
-#: website/web/templates/base.html:147
+#: website/web/templates/base.html:148
 msgid "Toggle theme"
 msgstr "Basculer le thème"
 
-#: website/web/templates/base.html:163
+#: website/web/templates/base.html:164
 msgid "Contribute on"
 msgstr "Contribuer sur"
 
-#: website/web/templates/base.html:178
+#: website/web/templates/base.html:179
 msgid "type to search"
 msgstr "saisir pour rechercher"
 
-#: website/web/templates/base.html:178
+#: website/web/templates/base.html:179
 msgid "Search text"
 msgstr "Texte de recherche"
 
@@ -1670,12 +1813,12 @@ msgstr "Comparer deux sources"
 #: website/web/templates/compare.html:21
 #, python-format
 msgid "Pick two %(kind)s to compare (posts 7/30/365, mirrors up, 30-day uptime)."
-msgstr ""
+msgstr "Choisissez deux %(kind)s à comparer (posts 7/30/365, miroirs en ligne, disponibilité sur 30 jours)."
 "Choisissez deux %(kind)s à comparer (publications 7/30/365, miroirs en "
 "ligne, uptime 30 jours)."
 
 #: website/web/templates/admin/ransomnotes_index.html:79
-#: website/web/templates/compare.html:21 website/web/templates/index.html:208
+#: website/web/templates/compare.html:21 website/web/templates/index.html:209
 msgid "groups"
 msgstr "groupes"
 
@@ -1747,9 +1890,9 @@ msgstr "Publications 365j"
 msgid "Mirrors up"
 msgstr "Miroirs en ligne"
 
-#: website/web/templates/compare.html:160 website/web/templates/group.html:465
-#: website/web/templates/group.html:520 website/web/templates/group.html:575
-#: website/web/templates/group.html:630 website/web/templates/urls.html:103
+#: website/web/templates/compare.html:160 website/web/templates/group.html:466
+#: website/web/templates/group.html:521 website/web/templates/group.html:576
+#: website/web/templates/group.html:631 website/web/templates/urls.html:103
 msgid "Uptime 30d"
 msgstr "Uptime 30j"
 
@@ -1849,13 +1992,13 @@ msgid_plural "%(n)s txs"
 msgstr[0] "%(n)s tx"
 msgstr[1] "%(n)s tx"
 
-#: website/web/templates/admin/logs.html:61
+#: website/web/templates/admin/logs.html:63
 #: website/web/templates/admin/torrent_pivot.html:59
 #: website/web/templates/admin/torrent_pivot.html:92
 #: website/web/templates/admin/torrent_pivot.html:123
 #: website/web/templates/admin/torrent_pivot.html:156
 #: website/web/templates/admin/torrent_pivot.html:187
-#: website/web/templates/cryptodetail.html:71
+#: website/web/templates/cryptodetail.html:74
 #: website/web/templates/hot.html:108 website/web/templates/stats.html:81
 #: website/web/templates/torrent_pivot.html:59
 #: website/web/templates/torrent_pivot.html:92
@@ -1865,48 +2008,48 @@ msgstr[1] "%(n)s tx"
 msgid "Export CSV"
 msgstr "Exporter CSV"
 
-#: website/web/templates/cryptodetail.html:71
-#: website/web/templates/group.html:133 website/web/templates/group.html:144
+#: website/web/templates/cryptodetail.html:74
+#: website/web/templates/group.html:134 website/web/templates/group.html:145
 msgid "CSV"
 msgstr "CSV"
 
 #: website/web/templates/admin/crypto_addr_form.html:109
 #: website/web/templates/admin/editpost.html:69
-#: website/web/templates/admin/logs.html:27
-#: website/web/templates/cryptodetail.html:79
+#: website/web/templates/admin/logs.html:28
+#: website/web/templates/cryptodetail.html:82
 #: website/web/templates/stats.html:35
 msgid "From"
 msgstr "Du"
 
 #: website/web/templates/admin/crypto_addr_form.html:113
 #: website/web/templates/admin/editpost.html:73
-#: website/web/templates/admin/logs.html:31
-#: website/web/templates/cryptodetail.html:83
+#: website/web/templates/admin/logs.html:32
+#: website/web/templates/cryptodetail.html:86
 #: website/web/templates/stats.html:39
 msgid "To"
 msgstr "Au"
 
-#: website/web/templates/cryptodetail.html:87
+#: website/web/templates/cryptodetail.html:90
 msgid "Min amount"
 msgstr "Montant min"
 
-#: website/web/templates/cryptodetail.html:91
+#: website/web/templates/cryptodetail.html:94
 msgid "Max amount"
 msgstr "Montant max"
 
-#: website/web/templates/cryptodetail.html:95
-#: website/web/templates/cryptodetail.html:125
+#: website/web/templates/cryptodetail.html:98
+#: website/web/templates/cryptodetail.html:128
 msgid "Dir"
 msgstr "Sens"
 
-#: website/web/templates/cryptodetail.html:102
+#: website/web/templates/cryptodetail.html:105
 #: website/web/templates/hot.html:112
 msgid "Filter"
 msgstr "Filtrer"
 
 #: website/web/templates/admin/alerts.html:69
 #: website/web/templates/admin/torrent_health.html:52
-#: website/web/templates/cryptodetail.html:103
+#: website/web/templates/cryptodetail.html:106
 #: website/web/templates/hot.html:116 website/web/templates/recent.html:76
 #: website/web/templates/torrent_health.html:52
 msgid "Clear"
@@ -1914,51 +2057,51 @@ msgstr "Effacer"
 
 #: website/web/templates/admin/crypto_addr_form.html:64
 #: website/web/templates/admin/crypto_addr_form.html:69
-#: website/web/templates/cryptodetail.html:106
+#: website/web/templates/cryptodetail.html:109
 msgid "Transactions"
 msgstr "Transactions"
 
 #: website/web/templates/admin/crypto_addr_form.html:101
-#: website/web/templates/cryptodetail.html:123
+#: website/web/templates/cryptodetail.html:126
 msgid "Transaction"
 msgstr "Transaction"
 
 #: website/web/templates/admin/addpostentry.html:39
 #: website/web/templates/admin/crypto_addr_form.html:73
 #: website/web/templates/admin/crypto_addr_form.html:129
-#: website/web/templates/cryptodetail.html:124
-#: website/web/templates/group.html:723 website/web/templates/recent.html:92
+#: website/web/templates/cryptodetail.html:127
+#: website/web/templates/group.html:724 website/web/templates/recent.html:92
 #: website/web/templates/recent.html:105 website/web/templates/search.html:94
 msgid "Date"
 msgstr "Date"
 
-#: website/web/templates/cryptodetail.html:126
+#: website/web/templates/cryptodetail.html:129
 msgid "Counterpart"
 msgstr "Contrepartie"
 
 #: website/web/templates/admin/crypto_addr_form.html:74
 #: website/web/templates/admin/crypto_addr_form.html:119
-#: website/web/templates/cryptodetail.html:127
+#: website/web/templates/cryptodetail.html:130
 msgid "Amount"
 msgstr "Montant"
 
-#: website/web/templates/cryptodetail.html:128
+#: website/web/templates/cryptodetail.html:131
 msgid "USD"
 msgstr "USD"
 
-#: website/web/templates/cryptodetail.html:169
+#: website/web/templates/cryptodetail.html:172
 msgid "Outgoing"
 msgstr "Sortante"
 
-#: website/web/templates/cryptodetail.html:171
+#: website/web/templates/cryptodetail.html:174
 msgid "Incoming"
 msgstr "Entrante"
 
-#: website/web/templates/cryptodetail.html:196
+#: website/web/templates/cryptodetail.html:199
 msgid "No transactions recorded."
 msgstr "Aucune transaction enregistrée."
 
-#: website/web/templates/cryptodetail.html:202
+#: website/web/templates/cryptodetail.html:205
 msgid "No wallet found for this group."
 msgstr "Aucun portefeuille trouvé pour ce groupe."
 
@@ -2183,7 +2326,7 @@ msgstr ""
 " exposés lors de brèches antérieures. RansomLook intègre des bases de "
 "leaks externes pour l'enrichissement."
 
-#: website/web/templates/glossary.html:98 website/web/templates/group.html:211
+#: website/web/templates/glossary.html:98 website/web/templates/group.html:212
 msgid "Ransom notes"
 msgstr "Notes de rançon"
 
@@ -2256,8 +2399,8 @@ msgstr ""
 "classer les changements d'infrastructure."
 
 #: website/web/templates/admin/editentry.html:64
-#: website/web/templates/glossary.html:130 website/web/templates/group.html:423
-#: website/web/templates/group.html:426 website/web/templates/group.html:427
+#: website/web/templates/glossary.html:130 website/web/templates/group.html:424
+#: website/web/templates/group.html:427 website/web/templates/group.html:428
 msgid "Affiliates"
 msgstr "Affiliés"
 
@@ -2344,8 +2487,8 @@ msgstr "Voir les analyses techniques"
 msgid "View Analyses"
 msgstr "Voir les analyses"
 
-#: website/web/templates/group.html:57 website/web/templates/group.html:153
-#: website/web/templates/group.html:154
+#: website/web/templates/group.html:57 website/web/templates/group.html:154
+#: website/web/templates/group.html:155
 msgid "View crypto"
 msgstr "Voir la crypto"
 
@@ -2382,269 +2525,278 @@ msgid "Known RaaS"
 msgstr "RaaS connu"
 
 #: website/web/templates/group.html:115
+msgid "Affiliate rules"
+msgstr "Règles affiliés"
+
+#: website/web/templates/group.html:116
 msgid "Captcha in place"
 msgstr "Captcha en place"
 
-#: website/web/templates/group.html:127
+#: website/web/templates/group.html:128
 msgid "Export URLs (CSV)"
 msgstr "Exporter URLs (CSV)"
 
-#: website/web/templates/group.html:129 website/web/templates/groups.html:67
+#: website/web/templates/group.html:130 website/web/templates/groups.html:67
 msgid "All statuses"
 msgstr "Tous les statuts"
 
-#: website/web/templates/group.html:130 website/web/templates/groups.html:68
+#: website/web/templates/group.html:131 website/web/templates/groups.html:68
 msgid "Active"
 msgstr "Actif"
 
-#: website/web/templates/group.html:140
+#: website/web/templates/group.html:141
 msgid "Export Posts (CSV)"
 msgstr "Exporter publications (CSV)"
 
-#: website/web/templates/group.html:141
+#: website/web/templates/group.html:142
 msgid "From date"
 msgstr "Date de début"
 
-#: website/web/templates/group.html:143
+#: website/web/templates/group.html:144
 msgid "To date"
 msgstr "Date de fin"
 
-#: website/web/templates/group.html:190 website/web/templates/group.html:195
+#: website/web/templates/group.html:191 website/web/templates/group.html:196
 msgid "External Analysis"
 msgstr "Analyse externe"
 
-#: website/web/templates/group.html:194
+#: website/web/templates/group.html:195
 msgid "External analysis"
 msgstr "Analyse externe"
 
-#: website/web/templates/group.html:227
+#: website/web/templates/group.html:228
 msgid "View all notes"
 msgstr "Voir toutes les notes"
 
-#: website/web/templates/group.html:230
+#: website/web/templates/group.html:231
 msgid "No note linked."
 msgstr "Aucune note liée."
 
-#: website/web/templates/group.html:241 website/web/templates/group.html:245
+#: website/web/templates/group.html:242 website/web/templates/group.html:246
 msgid "Known hashes"
 msgstr "Hashs connus"
 
 #: website/web/templates/admin/crypto_addr_form.html:72
 #: website/web/templates/admin/crypto_addr_form.html:104
 #: website/web/templates/admin/editentry.html:53
-#: website/web/templates/group.html:246
+#: website/web/templates/group.html:247
 msgid "Hash"
 msgstr "Hash"
 
 #: website/web/templates/admin/editentry.html:54
-#: website/web/templates/group.html:263 website/web/templates/group.html:266
-#: website/web/templates/group.html:267
+#: website/web/templates/group.html:264 website/web/templates/group.html:267
+#: website/web/templates/group.html:268
 msgid "Jabber"
 msgstr "Jabber"
 
 #: website/web/templates/admin/editentry.html:55
-#: website/web/templates/group.html:279 website/web/templates/group.html:282
-#: website/web/templates/group.html:283
+#: website/web/templates/group.html:280 website/web/templates/group.html:283
+#: website/web/templates/group.html:284
 msgid "Mail"
 msgstr "E-mail"
 
 #: website/web/templates/admin/editentry.html:56
-#: website/web/templates/group.html:295 website/web/templates/group.html:298
-#: website/web/templates/group.html:299
+#: website/web/templates/group.html:296 website/web/templates/group.html:299
+#: website/web/templates/group.html:300
 msgid "PGP"
 msgstr "PGP"
 
 #: website/web/templates/admin/editentry.html:57
-#: website/web/templates/group.html:311 website/web/templates/group.html:314
-#: website/web/templates/group.html:315
+#: website/web/templates/group.html:312 website/web/templates/group.html:315
+#: website/web/templates/group.html:316
 msgid "Matrix"
 msgstr "Matrix"
 
 #: website/web/templates/admin/editentry.html:58
-#: website/web/templates/group.html:327 website/web/templates/group.html:330
-#: website/web/templates/group.html:331
+#: website/web/templates/group.html:328 website/web/templates/group.html:331
+#: website/web/templates/group.html:332
 msgid "Session"
 msgstr "Session"
 
 #: website/web/templates/admin/editentry.html:59
-#: website/web/templates/group.html:343 website/web/templates/group.html:346
-#: website/web/templates/group.html:347
+#: website/web/templates/group.html:344 website/web/templates/group.html:347
+#: website/web/templates/group.html:348
 msgid "Telegram"
 msgstr "Telegram"
 
 #: website/web/templates/admin/editentry.html:60
-#: website/web/templates/group.html:359 website/web/templates/group.html:362
-#: website/web/templates/group.html:363
+#: website/web/templates/group.html:360 website/web/templates/group.html:363
+#: website/web/templates/group.html:364
 msgid "Tox"
 msgstr "Tox"
 
 #: website/web/templates/admin/editentry.html:61
-#: website/web/templates/group.html:375 website/web/templates/group.html:378
-#: website/web/templates/group.html:379
+#: website/web/templates/group.html:376 website/web/templates/group.html:379
+#: website/web/templates/group.html:380
 msgid "Simplex"
 msgstr "Simplex"
 
 #: website/web/templates/admin/editentry.html:62
-#: website/web/templates/group.html:391 website/web/templates/group.html:394
-#: website/web/templates/group.html:395
+#: website/web/templates/group.html:392 website/web/templates/group.html:395
+#: website/web/templates/group.html:396
 msgid "Max"
 msgstr "Max"
 
 #: website/web/templates/admin/editentry.html:63
-#: website/web/templates/group.html:407 website/web/templates/group.html:410
-#: website/web/templates/group.html:411
+#: website/web/templates/group.html:408 website/web/templates/group.html:411
+#: website/web/templates/group.html:412
 msgid "Sonar"
 msgstr "Sonar"
 
-#: website/web/templates/admin/admin.html:205
+#: website/web/templates/admin/admin.html:215
 #: website/web/templates/admin/editentry.html:65
-#: website/web/templates/group.html:440 website/web/templates/group.html:443
-#: website/web/templates/group.html:444
+#: website/web/templates/group.html:441 website/web/templates/group.html:444
+#: website/web/templates/group.html:445
 msgid "Other"
 msgstr "Autre"
 
-#: website/web/templates/group.html:455
+#: website/web/templates/group.html:456
 msgid "Urls"
 msgstr "URLs"
 
-#: website/web/templates/group.html:462 website/web/templates/group.html:517
-#: website/web/templates/group.html:572 website/web/templates/group.html:627
+#: website/web/templates/group.html:463 website/web/templates/group.html:518
+#: website/web/templates/group.html:573 website/web/templates/group.html:628
 msgid "Url"
 msgstr "URL"
 
 #: website/web/templates/admin/analysis_variants.html:32
-#: website/web/templates/admin/apikeys.html:48
+#: website/web/templates/admin/apikeys.html:52
 #: website/web/templates/admin/ransomnotes_group.html:75
 #: website/web/templates/admin/ransomnotes_group.html:144
 #: website/web/templates/admin/urls.html:97
-#: website/web/templates/group.html:463 website/web/templates/group.html:518
-#: website/web/templates/group.html:573 website/web/templates/group.html:628
+#: website/web/templates/group.html:464 website/web/templates/group.html:519
+#: website/web/templates/group.html:574 website/web/templates/group.html:629
 #: website/web/templates/groups.html:144 website/web/templates/urls.html:101
 msgid "Status"
 msgstr "Statut"
 
-#: website/web/templates/group.html:464 website/web/templates/group.html:485
-#: website/web/templates/group.html:519 website/web/templates/group.html:540
-#: website/web/templates/group.html:574 website/web/templates/group.html:595
-#: website/web/templates/group.html:629 website/web/templates/group.html:650
-#: website/web/templates/group.html:726 website/web/templates/group.html:738
+#: website/web/templates/group.html:465 website/web/templates/group.html:486
+#: website/web/templates/group.html:520 website/web/templates/group.html:541
+#: website/web/templates/group.html:575 website/web/templates/group.html:596
+#: website/web/templates/group.html:630 website/web/templates/group.html:651
+#: website/web/templates/group.html:727 website/web/templates/group.html:739
 #: website/web/templates/groups.html:147 website/web/templates/groups.html:179
 msgid "Screen"
 msgstr "Capture"
 
-#: website/web/templates/group.html:466 website/web/templates/group.html:521
-#: website/web/templates/group.html:576 website/web/templates/group.html:631
+#: website/web/templates/group.html:467 website/web/templates/group.html:522
+#: website/web/templates/group.html:577 website/web/templates/group.html:632
 #: website/web/templates/urls.html:104
 msgid "Health"
 msgstr "Santé"
 
-#: website/web/templates/group.html:475 website/web/templates/group.html:530
-#: website/web/templates/group.html:585 website/web/templates/group.html:640
+#: website/web/templates/group.html:476 website/web/templates/group.html:531
+#: website/web/templates/group.html:586 website/web/templates/group.html:641
 #: website/web/templates/groups.html:158 website/web/templates/urls.html:133
 msgid "Up"
 msgstr "En ligne"
 
-#: website/web/templates/group.html:477 website/web/templates/group.html:532
-#: website/web/templates/group.html:587 website/web/templates/group.html:642
+#: website/web/templates/group.html:478 website/web/templates/group.html:533
+#: website/web/templates/group.html:588 website/web/templates/group.html:643
 #: website/web/templates/groups.html:160 website/web/templates/urls.html:135
 msgid "Down"
 msgstr "Hors ligne"
 
-#: website/web/templates/group.html:479 website/web/templates/group.html:534
-#: website/web/templates/group.html:589 website/web/templates/group.html:644
+#: website/web/templates/group.html:480 website/web/templates/group.html:535
+#: website/web/templates/group.html:590 website/web/templates/group.html:645
 msgid "Unknown"
 msgstr "Inconnu"
 
-#: website/web/templates/group.html:510 website/web/templates/group.html:514
+#: website/web/templates/group.html:511 website/web/templates/group.html:515
 msgid "File servers"
 msgstr "Serveurs de fichiers"
 
-#: website/web/templates/group.html:565 website/web/templates/group.html:569
+#: website/web/templates/group.html:566 website/web/templates/group.html:570
 msgid "Chat servers"
 msgstr "Serveurs de chat"
 
-#: website/web/templates/group.html:620 website/web/templates/group.html:624
+#: website/web/templates/group.html:621 website/web/templates/group.html:625
 msgid "Admin servers"
 msgstr "Serveurs admin"
 
-#: website/web/templates/group.html:675
+#: website/web/templates/group.html:676
 msgid "Activity (interactive)"
 msgstr "Activité (interactive)"
 
-#: website/web/templates/group.html:681
+#: website/web/templates/group.html:682
 msgid "Open large view"
 msgstr "Ouvrir en grand"
 
-#: website/web/templates/group.html:681
+#: website/web/templates/group.html:682
 msgid "Activity charts"
 msgstr "Graphiques d'activité"
 
-#: website/web/templates/group.html:683 website/web/templates/stats.html:45
+#: website/web/templates/group.html:684 website/web/templates/stats.html:45
 msgid "Aggregation"
 msgstr "Agrégation"
 
-#: website/web/templates/group.html:685 website/web/templates/stats.html:48
+#: website/web/templates/group.html:686 website/web/templates/stats.html:48
 msgid "Daily"
 msgstr "Quotidien"
 
-#: website/web/templates/group.html:686 website/web/templates/stats.html:49
+#: website/web/templates/group.html:687 website/web/templates/stats.html:49
 msgid "Weekly"
 msgstr "Hebdomadaire"
 
-#: website/web/templates/group.html:688 website/web/templates/stats.html:54
+#: website/web/templates/group.html:689 website/web/templates/stats.html:54
 msgid "Rolling avg."
 msgstr "Moyenne glissante"
 
-#: website/web/templates/group.html:690 website/web/templates/stats.html:56
+#: website/web/templates/group.html:691 website/web/templates/stats.html:56
 msgid "Off"
 msgstr "Off"
 
-#: website/web/templates/group.html:695
+#: website/web/templates/group.html:696
 msgid "Download PNG"
 msgstr "Télécharger en PNG"
 
-#: website/web/templates/group.html:715 website/web/templates/group.html:720
+#: website/web/templates/group.html:716 website/web/templates/group.html:721
 #: website/web/templates/hot.html:129 website/web/templates/search.html:86
 #: website/web/templates/search.html:89 website/web/templates/stats.html:103
 msgid "Posts"
 msgstr "Publications"
 
-#: website/web/templates/admin/editpost.html:111
+#: website/web/templates/admin/editpost.html:114
 #: website/web/templates/admin/ransomnotes_group.html:73
 #: website/web/templates/admin/ransomnotes_group.html:131
-#: website/web/templates/group.html:724 website/web/templates/recent.html:93
+#: website/web/templates/group.html:725 website/web/templates/recent.html:93
 #: website/web/templates/recent.html:106 website/web/templates/search.html:93
 msgid "Title"
 msgstr "Titre"
 
-#: website/web/templates/group.html:757 website/web/templates/stats.html:161
+#: website/web/templates/group.html:734 website/web/templates/index.html:154
+#: website/web/templates/recent.html:119 website/web/templates/search.html:101
+msgid "Hidden from anonymous visitors"
+msgstr "Masqué aux visiteurs anonymes"
+
+#: website/web/templates/group.html:758 website/web/templates/stats.html:161
 msgid "Enlarged chart"
 msgstr "Graphique agrandi"
 
-#: website/web/templates/admin/logs.html:100
-#: website/web/templates/group.html:769 website/web/templates/groups.html:202
+#: website/web/templates/admin/logs.html:102
+#: website/web/templates/group.html:770 website/web/templates/groups.html:202
 msgid "Previous"
 msgstr "Précédent"
 
-#: website/web/templates/admin/logs.html:104
-#: website/web/templates/group.html:773 website/web/templates/groups.html:206
+#: website/web/templates/admin/logs.html:106
+#: website/web/templates/group.html:774 website/web/templates/groups.html:206
 msgid "Next"
 msgstr "Suivant"
 
-#: website/web/templates/group.html:827
+#: website/web/templates/group.html:828
 msgid "In-house technical analysis"
 msgstr "Analyse technique interne"
 
-#: website/web/templates/group.html:831
+#: website/web/templates/group.html:832
 msgid "View HTML"
 msgstr "Voir HTML"
 
 #: website/web/templates/admin/edit_analysis.html:42
-#: website/web/templates/group.html:832
+#: website/web/templates/group.html:833
 msgid "Download PDF"
 msgstr "Télécharger le PDF"
 
-#: website/web/templates/group.html:839
+#: website/web/templates/group.html:840
 msgid "Total:"
 msgstr "Total :"
 
@@ -2691,7 +2843,7 @@ msgid "Links for %(name)s"
 msgstr "Liens pour %(name)s"
 
 #: website/web/templates/admin/editentry.html:163
-#: website/web/templates/groups.html:143 website/web/templates/leaks.html:40
+#: website/web/templates/groups.html:143 website/web/templates/leaks.html:41
 msgid "Page title"
 msgstr "Titre de page"
 
@@ -2810,7 +2962,7 @@ msgstr "Volume"
 msgid "New entrants"
 msgstr "Nouveaux entrants"
 
-#: website/web/templates/hot.html:104
+#: website/web/templates/admin/logs.html:62 website/web/templates/hot.html:104
 msgid "Apply"
 msgstr "Appliquer"
 
@@ -2925,15 +3077,15 @@ msgstr "Dernières publications"
 msgid "see more"
 msgstr "voir plus"
 
-#: website/web/templates/index.html:162
+#: website/web/templates/index.html:163
 msgid "No posts yet."
 msgstr "Aucune publication pour l'instant."
 
-#: website/web/templates/index.html:174
+#: website/web/templates/index.html:175
 msgid "Torrent intelligence"
 msgstr "Renseignement torrent"
 
-#: website/web/templates/index.html:175
+#: website/web/templates/index.html:176
 msgid ""
 "passive swarm scan · IP/ASN pivot · BEP-48 tracker scrape · webseed "
 "mirrors"
@@ -2941,56 +3093,56 @@ msgstr ""
 "scan passif de swarm · pivot IP/ASN · scrape tracker BEP-48 · mirrors "
 "webseed"
 
-#: website/web/templates/index.html:180
+#: website/web/templates/index.html:181
 msgid "swarms tracked"
 msgstr "swarms suivis"
 
-#: website/web/templates/index.html:184
+#: website/web/templates/index.html:185
 msgid "alive"
 msgstr "vivants"
 
-#: website/web/templates/index.html:188
+#: website/web/templates/index.html:189
 msgid "seeders total"
 msgstr "seeders au total"
 
-#: website/web/templates/index.html:192
+#: website/web/templates/index.html:193
 msgid "cross-group IPs"
 msgstr "IPs cross-groupe"
 
-#: website/web/templates/index.html:193
+#: website/web/templates/index.html:194
 msgid "pivot signal"
 msgstr "signal de pivot"
 
-#: website/web/templates/admin/admin.html:175
-#: website/web/templates/index.html:197
+#: website/web/templates/admin/admin.html:185
+#: website/web/templates/index.html:198
 msgid "Swarm health"
 msgstr "État des swarms"
 
-#: website/web/templates/index.html:198
+#: website/web/templates/index.html:199
 msgid "Pivot IP / ASN"
 msgstr "Pivot IP / ASN"
 
-#: website/web/templates/index.html:210
+#: website/web/templates/index.html:211
 msgid "markets"
 msgstr "marchés"
 
-#: website/web/templates/index.html:212
+#: website/web/templates/index.html:213
 msgid "actors"
 msgstr "acteurs"
 
-#: website/web/templates/index.html:214
+#: website/web/templates/index.html:215
 msgid "leaks"
 msgstr "fuites"
 
-#: website/web/templates/index.html:216
+#: website/web/templates/index.html:217
 msgid "ransom notes"
 msgstr "notes de rançon"
 
-#: website/web/templates/index.html:218
+#: website/web/templates/index.html:219
 msgid "crypto addrs"
 msgstr "adresses crypto"
 
-#: website/web/templates/index.html:221
+#: website/web/templates/index.html:222
 msgid "in-house analyses"
 msgstr "analyses internes"
 
@@ -3000,23 +3152,23 @@ msgstr "Liste des leaks"
 
 #: website/web/templates/leaks.html:11
 msgid "Browse known public leaks. Click a leak to view details."
-msgstr ""
+msgstr "Parcourez les fuites publiques connues. Cliquez sur une fuite pour le détail."
 "Parcourez les leaks publics connus. Cliquez sur un leak pour voir les "
 "détails."
 
-#: website/web/templates/leaks.html:41
+#: website/web/templates/leaks.html:44
 msgid "Entries"
 msgstr "Entrées"
 
-#: website/web/templates/leaks.html:73
+#: website/web/templates/leaks.html:79
 msgid "Leak details"
 msgstr "Détails du leak"
 
-#: website/web/templates/leaks.html:79
+#: website/web/templates/leaks.html:85
 msgid "Leak data"
 msgstr "Données du leak"
 
-#: website/web/templates/leaks.html:84
+#: website/web/templates/leaks.html:90
 msgid "Indexed"
 msgstr "Indexé"
 
@@ -3057,8 +3209,8 @@ msgstr "Contenu de la note"
 msgid "Content"
 msgstr "Contenu"
 
-#: website/web/templates/admin/logs.html:36
-#: website/web/templates/admin/logs.html:76
+#: website/web/templates/admin/logs.html:37
+#: website/web/templates/admin/logs.html:78
 #: website/web/templates/notesdetails.html:39
 msgid "Action"
 msgstr "Action"
@@ -3066,6 +3218,67 @@ msgstr "Action"
 #: website/web/templates/notesdetails.html:50
 msgid "Copy"
 msgstr "Copier"
+
+#: website/web/templates/raas_index.html:9
+msgid ""
+"The terms ransomware-as-a-service programs impose on their affiliates: "
+"forbidden targets, excluded countries, revenue split, proof obligations."
+msgstr "Les conditions que les programmes ransomware-as-a-service imposent à leurs affiliés : cibles interdites, pays exclus, partage des gains, obligations de preuve."
+
+#: website/web/templates/raas_index.html:10
+msgid "programs documented."
+msgstr "programmes documentés."
+
+#: website/web/templates/admin/raas_select.html:26
+#: website/web/templates/raas_index.html:23
+msgid "Versions"
+msgstr "Versions"
+
+#: website/web/templates/raas_index.html:24
+msgid "Latest in force"
+msgstr "Dernière en vigueur"
+
+#: website/web/templates/raas_index.html:25
+msgid "Current set"
+msgstr "Jeu actuel"
+
+#: website/web/templates/admin/ransomnotes_group.html:87
+#: website/web/templates/raas_index.html:37
+msgid "yes"
+msgstr "oui"
+
+#: website/web/templates/raas_index.html:45
+msgid "No affiliate rules recorded yet."
+msgstr "Aucune règle affiliés enregistrée pour le moment."
+
+#: website/web/templates/raas_rules.html:9
+msgid "Affiliate terms published by this program, newest first."
+msgstr "Conditions imposées aux affiliés par ce programme, de la plus récente à la plus ancienne."
+
+#: website/web/templates/raas_rules.html:10
+msgid "Back to the group"
+msgstr "Retour au groupe"
+
+#: website/web/templates/raas_rules.html:11
+msgid "All programs"
+msgstr "Tous les programmes"
+
+#: website/web/templates/raas_rules.html:21
+msgid "Current rules"
+msgstr "Règles actuelles"
+
+#: website/web/templates/raas_rules.html:23
+msgid "In force since"
+msgstr "En vigueur depuis"
+
+#: website/web/templates/admin/raas_group.html:41
+#: website/web/templates/raas_rules.html:25
+msgid "Date unknown"
+msgstr "Date inconnue"
+
+#: website/web/templates/raas_rules.html:38
+msgid "Rules screenshot"
+msgstr "Capture des règles"
 
 #: website/web/templates/recent.html:12
 #, python-format
@@ -3077,7 +3290,7 @@ msgstr[1] "%(n)s derniers jours"
 #: website/web/templates/recent.html:15
 #, python-format
 msgid "showing most recent %(shown)s of %(total)s — older entries trimmed"
-msgstr ""
+msgstr "affichage des %(shown)s plus récentes sur %(total)s — les entrées plus anciennes sont tronquées"
 "affichage des %(shown)s plus récentes sur %(total)s — les plus anciennes "
 "sont tronquées"
 
@@ -3349,23 +3562,23 @@ msgstr "Exemples Python 3 (requests)"
 msgid "List recent posts (last 7 days)"
 msgstr "Lister les publications récentes (7 derniers jours)"
 
-#: website/web/templates/swagger.html:211
+#: website/web/templates/swagger.html:210
 msgid "Get a specific group's details"
 msgstr "Obtenir les détails d'un groupe spécifique"
 
-#: website/web/templates/swagger.html:227
+#: website/web/templates/swagger.html:225
 msgid "Search across all posts"
 msgstr "Rechercher dans toutes les publications"
 
-#: website/web/templates/swagger.html:240
+#: website/web/templates/swagger.html:238
 msgid "Export full database (requires API key)"
 msgstr "Exporter la base complète (nécessite une clé API)"
 
-#: website/web/templates/swagger.html:258
+#: website/web/templates/swagger.html:256
 msgid "Get threat actor profile"
 msgstr "Obtenir le profil d'un acteur de menace"
 
-#: website/web/templates/swagger.html:274
+#: website/web/templates/swagger.html:271
 msgid "Crypto addresses for a group"
 msgstr "Adresses crypto d'un groupe"
 
@@ -3427,7 +3640,7 @@ msgstr "IP"
 msgid "No IP indexed for this ASN."
 msgstr "Aucune IP indexée pour cet ASN."
 
-#: website/web/templates/admin/apikeys.html:44
+#: website/web/templates/admin/apikeys.html:48
 #: website/web/templates/admin/torrent_asn.html:66
 #: website/web/templates/admin/torrent_health.html:74
 #: website/web/templates/admin/torrent_ip.html:81
@@ -3574,7 +3787,7 @@ msgstr "Détail"
 #: website/web/templates/admin/torrent_health.html:149
 #: website/web/templates/torrent_health.html:149
 msgid "No torrent swarms scanned yet. Run poetry run torrent-health to populate."
-msgstr ""
+msgstr "Aucun essaim torrent analysé pour l'instant. Lancez « poetry run torrent-health » pour alimenter la base."
 "Aucun swarm torrent scanné pour le moment. Lancez poetry run torrent-"
 "health pour peupler la base."
 
@@ -4339,7 +4552,7 @@ msgstr "Image (optionnel)"
 
 #: website/web/templates/admin/addactor.html:155
 msgid "png / jpg / svg / gif. You can add/remove more from the “Logo” page."
-msgstr ""
+msgstr "png / jpg / svg / gif. Vous pouvez en ajouter ou en retirer depuis la page « Logo »."
 "png / jpg / svg / gif. Vous pouvez en ajouter/supprimer depuis la page « "
 "Logo »."
 
@@ -4353,7 +4566,7 @@ msgstr "Ajouter une publication à un groupe ou un marché"
 
 #: website/web/templates/admin/addpost.html:11
 msgid "Pick the type, search, then confirm to add post."
-msgstr ""
+msgstr "Choisissez le type, recherchez, puis confirmez pour ajouter le post."
 "Choisissez le type, recherchez, puis confirmez pour ajouter la "
 "publication."
 
@@ -4374,13 +4587,13 @@ msgid "Add post · Admin"
 msgstr "Ajouter une publication · Admin"
 
 #: website/web/templates/admin/addpostentry.html:11
-#: website/web/templates/admin/admin.html:79
+#: website/web/templates/admin/admin.html:89
 msgid "Add post"
 msgstr "Ajouter une publication"
 
 #: website/web/templates/admin/addpostentry.html:12
 msgid "Create a new post with optional screenshot, custom date, link and magnet."
-msgstr ""
+msgstr "Créez un post avec capture d'écran, date, lien et magnet optionnels."
 "Créer une nouvelle publication avec capture optionnelle, date "
 "personnalisée, lien et magnet."
 
@@ -4421,37 +4634,47 @@ msgid "Link (relative or full)"
 msgstr "Lien (relatif ou complet)"
 
 #: website/web/templates/admin/addpostentry.html:52
-#: website/web/templates/admin/editpost.html:131
+#: website/web/templates/admin/editpost.html:134
 msgid "Magnet"
 msgstr "Magnet"
 
 #: website/web/templates/admin/addpostentry.html:60
-#: website/web/templates/admin/editpost.html:137
+msgid ""
+"A private post is hidden from anonymous visitors, the API, the RSS feed "
+"and the MISP feed, and is not broadcast on Rocket.Chat, Mastodon or "
+"Bluesky."
+msgstr ""
+"Un post privé est masqué aux visiteurs anonymes, à l'API, au flux RSS et au "
+"feed MISP, et n'est diffusé ni sur Rocket.Chat, ni sur Mastodon, ni sur "
+"Bluesky."
+
+#: website/web/templates/admin/addpostentry.html:68
 #: website/web/templates/admin/editpost.html:140
+#: website/web/templates/admin/editpost.html:143
 msgid "Preview"
 msgstr "Prévisualisation"
 
-#: website/web/templates/admin/addpostentry.html:63
+#: website/web/templates/admin/addpostentry.html:71
 msgid "No image selected"
 msgstr "Aucune image sélectionnée"
 
-#: website/web/templates/admin/addpostentry.html:67
+#: website/web/templates/admin/addpostentry.html:75
 msgid "Title:"
 msgstr "Titre :"
 
-#: website/web/templates/admin/addpostentry.html:68
+#: website/web/templates/admin/addpostentry.html:76
 msgid "Date:"
 msgstr "Date :"
 
-#: website/web/templates/admin/addpostentry.html:69
+#: website/web/templates/admin/addpostentry.html:77
 msgid "Link:"
 msgstr "Lien :"
 
-#: website/web/templates/admin/addpostentry.html:73
+#: website/web/templates/admin/addpostentry.html:81
 msgid "Upload screenshot (optional)"
 msgstr "Téléverser une capture (optionnel)"
 
-#: website/web/templates/admin/addpostentry.html:76
+#: website/web/templates/admin/addpostentry.html:84
 msgid "PNG/JPG/WebP recommended (reasonable size)."
 msgstr "PNG/JPG/WebP recommandé (taille raisonnable)."
 
@@ -4487,7 +4710,7 @@ msgstr "Créer une nouvelle entrée de groupe/marché et configurer ses emplacem
 
 #: website/web/templates/admin/admin.html:39
 msgid "Add URLs (DLS, FS, Chat, Admin) to groups or markets — single or bulk."
-msgstr ""
+msgstr "Ajoutez des URLs (DLS, FS, Chat, Admin) aux groupes ou marchés — à l'unité ou en lot."
 "Ajouter des URLs (DLS, FS, Chat, Admin) à des groupes ou marchés — "
 "unitaire ou en masse."
 
@@ -4512,88 +4735,94 @@ msgstr ""
 "Attacher une analyse technique interne (Markdown) à un groupe ; rendue en"
 " HTML et PDF sur sa fiche."
 
-#: website/web/templates/admin/admin.html:75
+#: website/web/templates/admin/admin.html:79
+msgid ""
+"Record the affiliate terms a RaaS program publishes — one block per "
+"version, with screenshots. Visible only where the group itself is."
+msgstr "Enregistrez les conditions affiliés publiées par un programme RaaS — un bloc par version, avec captures. Visibles seulement là où le groupe l'est."
+
+#: website/web/templates/admin/admin.html:85
 msgid "Post actions"
 msgstr "Actions sur les publications"
 
-#: website/web/templates/admin/admin.html:83
+#: website/web/templates/admin/admin.html:93
 msgid "Manually insert a new post entry (title, date, description, screen)."
-msgstr ""
+msgstr "Insérez manuellement un post (titre, date, description, capture)."
 "Insérer manuellement une nouvelle publication (titre, date, description, "
 "capture)."
 
-#: website/web/templates/admin/admin.html:89
+#: website/web/templates/admin/admin.html:99
 msgid "Edit post"
 msgstr "Éditer une publication"
 
-#: website/web/templates/admin/admin.html:93
+#: website/web/templates/admin/admin.html:103
 msgid "Search and modify existing posts (fix typos, attach screenshots, etc.)."
-msgstr ""
+msgstr "Recherchez et modifiez des posts existants (corriger une coquille, joindre une capture, etc.)."
 "Rechercher et modifier des publications existantes (corriger des fautes, "
 "ajouter des captures, etc.)."
 
-#: website/web/templates/admin/admin.html:99
+#: website/web/templates/admin/admin.html:109
 msgid "Actor actions"
 msgstr "Actions sur les acteurs"
 
-#: website/web/templates/admin/admin.html:103
+#: website/web/templates/admin/admin.html:113
 msgid "Add actor"
 msgstr "Ajouter un acteur"
 
-#: website/web/templates/admin/admin.html:107
+#: website/web/templates/admin/admin.html:117
 msgid "Create a new T.A."
 msgstr "Créer un nouvel acteur de menace."
 
-#: website/web/templates/admin/admin.html:113
+#: website/web/templates/admin/admin.html:123
 msgid "Edit Actor"
 msgstr "Éditer l'acteur"
 
-#: website/web/templates/admin/admin.html:117
+#: website/web/templates/admin/admin.html:127
 msgid "Search and modify existing actors (fix typos, attach screenshots, etc.)."
-msgstr ""
+msgstr "Recherchez et modifiez des acteurs existants (corriger une coquille, joindre une capture, etc.)."
 "Rechercher et modifier les acteurs existants (corriger des fautes, "
 "ajouter des captures, etc.)."
 
-#: website/web/templates/admin/admin.html:123
+#: website/web/templates/admin/admin.html:133
 msgid "Notes actions"
 msgstr "Actions sur les notes"
 
-#: website/web/templates/admin/admin.html:127
+#: website/web/templates/admin/admin.html:137
 msgid "Edit ransomnotes"
 msgstr "Éditer les notes de rançon"
 
-#: website/web/templates/admin/admin.html:131
+#: website/web/templates/admin/admin.html:141
 msgid "Edit ransomnotes, manage aliases..."
 msgstr "Éditer les notes de rançon, gérer les alias..."
 
-#: website/web/templates/admin/admin.html:141
+#: website/web/templates/admin/admin.html:151
 msgid "Manage crypto"
 msgstr "Gérer la crypto"
 
-#: website/web/templates/admin/admin.html:145
+#: website/web/templates/admin/admin.html:155
 msgid "Browse, add and edit cryptocurrency wallets by group."
 msgstr "Parcourir, ajouter et éditer les portefeuilles cryptomonnaie par groupe."
 
-#: website/web/templates/admin/admin.html:151
+#: website/web/templates/admin/admin.html:161
 msgid "New crypto group"
 msgstr "Nouveau groupe crypto"
 
-#: website/web/templates/admin/admin.html:155
+#: website/web/templates/admin/admin.html:165
 msgid "Create a new cryptocurrency group entry."
 msgstr "Créer une nouvelle entrée de groupe cryptomonnaie."
 
-#: website/web/templates/admin/admin.html:161
+#: website/web/templates/admin/admin.html:171
 #: website/web/templates/admin/crypto.html:21
 #: website/web/templates/admin/crypto_aliases.html:31
 #: website/web/templates/admin/ransomnotes_group.html:20
 msgid "Aliases"
 msgstr "Alias"
 
-#: website/web/templates/admin/admin.html:165
+#: website/web/templates/admin/admin.html:175
 msgid "Manage crypto group aliases."
 msgstr "Gérer les alias de groupes crypto."
 
-#: website/web/templates/admin/admin.html:179
+#: website/web/templates/admin/admin.html:189
 msgid ""
 "Peer counts, seeders/leechers and last-scan status for every tracked "
 "magnet."
@@ -4601,75 +4830,66 @@ msgstr ""
 "Nombre de pairs, seeders/leechers et statut du dernier scan pour chaque "
 "magnet suivi."
 
-#: website/web/templates/admin/admin.html:179
 #: website/web/templates/admin/admin.html:189
+#: website/web/templates/admin/admin.html:199
 msgid "(public)"
 msgstr "(public)"
 
-#: website/web/templates/admin/admin.html:185
+#: website/web/templates/admin/admin.html:195
 msgid "Pivot intel"
 msgstr "Pivot d'intel"
 
-#: website/web/templates/admin/admin.html:189
+#: website/web/templates/admin/admin.html:199
 msgid "Top IPs / ASN, cross-group correlations and CSV exports."
 msgstr "Top IPs / ASN, corrélations entre groupes et exports CSV."
 
-#: website/web/templates/admin/admin.html:195
+#: website/web/templates/admin/admin.html:205
 #: website/web/templates/admin/torrent_manage.html:11
 msgid "Manage torrents"
 msgstr "Gérer les torrents"
 
-#: website/web/templates/admin/admin.html:199
+#: website/web/templates/admin/admin.html:209
 msgid "Attach magnets or .torrent files to a group. Unit and bulk add/delete."
-msgstr ""
+msgstr "Rattachez des magnets ou des fichiers .torrent à un groupe. Ajout et suppression à l'unité ou en lot."
 "Attacher magnets ou fichiers .torrent à un groupe. Ajout/suppression "
 "unitaire et en masse."
 
-#: website/web/templates/admin/admin.html:199
+#: website/web/templates/admin/admin.html:209
 msgid "(admin)"
 msgstr "(admin)"
 
-#: website/web/templates/admin/admin.html:209
-#: website/web/templates/admin/config.html:10
-msgid "Configuration"
-msgstr "Configuration"
-
-#: website/web/templates/admin/admin.html:213
-msgid "Edit notifications, LDAP, SMTP and general settings."
-msgstr "Éditer notifications, LDAP, SMTP et paramètres généraux."
-
-#: website/web/templates/admin/admin.html:219
+#: website/web/templates/admin/admin.html:220
 msgid "Alerting"
 msgstr "Alerting"
 
-#: website/web/templates/admin/admin.html:223
+#: website/web/templates/admin/admin.html:224
 msgid "Manage alert keywords and test matching rules."
 msgstr "Gérer les mots-clés d'alerte et tester les règles de correspondance."
 
-#: website/web/templates/admin/admin.html:229
+#: website/web/templates/admin/admin.html:230
 #: website/web/templates/admin/apikeys.html:10
 msgid "API Keys"
 msgstr "Clés API"
 
-#: website/web/templates/admin/admin.html:233
+#: website/web/templates/admin/admin.html:234
 msgid "Manage API keys for programmatic access (export, integrations)."
 msgstr "Gérer les clés API pour l'accès programmatique (export, intégrations)."
 
-#: website/web/templates/admin/admin.html:239
+#: website/web/templates/admin/admin.html:240
 msgid "Logs"
 msgstr "Journaux"
 
-#: website/web/templates/admin/admin.html:243
+#: website/web/templates/admin/admin.html:244
 msgid "Inspect recent activities, parser runs and system messages."
-msgstr ""
+msgstr "Consultez l'activité récente, les passages de parsers et les messages système."
 "Inspecter les activités récentes, exécutions du parser et messages "
 "système."
 
-#: website/web/templates/admin/admin.html:249
+#: website/web/templates/admin/admin.html:250
 msgid "Logout"
 msgstr "Déconnexion"
 
-#: website/web/templates/admin/admin.html:253
+#: website/web/templates/admin/admin.html:254
 msgid "Sign out from the administration interface."
 msgstr "Se déconnecter de l'interface d'administration."
 
@@ -4684,7 +4904,7 @@ msgstr "Admin · Cryptomonnaies"
 
 #: website/web/templates/admin/admin_crypto.html:11
 msgid "Create/read alias mappings for crypto (stored in DB=7 only)."
-msgstr ""
+msgstr "Créez et consultez les correspondances d'alias crypto (stockées en DB=7 uniquement)."
 "Créer/lire les correspondances d'alias pour la crypto (stocké dans DB=7 "
 "uniquement)."
 
@@ -4731,11 +4951,11 @@ msgstr "→ Cible"
 
 #: website/web/templates/admin/admin_crypto.html:52
 #: website/web/templates/admin/analysis_variants.html:78
-#: website/web/templates/admin/apikeys.html:77
+#: website/web/templates/admin/apikeys.html:91
 #: website/web/templates/admin/crypto_aliases.html:48
 #: website/web/templates/admin/crypto_group.html:52
 #: website/web/templates/admin/edit_analysis.html:48
-#: website/web/templates/admin/editpost.html:151
+#: website/web/templates/admin/editpost.html:159
 #: website/web/templates/admin/ransomnotes_group.html:102
 #: website/web/templates/admin/torrent_manage.html:112
 msgid "Delete"
@@ -4791,7 +5011,7 @@ msgstr "Exporter .txt"
 
 #: website/web/templates/admin/alerts.html:45
 msgid "Empty lines are ignored. Matching is case-insensitive by default."
-msgstr ""
+msgstr "Les lignes vides sont ignorées. La correspondance est insensible à la casse par défaut."
 "Les lignes vides sont ignorées. La correspondance est insensible à la "
 "casse par défaut."
 
@@ -4925,90 +5145,74 @@ msgstr "Nom / commentaire"
 msgid "e.g. MISP sync, partner feed, CI/CD…"
 msgstr "ex. sync MISP, flux partenaire, CI/CD…"
 
-#: website/web/templates/admin/apikeys.html:28
+#: website/web/templates/admin/apikeys.html:29
+msgid "Grant access to private entries (posts, groups, markets, actors)"
+msgstr "Accorder l'accès aux entrées privées (posts, groupes, marchés, acteurs)"
+
+#: website/web/templates/admin/apikeys.html:32
 msgid "Generate key"
 msgstr "Générer la clé"
 
-#: website/web/templates/admin/apikeys.html:37
+#: website/web/templates/admin/apikeys.html:41
 #, python-format
 msgid "%(num)s key"
 msgid_plural "%(num)s keys"
 msgstr[0] "%(num)s clé"
 msgstr[1] "%(num)s clés"
 
-#: website/web/templates/admin/apikeys.html:45
+#: website/web/templates/admin/apikeys.html:49
 msgid "Token"
 msgstr "Jeton"
 
-#: website/web/templates/admin/apikeys.html:46
+#: website/web/templates/admin/apikeys.html:50
 msgid "Created"
 msgstr "Créé"
 
-#: website/web/templates/admin/apikeys.html:47
+#: website/web/templates/admin/apikeys.html:51
 msgid "Last used"
 msgstr "Dernière utilisation"
 
-#: website/web/templates/admin/apikeys.html:61
+#: website/web/templates/admin/apikeys.html:65
 #: website/web/templates/admin/ransomnotes_group.html:146
 msgid "active"
 msgstr "actif"
 
-#: website/web/templates/admin/apikeys.html:63
-#: website/web/templates/admin/config.html:32
+#: website/web/templates/admin/apikeys.html:67
 msgid "disabled"
 msgstr "désactivé"
 
-#: website/web/templates/admin/apikeys.html:71
+#: website/web/templates/admin/apikeys.html:70
+msgid "This key sees entries flagged private"
+msgstr "Cette clé voit les entrées marquées privées"
+
+#: website/web/templates/admin/apikeys.html:78
 msgid "Disable"
 msgstr "Désactiver"
 
-#: website/web/templates/admin/apikeys.html:71
+#: website/web/templates/admin/apikeys.html:78
 msgid "Enable"
 msgstr "Activer"
 
-#: website/web/templates/admin/apikeys.html:75
+#: website/web/templates/admin/apikeys.html:84
+msgid "Whether this key may read entries flagged private"
+msgstr "Indique si cette clé peut lire les entrées marquées privées"
+
+#: website/web/templates/admin/apikeys.html:85
+msgid "Revoke private"
+msgstr "Retirer le droit privé"
+
+#: website/web/templates/admin/apikeys.html:85
+msgid "Grant private"
+msgstr "Accorder le droit privé"
+
+#: website/web/templates/admin/apikeys.html:89
 #, python-format
 msgid "Delete key « %(name)s »?"
 msgstr "Supprimer la clé « %(name)s » ?"
 
-#: website/web/templates/admin/apikeys.html:88
+#: website/web/templates/admin/apikeys.html:102
 msgid "No API keys yet. Create one above."
 msgstr "Aucune clé API. Créez-en une ci-dessus."
-
-#: website/web/templates/admin/config.html:3
-msgid "Admin · Configuration"
-msgstr "Admin · Configuration"
-
-#: website/web/templates/admin/config.html:11
-msgid "settings."
-msgstr "paramètres."
-
-#: website/web/templates/admin/config.html:12
-msgid "Using sample — no generic.json found, changes will create one."
-msgstr ""
-"Utilisation de l'échantillon — aucun generic.json trouvé, les "
-"modifications en créeront un."
-
-#: website/web/templates/admin/config.html:30
-msgid "enabled"
-msgstr "activé"
-
-#: website/web/templates/admin/config.html:53
-msgid "comma-separated"
-msgstr "séparé par des virgules"
-
-#: website/web/templates/admin/config.html:67
-#: website/web/templates/admin/config.html:107
-msgid "Show"
-msgstr "Afficher"
-
-#: website/web/templates/admin/config.html:87
-msgid "General"
-msgstr "Général"
-
-#: website/web/templates/admin/config.html:122
-msgid "Save configuration"
-msgstr "Enregistrer la configuration"
 
 #: website/web/templates/admin/crypto.html:9
 msgid "Crypto — Select or Create Group"
@@ -5016,7 +5220,7 @@ msgstr "Crypto — Sélectionner ou créer un groupe"
 
 #: website/web/templates/admin/crypto.html:10
 msgid "Choose a group to manage its wallets, or create a new one (DB=7 only)."
-msgstr ""
+msgstr "Choisissez un groupe pour gérer ses portefeuilles, ou créez-en un nouveau (DB=7 uniquement)."
 "Choisissez un groupe pour gérer ses portefeuilles, ou créez-en un nouveau"
 " (DB=7 uniquement)."
 
@@ -5309,7 +5513,7 @@ msgstr "Source Markdown stockée à"
 
 #: website/web/templates/admin/edit_analysis.html:17
 msgid "Rendered as HTML on the public group page and exported as PDF on demand."
-msgstr ""
+msgstr "Rendu en HTML sur la page publique du groupe et exporté en PDF à la demande."
 "Rendue en HTML sur la page publique du groupe et exportée en PDF à la "
 "demande."
 
@@ -5336,7 +5540,7 @@ msgstr "attachée"
 
 #: website/web/templates/admin/edit_analysis.html:63
 msgid "If a file is uploaded, it overrides the textarea content below."
-msgstr ""
+msgstr "Si un fichier est téléversé, il prend le pas sur le contenu de la zone de texte ci-dessous."
 "Si un fichier est uploadé, il remplace le contenu de la zone de texte ci-"
 "dessous."
 
@@ -5522,7 +5726,7 @@ msgid "Links"
 msgstr "Liens"
 
 #: website/web/templates/admin/editentry.html:152
-#: website/web/templates/admin/editpost.html:128
+#: website/web/templates/admin/editpost.html:131
 msgid "Link"
 msgstr "Lien"
 
@@ -5626,7 +5830,7 @@ msgstr "Éditer les publications"
 
 #: website/web/templates/admin/editpost.html:51
 msgid "Search, date filter, screen preview, quick delete — then save changes."
-msgstr ""
+msgstr "Recherche, filtre par date, aperçu des captures, suppression rapide — puis enregistrez."
 "Recherche, filtre par date, prévisualisation, suppression rapide — puis "
 "enregistrer les modifications."
 
@@ -5646,27 +5850,34 @@ msgstr "Tout réduire"
 msgid "Reset filters"
 msgstr "Réinitialiser les filtres"
 
-#: website/web/templates/admin/editpost.html:102
+#: website/web/templates/admin/editpost.html:104
 msgid "(untitled)"
 msgstr "(sans titre)"
 
-#: website/web/templates/admin/editpost.html:119
+#: website/web/templates/admin/editpost.html:122
 msgid "Discovered (ISO 8601 or YYYY‑MM‑DD)"
 msgstr "Découvert (ISO 8601 ou AAAA-MM-JJ)"
 
-#: website/web/templates/admin/editpost.html:123
+#: website/web/templates/admin/editpost.html:126
 msgid "Screen URL"
 msgstr "URL de la capture"
 
-#: website/web/templates/admin/editpost.html:141
+#: website/web/templates/admin/editpost.html:144
 msgid "No preview"
 msgstr "Pas de prévisualisation"
 
-#: website/web/templates/admin/editpost.html:146
+#: website/web/templates/admin/editpost.html:149
 msgid "Upload new screen (optional)"
 msgstr "Téléverser une nouvelle capture (optionnel)"
 
 #: website/web/templates/admin/editpost.html:164
+msgid ""
+"A private post is hidden from anonymous visitors, the API, the RSS feed "
+"and the MISP feed."
+msgstr "Un post privé est masqué aux visiteurs anonymes, à l'API, au flux RSS et au feed MISP."
+
+#: website/web/templates/admin/editpost.html:175
+#: website/web/templates/admin/raas_group.html:88
 msgid "Save changes"
 msgstr "Enregistrer les modifications"
 
@@ -5679,7 +5890,7 @@ msgid "Admin · Audit log"
 msgstr "Admin · Journal d'audit"
 
 #: website/web/templates/admin/logs.html:11
-#: website/web/templates/admin/logs.html:71
+#: website/web/templates/admin/logs.html:73
 msgid "Audit log"
 msgstr "Journal d'audit"
 
@@ -5693,35 +5904,99 @@ msgstr "%(total)s entrées (rétention 1 an)."
 msgid "%(n)s legacy entries pending migration."
 msgstr "%(n)s entrées legacy en attente de migration."
 
-#: website/web/templates/admin/logs.html:46
-#: website/web/templates/admin/logs.html:75
+#: website/web/templates/admin/logs.html:47
+#: website/web/templates/admin/logs.html:77
 msgid "User"
 msgstr "Utilisateur"
 
-#: website/web/templates/admin/logs.html:57
+#: website/web/templates/admin/logs.html:58
 msgid "target, details…"
 msgstr "cible, détails…"
 
-#: website/web/templates/admin/logs.html:62
+#: website/web/templates/admin/logs.html:64
 msgid "Reset"
 msgstr "Réinitialiser"
 
-#: website/web/templates/admin/logs.html:74
+#: website/web/templates/admin/logs.html:76
 msgid "Date (local)"
 msgstr "Date (locale)"
 
-#: website/web/templates/admin/logs.html:77
+#: website/web/templates/admin/logs.html:79
 msgid "Target"
 msgstr "Cible"
 
-#: website/web/templates/admin/logs.html:78
+#: website/web/templates/admin/logs.html:80
 msgid "Details"
 msgstr "Détails"
 
-#: website/web/templates/admin/logs.html:102
+#: website/web/templates/admin/logs.html:104
 #, python-format
 msgid "Page %(page)s / %(total)s"
 msgstr "Page %(page)s / %(total)s"
+
+#: website/web/templates/admin/raas_group.html:9
+msgid ""
+"One block per published version of the affiliate terms. Marking a block "
+"current clears the flag on the others."
+msgstr "Un bloc par version publiée des conditions affiliés. Marquer un bloc comme actuel retire la marque des autres."
+
+#: website/web/templates/admin/raas_group.html:10
+msgid "Change group"
+msgstr "Changer de groupe"
+
+#: website/web/templates/admin/raas_group.html:11
+msgid "Public page"
+msgstr "Page publique"
+
+#: website/web/templates/admin/raas_group.html:21
+msgid "Add a version"
+msgstr "Ajouter une version"
+
+#: website/web/templates/admin/raas_group.html:26
+#: website/web/templates/admin/raas_group.html:59
+msgid "These are the current rules"
+msgstr "Ce sont les règles actuelles"
+
+#: website/web/templates/admin/raas_group.html:29
+#: website/web/templates/admin/raas_group.html:65
+msgid "Screenshots"
+msgstr "Captures d'écran"
+
+#: website/web/templates/admin/raas_group.html:40
+msgid "Current"
+msgstr "Actuelle"
+
+#: website/web/templates/admin/raas_group.html:45
+msgid "Rules (Markdown)"
+msgstr "Règles (Markdown)"
+
+#: website/web/templates/admin/raas_group.html:49
+msgid "Public comment"
+msgstr "Commentaire public"
+
+#: website/web/templates/admin/raas_group.html:53
+msgid "In force since (YYYY-MM-DD, optional)"
+msgstr "En vigueur depuis (AAAA-MM-JJ, optionnel)"
+
+#: website/web/templates/admin/raas_group.html:74
+msgid "Remove"
+msgstr "Retirer"
+
+#: website/web/templates/admin/raas_group.html:84
+msgid "Add screenshots"
+msgstr "Ajouter des captures"
+
+#: website/web/templates/admin/raas_group.html:91
+msgid "Delete this version"
+msgstr "Supprimer cette version"
+
+#: website/web/templates/admin/raas_group.html:96
+msgid "No rules recorded for this group yet."
+msgstr "Aucune règle enregistrée pour ce groupe."
+
+#: website/web/templates/admin/raas_select.html:8
+msgid "Pick the group whose affiliate rules you want to edit."
+msgstr "Choisissez le groupe dont vous voulez modifier les règles affiliés."
 
 #: website/web/templates/admin/ransomnotes_group.html:3
 #, python-format
@@ -5782,10 +6057,6 @@ msgstr "Format"
 #: website/web/templates/admin/ransomnotes_group.html:76
 msgid "Local override"
 msgstr "Surcharge locale"
-
-#: website/web/templates/admin/ransomnotes_group.html:87
-msgid "yes"
-msgstr "oui"
 
 #: website/web/templates/admin/ransomnotes_group.html:87
 msgid "no"
@@ -6026,4 +6297,49 @@ msgstr "OK"
 #: website/web/templates/admin/urls.html:108
 msgid "Exists"
 msgstr "Existe"
+
+#~ msgid "Success to delete : %(name)s"
+#~ msgstr "Suppression réussie : %(name)s"
+
+#~ msgid "You are not allowed to dump this DataBase"
+#~ msgstr "Vous n'êtes pas autorisé à dumper cette base de données"
+
+#~ msgid "Configuration saved."
+#~ msgstr "Configuration enregistrée."
+
+#~ msgid "Missing token."
+#~ msgstr "Jeton manquant."
+
+#~ msgid "Configuration"
+#~ msgstr "Configuration"
+
+#~ msgid "Edit notifications, LDAP, SMTP and general settings."
+#~ msgstr "Éditer notifications, LDAP, SMTP et paramètres généraux."
+
+#~ msgid "Admin · Configuration"
+#~ msgstr "Admin · Configuration"
+
+#~ msgid "settings."
+#~ msgstr "paramètres."
+
+#~ msgid "Using sample — no generic.json found, changes will create one."
+#~ msgstr ""
+#~ "Utilisation de l'échantillon — aucun "
+#~ "generic.json trouvé, les modifications en "
+#~ "créeront un."
+
+#~ msgid "enabled"
+#~ msgstr "activé"
+
+#~ msgid "comma-separated"
+#~ msgstr "séparé par des virgules"
+
+#~ msgid "Show"
+#~ msgstr "Afficher"
+
+#~ msgid "General"
+#~ msgstr "Général"
+
+#~ msgid "Save configuration"
+#~ msgstr "Enregistrer la configuration"
 

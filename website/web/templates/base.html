@@ -85,6 +85,7 @@
           {{ nav_link('/leaks',    _('Leaks'),    ic_leaks) }}
           {{ nav_link('/notes',    _('Notes'),    ic_notes,  title=_('Ransomware Notes')) }}
           {{ nav_link('/analyses', _('Analyses'), ic_docs,   title=_('In-house technical analyses')) }}
+          {{ nav_link('/raas-rules', _('RaaS Rules'), ic_docs, match='/raas-rules', title=_('Affiliate rules published by RaaS programs')) }}
           {% if activatedRF %}
           {{ nav_link(url_for('rf'), _('RF Dumps'), ic_rf, match='/RF') }}
           {% endif %}
