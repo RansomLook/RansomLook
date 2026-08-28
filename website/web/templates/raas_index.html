@@ -1,50 +1,59 @@
 {% extends "base.html" %}
-{% block title %}{{ _('RaaS Rules') }} · RansomLook{% endblock %}
+
+{% block title %}{{ _('RaaS Rules') }}{% endblock %}
 
 {% block content %}
+
 <section class="hero">
   <div class="container">
-    <h1>{{ _('RaaS Rules') }}</h1>
-    <p class="lead">
-      {{ _('The terms ransomware-as-a-service programs impose on their affiliates: forbidden targets, excluded countries, revenue split, proof obligations.') }}
-      <strong>{{ total }}</strong> {{ _('programs documented.') }}
-    </p>
+    <h1>{{ _('Programs with affiliate rules') }}</h1>
+    <p class="lead">{{ _('The terms ransomware-as-a-service programs impose on their affiliates: forbidden targets, excluded countries, revenue split, proof obligations.') }}</p>
   </div>
 </section>
 
 <section class="metrics-section">
   <div class="container">
-    {% if items %}
-    <div class="table-scroll">
-      <table class="table">
-        <thead>
-          <tr>
-            <th>{{ _('Group') }}</th>
-            <th>{{ _('Versions') }}</th>
-            <th>{{ _('Latest in force') }}</th>
-            <th>{{ _('Current set') }}</th>
-          </tr>
-        </thead>
-        <tbody>
-          {% for item in items %}
-          <tr>
-            <td>
-              <a href="{{ url_for('raas_group', name=item.name) }}">{{ item.name }}</a>
-              {% if item.private %}<span class="badge-neutral">{{ _('Private') }}</span>{% endif %}
-            </td>
-            <td>{{ item.blocks }}</td>
-            <td>{{ item.latest or '—' }}</td>
-            <td>{% if item.has_current %}{{ _('yes') }}{% else %}—{% endif %}</td>
-          </tr>
-          {% endfor %}
-        </tbody>
-      </table>
+
+    <!-- Filters -->
+    <div class="table-card search-card pad-mb">
+      <div class="filters-wrap">
+        <div class="filters">
+          <div class="field field--search">
+            <label class="sr-only" for="raas-filter">{{ _('Search') }}</label>
+            <input id="raas-filter" class="input" type="search"
+                   aria-label="{{ _('Filter programs') }}"
+                   placeholder="{{ _('Group name…') }}">
+            <button class="input-clear" type="button" aria-label="{{ _('Clear search') }}">×</button>
+          </div>
+        </div>
+        <div class="filters-meta"><span id="flt-count"></span></div>
+      </div>
     </div>
-    {% else %}
+
+    <!-- Programs grid -->
+    <div id="raas-grid" class="auto-grid">
+      {% for item in items %}
+        <a class="group-chip stat-link"
+           href="{{ url_for('raas_group', name=item.name) }}"
+           data-name="{{ item.name|lower }}"
+           title="{% if item.latest %}{{ _('Latest in force') }}: {{ item.latest }}{% else %}{{ _('Date unknown') }}{% endif %}">
+          {{ item.name.title() }}
+          <span class="badge-neutral">{{ item.blocks }}</span>
+          {% if item.private %}<span class="badge-private">{{ _('Private') }}</span>{% endif %}
+        </a>
+      {% endfor %}
+    </div>
+
+    {% if not items %}
     <div class="table-card p-12">
       <p>{{ _('No affiliate rules recorded yet.') }}</p>
     </div>
     {% endif %}
+
   </div>
 </section>
+
+<script type="application/json" id="chips-config">{"inputId":"raas-filter","gridId":"raas-grid","label":"programs"}</script>
+<script src="{{ url_for('static', filename='js/chips-filter.js') }}" defer></script>
+
 {% endblock %}

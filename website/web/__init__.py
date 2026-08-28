@@ -4579,6 +4579,12 @@ def _raas_group_exists(name: str) -> str | None:
         return None
     for db_num in (DB_GROUPS, DB_MARKETS):
         red = Valkey(unix_socket_path=get_socket_path("cache"), db=db_num)
+        # Exact key first: group keys are stored lowercase, so this hits on the
+        # normal path. The scan is only a fallback for a legacy mixed-case key,
+        # and it matters — /raas-rules/<group>/asset/<file> is unauthenticated
+        # and one page load fetches an image per screenshot.
+        if red.exists(key):
+            return key
         for raw in red.keys():  # type: ignore[union-attr]
             if raw.decode().lower() == key:
                 return raw.decode()
@@ -4605,7 +4611,7 @@ def _raas_visible_or_404(name: str) -> list[dict[str, Any]]:
 def raas_index():  # type: ignore[no-untyped-def]
     """Every group whose affiliate rules we hold."""
     include_private = can_see_private()
-    items = []
+    items: list[dict[str, Any]] = []
     for name in raas_rules.groups(include_private=include_private):
         blocks = raas_rules.load(name)
         if not blocks:
@@ -4628,7 +4634,7 @@ def raas_group(name: str):  # type: ignore[no-untyped-def]
     for block in blocks:
         rendered.append({
             **block,
-            "html": _render_markdown_text(raas_rules.render_source(block.get("content"))),
+            "html": raas_rules.sanitize_links(_render_markdown_text(raas_rules.render_source(block.get("content")))),
         })
     return render_template("raas_rules.html", name=name, blocks=rendered)
 
@@ -4654,20 +4660,46 @@ def raas_asset(group: str, filename: str):  # type: ignore[no-untyped-def]
 @app.route("/admin/raas-rules", methods=["GET", "POST"])
 @flask_login.login_required
 def admin_raas_select():  # type: ignore[no-untyped-def]
-    form = RaasSelectForm()
-    names = []
-    for db_num in (DB_GROUPS, DB_MARKETS):
+    """Group / market picker, same shape as /admin/edit.
+
+    Two forms behind a type toggle with a shared search box rather than one
+    select holding every group and market: the list runs to several hundred
+    entries and picking from it unaided is not workable.
+    """
+    formGroups = RaasSelectForm()
+    formMarkets = RaasSelectForm()
+    for form, db_num, prompt in (
+        (formGroups, DB_GROUPS, _("Please select your group")),
+        (formMarkets, DB_MARKETS, _("Please select your Market")),
+    ):
         red = Valkey(unix_socket_path=get_socket_path("cache"), db=db_num)
-        names.extend(k.decode() for k in red.keys())  # type: ignore[union-attr]
-    form.group.choices = sorted(set(names), key=str.lower)
-    if form.validate_on_submit():
-        return redirect(url_for("admin_raas_group", group=form.group.data))
-    counts = {n: raas_rules.count(n) for n in form.group.choices}
-    return render_template("admin/raas_select.html", form=form, counts=counts)
+        keys = sorted((k.decode() for k in red.keys()), key=str.lower)  # type: ignore[union-attr]
+        form.group.choices = [("", prompt)] + [(k, k) for k in keys]
+
+    if formGroups.validate_on_submit() and formGroups.group.data:
+        return redirect(url_for("admin_raas_group", group=formGroups.group.data))
+    if formMarkets.validate_on_submit() and formMarkets.group.data:
+        return redirect(url_for("admin_raas_group", group=formMarkets.group.data))
+
+    existing = []
+    for name in raas_rules.groups(include_private=True):
+        blocks = raas_rules.load(name)
+        existing.append(
+            {
+                "name": name,
+                "blocks": len(blocks),
+                "latest": raas_rules.latest_date(blocks),
+                "has_current": any(b.get("current") is True for b in blocks),
+            }
+        )
+    existing.sort(key=lambda x: str(x["name"]).lower())
+    return render_template(
+        "admin/raas_select.html", form=formGroups, formMarkets=formMarkets, existing=existing
+    )
 
 
 @app.route("/admin/raas-rules/<group>", methods=["GET", "POST"])
-@flask_login.login_required
+@flask_login.login_required  # type: ignore[untyped-decorator]
 def admin_raas_group(group: str):  # type: ignore[no-untyped-def]
     canonical = _raas_group_exists(group)
     if canonical is None:
@@ -4721,7 +4753,12 @@ def _raas_store_images(key: str, block: dict[str, Any]) -> tuple[int, int]:
         if not uploaded or not uploaded.filename:
             continue
         ext = os.path.splitext(uploaded.filename)[1].lower()
-        if ext not in app.config["UPLOAD_EXTENSIONS"] or ext != validate_image(uploaded.stream):  # type: ignore
+        # Deliberately not app.config["UPLOAD_EXTENSIONS"]: that list allows
+        # .svg, which the asset route refuses to serve — an SVG would land on
+        # disk and 404 forever — and it lacks .jpeg/.webp, which the route does
+        # serve. The two ends now agree, and SVG stays out of a tree whose files
+        # are served from the app origin.
+        if ext not in raas_rules.ALLOWED_IMAGE_EXT or ext != validate_image(uploaded.stream):  # type: ignore
             rejected += 1
             continue
         os.makedirs(base, exist_ok=True)
@@ -4735,7 +4772,7 @@ def _raas_store_images(key: str, block: dict[str, Any]) -> tuple[int, int]:
 
 
 @app.route("/admin/raas-rules/<group>/<block_id>/update", methods=["POST"])
-@flask_login.login_required
+@flask_login.login_required  # type: ignore[untyped-decorator]
 def admin_raas_update(group: str, block_id: str):  # type: ignore[no-untyped-def]
     _raas_check_csrf()
     canonical = _raas_group_exists(group)
@@ -4767,7 +4804,7 @@ def admin_raas_update(group: str, block_id: str):  # type: ignore[no-untyped-def
 
 
 @app.route("/admin/raas-rules/<group>/<block_id>/delete", methods=["POST"])
-@flask_login.login_required
+@flask_login.login_required  # type: ignore[untyped-decorator]
 def admin_raas_delete(group: str, block_id: str):  # type: ignore[no-untyped-def]
     _raas_check_csrf()
     canonical = _raas_group_exists(group)
@@ -4795,7 +4832,7 @@ def admin_raas_delete(group: str, block_id: str):  # type: ignore[no-untyped-def
 
 
 @app.route("/admin/raas-rules/<group>/<block_id>/image/<path:filename>/delete", methods=["POST"])
-@flask_login.login_required
+@flask_login.login_required  # type: ignore[untyped-decorator]
 def admin_raas_image_delete(group: str, block_id: str, filename: str):  # type: ignore[no-untyped-def]
     _raas_check_csrf()
     canonical = _raas_group_exists(group)

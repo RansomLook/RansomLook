@@ -33,7 +33,12 @@ ASSET_ROOT = ("source", "raas")
 
 _DATE_RE = re.compile(r"^\d{4}-\d{2}-\d{2}$")
 _ID_RE = re.compile(r"^[0-9a-f]{32}$")
-_ALLOWED_IMAGE_EXT = (".png", ".jpg", ".jpeg", ".gif", ".webp")
+# Single list for both ends: what may be uploaded and what may be served.
+# Bounded by what validate_image() can return — ".svg", ".jpg", ".png", ".gif"
+# and nothing else — so ".jpeg" and ".webp" would advertise uploads that can
+# never succeed. ".svg" is left out deliberately: these files are served from
+# the app origin, and an SVG there executes script in it.
+ALLOWED_IMAGE_EXT = (".png", ".jpg", ".gif")
 
 
 def getdb() -> valkey.Valkey:
@@ -77,6 +82,42 @@ def render_source(text: Any) -> str:
     return html.escape(str(text or ""), quote=False)
 
 
+# href/src emitted by Markdown itself. Escaping the source neutralises raw HTML
+# but not [text](javascript:...), which Markdown turns into a real anchor.
+_URL_ATTR_RE = re.compile(r'\b(href|src)\s*=\s*"([^"]*)"', re.I)
+_SAFE_SCHEMES = ("http", "https", "mailto")
+
+
+def _url_is_safe(value: str) -> bool:
+    """True for a URL we are willing to emit into the page.
+
+    Relative URLs and fragments are fine. An absolute one must carry a scheme we
+    trust: javascript:, data: and vbscript: all execute, and data: can carry a
+    whole HTML document.
+    """
+    # strip the characters browsers ignore when parsing a scheme
+    cleaned = "".join(c for c in value if c not in "\t\r\n\x00 ").lower()
+    if not cleaned or cleaned.startswith(("#", "/", "?", ".")):
+        return True
+    head = cleaned.split("/", 1)[0]
+    if ":" not in head:
+        return True
+    return head.split(":", 1)[0] in _SAFE_SCHEMES
+
+
+def sanitize_links(rendered: str) -> str:
+    """Blank out href/src attributes carrying an executable scheme.
+
+    Applied to the Markdown output, which is machine-generated from an already
+    escaped source, so the only attributes present are the ones Markdown wrote.
+    """
+    def repl(match: "re.Match[str]") -> str:
+        attr, value = match.group(1), match.group(2)
+        return match.group(0) if _url_is_safe(value) else f'{attr}=""'
+
+    return _URL_ATTR_RE.sub(repl, rendered)
+
+
 def asset_dir(group: Any) -> str | None:
     """Absolute image directory for a group, or None if the name escapes it."""
     candidate = norm_group(group)
@@ -94,7 +135,7 @@ def safe_asset(name: Any) -> str | None:
     candidate = str(name or "").strip()
     if not candidate or candidate in (".", "..") or set(candidate) & {"/", "\\", "\0"}:
         return None
-    if not candidate.lower().endswith(_ALLOWED_IMAGE_EXT):
+    if not candidate.lower().endswith(ALLOWED_IMAGE_EXT):
         return None
     return candidate
 

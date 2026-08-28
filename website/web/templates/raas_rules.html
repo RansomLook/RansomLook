@@ -16,7 +16,7 @@
 <section class="metrics-section">
   <div class="container">
     {% for block in blocks %}
-    <article class="table-card p-16 mb-14">
+    <article class="table-card p-16 mb-14"{% if block.current %} style="border-left:3px solid var(--pri)"{% endif %}>
       <header class="mb-12">
         {% if block.current %}<span class="badge-neutral">{{ _('Current rules') }}</span>{% endif %}
         {% if block.started %}
@@ -27,12 +27,12 @@
         {% if block.comment %}<p class="lead">{{ block.comment }}</p>{% endif %}
       </header>
 
-      <div class="markdown-body">{{ block.html | safe }}</div>
+      <div class="markdown-section">{{ block.html | safe }}</div>
 
       {% if block.images %}
-      <div class="mt-12">
+      <div class="auto-grid mt-12">
         {% for image in block.images %}
-        <figure style="display:inline-block;margin:0 12px 12px 0;max-width:100%">
+        <figure style="margin:0;max-width:100%">
           <a href="{{ url_for('raas_asset', group=name, filename=image) }}">
             <img src="{{ url_for('raas_asset', group=name, filename=image) }}"
                  alt="{{ _('Rules screenshot') }}"

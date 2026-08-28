@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version:  RansomLook\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-08-27 09:12+0200\n"
+"POT-Creation-Date: 2026-08-28 11:40+0200\n"
 "PO-Revision-Date: 2026-04-21 13:39+0200\n"
 "Last-Translator: RansomLook team\n"
 "Language: fr\n"
@@ -42,9 +42,10 @@ msgstr "Groupe inexistant : %(name)s"
 
 #: website/web/__init__.py:2426
 msgid "Invalid variant id (use [a-z0-9_-], 1–64 chars; not 'assets'/'pdf')."
-msgstr "Identifiant de variante invalide (utilisez [a-z0-9_-], 1 à 64 caractères ; ni « assets » ni « pdf »)."
-"ID de variante invalide (utilisez [a-z0-9_-], 1–64 caractères ; pas "
-"'assets'/'pdf')."
+msgstr ""
+"Identifiant de variante invalide (utilisez [a-z0-9_-], 1 à 64 caractères "
+"; ni « assets » ni « pdf »).ID de variante invalide (utilisez [a-z0-9_-],"
+" 1–64 caractères ; pas 'assets'/'pdf')."
 
 #: website/web/__init__.py:2430
 #, python-format
@@ -205,65 +206,80 @@ msgid ""
 "Success to delete : %(name)s — %(posts)d posts and %(raas)d RaaS rules "
 "versions removed, %(notes)d ransom notes and %(wallets)d wallets kept but"
 " detached."
-msgstr "Suppression réussie : %(name)s — %(posts)d posts et %(raas)d versions de règles RaaS supprimés, %(notes)d notes de rançon et %(wallets)d portefeuilles conservés mais détachés."
+msgstr ""
+"Suppression réussie : %(name)s — %(posts)d posts et %(raas)d versions de "
+"règles RaaS supprimés, %(notes)d notes de rançon et %(wallets)d "
+"portefeuilles conservés mais détachés."
 
 #: website/web/__init__.py:4381
 #, python-format
 msgid ""
 "Cannot rename %(old)s to %(new)s: only the record itself would move. Left"
 " behind: %(what)s. Rename it from the shell instead."
-msgstr "Impossible de renommer %(old)s en %(new)s : seul l'enregistrement lui-même serait déplacé. Resteraient en arrière : %(what)s. Renommez-le depuis le shell."
+msgstr ""
+"Impossible de renommer %(old)s en %(new)s : seul l'enregistrement lui-"
+"même serait déplacé. Resteraient en arrière : %(what)s. Renommez-le "
+"depuis le shell."
 
-#: website/web/__init__.py:4457 website/web/__init__.py:4867
-#: website/web/__init__.py:4935 website/web/__init__.py:5047
+#: website/web/__init__.py:4457 website/web/__init__.py:4930
+#: website/web/__init__.py:4998 website/web/__init__.py:5110
 #, python-format
 msgid "Error to add post to : %(name)s - Screen should be a PNG"
-msgstr "Échec de l'ajout du post à %(name)s — la capture doit être un PNG"
-"Erreur lors de l'ajout d'une publication à %(name)s — la capture doit "
-"être un PNG"
+msgstr ""
+"Échec de l'ajout du post à %(name)s — la capture doit être un PNGErreur "
+"lors de l'ajout d'une publication à %(name)s — la capture doit être un "
+"PNG"
 
 #: website/web/__init__.py:4542
 #, python-format
 msgid "Success to edit : %(name)s"
 msgstr "Édition réussie : %(name)s"
 
-#: website/web/__init__.py:4653
+#: website/web/__init__.py:4672
+msgid "Please select your group"
+msgstr "Choisissez votre groupe"
+
+#: website/web/__init__.py:4673
+msgid "Please select your Market"
+msgstr "Choisissez votre marché"
+
+#: website/web/__init__.py:4706
 #, python-format
 msgid "Group not found: %(name)s"
 msgstr "Groupe introuvable : %(name)s"
 
-#: website/web/__init__.py:4669 website/web/__init__.py:4730
+#: website/web/__init__.py:4722 website/web/__init__.py:4791
 #, python-format
 msgid "Ignored start date %(value)s: expected YYYY-MM-DD."
 msgstr "Date de début %(value)s ignorée : format attendu AAAA-MM-JJ."
 
-#: website/web/__init__.py:4677 website/web/__init__.py:4740
+#: website/web/__init__.py:4730 website/web/__init__.py:4801
 #, python-format
 msgid "%(n)d file(s) refused: images only (png/jpg/gif/webp)."
 msgstr "%(n)d fichier(s) refusé(s) : images uniquement (png/jpg/gif/webp)."
 
-#: website/web/__init__.py:4678
+#: website/web/__init__.py:4731
 msgid "Rules added."
 msgstr "Règles ajoutées."
 
-#: website/web/__init__.py:4741
+#: website/web/__init__.py:4802
 msgid "Rules updated."
 msgstr "Règles mises à jour."
 
-#: website/web/__init__.py:4768
+#: website/web/__init__.py:4830
 msgid "Rules deleted."
 msgstr "Règles supprimées."
 
-#: website/web/__init__.py:4794
+#: website/web/__init__.py:4857
 msgid "Screenshot removed."
 msgstr "Capture d'écran supprimée."
 
-#: website/web/__init__.py:4859
+#: website/web/__init__.py:4922
 #, python-format
 msgid "Unknown logo: %(file)s"
 msgstr "Logo inconnu : %(file)s"
 
-#: website/web/__init__.py:4926
+#: website/web/__init__.py:4989
 #, python-format
 msgid ""
 "Error to add post to : %(name)s - You should select Magnet or Link not "
@@ -272,198 +288,199 @@ msgstr ""
 "Erreur lors de l'ajout d'une publication à %(name)s — sélectionnez Magnet"
 " ou Lien, pas les deux"
 
-#: website/web/__init__.py:4948
+#: website/web/__init__.py:5011
 #, python-format
 msgid "Error to add post to : %(name)s - The entry already exists"
 msgstr "Erreur lors de l'ajout d'une publication à %(name)s — l'entrée existe déjà"
 
-#: website/web/__init__.py:4961 website/web/__init__.py:5095
+#: website/web/__init__.py:5024 website/web/__init__.py:5158
 #, python-format
 msgid "Success to add post to : %(name)s"
 msgstr "Publication ajoutée avec succès à %(name)s"
 
-#: website/web/__init__.py:5053
+#: website/web/__init__.py:5116
 #, python-format
 msgid "Invalid path: %(name)s"
 msgstr "Chemin invalide : %(name)s"
 
-#: website/web/__init__.py:5065
+#: website/web/__init__.py:5128
 #, python-format
 msgid "Invalid screen path for %(title)s"
 msgstr "Chemin de capture invalide pour %(title)s"
 
-#: website/web/__init__.py:5117
+#: website/web/__init__.py:5180
 msgid "Name required"
 msgstr "Nom requis"
 
-#: website/web/__init__.py:5125
+#: website/web/__init__.py:5188
 #, python-format
 msgid "Invalid actor name: %(name)s"
 msgstr "Nom d'acteur invalide : %(name)s"
 
-#: website/web/__init__.py:5132
+#: website/web/__init__.py:5195
 msgid "This actor already exists."
 msgstr "Cet acteur existe déjà."
 
-#: website/web/__init__.py:5212
+#: website/web/__init__.py:5275
 msgid "Image invalide (png/jpg/svg/gif)"
 msgstr "Image invalide (png/jpg/svg/gif)"
 
-#: website/web/__init__.py:5234
+#: website/web/__init__.py:5297
 msgid "Actor created."
 msgstr "Acteur créé."
 
-#: website/web/__init__.py:5265
+#: website/web/__init__.py:5328
 msgid "Actor not found"
 msgstr "Acteur introuvable"
 
-#: website/web/__init__.py:5448
+#: website/web/__init__.py:5511
 msgid "Actor updated."
 msgstr "Acteur mis à jour."
 
-#: website/web/__init__.py:5507
+#: website/web/__init__.py:5570
 msgid "Please select a group name."
 msgstr "Veuillez sélectionner un nom de groupe."
 
-#: website/web/__init__.py:5564
+#: website/web/__init__.py:5627
 msgid "Alias invalide."
 msgstr "Alias invalide."
 
-#: website/web/__init__.py:5569
+#: website/web/__init__.py:5632
 #, python-format
 msgid "Alias '%(alias)s' added."
 msgstr "Alias « %(alias)s » ajouté."
 
-#: website/web/__init__.py:5582
+#: website/web/__init__.py:5645
 #, python-format
 msgid "Alias '%(alias)s' deleted."
 msgstr "Alias « %(alias)s » supprimé."
 
-#: website/web/__init__.py:5620
+#: website/web/__init__.py:5683
 msgid "Note created."
 msgstr "Note créée."
 
-#: website/web/__init__.py:5632 website/web/__init__.py:5688
+#: website/web/__init__.py:5695 website/web/__init__.py:5751
 msgid "Note not found."
 msgstr "Note introuvable."
 
-#: website/web/__init__.py:5676
+#: website/web/__init__.py:5739
 msgid "Note updated."
 msgstr "Note mise à jour."
 
-#: website/web/__init__.py:5693
+#: website/web/__init__.py:5756
 msgid "Note deleted."
 msgstr "Note supprimée."
 
-#: website/web/__init__.py:5792
+#: website/web/__init__.py:5855
 msgid "Canonical name is required."
 msgstr "Le nom canonique est requis."
 
-#: website/web/__init__.py:5806
+#: website/web/__init__.py:5869
 msgid "Group created in DB=7."
 msgstr "Groupe créé en DB=7."
 
-#: website/web/__init__.py:5829
+#: website/web/__init__.py:5892
 msgid "Address is required."
 msgstr "L'adresse est requise."
 
-#: website/web/__init__.py:5833
+#: website/web/__init__.py:5896
 msgid "Invalid address: letters, digits, ':', '_' and '-' only."
 msgstr "Adresse invalide : lettres, chiffres, « : », « _ » et « - » uniquement."
 
-#: website/web/__init__.py:5837
+#: website/web/__init__.py:5900
 msgid "Invalid blockchain name: lowercase letters, digits and '-' only."
 msgstr "Nom de blockchain invalide : minuscules, chiffres et « - » uniquement."
 
-#: website/web/__init__.py:5848 website/web/__init__.py:5929
+#: website/web/__init__.py:5911 website/web/__init__.py:5992
 #, python-format
 msgid "Invalid transactions JSON: %(error)s"
 msgstr "JSON de transactions invalide : %(error)s"
 
-#: website/web/__init__.py:5876
+#: website/web/__init__.py:5939
 msgid "Address created."
 msgstr "Adresse créée."
 
-#: website/web/__init__.py:5914
+#: website/web/__init__.py:5977
 msgid "Address deleted."
 msgstr "Adresse supprimée."
 
-#: website/web/__init__.py:5971
+#: website/web/__init__.py:6034
 msgid "Address updated."
 msgstr "Adresse mise à jour."
 
-#: website/web/__init__.py:5990
+#: website/web/__init__.py:6053
 msgid "Alias is required."
 msgstr "L'alias est requis."
 
-#: website/web/__init__.py:5998
+#: website/web/__init__.py:6061
 msgid "Alias deleted."
 msgstr "Alias supprimé."
 
-#: website/web/__init__.py:6002
+#: website/web/__init__.py:6065
 msgid "Canonical slug is required."
 msgstr "Le slug canonique est requis."
 
-#: website/web/__init__.py:6007
+#: website/web/__init__.py:6070
 msgid "Alias saved."
 msgstr "Alias enregistré."
 
-#: website/web/__init__.py:6053
+#: website/web/__init__.py:6116
 msgid "Group/market name is required."
 msgstr "Le nom de groupe/marché est requis."
 
-#: website/web/__init__.py:6058
+#: website/web/__init__.py:6121
 #, python-format
 msgid "\"%(name)s\" does not exist. Create it first."
 msgstr "« %(name)s » n'existe pas. Créez-le d'abord."
 
-#: website/web/__init__.py:6063
+#: website/web/__init__.py:6126
 msgid "At least one URL is required."
 msgstr "Au moins une URL est requise."
 
-#: website/web/__init__.py:6077
+#: website/web/__init__.py:6140
 #, python-format
 msgid "%(count)s URL(s) added to %(name)s."
 msgstr "%(count)s URL(s) ajoutée(s) à %(name)s."
 
-#: website/web/__init__.py:6079
+#: website/web/__init__.py:6142
 #, python-format
 msgid "%(count)s URL(s) already existed (skipped)."
 msgstr "%(count)s URL(s) existaient déjà (ignorées)."
 
-#: website/web/__init__.py:6148
+#: website/web/__init__.py:6211
 msgid "A name / comment is required."
 msgstr "Un nom / commentaire est requis."
 
-#: website/web/__init__.py:6162
+#: website/web/__init__.py:6225
 #, python-format
 msgid "API key created. Token (copy it now, it won't be shown again): %(token)s"
-msgstr "Clé d'API créée. Jeton (copiez-le maintenant, il ne sera plus affiché) : %(token)s"
-"Clé API créée. Jeton (copiez-le maintenant, il ne sera plus affiché) : "
-"%(token)s"
+msgstr ""
+"Clé d'API créée. Jeton (copiez-le maintenant, il ne sera plus affiché) : "
+"%(token)sClé API créée. Jeton (copiez-le maintenant, il ne sera plus "
+"affiché) : %(token)s"
 
-#: website/web/__init__.py:6171 website/web/__init__.py:6176
-#: website/web/__init__.py:6192 website/web/__init__.py:6197
-#: website/web/__init__.py:6216
+#: website/web/__init__.py:6234 website/web/__init__.py:6239
+#: website/web/__init__.py:6255 website/web/__init__.py:6260
+#: website/web/__init__.py:6279
 msgid "Key not found."
 msgstr "Clé introuvable."
 
-#: website/web/__init__.py:6183
+#: website/web/__init__.py:6246
 #, python-format
 msgid "Key \"%(name)s\" %(state)s."
 msgstr "Clé « %(name)s » %(state)s."
 
-#: website/web/__init__.py:6205
+#: website/web/__init__.py:6268
 #, python-format
 msgid "Private access %(state)s for key \"%(name)s\"."
 msgstr "Accès privé %(state)s pour la clé « %(name)s »."
 
-#: website/web/__init__.py:6228
+#: website/web/__init__.py:6291
 #, python-format
 msgid "Key \"%(name)s\" deleted."
 msgstr "Clé « %(name)s » supprimée."
 
-#: website/web/__init__.py:6397
+#: website/web/__init__.py:6460
 msgid "Success to update keywords"
 msgstr "Mots-clés mis à jour avec succès"
 
@@ -538,7 +555,8 @@ msgstr "Nom ou description du dump…"
 #: website/web/templates/admin/ransomnotes_index.html:39
 #: website/web/templates/browse.html:43 website/web/templates/crypto.html:26
 #: website/web/templates/groups.html:46 website/web/templates/leaks.html:27
-#: website/web/templates/notes.html:26 website/web/templates/urls.html:54
+#: website/web/templates/notes.html:26 website/web/templates/raas_index.html:26
+#: website/web/templates/urls.html:54
 msgid "Clear search"
 msgstr "Effacer la recherche"
 
@@ -860,9 +878,10 @@ msgstr "Plusieurs moyens permettent de suivre les nouvelles publications :"
 
 #: website/web/templates/about.html:103
 msgid "Run your own instance and enable RocketChat and/or email notifications"
-msgstr "Hébergez votre propre instance et activez les notifications RocketChat et/ou courriel"
-"Héberger sa propre instance et activer les notifications RocketChat et/ou"
-" e‑mail"
+msgstr ""
+"Hébergez votre propre instance et activez les notifications RocketChat "
+"et/ou courrielHéberger sa propre instance et activer les notifications "
+"RocketChat et/ou e‑mail"
 
 #: website/web/templates/about.html:105
 msgid "Check the public instance"
@@ -898,9 +917,10 @@ msgstr "Ouvrir un ticket sur notre dépôt GitHub"
 
 #: website/web/templates/about.html:131
 msgid "Submit pull requests with new features or improvements"
-msgstr "Proposez des pull requests avec de nouvelles fonctionnalités ou des améliorations"
-"Proposer des pull requests avec de nouvelles fonctionnalités ou "
-"améliorations"
+msgstr ""
+"Proposez des pull requests avec de nouvelles fonctionnalités ou des "
+"améliorationsProposer des pull requests avec de nouvelles fonctionnalités"
+" ou améliorations"
 
 #: website/web/templates/about.html:132
 msgid "Share new sources of DLS (Darknet Leak Sites)"
@@ -1056,7 +1076,7 @@ msgstr "Inactif"
 #: website/web/templates/admin/editpost.html:154
 #: website/web/templates/admin/urls.html:61
 #: website/web/templates/group.html:117 website/web/templates/groups.html:126
-#: website/web/templates/raas_index.html:33
+#: website/web/templates/raas_index.html:42
 msgid "Private"
 msgstr "Privé"
 
@@ -1100,13 +1120,12 @@ msgstr "Cet acteur"
 
 #: website/web/templates/actor.html:79
 #: website/web/templates/admin/crypto.html:30
-#: website/web/templates/admin/raas_select.html:26
+#: website/web/templates/admin/raas_select.html:71
 #: website/web/templates/admin/torrent_manage.html:31
 #: website/web/templates/admin/torrent_manage.html:56
 #: website/web/templates/admin/urls.html:24
 #: website/web/templates/analyses_index.html:47
 #: website/web/templates/glossary.html:34 website/web/templates/hot.html:128
-#: website/web/templates/raas_index.html:22
 #: website/web/templates/recent.html:94 website/web/templates/recent.html:107
 #: website/web/templates/search.html:17 website/web/templates/search.html:42
 #: website/web/templates/search.html:92 website/web/templates/search.html:124
@@ -1156,6 +1175,7 @@ msgstr "Relations"
 #: website/web/templates/admin/edit.html:22
 #: website/web/templates/admin/editactor.html:108
 #: website/web/templates/admin/logo.html:22
+#: website/web/templates/admin/raas_select.html:22
 #: website/web/templates/admin/torrent_asn.html:67
 #: website/web/templates/admin/torrent_health.html:76
 #: website/web/templates/admin/torrent_ip.html:82
@@ -1292,6 +1312,7 @@ msgstr "Parcourir les acteurs de menace / affiliés."
 #: website/web/templates/admin/editpost.html:65
 #: website/web/templates/admin/logo.html:33
 #: website/web/templates/admin/logs.html:57
+#: website/web/templates/admin/raas_select.html:30
 #: website/web/templates/admin/ransomnotes_index.html:35
 #: website/web/templates/analyses_index.html:21
 #: website/web/templates/base.html:145 website/web/templates/base.html:177
@@ -1299,6 +1320,7 @@ msgstr "Parcourir les acteurs de menace / affiliés."
 #: website/web/templates/crypto.html:22 website/web/templates/groups.html:42
 #: website/web/templates/groups.html:44 website/web/templates/leaks.html:23
 #: website/web/templates/leaks.html:25 website/web/templates/notes.html:22
+#: website/web/templates/raas_index.html:22
 #: website/web/templates/recent.html:71 website/web/templates/search.html:3
 #: website/web/templates/urls.html:48
 msgid "Search"
@@ -1594,12 +1616,10 @@ msgid "In-house technical analyses"
 msgstr "Analyses techniques internes"
 
 #: website/web/templates/admin/admin.html:75
-#: website/web/templates/admin/raas_group.html:2
-#: website/web/templates/admin/raas_group.html:7
-#: website/web/templates/admin/raas_select.html:2
-#: website/web/templates/admin/raas_select.html:7
-#: website/web/templates/base.html:88 website/web/templates/raas_index.html:2
-#: website/web/templates/raas_index.html:7
+#: website/web/templates/admin/raas_group.html:3
+#: website/web/templates/admin/raas_group.html:8
+#: website/web/templates/admin/raas_select.html:10
+#: website/web/templates/base.html:88 website/web/templates/raas_index.html:3
 #: website/web/templates/raas_rules.html:2
 #: website/web/templates/raas_rules.html:7
 msgid "RaaS Rules"
@@ -1656,8 +1676,7 @@ msgid "Language"
 msgstr "Langue"
 
 #: website/web/templates/admin/editentry.html:170
-#: website/web/templates/admin/raas_group.html:2
-#: website/web/templates/admin/raas_select.html:2
+#: website/web/templates/admin/raas_group.html:3
 #: website/web/templates/base.html:136
 msgid "Admin"
 msgstr "Admin"
@@ -1813,9 +1832,10 @@ msgstr "Comparer deux sources"
 #: website/web/templates/compare.html:21
 #, python-format
 msgid "Pick two %(kind)s to compare (posts 7/30/365, mirrors up, 30-day uptime)."
-msgstr "Choisissez deux %(kind)s à comparer (posts 7/30/365, miroirs en ligne, disponibilité sur 30 jours)."
-"Choisissez deux %(kind)s à comparer (publications 7/30/365, miroirs en "
-"ligne, uptime 30 jours)."
+msgstr ""
+"Choisissez deux %(kind)s à comparer (posts 7/30/365, miroirs en ligne, "
+"disponibilité sur 30 jours).Choisissez deux %(kind)s à comparer "
+"(publications 7/30/365, miroirs en ligne, uptime 30 jours)."
 
 #: website/web/templates/admin/ransomnotes_index.html:79
 #: website/web/templates/compare.html:21 website/web/templates/index.html:209
@@ -1833,6 +1853,7 @@ msgstr "Choisir le type à comparer"
 #: website/web/templates/admin/addpost.html:25
 #: website/web/templates/admin/edit.html:25
 #: website/web/templates/admin/logo.html:25
+#: website/web/templates/admin/raas_select.html:25
 #: website/web/templates/compare.html:35
 #: website/web/templates/glossary.html:110
 msgid "Markets / Forums"
@@ -3152,9 +3173,10 @@ msgstr "Liste des leaks"
 
 #: website/web/templates/leaks.html:11
 msgid "Browse known public leaks. Click a leak to view details."
-msgstr "Parcourez les fuites publiques connues. Cliquez sur une fuite pour le détail."
-"Parcourez les leaks publics connus. Cliquez sur un leak pour voir les "
-"détails."
+msgstr ""
+"Parcourez les fuites publiques connues. Cliquez sur une fuite pour le "
+"détail.Parcourez les leaks publics connus. Cliquez sur un leak pour voir "
+"les détails."
 
 #: website/web/templates/leaks.html:44
 msgid "Entries"
@@ -3220,40 +3242,46 @@ msgid "Copy"
 msgstr "Copier"
 
 #: website/web/templates/raas_index.html:9
+msgid "Programs with affiliate rules"
+msgstr "Programmes avec des règles affiliés"
+
+#: website/web/templates/raas_index.html:10
 msgid ""
 "The terms ransomware-as-a-service programs impose on their affiliates: "
 "forbidden targets, excluded countries, revenue split, proof obligations."
-msgstr "Les conditions que les programmes ransomware-as-a-service imposent à leurs affiliés : cibles interdites, pays exclus, partage des gains, obligations de preuve."
-
-#: website/web/templates/raas_index.html:10
-msgid "programs documented."
-msgstr "programmes documentés."
-
-#: website/web/templates/admin/raas_select.html:26
-#: website/web/templates/raas_index.html:23
-msgid "Versions"
-msgstr "Versions"
+msgstr ""
+"Les conditions que les programmes ransomware-as-a-service imposent à "
+"leurs affiliés : cibles interdites, pays exclus, partage des gains, "
+"obligations de preuve."
 
 #: website/web/templates/raas_index.html:24
+msgid "Filter programs"
+msgstr "Filtrer les programmes"
+
+#: website/web/templates/raas_index.html:25
+msgid "Group name…"
+msgstr "Nom du groupe…"
+
+#: website/web/templates/admin/raas_select.html:73
+#: website/web/templates/raas_index.html:39
 msgid "Latest in force"
 msgstr "Dernière en vigueur"
 
-#: website/web/templates/raas_index.html:25
-msgid "Current set"
-msgstr "Jeu actuel"
+#: website/web/templates/admin/raas_group.html:43
+#: website/web/templates/raas_index.html:39
+#: website/web/templates/raas_rules.html:25
+msgid "Date unknown"
+msgstr "Date inconnue"
 
-#: website/web/templates/admin/ransomnotes_group.html:87
-#: website/web/templates/raas_index.html:37
-msgid "yes"
-msgstr "oui"
-
-#: website/web/templates/raas_index.html:45
+#: website/web/templates/raas_index.html:49
 msgid "No affiliate rules recorded yet."
 msgstr "Aucune règle affiliés enregistrée pour le moment."
 
 #: website/web/templates/raas_rules.html:9
 msgid "Affiliate terms published by this program, newest first."
-msgstr "Conditions imposées aux affiliés par ce programme, de la plus récente à la plus ancienne."
+msgstr ""
+"Conditions imposées aux affiliés par ce programme, de la plus récente à "
+"la plus ancienne."
 
 #: website/web/templates/raas_rules.html:10
 msgid "Back to the group"
@@ -3271,11 +3299,6 @@ msgstr "Règles actuelles"
 msgid "In force since"
 msgstr "En vigueur depuis"
 
-#: website/web/templates/admin/raas_group.html:41
-#: website/web/templates/raas_rules.html:25
-msgid "Date unknown"
-msgstr "Date inconnue"
-
 #: website/web/templates/raas_rules.html:38
 msgid "Rules screenshot"
 msgstr "Capture des règles"
@@ -3290,9 +3313,10 @@ msgstr[1] "%(n)s derniers jours"
 #: website/web/templates/recent.html:15
 #, python-format
 msgid "showing most recent %(shown)s of %(total)s — older entries trimmed"
-msgstr "affichage des %(shown)s plus récentes sur %(total)s — les entrées plus anciennes sont tronquées"
-"affichage des %(shown)s plus récentes sur %(total)s — les plus anciennes "
-"sont tronquées"
+msgstr ""
+"affichage des %(shown)s plus récentes sur %(total)s — les entrées plus "
+"anciennes sont tronquéesaffichage des %(shown)s plus récentes sur "
+"%(total)s — les plus anciennes sont tronquées"
 
 #: website/web/templates/admin/torrent_pivot.html:25
 #: website/web/templates/recent.html:21
@@ -3787,9 +3811,10 @@ msgstr "Détail"
 #: website/web/templates/admin/torrent_health.html:149
 #: website/web/templates/torrent_health.html:149
 msgid "No torrent swarms scanned yet. Run poetry run torrent-health to populate."
-msgstr "Aucun essaim torrent analysé pour l'instant. Lancez « poetry run torrent-health » pour alimenter la base."
-"Aucun swarm torrent scanné pour le moment. Lancez poetry run torrent-"
-"health pour peupler la base."
+msgstr ""
+"Aucun essaim torrent analysé pour l'instant. Lancez « poetry run torrent-"
+"health » pour alimenter la base.Aucun swarm torrent scanné pour le "
+"moment. Lancez poetry run torrent-health pour peupler la base."
 
 #: website/web/templates/admin/torrent_health.html:183
 #: website/web/templates/torrent_health.html:183
@@ -4552,9 +4577,10 @@ msgstr "Image (optionnel)"
 
 #: website/web/templates/admin/addactor.html:155
 msgid "png / jpg / svg / gif. You can add/remove more from the “Logo” page."
-msgstr "png / jpg / svg / gif. Vous pouvez en ajouter ou en retirer depuis la page « Logo »."
-"png / jpg / svg / gif. Vous pouvez en ajouter/supprimer depuis la page « "
-"Logo »."
+msgstr ""
+"png / jpg / svg / gif. Vous pouvez en ajouter ou en retirer depuis la "
+"page « Logo ».png / jpg / svg / gif. Vous pouvez en ajouter/supprimer "
+"depuis la page « Logo »."
 
 #: website/web/templates/admin/addpost.html:3
 msgid "Admin · Add post"
@@ -4566,19 +4592,22 @@ msgstr "Ajouter une publication à un groupe ou un marché"
 
 #: website/web/templates/admin/addpost.html:11
 msgid "Pick the type, search, then confirm to add post."
-msgstr "Choisissez le type, recherchez, puis confirmez pour ajouter le post."
-"Choisissez le type, recherchez, puis confirmez pour ajouter la "
+msgstr ""
+"Choisissez le type, recherchez, puis confirmez pour ajouter le "
+"post.Choisissez le type, recherchez, puis confirmez pour ajouter la "
 "publication."
 
 #: website/web/templates/admin/addpost.html:20
 #: website/web/templates/admin/edit.html:20
 #: website/web/templates/admin/logo.html:20
+#: website/web/templates/admin/raas_select.html:20
 msgid "Choose type to edit"
 msgstr "Choisissez le type à éditer"
 
 #: website/web/templates/admin/addpost.html:31
 #: website/web/templates/admin/edit.html:31
 #: website/web/templates/admin/logo.html:34
+#: website/web/templates/admin/raas_select.html:31
 msgid "Filter options…"
 msgstr "Filtrer les options…"
 
@@ -4593,9 +4622,10 @@ msgstr "Ajouter une publication"
 
 #: website/web/templates/admin/addpostentry.html:12
 msgid "Create a new post with optional screenshot, custom date, link and magnet."
-msgstr "Créez un post avec capture d'écran, date, lien et magnet optionnels."
-"Créer une nouvelle publication avec capture optionnelle, date "
-"personnalisée, lien et magnet."
+msgstr ""
+"Créez un post avec capture d'écran, date, lien et magnet optionnels.Créer"
+" une nouvelle publication avec capture optionnelle, date personnalisée, "
+"lien et magnet."
 
 #: website/web/templates/admin/addpostentry.html:25
 msgid "New post"
@@ -4644,9 +4674,9 @@ msgid ""
 "and the MISP feed, and is not broadcast on Rocket.Chat, Mastodon or "
 "Bluesky."
 msgstr ""
-"Un post privé est masqué aux visiteurs anonymes, à l'API, au flux RSS et au "
-"feed MISP, et n'est diffusé ni sur Rocket.Chat, ni sur Mastodon, ni sur "
-"Bluesky."
+"Un post privé est masqué aux visiteurs anonymes, à l'API, au flux RSS et "
+"au feed MISP, et n'est diffusé ni sur Rocket.Chat, ni sur Mastodon, ni "
+"sur Bluesky."
 
 #: website/web/templates/admin/addpostentry.html:68
 #: website/web/templates/admin/editpost.html:140
@@ -4710,9 +4740,10 @@ msgstr "Créer une nouvelle entrée de groupe/marché et configurer ses emplacem
 
 #: website/web/templates/admin/admin.html:39
 msgid "Add URLs (DLS, FS, Chat, Admin) to groups or markets — single or bulk."
-msgstr "Ajoutez des URLs (DLS, FS, Chat, Admin) aux groupes ou marchés — à l'unité ou en lot."
-"Ajouter des URLs (DLS, FS, Chat, Admin) à des groupes ou marchés — "
-"unitaire ou en masse."
+msgstr ""
+"Ajoutez des URLs (DLS, FS, Chat, Admin) aux groupes ou marchés — à "
+"l'unité ou en lot.Ajouter des URLs (DLS, FS, Chat, Admin) à des groupes "
+"ou marchés — unitaire ou en masse."
 
 #: website/web/templates/admin/admin.html:49
 msgid "Update metadata, descriptions, links and flags (FS/Chat/Admin)."
@@ -4739,7 +4770,10 @@ msgstr ""
 msgid ""
 "Record the affiliate terms a RaaS program publishes — one block per "
 "version, with screenshots. Visible only where the group itself is."
-msgstr "Enregistrez les conditions affiliés publiées par un programme RaaS — un bloc par version, avec captures. Visibles seulement là où le groupe l'est."
+msgstr ""
+"Enregistrez les conditions affiliés publiées par un programme RaaS — un "
+"bloc par version, avec captures. Visibles seulement là où le groupe "
+"l'est."
 
 #: website/web/templates/admin/admin.html:85
 msgid "Post actions"
@@ -4747,8 +4781,9 @@ msgstr "Actions sur les publications"
 
 #: website/web/templates/admin/admin.html:93
 msgid "Manually insert a new post entry (title, date, description, screen)."
-msgstr "Insérez manuellement un post (titre, date, description, capture)."
-"Insérer manuellement une nouvelle publication (titre, date, description, "
+msgstr ""
+"Insérez manuellement un post (titre, date, description, capture).Insérer "
+"manuellement une nouvelle publication (titre, date, description, "
 "capture)."
 
 #: website/web/templates/admin/admin.html:99
@@ -4757,9 +4792,10 @@ msgstr "Éditer une publication"
 
 #: website/web/templates/admin/admin.html:103
 msgid "Search and modify existing posts (fix typos, attach screenshots, etc.)."
-msgstr "Recherchez et modifiez des posts existants (corriger une coquille, joindre une capture, etc.)."
-"Rechercher et modifier des publications existantes (corriger des fautes, "
-"ajouter des captures, etc.)."
+msgstr ""
+"Recherchez et modifiez des posts existants (corriger une coquille, "
+"joindre une capture, etc.).Rechercher et modifier des publications "
+"existantes (corriger des fautes, ajouter des captures, etc.)."
 
 #: website/web/templates/admin/admin.html:109
 msgid "Actor actions"
@@ -4779,9 +4815,10 @@ msgstr "Éditer l'acteur"
 
 #: website/web/templates/admin/admin.html:127
 msgid "Search and modify existing actors (fix typos, attach screenshots, etc.)."
-msgstr "Recherchez et modifiez des acteurs existants (corriger une coquille, joindre une capture, etc.)."
-"Rechercher et modifier les acteurs existants (corriger des fautes, "
-"ajouter des captures, etc.)."
+msgstr ""
+"Recherchez et modifiez des acteurs existants (corriger une coquille, "
+"joindre une capture, etc.).Rechercher et modifier les acteurs existants "
+"(corriger des fautes, ajouter des captures, etc.)."
 
 #: website/web/templates/admin/admin.html:133
 msgid "Notes actions"
@@ -4850,9 +4887,10 @@ msgstr "Gérer les torrents"
 
 #: website/web/templates/admin/admin.html:209
 msgid "Attach magnets or .torrent files to a group. Unit and bulk add/delete."
-msgstr "Rattachez des magnets ou des fichiers .torrent à un groupe. Ajout et suppression à l'unité ou en lot."
-"Attacher magnets ou fichiers .torrent à un groupe. Ajout/suppression "
-"unitaire et en masse."
+msgstr ""
+"Rattachez des magnets ou des fichiers .torrent à un groupe. Ajout et "
+"suppression à l'unité ou en lot.Attacher magnets ou fichiers .torrent à "
+"un groupe. Ajout/suppression unitaire et en masse."
 
 #: website/web/templates/admin/admin.html:209
 msgid "(admin)"
@@ -4881,9 +4919,10 @@ msgstr "Journaux"
 
 #: website/web/templates/admin/admin.html:244
 msgid "Inspect recent activities, parser runs and system messages."
-msgstr "Consultez l'activité récente, les passages de parsers et les messages système."
-"Inspecter les activités récentes, exécutions du parser et messages "
-"système."
+msgstr ""
+"Consultez l'activité récente, les passages de parsers et les messages "
+"système.Inspecter les activités récentes, exécutions du parser et "
+"messages système."
 
 #: website/web/templates/admin/admin.html:250
 msgid "Logout"
@@ -4904,9 +4943,10 @@ msgstr "Admin · Cryptomonnaies"
 
 #: website/web/templates/admin/admin_crypto.html:11
 msgid "Create/read alias mappings for crypto (stored in DB=7 only)."
-msgstr "Créez et consultez les correspondances d'alias crypto (stockées en DB=7 uniquement)."
-"Créer/lire les correspondances d'alias pour la crypto (stocké dans DB=7 "
-"uniquement)."
+msgstr ""
+"Créez et consultez les correspondances d'alias crypto (stockées en DB=7 "
+"uniquement).Créer/lire les correspondances d'alias pour la crypto (stocké"
+" dans DB=7 uniquement)."
 
 #: website/web/templates/admin/admin_crypto.html:21
 msgid "Add / Update alias"
@@ -5011,9 +5051,10 @@ msgstr "Exporter .txt"
 
 #: website/web/templates/admin/alerts.html:45
 msgid "Empty lines are ignored. Matching is case-insensitive by default."
-msgstr "Les lignes vides sont ignorées. La correspondance est insensible à la casse par défaut."
+msgstr ""
 "Les lignes vides sont ignorées. La correspondance est insensible à la "
-"casse par défaut."
+"casse par défaut.Les lignes vides sont ignorées. La correspondance est "
+"insensible à la casse par défaut."
 
 #: website/web/templates/admin/alerts.html:57
 msgid "Quick tester"
@@ -5220,9 +5261,10 @@ msgstr "Crypto — Sélectionner ou créer un groupe"
 
 #: website/web/templates/admin/crypto.html:10
 msgid "Choose a group to manage its wallets, or create a new one (DB=7 only)."
-msgstr "Choisissez un groupe pour gérer ses portefeuilles, ou créez-en un nouveau (DB=7 uniquement)."
+msgstr ""
 "Choisissez un groupe pour gérer ses portefeuilles, ou créez-en un nouveau"
-" (DB=7 uniquement)."
+" (DB=7 uniquement).Choisissez un groupe pour gérer ses portefeuilles, ou "
+"créez-en un nouveau (DB=7 uniquement)."
 
 #: website/web/templates/admin/crypto.html:19
 msgid "Search group…"
@@ -5513,9 +5555,10 @@ msgstr "Source Markdown stockée à"
 
 #: website/web/templates/admin/edit_analysis.html:17
 msgid "Rendered as HTML on the public group page and exported as PDF on demand."
-msgstr "Rendu en HTML sur la page publique du groupe et exporté en PDF à la demande."
-"Rendue en HTML sur la page publique du groupe et exportée en PDF à la "
-"demande."
+msgstr ""
+"Rendu en HTML sur la page publique du groupe et exporté en PDF à la "
+"demande.Rendue en HTML sur la page publique du groupe et exportée en PDF "
+"à la demande."
 
 #: website/web/templates/admin/edit_analysis.html:36
 msgid "Back to variants"
@@ -5540,9 +5583,10 @@ msgstr "attachée"
 
 #: website/web/templates/admin/edit_analysis.html:63
 msgid "If a file is uploaded, it overrides the textarea content below."
-msgstr "Si un fichier est téléversé, il prend le pas sur le contenu de la zone de texte ci-dessous."
-"Si un fichier est uploadé, il remplace le contenu de la zone de texte ci-"
-"dessous."
+msgstr ""
+"Si un fichier est téléversé, il prend le pas sur le contenu de la zone de"
+" texte ci-dessous.Si un fichier est uploadé, il remplace le contenu de la"
+" zone de texte ci-dessous."
 
 #: website/web/templates/admin/edit_analysis.html:72
 msgid "Metadata"
@@ -5830,9 +5874,10 @@ msgstr "Éditer les publications"
 
 #: website/web/templates/admin/editpost.html:51
 msgid "Search, date filter, screen preview, quick delete — then save changes."
-msgstr "Recherche, filtre par date, aperçu des captures, suppression rapide — puis enregistrez."
-"Recherche, filtre par date, prévisualisation, suppression rapide — puis "
-"enregistrer les modifications."
+msgstr ""
+"Recherche, filtre par date, aperçu des captures, suppression rapide — "
+"puis enregistrez.Recherche, filtre par date, prévisualisation, "
+"suppression rapide — puis enregistrer les modifications."
 
 #: website/web/templates/admin/editpost.html:66
 msgid "Title, description…"
@@ -5874,10 +5919,12 @@ msgstr "Téléverser une nouvelle capture (optionnel)"
 msgid ""
 "A private post is hidden from anonymous visitors, the API, the RSS feed "
 "and the MISP feed."
-msgstr "Un post privé est masqué aux visiteurs anonymes, à l'API, au flux RSS et au feed MISP."
+msgstr ""
+"Un post privé est masqué aux visiteurs anonymes, à l'API, au flux RSS et "
+"au feed MISP."
 
 #: website/web/templates/admin/editpost.html:175
-#: website/web/templates/admin/raas_group.html:88
+#: website/web/templates/admin/raas_group.html:90
 msgid "Save changes"
 msgstr "Enregistrer les modifications"
 
@@ -5934,69 +5981,88 @@ msgstr "Détails"
 msgid "Page %(page)s / %(total)s"
 msgstr "Page %(page)s / %(total)s"
 
-#: website/web/templates/admin/raas_group.html:9
+#: website/web/templates/admin/raas_group.html:10
 msgid ""
 "One block per published version of the affiliate terms. Marking a block "
 "current clears the flag on the others."
-msgstr "Un bloc par version publiée des conditions affiliés. Marquer un bloc comme actuel retire la marque des autres."
+msgstr ""
+"Un bloc par version publiée des conditions affiliés. Marquer un bloc "
+"comme actuel retire la marque des autres."
 
-#: website/web/templates/admin/raas_group.html:10
+#: website/web/templates/admin/raas_group.html:11
 msgid "Change group"
 msgstr "Changer de groupe"
 
-#: website/web/templates/admin/raas_group.html:11
+#: website/web/templates/admin/raas_group.html:12
 msgid "Public page"
 msgstr "Page publique"
 
-#: website/web/templates/admin/raas_group.html:21
+#: website/web/templates/admin/raas_group.html:23
 msgid "Add a version"
 msgstr "Ajouter une version"
 
-#: website/web/templates/admin/raas_group.html:26
-#: website/web/templates/admin/raas_group.html:59
+#: website/web/templates/admin/raas_group.html:28
+#: website/web/templates/admin/raas_group.html:61
 msgid "These are the current rules"
 msgstr "Ce sont les règles actuelles"
 
-#: website/web/templates/admin/raas_group.html:29
-#: website/web/templates/admin/raas_group.html:65
+#: website/web/templates/admin/raas_group.html:31
+#: website/web/templates/admin/raas_group.html:67
 msgid "Screenshots"
 msgstr "Captures d'écran"
 
-#: website/web/templates/admin/raas_group.html:40
+#: website/web/templates/admin/raas_group.html:42
 msgid "Current"
 msgstr "Actuelle"
 
-#: website/web/templates/admin/raas_group.html:45
+#: website/web/templates/admin/raas_group.html:47
 msgid "Rules (Markdown)"
 msgstr "Règles (Markdown)"
 
-#: website/web/templates/admin/raas_group.html:49
+#: website/web/templates/admin/raas_group.html:51
 msgid "Public comment"
 msgstr "Commentaire public"
 
-#: website/web/templates/admin/raas_group.html:53
+#: website/web/templates/admin/raas_group.html:55
 msgid "In force since (YYYY-MM-DD, optional)"
 msgstr "En vigueur depuis (AAAA-MM-JJ, optionnel)"
 
-#: website/web/templates/admin/raas_group.html:74
+#: website/web/templates/admin/raas_group.html:76
 msgid "Remove"
 msgstr "Retirer"
 
-#: website/web/templates/admin/raas_group.html:84
+#: website/web/templates/admin/raas_group.html:86
 msgid "Add screenshots"
 msgstr "Ajouter des captures"
 
-#: website/web/templates/admin/raas_group.html:91
+#: website/web/templates/admin/raas_group.html:93
 msgid "Delete this version"
 msgstr "Supprimer cette version"
 
-#: website/web/templates/admin/raas_group.html:96
+#: website/web/templates/admin/raas_group.html:98
 msgid "No rules recorded for this group yet."
 msgstr "Aucune règle enregistrée pour ce groupe."
 
-#: website/web/templates/admin/raas_select.html:8
-msgid "Pick the group whose affiliate rules you want to edit."
-msgstr "Choisissez le groupe dont vous voulez modifier les règles affiliés."
+#: website/web/templates/admin/raas_select.html:3
+msgid "Admin · RaaS Rules"
+msgstr "Admin · Règles RaaS"
+
+#: website/web/templates/admin/raas_select.html:11
+msgid "Pick the type, search, then confirm to edit the affiliate rules."
+msgstr "Choisissez le type, recherchez, puis confirmez pour modifier les règles affiliés."
+
+#: website/web/templates/admin/raas_select.html:72
+msgid "Versions"
+msgstr "Versions"
+
+#: website/web/templates/admin/raas_select.html:74
+msgid "Current set"
+msgstr "Jeu actuel"
+
+#: website/web/templates/admin/raas_select.html:83
+#: website/web/templates/admin/ransomnotes_group.html:87
+msgid "yes"
+msgstr "oui"
 
 #: website/web/templates/admin/ransomnotes_group.html:3
 #, python-format
@@ -6342,4 +6408,10 @@ msgstr "Existe"
 
 #~ msgid "Save configuration"
 #~ msgstr "Enregistrer la configuration"
+
+#~ msgid "programs documented."
+#~ msgstr "programmes documentés."
+
+#~ msgid "Pick the group whose affiliate rules you want to edit."
+#~ msgstr "Choisissez le groupe dont vous voulez modifier les règles affiliés."
 
