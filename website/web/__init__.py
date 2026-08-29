@@ -4109,8 +4109,28 @@ def _detach_group_data(database: int, name: str) -> dict[str, int]:
         counts["posts"] += 1
 
     # --- RaaS rules: removed, they describe this group and nothing else ------
-    counts["raas"] = raas_rules.count(key)
-    if counts["raas"]:
+    # Their screenshots go too, the way deleting a single block already removes
+    # them: leaving the tree behind would orphan it for good, since nothing else
+    # ever references source/raas/<group>/. Only names that passed safe_asset()
+    # are unlinked, and the directory is removed only once it is empty, so a
+    # stray file is left in place rather than destroyed.
+    raas_blocks = raas_rules.load(key)
+    counts["raas"] = len(raas_blocks)
+    if raas_blocks:
+        raas_base = raas_rules.asset_dir(key)
+        for raas_block in raas_blocks:
+            for image in raas_block.get("images") or []:
+                safe_image = raas_rules.safe_asset(image)
+                if raas_base and safe_image:
+                    try:
+                        os.remove(os.path.join(raas_base, safe_image))
+                    except OSError:
+                        pass
+        if raas_base:
+            try:
+                os.rmdir(raas_base)
+            except OSError:
+                pass
         raas_rules.save(key, [])
 
     # --- ransom notes: kept, detached ---------------------------------------
