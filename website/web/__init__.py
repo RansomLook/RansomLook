@@ -1386,11 +1386,8 @@ def about():  # type: ignore[no-untyped-def]
 
 def _first_logo(database: str, name: str) -> Optional[str]:
     """Return URL path to the first logo file for an entity, or None."""
-    root = os.path.normpath(os.path.join(str(get_homedir()), "source", "logo", database))
-    target = os.path.normpath(os.path.join(root, name))
-    if not (target == root or target.startswith(root + os.sep)):
-        return None
-    if not os.path.isdir(target):
+    target = _contained(os.path.join(str(get_homedir()), "source", "logo", database), name)
+    if target is None or not os.path.isdir(target):
         return None
     try:
         files = sorted(f for f in os.listdir(target) if os.path.isfile(os.path.join(target, f)))
@@ -1940,11 +1937,7 @@ def _analysis_dir(name: str) -> Optional[str]:
     safe = _safe_group_name(name)
     if not safe:
         return None
-    root = _analyses_root()
-    candidate = os.path.normpath(os.path.join(root, safe))
-    if not (candidate == root or candidate.startswith(root + os.sep)):
-        return None
-    return candidate
+    return _contained(_analyses_root(), safe)
 
 
 RESERVED_VARIANT_NAMES = {"assets", "pdf"}
@@ -2439,16 +2432,15 @@ def admin_group_analyses(name: str):  # type: ignore[no-untyped-def]
         base = _analysis_dir(name)
         if not base:
             abort(400)
-        base_abs = os.path.abspath(base)
         safe_new_id = os.path.basename(new_id)
         if safe_new_id != new_id:
             abort(400)
-        variant_dir = os.path.abspath(os.path.normpath(os.path.join(base_abs, safe_new_id)))
-        if os.path.commonpath([base_abs, variant_dir]) != base_abs:
+        variant_dir = _contained(base, safe_new_id)
+        if variant_dir is None:
             abort(400)
         os.makedirs(variant_dir, exist_ok=True)
-        md = os.path.abspath(os.path.normpath(os.path.join(variant_dir, "FULL_ANALYSIS.md")))
-        if os.path.commonpath([variant_dir, md]) != variant_dir:
+        md = _contained(variant_dir, "FULL_ANALYSIS.md")
+        if md is None:
             abort(400)
         if not os.path.isfile(md):
             dir_fd = os.open(variant_dir, os.O_RDONLY)
@@ -2560,9 +2552,13 @@ def admin_edit_analysis_variant(name: str, variant_url: str):  # type: ignore[no
     base = _analysis_dir(name)
     if not base:
         abort(400)
-    target_dir = base if not variant else os.path.join(base, variant)
+    target_dir = base if not variant else _contained(base, variant)
+    if target_dir is None:
+        abort(400)
     os.makedirs(target_dir, exist_ok=True)
-    target_md = os.path.join(target_dir, "FULL_ANALYSIS.md")
+    target_md = _contained(target_dir, "FULL_ANALYSIS.md")
+    if target_md is None:
+        abort(400)
 
     new_content: Optional[str] = None
     if form.upload.data and getattr(form.upload.data, "filename", ""):
@@ -2720,11 +2716,15 @@ def admin_upload_asset_variant(name: str, variant_url: str):  # type: ignore[no-
         return jsonify(ok=False, error="bad_dir"), 400
     os.makedirs(adir, exist_ok=True)
 
-    target = os.path.join(adir, safe)
+    target = _contained(adir, safe)
+    if target is None:
+        return jsonify(ok=False, error="bad_dir"), 400
     if os.path.exists(target):
         stem, ext = os.path.splitext(safe)
         safe = f"{stem}-{dt.now().strftime('%Y%m%d%H%M%S')}{ext}"
-        target = os.path.join(adir, safe)
+        target = _contained(adir, safe)
+        if target is None:
+            return jsonify(ok=False, error="bad_dir"), 400
     f.save(target)
     audit_log("analysis_asset_upload", name, f"variant={variant or '(root)'}; file={safe}; bytes={os.path.getsize(target)}")
     return jsonify(ok=True, filename=safe, snippet=f"![](assets/{safe})")
@@ -2744,9 +2744,8 @@ def admin_delete_analysis_variant(name: str, variant_url: str):  # type: ignore[
     if not v:
         flash(_("Nothing to delete for that variant"), "error")
         return redirect(url_for("admin_group_analyses", name=name))
-    target_dir = os.path.dirname(v["md_path"])
-    root = _analyses_root()
-    if not target_dir.startswith(root + os.sep):
+    target_dir = _contained(_analyses_root(), os.path.relpath(os.path.dirname(v["md_path"]), _analyses_root()))
+    if target_dir is None or target_dir == os.path.realpath(_analyses_root()):
         abort(400)
     try:
         for fn in ("FULL_ANALYSIS.md", "meta.json"):
@@ -3376,13 +3375,14 @@ def screenshot_thumb(file: str) -> Any:
     if not os.path.isfile(src):
         abort(404)
 
-    thumb_dir = os.path.join(base, "thumbs")
-    thumb_name = os.path.splitext(os.path.basename(file))[0] + ".jpg"
-    # Preserve subdirectory structure (for /screenshots/group/file.png)
-    sub = os.path.dirname(file)
-    if sub:
-        thumb_dir = os.path.join(thumb_dir, sub)
-    thumb_path = os.path.join(thumb_dir, thumb_name)
+    # Derive the thumbnail path from the validated `src`, never from the raw
+    # `file`: only src has been through _contained(), and the subdirectory
+    # structure is preserved either way (for /screenshots/group/file.png).
+    rel = os.path.relpath(src, base)
+    thumb_path = _contained(base, "thumbs", os.path.splitext(rel)[0] + ".jpg")
+    if thumb_path is None:
+        abort(403)
+    thumb_dir = os.path.dirname(thumb_path)
 
     # Regenerate thumb if source is newer (screenshots are refreshed at each scrape)
     stale = (
@@ -4239,13 +4239,15 @@ def _rename_blockers(database: int, old: str, new: str) -> list[str]:
             pass
 
     home = str(get_homedir())
+    # old_key comes straight from the URL, so it goes through _contained() like
+    # every other path built from a request value.
     paths = [
-        (os.path.join(home, "source", "screenshots", old_key), _("screenshots")),
-        (os.path.join(home, "source", old_key), _("torrent files and notes")),
-        (os.path.join(home, "source", "logo", "group", old_key), _("logo")),
+        (_contained(os.path.join(home, "source", "screenshots"), old_key), _("screenshots")),
+        (_contained(os.path.join(home, "source"), old_key), _("torrent files and notes")),
+        (_contained(os.path.join(home, "source", "logo", "group"), old_key), _("logo")),
     ]
     for path, label in paths:
-        if os.path.isdir(path):
+        if path and os.path.isdir(path):
             blockers.append(_("a %(label)s directory: %(path)s", label=label, path=path))
     if _misp_victim_events(old_key, first_only=True):
         blockers.append(_("victim events still in the MISP feed under that name"))
