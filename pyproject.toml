@@ -55,7 +55,7 @@ playwright = "^1.55.0"
 playwright-stealth = "^2.0.0"
 playwrightcapture = "^1.39.2"
 lacuscore = "^1.24.0"
-pylacus = "1.25.0"
+pylacus = "^1.26.0"
 # imaging / misc
 Pillow = "^12.2.0"
 WTForms = "^3.1.0"
