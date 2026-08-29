@@ -16,6 +16,7 @@ source/logo/**/**
 source/**/*.html
 source/**/*.torrent
 source/screenshots/*
+source/raas/*
 
 # Valkey runtime files
 cache/*.pid
