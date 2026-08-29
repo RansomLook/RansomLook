@@ -2152,8 +2152,8 @@ def _assets_dir(name: str, variant: Optional[str] = None) -> Optional[str]:
     if variant:
         if not _is_valid_variant(variant):
             return None
-        return os.path.join(base, variant, "assets")
-    return os.path.join(base, "assets")
+        return _contained(base, variant, "assets")
+    return _contained(base, "assets")
 
 
 def _rewrite_asset_urls(html: str, group_name: str, mode: str, variant: Optional[str] = None) -> str:
