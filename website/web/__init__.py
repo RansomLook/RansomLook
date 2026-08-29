@@ -4772,18 +4772,26 @@ def _raas_store_images(key: str, block: dict[str, Any]) -> tuple[int, int]:
             continue
         ext = os.path.splitext(uploaded.filename)[1].lower()
         # Deliberately not app.config["UPLOAD_EXTENSIONS"]: that list allows
-        # .svg, which the asset route refuses to serve — an SVG would land on
-        # disk and 404 forever — and it lacks .jpeg/.webp, which the route does
-        # serve. The two ends now agree, and SVG stays out of a tree whose files
-        # are served from the app origin.
+        # .svg, which is never served from this tree because an SVG executes
+        # script in the app origin. raas.ALLOWED_IMAGE_EXT is the single list
+        # both ends share, bounded by what validate_image() can return.
         if ext not in raas_rules.ALLOWED_IMAGE_EXT or ext != validate_image(uploaded.stream):  # type: ignore
             rejected += 1
             continue
-        os.makedirs(base, exist_ok=True)
-        name = secure_filename(os.path.splitext(uploaded.filename)[0]) or "screenshot"
+        # secure_filename does not truncate, and a 300-character stem overruns
+        # the 255-byte limit of most filesystems: uploaded.save() would raise
+        # ENAMETOOLONG outside any guard. Cap the stem and keep the whole write
+        # in a try, so a full disk or a refused write is counted rather than 500.
+        name = secure_filename(os.path.splitext(uploaded.filename)[0])[:80] or "screenshot"
         stored = f"{name}-{uuid4().hex[:8]}{ext}"
-        uploaded.stream.seek(0)
-        uploaded.save(os.path.join(base, stored))
+        try:
+            os.makedirs(base, exist_ok=True)
+            uploaded.stream.seek(0)
+            uploaded.save(os.path.join(base, stored))
+        except OSError:
+            app.logger.exception("raas: can not store %s for %s", stored, key)
+            rejected += 1
+            continue
         block.setdefault("images", []).append(stored)
         saved += 1
     return saved, rejected
