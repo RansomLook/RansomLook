@@ -24,7 +24,7 @@ import valkey
 
 from .default import DB_RAAS, get_socket_path
 from .default.config import get_homedir
-from .sharedutils import errlog, is_private_entity
+from .sharedutils import errlog, get_private_entity_names, is_private_entity
 
 # Screenshots live outside source/screenshots on purpose: that tree is served by
 # routes that perform no privacy check at all, so anything dropped there would
@@ -181,8 +181,11 @@ def sort_blocks(blocks: list[dict[str, Any]]) -> list[dict[str, Any]]:
         key=lambda b: str(b.get("started")),
         reverse=True,
     )
-    undated = sorted(rest, key=lambda b: str(b.get("created_at") or ""), reverse=True)
-    undated = [b for b in undated if not valid_started(b.get("started"))]
+    undated = sorted(
+        (b for b in rest if not valid_started(b.get("started"))),
+        key=lambda b: str(b.get("created_at") or ""),
+        reverse=True,
+    )
     return current + dated + undated
 
 
@@ -217,18 +220,22 @@ def set_current(blocks: list[dict[str, Any]], block_id: str) -> None:
         b["current"] = b.get("id") == block_id
 
 
-def public_groups(red: valkey.Valkey | None = None) -> list[str]:
-    """Group names holding at least one block, private entities excluded."""
-    return groups(include_private=False, red=red)
-
-
 def groups(include_private: bool = False, red: valkey.Valkey | None = None) -> list[str]:
+    """Group names holding at least one block, ordered case-insensitively.
+
+    The private set is fetched once rather than asking is_private_entity() per
+    group: that helper opens a connection to each of DB_GROUPS and DB_MARKETS on
+    every call, which on an unauthenticated index means 2N connections per
+    request. get_private_entity_names() answers in a single pass, the same way
+    iter_posts() does it.
+    """
     red = red or getdb()
+    private: set[str] = set() if include_private else get_private_entity_names()
     out = []
     try:
         for key in red.keys():  # type: ignore[union-attr]
             name = key.decode() if isinstance(key, (bytes, bytearray)) else str(key)
-            if not include_private and is_private_entity(name):
+            if name.lower() in private:
                 continue
             if load(name, red):
                 out.append(name)
