@@ -358,14 +358,21 @@ def _norm_telegram(v: str) -> str:
     return v
 
 
+# Match the host only, not the substring anywhere in the URL: the old
+# `"twitter.com/" in v` rewrote https://evil.tld/twitter.com/x into
+# https://evil.tld/x.com/x and mangled query strings that merely mentioned it.
+_X_HOST_RE = re.compile(r"^(https?://)?(www\.)?(mobile\.)?twitter\.com(?=[/?#]|$)", re.I)
+
+
 def _norm_x(v: str) -> str:
+    """Normalise an X / Twitter handle or URL to an https://x.com/ link."""
     v = (v or "").strip()
     if not v:
         return v
     if v.startswith("@"):
         return f"https://x.com/{v[1:]}"
-    if "twitter.com/" in v:
-        return v.replace("twitter.com", "x.com")
+    if _X_HOST_RE.match(v):
+        return _X_HOST_RE.sub("https://x.com", v, count=1)
     return v
 
 
@@ -1681,10 +1688,9 @@ def group(name: str):  # type: ignore[no-untyped-def]
             group = json.loads(red.get(key))  # type: ignore[arg-type]
             if not current_user.is_authenticated and "private" in group and group["private"] is True:
                 return redirect(url_for("home"))
-            base_path = os.path.normpath(str(get_homedir()) + "/source/logo/group/")
-            logofolder = os.path.normpath(os.path.join(base_path, name))
+            logofolder = _contained(str(get_homedir()) + "/source/logo/group/", name)
             logo = []
-            if not logofolder.startswith(base_path + os.sep) and logofolder != base_path:
+            if logofolder is None:
                 raise Exception("Invalid path")
             if os.path.exists(logofolder):
                 listlogo = [f for f in listdir(logofolder) if isfile(join(logofolder, f))]
@@ -2773,10 +2779,9 @@ def market(name: str):  # type: ignore[no-untyped-def]
             group = json.loads(red.get(key))  # type: ignore[arg-type]
             if not current_user.is_authenticated and "private" in group and group["private"] is True:
                 return redirect(url_for("home"))
-            base_path = os.path.normpath(str(get_homedir()) + "/source/logo/market/")
-            logofolder = os.path.normpath(os.path.join(base_path, name))
+            logofolder = _contained(str(get_homedir()) + "/source/logo/market/", name)
             logo = []
-            if not logofolder.startswith(base_path + os.sep) and logofolder != base_path:
+            if logofolder is None:
                 raise Exception("Invalid path")
             if os.path.exists(logofolder):
                 listlogo = [f for f in listdir(logofolder) if isfile(join(logofolder, f))]
@@ -3364,9 +3369,9 @@ _THUMB_SIZE = (280, 180)
 @app.route("/screenshots/thumb/<path:file>")
 def screenshot_thumb(file: str) -> Any:
     """Serve a small JPEG thumbnail of a screenshot. Generated on first request, cached on disk."""
-    base = os.path.normpath(os.path.join(str(get_homedir()), "source", "screenshots"))
-    src = os.path.normpath(os.path.join(base, file))
-    if not src.startswith(base + os.sep):
+    base = os.path.realpath(os.path.join(str(get_homedir()), "source", "screenshots"))
+    src = _contained(base, file)
+    if src is None or src == base:
         abort(403)
     if not os.path.isfile(src):
         abort(404)
@@ -3419,8 +3424,8 @@ def screenshotspost(group: str, file: str):  # type: ignore[no-untyped-def]
 @app.route("/logo/<database>/<group>/<file>")
 def logofile(database: str, group: str, file: str):  # type: ignore[no-untyped-def]
     base = os.path.join(str(get_homedir()), "source", "logo")
-    dirpath = os.path.normpath(os.path.join(base, database, group))
-    if not dirpath.startswith(base + os.sep):
+    dirpath = _contained(base, database, group)
+    if dirpath is None or dirpath == os.path.realpath(base):
         abort(403)
 
     filename = secure_filename(file)
@@ -3455,6 +3460,21 @@ def glossary():  # type: ignore[no-untyped-def]
 _AUDIT_RETENTION = 365  # days
 
 
+def _contained(base: str, *parts: Any) -> Optional[str]:
+    """Join `parts` under `base` and return the result only if it stays there.
+
+    realpath, not normpath: the lexical form removes "../" segments but follows
+    no symlink, so a link planted inside the tree walks straight out of it while
+    still passing a startswith() check. CodeQL says the same thing in its
+    py/path-injection guidance.
+    """
+    root = os.path.realpath(base)
+    target = os.path.realpath(os.path.join(root, *(str(p) for p in parts)))
+    if target != root and not target.startswith(root + os.sep):
+        return None
+    return target
+
+
 def _source_path(relative: Any) -> Optional[str]:
     """Resolve a stored path under ``source/``, or None when it escapes.
 
@@ -3463,11 +3483,7 @@ def _source_path(relative: Any) -> Optional[str]:
     """
     if not relative:
         return None
-    base = os.path.realpath(os.path.join(str(get_homedir()), "source"))
-    target = os.path.realpath(os.path.join(base, str(relative)))
-    if target != base and not target.startswith(base + os.sep):
-        return None
-    return target
+    return _contained(os.path.join(str(get_homedir()), "source"), relative)
 
 
 def audit_log(action: str, target: str, details: str = "") -> None:
@@ -4897,9 +4913,8 @@ def editlogo(database: int, name: str):  # type: ignore
         return render_template("admin.html")
     logo = namedtuple("logo", ["link"])
     logos = []
-    base_path = os.path.normpath(str(get_homedir()) + "/source/logo/" + dbvalue[int(database)])
-    logofolder = os.path.normpath(os.path.join(base_path, name))
-    if not logofolder.startswith(base_path + os.sep) and logofolder != base_path:
+    logofolder = _contained(str(get_homedir()) + "/source/logo/" + dbvalue[int(database)], name)
+    if logofolder is None:
         raise Exception("Invalid path")
     if os.path.exists(logofolder):
         listlogo = [f for f in listdir(logofolder) if isfile(join(logofolder, f))]
@@ -4998,9 +5013,8 @@ def addpostentry(database: int, name: str):  # type: ignore
                 flash(_("Error to add post to : %(name)s - Screen should be a PNG", name=name), "error")
                 return render_template("admin/addpostentry.html", form=form)
             filenamepng = createfile(form.title.data) + file_ext
-            base_path = os.path.normpath(str(get_homedir()) + "/source/screenshots")
-            path = os.path.normpath(os.path.join(base_path, name))
-            if not path.startswith(base_path + os.sep) and path != base_path:
+            path = _contained(str(get_homedir()) + "/source/screenshots", name)
+            if path is None:
                 raise Exception("Invalid path")
             if not os.path.exists(path):
                 os.mkdir(path)
@@ -5110,9 +5124,8 @@ def editpostentry(name: str):  # type: ignore
                     flash(_("Error to add post to : %(name)s - Screen should be a PNG", name=name), "error")
                     return render_template("admin/editpost.html", form=form)
                 filenamepng = createfile(post["post_title"]) + file_ext
-                base_path = os.path.normpath(str(get_homedir()) + "/source/screenshots")
-                path = os.path.normpath(os.path.join(base_path, name))
-                if not path.startswith(base_path + os.sep) and path != base_path:
+                path = _contained(str(get_homedir()) + "/source/screenshots", name)
+                if path is None:
                     flash(_("Invalid path: %(name)s", name=name), "error")
                     return render_template("admin/editpost.html", form=form)
                 if not os.path.exists(path):
