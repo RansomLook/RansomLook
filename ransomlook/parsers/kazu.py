@@ -1,210 +1,77 @@
 import json
 import os
-from typing import Any
+import re
 
 from ransomlook.default.logging import get_logger
 
 logger = get_logger(__name__)
 
+# The victim cards live in a JS array literal: `const platforms` since the site
+# split into /ransom.html and /databases.html, `const companies` before that.
+ARRAY = re.compile(r"const\s+(?:platforms|companies)\s*=\s*\[")
+# Every field we care about is a double-quoted string; `id` is a bare number
+# and is skipped, which is fine.
+FIELD = re.compile(r'(\w+)\s*:\s*("(?:[^"\\]|\\.)*")')
 
-def extract_companies_block(raw: str) -> str:
-    i = raw.find("const companies")
-    if i == -1:
-        raise ValueError("const companies not found")
-    j = raw.find("=", i)
-    k = raw.find("[", j)
-    if k == -1:
-        raise ValueError("No '[' after '='")
-    depth = 0
-    in_str = False
-    esc = False
-    quote = ""
-    for idx, ch in enumerate(raw[k:], start=k):
-        if in_str:
-            if esc:
-                esc = False
-            elif ch == "\\":
-                esc = True
-            elif ch == quote:
-                in_str = False
-        else:
-            if ch in ("'", '"'):
-                in_str = True
-                quote = ch
-            elif ch == "[":
-                depth += 1
-            elif ch == "]":
-                depth -= 1
-                if depth == 0:
-                    return raw[k : idx + 1]
-    raise ValueError("']' final not found")
+FACTS = (("ransom", "Ransom"), ("price", "Price"), ("size", "Size"),
+         ("record", "Records"), ("expires", "Expires"), ("dumpDate", "Dump date"))
 
 
-def jsarray_to_json(js: str) -> str:
-    out = []
-    i = 0
-    n = len(js)
-    in_str = False
-    esc = False
-    quote = ""
-    while i < n:
-        ch = js[i]
-        if in_str:
-            out.append(ch)
-            if esc:
-                esc = False
-            elif ch == "\\":
-                esc = True
-            elif ch == quote:
-                in_str = False
-            i += 1
-        else:
-            if ch in ("'", '"'):
-                in_str = True
-                quote = ch
-                out.append(ch)
-                i += 1
-            elif ch == "/" and i + 1 < n and js[i + 1] in ("/", "*"):
-                if js[i + 1] == "/":
-                    i += 2
-                    while i < n and js[i] not in "\r\n":
-                        i += 1
-                else:
-                    i += 2
-                    while i + 1 < n and not (js[i] == "*" and js[i + 1] == "/"):
-                        i += 1
-                    i += 2
-            else:
-                out.append(ch)
-                i += 1
-    s = "".join(out)
+def cards(raw: str) -> list[dict[str, str]]:
+    """Fields of every card in the array, without parsing JavaScript.
 
-    out = []
-    i = 0
-    n = len(s)
-    in_str = False
-    esc = False
-    quote = ""
-    while i < n:
-        ch = s[i]
-        if in_str:
-            out.append(ch)
-            if esc:
-                esc = False
-            elif ch == "\\":
-                esc = True
-            elif ch == quote:
-                in_str = False
-            i += 1
-        else:
-            if ch in ("'", '"'):
-                in_str = True
-                quote = ch
-                out.append(ch)
-                i += 1
-            elif ch in "{,":
-                out.append(ch)
-                i += 1
-                while i < n and s[i].isspace():
-                    out.append(s[i])
-                    i += 1
-                j = i
-                if j < n and (s[j].isalpha() or s[j] == "_"):
-                    j += 1
-                    while j < n and (s[j].isalnum() or s[j] == "_"):
-                        j += 1
-                    k = j
-                    while k < n and s[k].isspace():
-                        k += 1
-                    if k < n and s[k] == ":":
-                        key = s[i:j]
-                        out.append('"' + key + '":')
-                        i = k + 1
-                        continue
-            else:
-                out.append(ch)
-                i += 1
-    s = "".join(out)
-
-    out = []
-    in_str = False
-    esc = False
-    quote = ""
-    prev: list[str] = []
-    for ch in s:
-        if in_str:
-            out.append(ch)
-            if esc:
-                esc = False
-            elif ch == "\\":
-                esc = True
-            elif ch == quote:
-                in_str = False
-        else:
-            if ch in ("'", '"'):
-                in_str = True
-                quote = ch
-                out.append(ch)
-            elif ch in "}]":
-                t = len(out) - 1
-                while t >= 0 and out[t].isspace():
-                    t -= 1
-                if t >= 0 and out[t] == ",":
-                    del out[t]
-                out.append(ch)
-            else:
-                out.append(ch)
-    s = "".join(out)
-
-    out = []
-    in_str = False
-    esc = False
-    quote = ""
-    for ch in s:
-        code = ord(ch)
-        if in_str:
-            if esc:
-                out.append(ch)
-                esc = False
-            else:
-                if ch == "\\":
-                    out.append(ch)
-                    esc = True
-                elif ch == quote:
-                    out.append(ch)
-                    in_str = False
-                else:
-                    out.append("\\u%04x" % code if code < 0x20 else ch)
-        else:
-            if ch in ("'", '"'):
-                in_str = True
-                quote = ch
-                out.append(ch)
-            else:
-                out.append(ch if code >= 0x20 or ch in "\t\n\r" else " ")
-    return "".join(out)
+    A key that shows up twice means the previous card ended, which is enough to
+    split them: no need to balance braces or quote keys.
+    """
+    match = ARRAY.search(raw)
+    if not match:
+        return []
+    block = raw[match.end(): raw.find("];", match.end())]
+    out: list[dict[str, str]] = []
+    card: dict[str, str] = {}
+    for key, value in FIELD.findall(block):
+        if key in card:
+            out.append(card)
+            card = {}
+        try:
+            card[key] = json.loads(value)
+        except ValueError:
+            continue
+    if card:
+        out.append(card)
+    return out
 
 
-def parse_file(path: str) -> Any:
-    with open(path, encoding="utf-8", errors="replace") as f:
-        raw = f.read().lstrip("\ufeff")
-    block = extract_companies_block(raw)
-    json_text = jsarray_to_json(block)
-    data = json.loads(json_text)
-    return data
+def describe(card: dict[str, str]) -> str:
+    """Description plus the sale/ransom facts printed on the card."""
+    text = card.get("description", "").strip()
+    facts = [f"{label}: {card[key].strip()}" for key, label in FACTS if card.get(key, "").strip()]
+    if facts:
+        text = (text + "\n\n" if text else "") + " | ".join(facts)
+    return text
 
 
 def main() -> list[dict[str, str]]:
-    list_div = []
+    entries: dict[str, dict[str, str]] = {}
 
-    for filename in os.listdir("source"):
+    for filename in sorted(os.listdir("source")):
+        if not filename.startswith(__name__.split(".")[-1] + "-"):
+            continue
         try:
-            if filename.startswith(__name__.split(".")[-1] + "-"):
-                html_doc = "source/" + filename
-                data = parse_file(html_doc)
-                for entry in data:
-                    list_div.append({"title": entry["name"], "description": entry["description"]})
+            with open("source/" + filename, encoding="utf-8", errors="replace") as file:
+                found = cards(file.read())
         except Exception:
             logger.debug("Failed during : " + filename)
+            continue
+        for card in found:
+            # `title` since the redesign, `name` on the old layout.
+            title = (card.get("title") or card.get("name") or "").strip()
+            if not title:
+                continue
+            # No link: a card opens a modal, and its `link` field points at the
+            # victim's own site, which must never become a capture target.
+            entries[title] = {"title": title, "description": describe(card), "slug": filename}
+
+    list_div = list(entries.values())
     logger.debug(list_div)
     return list_div
