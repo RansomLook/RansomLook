@@ -1,5 +1,5 @@
-import json
 import os
+import re
 
 from bs4 import BeautifulSoup
 
@@ -7,8 +7,13 @@ from ransomlook.default.logging import get_logger
 
 logger = get_logger(__name__)
 
+# Publication cards link to /<uuid> at the site root (they used to live under
+# /publications/details/<id>).
+UUID_HREF = re.compile(r"^/[0-9a-f]{8}(-[0-9a-f]{4}){3}-[0-9a-f]{12}$")
+
 
 def main() -> list[dict[str, str]]:
+
     list_div = []
 
     for filename in os.listdir("source"):
@@ -17,24 +22,16 @@ def main() -> list[dict[str, str]]:
                 html_doc = "source/" + filename
                 file = open(html_doc, encoding="utf-8")
                 soup = BeautifulSoup(file, "html.parser")
-                if "-publication" not in filename:
-                    divs_name = soup.find_all("div", {"class": "col-4"})
-                    for div in divs_name:
-                        try:
-                            title = div.find("p", {"class": "css-1jxwgxh"}).text.strip()
+                for card in soup.find_all("a", href=UUID_HREF):
+                    try:
+                        texts = [p.text.strip() for p in card.find_all("p")]
+                        description = texts[2] if len(texts) > 2 else ""
+                        if description.rstrip(":").lower() in ("revenue", "category"):
                             description = ""
-                            link = div.find("a")["href"]
-                            list_div.append({"title": title, "description": description, "link": link, "slug": filename})
-                        except Exception:
-                            continue
-                else:
-                    jsonpart = soup.pre.contents  # type: ignore
-                    data = json.loads(jsonpart[0])  # type: ignore
-                    for entry in data:
-                        title = entry["company"].strip()
-                        description = entry["description"].strip()
-                        link = "/publications/details/" + entry["id"]
-                        list_div.append({"title": title, "description": description, "link": link, "slug": filename})
+                        list_div.append({"title": texts[1], "description": description,
+                                         "link": card["href"], "slug": filename})
+                    except Exception:
+                        logger.debug("Failed entry in : " + filename)
                 file.close()
         except Exception:
             logger.debug("Failed during : " + filename)
