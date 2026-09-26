@@ -16,23 +16,19 @@ def main() -> list[dict[str, str]]:
                 html_doc = "source/" + filename
                 file = open(html_doc, encoding="utf-8")
                 soup = BeautifulSoup(file, "html.parser")
-                cards = soup.find_all("div", {"class": "lt-card"})
+                cards = soup.find_all("div", {"class": "glow-card"})
                 for card in cards:
-                    name_elem = card.find("span", {"class": "lt-card-name"})
-                    title = name_elem.get_text(strip=True)
-                    memo_elem = card.find("p", {"class": "lt-card-memo"})
-                    description = memo_elem.get_text(strip=True) if memo_elem else ""
-                    file_link = ""
-                    links = card.find_all("a")
-                    for link in links:
-                        if "Files" in link.get_text():
-                            file_link = link.get("href", "")
-                            break
+                    name_elem = card.find("h2", {"class": "company-name"})
+                    title = name_elem.text.strip() if name_elem else ""
+                    desc_elem = card.find("p", {"class": "description"})
+                    description = desc_elem.text.strip() if desc_elem else ""
+                    sample_btn = card.find("a", {"class": "sample-btn"})
+                    link = sample_btn.get("href", "") if sample_btn else ""
                     if title:
                         list_div.append({
                             "title": title,
                             "description": description,
-                            "link": file_link,
+                            "link": link,
                             "slug": filename
                         })
                 file.close()
