@@ -7,6 +7,8 @@ from ransomlook.default.logging import get_logger
 
 logger = get_logger(__name__)
 
+BASE = "http://shibaitobajtr6yctvrijfitnugfulkmprrqbmu2ysk3zyzx2ufe3yqd.onion"
+
 
 def main() -> list[dict[str, str]]:
     list_div = []
@@ -31,10 +33,12 @@ def main() -> list[dict[str, str]]:
                     description = entry.get("description", "").strip()
                     if header:
                         description = header + "\n" + description if description else header
+                    cid = entry.get("id", "")
+                    link = BASE + "/?company=" + cid if cid else entry.get("website", "")
                     list_div.append({
                         "title": title,
                         "description": description,
-                        "link": entry.get("website", ""),
+                        "link": link,
                         "slug": filename,
                     })
         except Exception:
