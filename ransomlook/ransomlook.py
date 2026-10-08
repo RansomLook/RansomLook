@@ -420,34 +420,54 @@ def screen() -> None:
     uuids = []
     slugs = []
     stdlog("Enqueuing captures...")
+    # Links pointing at a raw file (archive/dump) must never be "screenshotted":
+    # Lacus would download them over Tor. The link field is meant to be a page.
+    raw_file_ext = (".zip", ".7z", ".rar", ".tar", ".gz", ".tgz", ".torrent", ".jsonl", ".csv")
     for capture in captures:
-        group = json.loads(redgroup.get(capture["group"].encode()))  # type: ignore[arg-type]
-        for host in group["locations"]:
-            try:
-                if capture["slug"].removeprefix(capture["group"] + "-").split(".")[0] in striptld(host["slug"]):
-                    if "private" in host and host["private"] is True:
-                        continue
-                    capture.update({"slug2": urllib.parse.urljoin(host["slug"], str(capture["link"]))})
-                    if capture["slug2"] not in slugs:
-                        slugs.append(capture["slug2"])
-                        settings: dict[str, Any] = {
-                            "url": capture["slug2"],
-                            "general_timeout_in_sec": 90,
-                            "max_retries": 1,
-                        }
-                        if "header" in host:
-                            settings["headers"] = host["header"]
-                        if "browser" in host and host["browser"] is not None:
-                            settings["browser"] = host["browser"]
-                        if "init_script" in host and host["init_script"] is not None:
-                            settings["init_script"] = host["init_script"]
-                        uuid = lacus.enqueue(settings=settings)
-                        capture.update({"uuid": uuid})
-                        uuids.append(uuid)
-                        stdlog("Enqueued: %s → %s" % (capture["group"], capture["slug2"]))
-            except Exception:
-                logger.debug("capture group: %s", capture["group"].encode())
-                logger.debug("capture slug: %s", capture["slug"])
+        try:
+            g = redgroup.get(capture["group"].encode())
+            if g is None:
+                continue
+            group = json.loads(g)
+            link = capture.get("link")
+            if not link:
+                continue
+            if str(link).lower().split("?")[0].endswith(raw_file_ext):
+                continue
+            locs = group.get("locations") or []
+            if not locs:
+                continue
+            # Screenshot target: prefer a public location (it renders the display
+            # page), but fall back to a private one so a fully-private group is
+            # still captured. The parse source may be a private mirror (e.g. a
+            # private .json) while the onion /blog of the same group is public.
+            public_hosts = [h for h in locs if h.get("private") is not True]
+            host = public_hosts[0] if public_hosts else locs[0]
+            if str(link).startswith("http"):
+                slug2 = str(link)  # an absolute link self-identifies its host
+            else:
+                slug2 = urllib.parse.urljoin(host["slug"], str(link))
+            if slug2 in slugs:
+                continue
+            slugs.append(slug2)
+            settings: dict[str, Any] = {
+                "url": slug2,
+                "general_timeout_in_sec": 90,
+                "max_retries": 1,
+            }
+            if "header" in host:
+                settings["headers"] = host["header"]
+            if host.get("browser") is not None:
+                settings["browser"] = host["browser"]
+            if host.get("init_script") is not None:
+                settings["init_script"] = host["init_script"]
+            uuid = lacus.enqueue(settings=settings)
+            capture.update({"uuid": uuid, "slug2": slug2})
+            uuids.append(uuid)
+            stdlog("Enqueued: %s → %s" % (capture["group"], slug2))
+        except Exception:
+            logger.debug("capture group: %s", capture.get("group"))
+            logger.debug("capture slug: %s", capture.get("slug"))
 
     stdlog("Enqueued %s captures" % len(uuids))
     if not remote_lacus_url:

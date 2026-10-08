@@ -118,13 +118,17 @@ def appender(entry: dict[str, Any] | str, group_name: str) -> int:
     posts.append(newpost)
     red.set(group_name, json.dumps(posts))
     # preparing to screen
+    slug = entry.get("slug") if isinstance(entry, dict) else None
     if link is not None and link != "" and not screen:
         screenred = _get_red(DB_TASKS)
         if b"toscan" not in screenred.keys():  # type: ignore[operator]
             toscan = []
         else:
             toscan = json.loads(screenred.get("toscan"))  # type: ignore[arg-type]
-        toscan.append({"group": group_name, "title": entry["title"], "slug": entry["slug"], "link": entry["link"]})  # type: ignore[index]
+        # Use the already-validated local vars (post_title/link) rather than
+        # re-reading entry keys: a parser that omits "slug"/"link" used to raise
+        # KeyError here, and a None slug later crashed screen() on removeprefix.
+        toscan.append({"group": group_name, "title": post_title, "slug": slug, "link": link})
         screenred.set("toscan", json.dumps(toscan))
     # preparing to torrent
     if magnet is not None and magnet != "":
