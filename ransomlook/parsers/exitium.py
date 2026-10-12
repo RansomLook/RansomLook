@@ -13,12 +13,13 @@ def main() -> list[dict[str, str]]:
     Parser for the Exitium ransomware DLS.
 
     Victims are rendered server-side as div.target-card elements inside
-    #targetGrid. Two states:
-    - .pending: countdown active, not yet published
-    - .clickable-card: published, has data-zip download link
+    #targetGrid. Each card carries its data in attributes:
+    - data-title  : victim name
+    - data-text   : description (website / exfil summary)
+    - data-date   : publish date (ISO 8601)
+    - data-zip    : download link (may be empty)
 
-    Data is in the HTML directly (h3.target-title, p.target-text,
-    data-publish-date, data-zip attributes).
+    DOM fallbacks: span.card-name (title), p.target-text (description).
     """
     list_posts = []
     parser_name = __name__.split(".")[-1]  # 'exitium'
@@ -40,14 +41,11 @@ def main() -> list[dict[str, str]]:
             continue
 
         for card in grid.find_all("div", class_="target-card"):  # type: ignore[union-attr]
-            title_tag = card.find("h3", class_="target-title")
-            if not title_tag:
-                continue
-            name = title_tag.get_text(strip=True)
-            # Remove the crosshairs icon text if present
-            for icon in title_tag.find_all("i"):
-                icon.decompose()
-            name = title_tag.get_text(strip=True)
+            name = (card.get("data-title") or "").strip()
+            if not name:
+                span = card.find("span", class_="card-name")
+                if span:
+                    name = span.get_text(strip=True)
             if not name:
                 continue
 
@@ -58,9 +56,13 @@ def main() -> list[dict[str, str]]:
             }
 
             # Description
-            desc_tag = card.find("p", class_="target-text")
-            if desc_tag:
-                post["description"] = desc_tag.get_text(strip=True)
+            desc = (card.get("data-text") or "").strip()
+            if not desc:
+                desc_tag = card.find("p", class_="target-text")
+                if desc_tag:
+                    desc = desc_tag.get_text(strip=True)
+            if desc:
+                post["description"] = desc
 
             list_posts.append(post)
 
