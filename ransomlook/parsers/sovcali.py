@@ -5,7 +5,7 @@ from ransomlook.default.logging import get_logger
 
 logger = get_logger(__name__)
 
-POST = re.compile(r'cat\s*:\s*"([^"]*)".*?excerpt\s*:\s*"((?:[^"\\]|\\.)*)"', re.DOTALL)
+POST = re.compile(r'title\s*:\s*"((?:[^"\\]|\\.)*)".*?excerpt\s*:\s*"((?:[^"\\]|\\.)*)"', re.DOTALL)
 
 
 def main() -> list[dict[str, str]]:
