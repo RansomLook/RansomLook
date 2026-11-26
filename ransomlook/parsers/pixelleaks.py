@@ -16,8 +16,13 @@ def main() -> list[dict[str, str]]:
     Parser for the PixelLeaks DLS (server-rendered).
 
     Victims are article.lg-entry cards in the "Disclosures" and "Leaks" tabs
-    (div.lg-name, div.lg-ctx, hidden div.lgm-data with the summary). The
-    "Upcoming" tab only lists anonymous teasers ("Unnamed") and is skipped.
+    (div.lg-name, div.lg-ctx, hidden div.lgm-data with the summary).
+
+    The "Upcoming Disclosures" tab lists anonymous teasers (article.lg-up, name
+    masked as "Name upcoming") with only a sector (div.lg-up-what), a country
+    (div.lg-up-due) and a countdown (div.lg-up-clock[data-deadline]). They are
+    added using the sector as title; they carry no per-card anchor so no link
+    (screenshot) is emitted for them.
 
     Screenshots: link is '#Name' — the init_script switches to the card's tab
     and clicks it to open the details modal. The /dl/<id> archive links are
@@ -69,6 +74,35 @@ def main() -> list[dict[str, str]]:
                     )
                 except Exception as e:
                     logger.error("Error parsing entry in %s: %s", filename, e)
+
+            for card in soup.find_all("article", class_="lg-up"):
+                try:
+                    what = card.find("div", class_="lg-up-what")
+                    title = what.get_text(" ", strip=True) if what else ""
+                    if not title:
+                        continue
+
+                    parts = ["[Upcoming disclosure]"]
+                    due = card.find("div", class_="lg-up-due")
+                    if due and due.get_text(strip=True):
+                        parts.append("Country: " + due.get_text(" ", strip=True))
+                    timer = card.find(attrs={"data-deadline": True})
+                    if timer:
+                        try:
+                            ts = datetime.fromtimestamp(int(str(timer["data-deadline"])), tz=timezone.utc)
+                            parts.append("Full data leak: " + ts.strftime("%Y-%m-%d %H:%M UTC"))
+                        except ValueError:
+                            pass
+
+                    list_div.append(
+                        {
+                            "title": title,
+                            "description": "\n".join(parts),
+                            "slug": filename,
+                        }
+                    )
+                except Exception as e:
+                    logger.error("Error parsing upcoming entry in %s: %s", filename, e)
 
         except Exception as e:
             logger.error("Error parsing %s: %s", filename, e)
